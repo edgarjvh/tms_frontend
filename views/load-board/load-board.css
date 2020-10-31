@@ -1,0 +1,70 @@
+.load-board-container {
+  width: 100%;
+  height: 100%;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.load-board-container .load-board-content {
+  width: 100%;
+  flex-grow: 1;
+  background-color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+.load-board-container .load-board-content .load-board-wrapper {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: inherit;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content .form-section {
+  flex-grow: 1;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content .form-section:not(:first-child) {
+  margin-top: 10px;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content .live-row-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 0;
+  align-items: center;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content .live-row-section .mochi-button {
+  display: flex;
+  width: unset;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content .live-row-section .input-checkbox-container {
+  display: flex;
+  align-items: center;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content .live-row-section .input-checkbox-container label {
+  margin: 0;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.load-board-container .load-board-content .load-board-wrapper .live-row-content .live-col-content .live-row-section .input-checkbox-container input {
+  margin-left: 5px;
+}

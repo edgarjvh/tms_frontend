@@ -1,0 +1,338 @@
+.panel-close-btn {
+  z-index: 2;
+}
+.panel-contact-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+.panel-contact-container .contact-list-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+.panel-contact-container .contact-list-container .contact-list-content {
+  flex-grow: 1;
+  position: relative;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  left: -5px;
+  padding-left: 5px;
+  overflow: auto;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-header-item {
+  font-size: 2.5rem;
+  font-weight: normal;
+  font-family: "Mochi Light";
+  margin: 10px 0;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item:hover .contact-name-item {
+  font-weight: bold !important;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item {
+  display: flex;
+  flex-direction: row;
+  margin: 10px 0;
+  cursor: pointer;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .hidden {
+  display: none;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-image-item {
+  min-width: 50px;
+  min-height: 50px;
+  max-width: 50px;
+  max-height: 50px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-right: 10px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-name-item {
+  font-style: italic;
+  font-weight: normal;
+  font-family: "Mochi Light";
+  font-size: 0.9rem;
+  transition: ease 0.2s;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-status-item {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-status-item.online {
+  background-color: green;
+}
+.panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-status-item.offline {
+  background-color: red;
+}
+.panel-contact-container .contact-list-container #customer-contacts-add-contact-btn {
+  margin: 20px 0 0 0 !important;
+}
+.panel-contact-container .contact-info-container {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+  margin-left: 5px;
+}
+.panel-contact-container .contact-info-container .contact-info-container-wrapper {
+  position: absolute;
+  width: calc(100% + 10px);
+  height: calc(100% + 94px);
+  z-index: 1;
+  left: 0;
+  padding-left: 20px;
+  padding-top: 40px;
+  padding-right: 10px;
+  top: -84px;
+  background-color: #efefef;
+  display: flex;
+  flex-direction: column;
+}
+.panel-contact-container .contact-info-container .contact-info-header {
+  display: flex;
+  flex-direction: row;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image {
+  min-width: 200px;
+  max-width: 200px;
+  min-height: 200px;
+  max-height: 200px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-right: 30px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+  border-radius: 50% 0 50% 50%;
+  position: relative;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .avatar-container {
+  overflow: hidden;
+  border-radius: 50% 0 50% 50%;
+  width: 100%;
+  height: 100%;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .avatar-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-avatar-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  cursor: pointer;
+  display: none;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-avatar-btn span {
+  font-size: 18px;
+  transition: ease 0.2s;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-avatar-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: pointer;
+  display: none;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-avatar-btn span {
+  font-size: 28px;
+  transition: ease 0.2s;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-avatar-btn:hover span,
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-avatar-btn:hover span {
+  color: rgba(0, 0, 0, 0.5);
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-top: -3px;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-name {
+  text-transform: uppercase;
+  font-family: 'Mochi Light';
+  font-size: 2.5rem;
+  line-height: 0.1rem;
+  margin-top: -30px;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-info-header-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-info-header-buttons .mochi-button {
+  font-size: 1rem;
+  text-align: right !important;
+  padding-right: 5px;
+  pointer-events: none;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-info-header-buttons .mochi-button .mochi-button-base {
+  color: rgba(124, 16, 8, 0.5);
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  font-family: 'Mochi Light';
+  font-style: italic;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding-left: 3px;
+}
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div {
+  margin-right: 20px;
+}
+.panel-contact-container .contact-info-container .contact-info-form {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+.panel-contact-container .contact-info-container .contact-info-form .hidden {
+  display: none !important;
+}
+.panel-contact-container .contact-info-container .contact-info-form .contact-info-row {
+  margin-bottom: 15px;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+.panel-contact-container .contact-info-container .contact-info-form .contact-info-row label {
+  margin: 0;
+  font-family: 'lato', sans-serif;
+  font-style: italic;
+  font-weight: bold;
+  pointer-events: none;
+}
+.panel-contact-container .contact-info-container .contact-info-form .contact-info-row input {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  border-bottom: 0;
+  background-color: transparent;
+  font-family: 'Mochi Light';
+  pointer-events: none;
+}
+.panel-contact-container .contact-info-container .contact-info-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px 10px;
+}
+.panel-contact-container .contact-info-container .contact-info-footer span {
+  cursor: pointer;
+}
+.panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-contacts-save {
+  display: none;
+}
+.panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-contacts-edit {
+  pointer-events: none;
+  color: rgba(0, 0, 0, 0.3);
+}
+.panel-contact-container .contact-info-container.showing span.btn-panel-contacts-save {
+  display: none;
+}
+.panel-contact-container .contact-info-container.showing span.btn-panel-contacts-edit {
+  display: unset;
+  pointer-events: all;
+  color: #000000;
+  transition: ease color 0.3s;
+}
+.panel-contact-container .contact-info-container.showing span.btn-panel-contacts-edit:hover {
+  color: rgba(0, 0, 0, 0.5);
+}
+.panel-contact-container .contact-info-container.showing .input-toggle-container input,
+.panel-contact-container .contact-info-container.showing .input-toggle-container label {
+  pointer-events: none;
+}
+.panel-contact-container .contact-info-container.showing .upload-avatar-btn,
+.panel-contact-container .contact-info-container.showing .remove-avatar-btn {
+  pointer-events: none;
+  color: rgba(0, 0, 0, 0.5);
+}
+.panel-contact-container .contact-info-container.showing .contact-info-header-data .mochi-button {
+  pointer-events: all !important;
+}
+.panel-contact-container .contact-info-container.showing .contact-info-header-data .mochi-button .mochi-button-base {
+  color: #7c1008 !important;
+}
+.panel-contact-container .contact-info-container.editing .contact-info-header-data .mochi-button {
+  pointer-events: all !important;
+}
+.panel-contact-container .contact-info-container.editing .contact-info-header-data .mochi-button .mochi-button-base {
+  color: #7c1008 !important;
+}
+.panel-contact-container .contact-info-container.adding .contact-info-header-data .mochi-button {
+  pointer-events: none;
+}
+.panel-contact-container .contact-info-container.adding .contact-info-header-data .mochi-button .mochi-button-base {
+  color: rgba(124, 16, 8, 0.5);
+}
+.panel-contact-container .contact-info-container.editing span.btn-panel-contacts-save,
+.panel-contact-container .contact-info-container.adding span.btn-panel-contacts-save {
+  display: unset;
+}
+.panel-contact-container .contact-info-container.editing span.btn-panel-contacts-edit,
+.panel-contact-container .contact-info-container.adding span.btn-panel-contacts-edit {
+  display: none;
+}
+.panel-contact-container .contact-info-container.editing .contact-info-row input,
+.panel-contact-container .contact-info-container.adding .contact-info-row input {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  pointer-events: all;
+}
+.panel-contact-container .contact-info-container.editing .input-toggle-container input,
+.panel-contact-container .contact-info-container.adding .input-toggle-container input,
+.panel-contact-container .contact-info-container.editing .input-toggle-container label,
+.panel-contact-container .contact-info-container.adding .input-toggle-container label {
+  pointer-events: all;
+}
+.panel-contact-container .contact-info-container.editing .upload-avatar-btn,
+.panel-contact-container .contact-info-container.adding .upload-avatar-btn,
+.panel-contact-container .contact-info-container.editing .remove-avatar-btn,
+.panel-contact-container .contact-info-container.adding .remove-avatar-btn {
+  pointer-events: all;
+  color: #000000;
+}
+.panel-contact-container .contact-info-container::after {
+  z-index: 0;
+  content: "";
+  position: absolute;
+  -webkit-box-shadow: 0 0 10px 5px #000000;
+  -moz-box-shadow: 0 0 10px 5px #000000;
+  box-shadow: 0 0 10px 5px #000000;
+  height: calc(95% + 84px);
+  left: 7px;
+  right: 10%;
+  width: 3px;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  top: 45%;
+  transform: translateY(-50%);
+}

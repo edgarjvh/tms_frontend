@@ -1,0 +1,72 @@
+#panel-carrier-docs .input-box-container {
+  margin: 0;
+}
+#panel-carrier-docs .header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+#panel-carrier-docs .header .input-fields-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+#panel-carrier-docs .header .input-fields-section > .separator {
+  margin: 2px 0;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container {
+  flex-grow: 1;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.medium-size {
+  max-width: 100px;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.fixed-size {
+  max-width: 270px;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields > .separator {
+  margin: 0 1px;
+  width: 0;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields:first-child {
+  justify-content: flex-start;
+}
+#panel-carrier-docs .header .buttons-section {
+  width: 120px;
+  margin-left: 5px;
+}
+#panel-carrier-docs .header .buttons-section .mochi-button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#panel-carrier-docs .header .buttons-section .mochi-button .mochi-button-base {
+  font-size: 0.9rem;
+  text-align: center;
+  flex-grow: 1;
+  white-space: normal;
+  line-height: 14px;
+  font-weight: normal;
+}
+#panel-carrier-docs .row-content {
+  display: flex;
+  flex-direction: row;
+  margin: 3px 0;
+  height: 200px;
+}
+#panel-carrier-docs .row-content > .separator {
+  margin: 0 3px;
+}
+#panel-carrier-docs .row-content.growed {
+  flex-grow: 1;
+}
+#panel-carrier-docs .form-section {
+  margin: 0;
+}

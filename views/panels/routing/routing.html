@@ -1,0 +1,242 @@
+<div class="panel stacked not-stacked" id="panel-routing">
+    <div class="panel-content">
+        <div class="panel-close-btn">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="mochi-header">
+            <div class="mochi-header-content">
+                Routing
+            </div>
+        </div>
+
+        <div class="panel-routing-content">
+            <div class="routing-row-content">
+                <div class="first">
+                    <div class="input-box-container ">
+                        <input required type="text" id="txt-panel-routing-agent-number"
+                            name="txt-panel-routing-agent-number" title="Agent / Employee Number">
+                        <label for="txt-panel-routing-agent-number">A/E Number</label>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="input-box-container ">
+                        <input required type="text" id="txt-panel-routing-order-number"
+                            name="txt-panel-routing-order-number" title="Order Number">
+                        <label for="txt-panel-routing-order-number">Order Number</label>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="input-box-container ">
+                        <input required type="text" id="txt-panel-routing-trip-number"
+                            name="txt-panel-routing-trip-number" title="Trip Number">
+                        <label for="txt-panel-routing-trip-number">Trip Number</label>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="input-box-container ">
+                        <input required type="text" id="txt-panel-routing-miles" name="txt-panel-routing-miles"
+                            title="Miles">
+                        <label for="txt-panel-routing-miles">Miles</label>
+                    </div>
+                </div>
+
+                <div class="second">
+                    <div class="form-section" id="frm-panel-routing-pick-ups">
+                        <div class="top-border-section">
+                            <div class="left-border"></div>
+                            <div class="section-title">Pick Ups</div>
+                            <div class="middle-border"></div>
+                            <div class="right-border"></div>
+                        </div>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="form-section">
+                        <div class="top-border-section">
+                            <div class="left-border"></div>
+                            <div class="section-title">Carrier</div>
+                            <div class="middle-border"></div>
+                            <div class="section-btn">
+                                <div class="mochi-button text-center" id="panel-routing-carrier-info-btn">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Carrier Info
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                            <div class="right-border"></div>
+                        </div>
+
+                        <div class="row-section">
+                            <div class="input-box-container code">
+                                <input required type="text" id="txt-panel-routing-carrier-code"
+                                    name="txt-panel-routing-carrier-code" title="carrier-Code">
+                                <label for="txt-panel-routing-carrier-code">Code</label>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-panel-routing-carrier-name"
+                                    name="txt-panel-routing-carrier-name" title="Carrier Name">
+                                <label for="txt-panel-routing-carrier-name">Name</label>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="input-box-container insurance box-danger">
+                                <input required type="text" id="txt-panel-routing-carrier-insurance"
+                                    name="txt-panel-routing-carrier-insurance" title="Carrier Insurance">
+                                <label for="txt-panel-routing-carrier-insurance">Insurance</label>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="row-section">
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-panel-routing-carrier-load-starting-destination"
+                                    name="txt-panel-routing-carrier-load-starting-destination"
+                                    title="Carrier Load Starting and Destination">
+                                <label for="txt-panel-routing-carrier-load-starting-destination">
+                                    Carrier Load - Starting City State - Destination City State
+                                </label>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="row-section">
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-panel-routing-carrier-contact-name"
+                                    name="txt-panel-routing-carrier-contact-name" title="Carrier Contact Name">
+                                <label for="txt-panel-routing-carrier-contact-name">Contact Name</label>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="input-box-container phone-number">
+                                <input required type="text" id="txt-panel-routing-carrier-contact-phone-number"
+                                    name="txt-panel-routing-carrier-contact-phone-number"
+                                    title="Carrier Contact Phone Number">
+                                <label for="txt-panel-routing-carrier-contact-phone-number">Contact Phone</label>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="input-box-container phone-ext">
+                                <input required type="text" id="txt-panel-routing-carrier-contact-phone-ext"
+                                    name="txt-panel-routing-carrier-contact-phone-ext"
+                                    title="Carrier Contact Phone Ext">
+                                <label for="txt-panel-routing-carrier-contact-phone-ext">Ext</label>
+                            </div>
+                            <div class="separator"></div>
+                            <!-- <div class="select-box-container equipment">
+                                <select required type="text" id="cbo-panel-routing-carrier-equipment"
+                                    name="cbo-panel-routing-carrier-equipment" title="Carrier Equipments">
+                                    <option value="1">Equip. 1</option>
+                                    <option value="2">Equip. 2</option>
+                                    <option value="3">Equip. 3</option>
+                                </select>
+                                <label for="cbo-panel-routing-carrier-equipment">Equipment</label>
+                            </div> -->
+                            <div class="input-box-container drop-down equipment">
+                                <input required type="text" id="cbo-panel-routing-carrier-equipment" name="cbo-panel-routing-carrier-equipment"
+                                    title="Equipment" data-selected-index="none">
+                                <label for="cbo-panel-routing-carrier-equipment">Equipment</label>
+                                <span class="fas fa-sort-down"></span>                                    
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="row-section">
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-panel-routing-carrier-driver-name"
+                                    name="txt-panel-routing-carrier-driver-name" title="Carrier Driver Name">
+                                <label for="txt-panel-routing-carrier-driver-name">Driver Name</label>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="input-box-container phone-number">
+                                <input required type="text" id="txt-panel-routing-carrier-driver-phone-number"
+                                    name="txt-panel-routing-carrier-driver-phone-number"
+                                    title="Carrier Driver Phone Number">
+                                <label for="txt-panel-routing-carrier-driver-phone-number">Driver Phone</label>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="input-box-container phone-ext">
+                                <input required type="text" id="txt-panel-routing-carrier-unit-number"
+                                    name="txt-panel-routing-carrier-unit-number" title="Carrier Unit Number">
+                                <label for="txt-panel-routing-carrier-unit-number">Unit Number</label>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="input-box-container equipment">
+                                <input required type="text" id="txt-panel-routing-carrier-trailer-number"
+                                    name="txt-panel-routing-carrier-trailer-number" title="Carrier Trailer Number">
+                                <label for="txt-panel-routing-carrier-trailer-number">Trailer Number</label>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="row-section buttons">
+                            <div class="mochi-button">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Rate Confirmation
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="mochi-button">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    E-mail Rate Confirmation
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="separator"></div>
+                <div class="third">
+                    <div class="form-section fixed-half-size" id="frm-panel-routing-deliveries">
+                        <div class="top-border-section">
+                            <div class="left-border"></div>
+                            <div class="section-title">Deliveries</div>
+                            <div class="middle-border"></div>
+                            <div class="right-border"></div>
+                        </div>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="form-section bottom-controls">
+                        <div class="top-border-section">
+                            <div class="left-border"></div>
+                            <div class="section-title">Route</div>
+                            <div class="middle-border"></div>
+                            <div class="section-btn">
+                                <div class="mochi-button" id="panel-routing-route-update-btn">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Update
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div class="mochi-button" id="panel-routing-route-email-btn">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        E-Mail Route
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div class="mochi-button" id="panel-routing-route-print-btn">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Print Route
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                            <div class="right-border"></div>
+                        </div>
+
+                        <div class="bottom-border-section">
+                            <div class="left-border"></div>
+                            <div class="middle-border"></div>
+                            <div class="input-box-container profit">
+                                <input required type="text" id="txt-panel-routing-route-miles"
+                                    name="txt-panel-routing-route-miles" title="Miles">
+                                <label for="txt-panel-routing-route-miles">Miles</label>
+                            </div>
+                            <div class="right-border"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="drag-handler"> </div>
+        <div class="panel-not-focused"> </div>
+        <div class="panel-selection-handler"> </div>
+    </div>
+</div>

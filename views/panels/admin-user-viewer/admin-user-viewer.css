@@ -1,0 +1,59 @@
+.user-viewer-wrapper {
+  width: 100%;
+  height: calc(100% - 40px);
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+}
+.user-viewer-wrapper .profile-info {
+  flex-grow: 1;
+  padding-top: 10px;
+}
+.user-viewer-wrapper .profile-info .input-box-container.non-editable {
+  pointer-events: none;
+  background-color: transparent;
+}
+.user-viewer-wrapper .profile-info .prof-row {
+  margin: 10px 0;
+}
+.user-viewer-wrapper .profile-info .prof-avatar img {
+  max-width: 200px !important;
+  width: 200px !important;
+  height: 200px !important;
+  max-height: 200px !important;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.user-viewer-wrapper .profile-info .prof-email input {
+  text-transform: lowercase;
+}
+.user-viewer-wrapper .profile-info .prof-address {
+  display: flex;
+  flex-wrap: wrap;
+}
+.user-viewer-wrapper .profile-info .prof-address .input-box-container:first-child {
+  flex-grow: 1;
+}
+.user-viewer-wrapper .profile-info .prof-address .hsep {
+  margin: 0 1px;
+}
+.user-viewer-wrapper .profile-info .prof-status input[type=checkbox]:not(:checked) + label .lbl-toggle-button::after {
+  content: 'Inactive';
+}
+.user-viewer-wrapper .profile-info .prof-status input[type=checkbox]:checked + label .lbl-toggle-button::after {
+  content: 'Active';
+}
+.user-viewer-wrapper .profile-footer {
+  padding-top: 5px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+.user-viewer-wrapper .profile-footer .mochi-button {
+  margin-left: 15px;
+}
+.user-viewer-wrapper .profile-footer .mochi-button.hidden {
+  display: none;
+}

@@ -1,0 +1,13 @@
+#panel-adjust-rate .row-section {
+  display: flex;
+  justify-content: initial;
+}
+#panel-adjust-rate .row-section .input-box-container {
+  margin: 0;
+}
+#panel-adjust-rate .row-section .separator {
+  margin: 0 1px;
+}
+#panel-adjust-rate .bottom-border-section .separator {
+  margin: 0 1px;
+}

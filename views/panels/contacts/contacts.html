@@ -1,0 +1,229 @@
+<div class="panel stacked not-stacked" id="panel-contacts">
+    <div class="panel-content">
+        <div class="panel-close-btn">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="mochi-header">
+            <div class="mochi-header-content">
+                Contacts
+            </div>
+        </div>
+
+        <div class="panel-contact-container" data-id="[CUSTOMER-ID]">
+            <div class="contact-list-container">
+                <div class="contact-list-content">
+                    <div class="contact-list-wrapper">
+                        [CONTACT-LIST]
+                    </div>
+                </div>
+
+                <div class="mochi-button text-center" id="customer-contacts-add-contact-btn">
+                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div class="mochi-button-base">
+                        Add Contact
+                    </div>
+                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                </div>
+            </div>
+
+            <div class="contact-info-container [ACTION-CLASS]">
+                <div class="contact-info-container-wrapper">
+                    <div class="contact-info-header">
+                        <div class="contact-info-header-image">
+                            <div class="avatar-container">
+                                <img src="[CONTACT-AVATAR]" data-default="../../../img/avatar-user-default.png" alt="">
+                            </div>
+                            <form id="frm-contact-avatar" style="display: none;" enctype="multipart/form-data">
+                                <input type="file" name="avatar" id="select-avatar-input" accept="image/*">                                
+                            </form>
+
+                            <div class="upload-avatar-btn" style="display: [DISPLAY-UPLOAD-AVATAR];">
+                                <span class="fas fa-sync"></span>
+                            </div>
+
+                             <div class="remove-avatar-btn" style="display: [DISPLAY-REMOVE-AVATAR];">
+                                <span class="fas fa-trash"></span>
+                            </div>
+
+                            
+                        </div>
+                        <div class="contact-info-header-data">
+                            <div class="contact-info-header-data-name">
+                                <div class="contact-name">[CONTACT-NAME]</div>
+
+                                <div class="contact-info-header-buttons">
+                                    <div class="input-toggle-container">
+                                        <input type="checkbox" id="toggle-panel-contacts-primary"
+                                            name="toggle-panel-contacts-primary" [IS-PRIMARY]>
+                                        <label for="toggle-panel-contacts-primary" title="Primary">
+                                            <div class="lbl-toggle-button">Primary</div>
+                                            <div class="input-toggle-button"></div>
+                                        </label>
+                                    </div>
+
+                                    <div class="mochi-button text-center" id="customer-contacts-delete-contact-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Delete
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="contact-info-header-data-extra">
+                                <div class="contact-info-header-data-extra-occupation">[CONTACT-OCCUPATION]</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-info-form">
+                        <div class="contact-info-row hidden">
+                            <label for="txt-panel-contact-info-id">Contact Id</label>
+                            <input required type="text" id="txt-panel-contact-info-id" name="txt-panel-contact-info-id"
+                                title="Id" value="[CONTACT-ID]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-title">Prefix</label>
+                            <input required type="text" id="txt-panel-contact-info-title"
+                                name="txt-panel-contact-info-title" title="Title" value="[CONTACT-PREFIX]" />
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-first-name">First Name</label>
+                            <input required type="text" id="txt-panel-contact-info-first-name"
+                                name="txt-panel-contact-info-first-name" title="First Name"
+                                value="[CONTACT-FIRST-NAME]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-middle-name">Middle Name</label>
+                            <input required type="text" id="txt-panel-contact-info-middle-name"
+                                name="txt-panel-contact-info-middle-name" title="Middle Name"
+                                value="[CONTACT-MIDDLE-NAME]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-last-name">Last Name</label>
+                            <input required type="text" id="txt-panel-contact-info-last-name"
+                                name="txt-panel-contact-info-last-name" title="Last Name" value="[CONTACT-LAST-NAME]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-suffix">Suffix</label>
+                            <input required type="text" id="txt-panel-contact-info-suffix"
+                                name="txt-panel-contact-info-suffix" title="Suffix" value="[CONTACT-SUFFIX]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-occupation">Title</label>
+                            <input required type="text" id="txt-panel-contact-info-occupation"
+                                name="txt-panel-contact-info-occupation" title="Occupation"
+                                value="[CONTACT-OCCUPATION2]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-department">Department</label>
+                            <input required type="text" id="txt-panel-contact-info-department"
+                                name="txt-panel-contact-info-department" title="Department"
+                                value="[CONTACT-DEPARTMENT]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-email-work">E-mail Work</label>
+                            <input required type="text" id="txt-panel-contact-info-email-work"
+                                name="txt-panel-contact-info-email-work" title="E-mail Work"
+                                value="[CONTACT-EMAIL-WORK]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-email-personal">E-mail Personal</label>
+                            <input required type="text" id="txt-panel-contact-info-email-personal"
+                                name="txt-panel-contact-info-email-personal" title="E-mail Personal"
+                                value="[CONTACT-EMAIL-PERSONAL]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-email-other">E-mail Other</label>
+                            <input required type="text" id="txt-panel-contact-info-email-other"
+                                name="txt-panel-contact-info-email-other" title="E-mail Other"
+                                value="[CONTACT-EMAIL-OTHER]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-phone-work">Phone Work</label>
+                            <input class="contact-phone" required type="text" id="txt-panel-contact-info-phone-work"
+                                name="txt-panel-contact-info-phone-work" title="Phone Work"
+                                value="[CONTACT-PHONE-WORK]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-phone-work-fax">Phone Work Fax</label>
+                            <input class="contact-phone" required type="text" id="txt-panel-contact-info-phone-work-fax"
+                                name="txt-panel-contact-info-phone-work-fax" title="Phone Work Fax"
+                                value="[CONTACT-PHONE-WORK-FAX]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-phone-mobile">Phone Mobile</label>
+                            <input class="contact-phone" required type="text" id="txt-panel-contact-info-phone-mobile"
+                                name="txt-panel-contact-info-phone-mobile" title="Phone Mobile"
+                                value="[CONTACT-PHONE-MOBILE]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-phone-direct">Phone Direct</label>
+                            <input class="contact-phone" required type="text" id="txt-panel-contact-info-phone-direct"
+                                name="txt-panel-contact-info-phone-direct" title="Phone Direct"
+                                value="[CONTACT-PHONE-DIRECT]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-phone-other">Phone Other</label>
+                            <input class="contact-phone" required type="text" id="txt-panel-contact-info-phone-other"
+                                name="txt-panel-contact-info-phone-other" title="Phone Other"
+                                value="[CONTACT-PHONE-OTHER]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-country">Country</label>
+                            <input required type="text" id="txt-panel-contact-info-country"
+                                name="txt-panel-contact-info-country" title="Country" value="[CONTACT-COUNTRY]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-address1">Address 1</label>
+                            <input required type="text" id="txt-panel-contact-info-address1"
+                                name="txt-panel-contact-info-address1" title="Address 1" value="[CONTACT-ADDRESS1]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-address2">Address 2</label>
+                            <input required type="text" id="txt-panel-contact-info-address2"
+                                name="txt-panel-contact-info-address2" title="Address 2" value="[CONTACT-ADDRESS2]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-city">City</label>
+                            <input required type="text" id="txt-panel-contact-info-city"
+                                name="txt-panel-contact-info-city" title="City" value="[CONTACT-CITY]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-state">State</label>
+                            <input required type="text" id="txt-panel-contact-info-state"
+                                name="txt-panel-contact-info-state" title="State" value="[CONTACT-STATE]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-zip-code">Postal Code</label>
+                            <input required type="text" id="txt-panel-contact-info-zip-code"
+                                name="txt-panel-contact-info-zip-code" title="Postal Code" value="[CONTACT-ZIP-CODE]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-birthday">Birthday</label>
+                            <input class="birthday" required type="text" id="txt-panel-contact-info-birthday"
+                                name="txt-panel-contact-info-birthday" title="Day of Birth" value="[CONTACT-BIRTHDAY]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-website">Website</label>
+                            <input required type="text" id="txt-panel-contact-info-website"
+                                name="txt-panel-contact-info-website" title="Website" value="[CONTACT-WEBSITE]">
+                        </div>
+                        <div class="contact-info-row">
+                            <label for="txt-panel-contact-info-notes">Notes</label>
+                            <input required type="text" id="txt-panel-contact-info-notes"
+                                name="txt-panel-contact-info-notes" title="Notes" value="[CONTACT-NOTES]">
+                        </div>
+                    </div>
+                    <div class="contact-info-footer">
+                        <span class="fas fa-pencil-alt btn-panel-contacts-edit"></span>
+                        <span class="fas fa-save btn-panel-contacts-save"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="drag-handler"> </div>
+        <div class="panel-not-focused"> </div>
+        <div class="panel-selection-handler"> </div>
+    </div>
+</div>

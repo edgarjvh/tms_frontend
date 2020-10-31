@@ -1,0 +1,450 @@
+@inputLabelColor: rgba(0, 0, 0, 0.7);
+@sectionTitleFontSize: 12px;
+@sectionTitlePadding: 0 3px;
+@topBarBg: #4b4b4b;
+.mochi-contextual-container {
+    display: none;
+}
+
+.dispatch-container {
+    width: 100%;
+    height: 100%;
+    background-color: lightgrey;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+
+    .dispatch-header {
+        width: 100%;
+        height: 25px;
+        color: #000;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 1);
+
+        >div {
+            width: 33%;
+            text-align: center;
+        }
+
+        >div:first-child {
+            text-align: left;
+        }
+
+        >div:last-child {
+            text-align: right;
+        }
+    }
+
+    .dispatch-content {
+        width: 100%;
+        flex-grow: 1;
+        position: relative;
+        overflow: hidden;
+
+        .dispatch-wrapper {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            justify-content: flex-start;
+           
+
+            .hsep {
+                margin: 0 1px;
+            }
+
+            .vsep {
+                margin: 1px 0;
+            }
+
+            .forms-section-container {
+                display: flex;
+                flex-direction: row;
+                width: 70%;
+                flex-wrap: wrap;
+                justify-content: space-between;
+
+                >div {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+
+                    .header-section {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 10px;
+
+                        .select-box-container {                            
+                            flex-grow: 1;
+                        }
+
+                        .mochi-button {
+                            display: flex;
+                            justify-content: center;
+
+                            .mochi-button-base {
+                                font-size: 0.9rem;
+                                text-align: center;
+                                margin: 0;
+                                padding: 0 5px;
+                            }
+                        }
+                    }
+                }
+
+                .bill-to-section {
+                    width: 50%;
+                    padding: 5px;
+                    position: relative;
+                    flex-grow: 1;
+
+                    .form-section {
+                        min-height: 173px;
+                    }
+                }
+
+                .carrier-section {
+                    width: 50%;
+                    padding: 5px;
+                    position: relative;
+
+                    .form-section {
+                        min-height: 173px;
+             
+                    }
+
+                    .input-box-container.box-danger {
+                        min-width: 120px;
+                        max-width: 120px;
+                    }
+
+                    .input-box-container.insurance {
+                        min-width: 6.5rem;
+                        max-width: 6.5rem;
+                    }
+
+                    .row-section.buttons {
+
+                        .mochi-button {
+                            font-size: 0.9rem;
+
+                            .mochi-button-base {
+                                margin: 2px 0;
+                            }
+                        }
+                    }
+
+                    .select-box-container.equipment,
+                    .input-box-container.equipment {
+                        min-width: 6.5rem;
+                        max-width: 6.5rem;
+                    }
+
+
+                }
+
+                .shipper-section {
+                    width: 50%;
+                    padding: 5px;
+                    position: relative;
+
+                    .pages-container {
+                        width: 100%;
+                        overflow: hidden;
+
+                        .pages-wrapper {
+                            width: ~'calc(200%)';
+                            display: flex;
+                            transform: translateX(0);
+                            transition: transform 0.3s;
+
+                            .page {
+                                width: 100%;
+                                padding: 0 0.5px;
+                                .splitted-container {
+                                    display: flex;
+                                    width: ~'calc(50% - 10px)';
+                                }
+                            }                            
+
+                            .separator {
+                                margin: 0 5px !important;
+                                width: 20px !important;
+                                text-align: center;
+                            }
+                        }
+                    }
+                }
+
+                .consignee-section {
+                    width: 50%;
+                    padding: 5px;
+                    position: relative;
+
+                    .pages-container {
+                        width: 100%;
+                        overflow: hidden;
+
+                        .pages-wrapper {
+                            width: ~'calc(200%)';
+                            display: flex;
+                            transform: translateX(0);
+                            transition: transform 0.3s;                          
+
+                            .page {
+                                width: 100%;
+                                padding: 0 0.5px;
+                                .splitted-container {
+                                    display: flex;
+                                    width: ~'calc(50% - 10px)';
+                                }
+                            }
+
+                            .separator {
+                                margin: 0 5px !important;
+                                width: 20px !important;
+                                text-align: center;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .routing-section {
+                width: 100%;
+                padding: 5px;
+                position: relative;
+                display: flex;
+                align-items: center;
+                // margin-top: 3px;
+
+                .row-section {
+                    min-width: 70%;
+                    max-width: 70%;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    // min-height: 39px;
+                    justify-content: center;
+
+                    .input-box-container {
+                        flex-grow: 1 !important;                        
+                    }
+
+                    .mochi-button {
+                        margin: 0 2px;
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+
+            .functions-section-container {
+                display: flex;
+                flex-direction: row;
+                width: 30%;
+                justify-content: space-between;
+                padding: 5px;
+
+                .button-section {
+                    display: flex; // flex-wrap: wrap;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    flex-direction: column;
+                    padding-top: 0;
+                    width: 58%;
+
+                    .buttons-row {
+                        display: flex;
+
+                        .mochi-button {
+                            margin-right: 5px;
+                        }
+                    }
+
+                    .checkboxes-container {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 15px;
+                        margin-top: 9px;
+                        width: 100%;
+
+                        .input-checkbox-container {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+
+                            input {
+                                margin-right: 3px;
+                            }
+
+                            label {
+                                margin: 0;
+                                font-size: 0.7rem;
+                            }
+                        }
+
+                        .input-checkbox-container:last-child {
+                            margin-left: 10px;
+                        }
+                    }
+
+                    .mochi-button {
+                        width: unset;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+
+                        .mochi-button-base {
+                            flex-grow: 1;
+                            // display: inline-block;
+                            white-space: normal;
+                            font-size: 0.9rem;
+                            padding: 0 5px;
+                        }
+                    }
+
+                    .form-section {
+                        flex-grow: 1;
+                        width: 100%;
+
+                        .section-title {
+                            font-size: 0.6rem;
+                        }
+                    }
+                }
+
+                .button-section.left {
+                    flex-grow: 1;
+                    display: flex;
+                    margin-right: 3px;
+
+                    .form-section {
+                        width: 100%;
+                    }
+                }
+
+                .button-section.right {
+                    width: 9.125rem;
+
+                    .mochi-button {
+                        align-self: flex-end;
+                    }
+                }
+
+                .form-section {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    margin: 0;
+                }
+
+                .internal-notes-container {
+                    flex-grow: 1;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-end;
+                    margin-right: 3px;
+                }
+
+                .commisions-container {
+                    display: flex;
+                    flex-direction: row;
+                    width: 9.125rem;
+                    justify-content: flex-end;
+                }
+            }
+
+            .main-row-section.growed{
+                flex-grow: 1;
+                display:flex;
+                flex-direction: row;
+
+                .print-event-container {
+                    display: flex;
+                    flex-direction: row;
+                    flex-grow:1;
+                    padding: 5px;
+    
+                    .form-section {
+                        flex-grow:1;
+    
+                        textarea {
+                            width: 100%;
+                            height: 100%;
+                            resize: none;
+                            border: 0;
+                            background-color: transparent;
+                        }
+                    }
+                }
+            }
+
+            
+
+            .carrier-notes-section-container {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                flex-wrap: wrap;
+                align-items: center;
+                padding: 5px;
+
+                .notes-section-1 {
+                    display: flex;
+                    flex-direction: column;
+                    width: 70%;
+
+
+                    .row-section {
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: wrap;
+
+                        .input-box-container.to-fit {
+                            flex-grow: 1;
+                        }
+                    }
+
+                }
+
+                .notes-section-2 {
+                    display: flex;
+                    width: 30%;
+                    padding-left: 5px;
+
+                    .row-section {
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+
+                        .separator {
+                            margin: 0 1px;
+                        }
+
+                        .input-box-container.to-fit {
+                            flex-grow: 1;
+                        }
+
+                        .input-box-container.profit-box,
+                        .input-box-container.percentage-box {
+                            min-width: 4.5rem !important;
+                            max-width: 4.5rem !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

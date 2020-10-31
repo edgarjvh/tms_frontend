@@ -1,0 +1,139 @@
+.mochi-contextual-container {
+  display: none;
+}
+.admin-users-container {
+  width: 100%;
+  height: 100%;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.admin-users-container .admin-users-header {
+  width: 100%;
+  height: 25px;
+  color: #000;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 5px #000000;
+}
+.admin-users-container .admin-users-header > div {
+  width: 33%;
+  text-align: center;
+}
+.admin-users-container .admin-users-header > div:first-child {
+  text-align: left;
+}
+.admin-users-container .admin-users-header > div:last-child {
+  text-align: right;
+}
+.admin-users-container .admin-users-content {
+  width: 100%;
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper {
+  width: 100%;
+  max-width: 1024px;
+  height: 100%;
+  position: absolute;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  justify-content: flex-start;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .hsep {
+  margin: 0 1px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .vsep {
+  margin: 1px 0;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  padding-top: 10px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .thead,
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tbody,
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tfoot {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .thead .trow {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.7);
+  padding: 2px 5px;
+  height: 30px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .thead .trow .tcol {
+  font-weight: bold;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tbody {
+  position: relative;
+  flex-grow: 1;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tbody .tbody-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  left: 0;
+  top: 0;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tbody .tbody-wrapper .trow {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  min-height: 40px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tbody .tbody-wrapper .trow .tcol.hidden {
+  display: none;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tbody .tbody-wrapper .trow:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .trow {
+  display: flex;
+  align-items: center;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tcol {
+  text-align: center;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tcol.index {
+  max-width: 60px;
+  min-width: 60px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tcol.name {
+  max-width: 250px;
+  min-width: 250px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tcol.email {
+  max-width: 250px;
+  min-width: 250px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tcol.status {
+  max-width: 100px;
+  min-width: 100px;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tcol.action {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.admin-users-container .admin-users-content .admin-users-wrapper .tbl-admin-users .tcol.action .mochi-button {
+  margin: 0 10px;
+  font-size: 1.2rem;
+}

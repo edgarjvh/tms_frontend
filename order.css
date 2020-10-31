@@ -1,0 +1,425 @@
+* {
+  box-sizing: border-box;
+}
+body,
+html {
+  background-color: #eaeaea;
+  margin: 0;
+  padding: 0;
+  font-family: "Lato", sans-serif;
+  font-size: 12px;
+}
+.order-main-container {
+  width: 215.5mm;
+  height: 279.4mm;
+  background-color: #fff;
+  margin: 0 auto;
+  padding: 15mm 10mm;
+  display: flex;
+  flex-direction: column;
+}
+.order-main-container .header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.order-main-container .header div.label {
+  font-weight: 700;
+}
+.order-main-container .header div.value {
+  color: red;
+  margin-left: 10px;
+}
+.order-main-container .header > .date {
+  display: flex;
+  justify-content: flex-start;
+  font-size: 14px;
+}
+.order-main-container .header > .company {
+  display: flex;
+  justify-content: center;
+  font-size: 16px;
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .header > .numbers {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+.order-main-container .header > .numbers > div {
+  display: flex;
+  justify-content: flex-end;
+}
+.order-main-container .customer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+.order-main-container .customer .left {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-basis: 100%;
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 10px;
+}
+.order-main-container .customer .right {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-basis: 100%;
+  padding: 5px 10px;
+}
+.order-main-container .customer .right .row {
+  margin-bottom: 7px;
+}
+.order-main-container .customer .right .label-col {
+  min-width: unset !important;
+  max-width: unset !important;
+  font-weight: 700;
+}
+.order-main-container .customer .right .value-col {
+  color: red;
+  font-weight: bold;
+  margin-left: 5px;
+}
+.order-main-container .customer .right .right-col {
+  margin-left: 15px;
+}
+.order-main-container .customer .row {
+  display: flex;
+  padding: 1px 0;
+}
+.order-main-container .customer .row .label-col {
+  min-width: 60px;
+  max-width: 60px;
+  font-weight: 700;
+}
+.order-main-container .customer .row .value-col {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .customer .row .value-col.code {
+  color: steelblue;
+}
+.order-main-container .order {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 10px;
+}
+.order-main-container .order .info {
+  display: flex;
+  justify-content: space-around;
+}
+.order-main-container .order .info > div {
+  display: flex;
+}
+.order-main-container .order .info .label {
+  font-weight: 700;
+}
+.order-main-container .order .info .value {
+  font-weight: bold;
+  color: red;
+  margin-left: 5px;
+}
+.order-main-container .order .tbl {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+.order-main-container .order .tbl .thead,
+.order-main-container .order .tbl .tbody {
+  display: flex;
+  flex-direction: column;
+}
+.order-main-container .order .tbl .thead .tcol {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.order-main-container .order .tbl .tbody .tcol {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .order .tbl .trow {
+  display: flex;
+}
+.order-main-container .order .tbl .trow .tcol {
+  padding: 5px;
+}
+.order-main-container .order .tbl .tcol.pieces {
+  min-width: 50px;
+  max-width: 50px;
+}
+.order-main-container .order .tbl .tcol.type {
+  min-width: 60px;
+  max-width: 60px;
+}
+.order-main-container .order .tbl .tcol.weight {
+  min-width: 80px;
+  max-width: 80px;
+}
+.order-main-container .order .tbl .tcol.description {
+  flex-grow: 1;
+}
+.order-main-container .order .tbl .tcol.rate {
+  min-width: 100px;
+  max-width: 100px;
+}
+.order-main-container .order .tbl .tcol.descriptor {
+  min-width: 120px;
+  max-width: 120px;
+}
+.order-main-container .order .tbl .tcol.charges {
+  min-width: 100px;
+  max-width: 100px;
+}
+.order-main-container .shipper-consignee {
+  display: flex;
+  justify-content: space-between;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+.order-main-container .shipper-consignee .shipper,
+.order-main-container .shipper-consignee .consignee {
+  padding: 10px;
+  flex-grow: 1;
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.order-main-container .shipper-consignee .shipper {
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+}
+.order-main-container .shipper-consignee .row {
+  display: flex;
+  padding: 1px 0;
+}
+.order-main-container .shipper-consignee .row .label-col {
+  min-width: 80px;
+  max-width: 80px;
+  font-weight: 700;
+}
+.order-main-container .shipper-consignee .row .label-col.underlined {
+  min-width: unset !important;
+  max-width: unset !important;
+  text-decoration: underline;
+}
+.order-main-container .shipper-consignee .row .value-col {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .shipper-consignee .row .value-col.code {
+  color: steelblue;
+}
+.order-main-container .shipper-consignee .right {
+  margin-left: 10px;
+}
+.order-main-container .shipper-consignee .right .label-col {
+  min-width: 50px;
+  max-width: 50px;
+  font-weight: 700;
+}
+.order-main-container .carrier-driver {
+  display: flex;
+  justify-content: space-between;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  align-items: center;
+}
+.order-main-container .carrier-driver > div {
+  flex-grow: 1;
+  flex-basis: 100%;
+}
+.order-main-container .carrier-driver .row {
+  display: flex;
+  padding: 1px 0;
+}
+.order-main-container .carrier-driver .row .label-col {
+  min-width: 55px;
+  max-width: 55px;
+  font-weight: 700;
+}
+.order-main-container .carrier-driver .row .label-col.title,
+.order-main-container .carrier-driver .row .label-col.ext {
+  min-width: unset !important;
+  max-width: unset !important;
+}
+.order-main-container .carrier-driver .row .label-col.ext {
+  margin-left: 5px;
+}
+.order-main-container .carrier-driver .row .value-col {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .carrier-driver .row .value-col.code {
+  color: steelblue;
+}
+.order-main-container .notes-carrier {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  min-height: 120px;
+}
+.order-main-container .notes-carrier .row {
+  display: flex;
+  padding: 1px 0;
+}
+.order-main-container .notes-carrier .row .label.title {
+  min-width: unset !important;
+  max-width: unset !important;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.order-main-container .notes-carrier .row .value {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .events {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  flex-grow: 1;
+}
+.order-main-container .events .row {
+  display: flex;
+  padding: 1px 0;
+}
+.order-main-container .events .row .label.title {
+  min-width: unset !important;
+  max-width: unset !important;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.order-main-container .events .row .value {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .events .tbl {
+  display: flex;
+  flex-direction: column;
+}
+.order-main-container .events .tbl .thead,
+.order-main-container .events .tbl .tbody {
+  display: flex;
+  flex-direction: column;
+}
+.order-main-container .events .tbl .thead .tcol {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.order-main-container .events .tbl .tbody .tcol {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .events .tbl .trow {
+  display: flex;
+}
+.order-main-container .events .tbl .trow .tcol {
+  padding: 5px 0;
+}
+.order-main-container .events .tbl .tcol.datetime {
+  min-width: 150px;
+  max-width: 150px;
+}
+.order-main-container .events .tbl .tcol.event {
+  min-width: 120px;
+  max-width: 120px;
+}
+.order-main-container .events .tbl .tcol.location {
+  min-width: 140px;
+  max-width: 140px;
+}
+.order-main-container .events .tbl .tcol.notes {
+  flex-grow: 1;
+}
+.order-main-container .events .tbl .tcol.user {
+  min-width: 40px;
+  max-width: 40px;
+}
+.order-main-container .totals {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 10px;
+}
+.order-main-container .totals .row {
+  display: flex;
+  padding: 1px 0;
+}
+.order-main-container .totals .row .label.title {
+  min-width: unset !important;
+  max-width: unset !important;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.order-main-container .totals .row .value {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .totals .tbl {
+  display: flex;
+  flex-direction: column;
+}
+.order-main-container .totals .tbl .thead,
+.order-main-container .totals .tbl .tbody {
+  display: flex;
+  flex-direction: column;
+}
+.order-main-container .totals .tbl .thead .tcol {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.order-main-container .totals .tbl .tbody .tcol {
+  color: red;
+  font-weight: bold;
+}
+.order-main-container .totals .tbl .trow {
+  display: flex;
+}
+.order-main-container .totals .tbl .trow .tcol {
+  padding: 5px 0;
+}
+.order-main-container .totals .tbl .tcol.pieces {
+  min-width: 90px;
+  max-width: 90px;
+}
+.order-main-container .totals .tbl .tcol.weight {
+  min-width: 100px;
+  max-width: 100px;
+}
+.order-main-container .totals .tbl .tcol.charges {
+  min-width: 100px;
+  max-width: 100px;
+}
+.order-main-container .totals .tbl .tcol.cost {
+  min-width: 100px;
+  max-width: 100px;
+}
+.order-main-container .totals .tbl .tcol.profit {
+  min-width: 100px;
+  max-width: 100px;
+}
+.order-main-container .totals .tbl .tcol.percentage {
+  min-width: 100px;
+  max-width: 100px;
+}
+.order-main-container .totals .tbl .tcol.miles {
+  flex-grow: 1;
+}

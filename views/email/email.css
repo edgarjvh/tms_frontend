@@ -1,0 +1,112 @@
+.email-main-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-basis: 100%;
+  background-color: lightgrey;
+  left: 0;
+  top: 0;
+}
+.email-main-container .email-left-container {
+  width: 30%;
+  background-color: lightgrey;
+}
+.email-main-container .email-right-container {
+  width: 70%;
+  box-shadow: -2px 0 2px rgba(0, 0, 0, 0.5);
+  border-radius: 45px 0 0 0;
+  background: #ffffff;
+  background: -moz-radial-gradient(center, ellipse cover, #ffffff 0%, #e5e5e5 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #ffffff 0%, #e5e5e5 100%);
+  background: radial-gradient(ellipse at center, #ffffff 0%, #e5e5e5 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e5e5e5', GradientType=1);
+  overflow: hidden;
+}
+.email-main-container .email-right-container .panel-container {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 100%;
+  background-color: inherit;
+  border-radius: inherit;
+  box-shadow: inherit;
+  overflow: hidden;
+  background: #ffffff;
+  background: -moz-radial-gradient(center, ellipse cover, #ffffff 0%, #e5e5e5 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #ffffff 0%, #e5e5e5 100%);
+  background: radial-gradient(ellipse at center, #ffffff 0%, #e5e5e5 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e5e5e5', GradientType=1);
+  transition: width ease 0.7s;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container {
+  width: 100%;
+  height: 100%;
+}
+.email-main-container .email-right-container .panel-container.fixed {
+  left: 0;
+  box-shadow: none;
+}
+.email-main-container .email-right-container .gutter {
+  position: absolute;
+  width: 15px;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  cursor: pointer;
+  z-index: 100;
+}
+.email-main-container .email-right-container.inactive::after,
+.email-main-container .email-right-container .panel-container.inactive::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  top: 0;
+  z-index: 0;
+}
+.email-main-container .email-right-container .panel-container .panel-content {
+  margin-top: 10px;
+  padding: 0 32px;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .modal-shown {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .edit-contact-container {
+  left: 100%;
+  width: 30%;
+  height: 100%;
+  top: 0;
+  background-color: #eeeeee;
+  box-shadow: -1px 0 5px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .edit-contact-container .title {
+  text-align: center;
+  font-size: 18px;
+  margin: 20px 0;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .edit-contact-container .title .btn-close {
+  top: -20px;
+  right: 0;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .edit-contact-container .title .btn-close:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .edit-contact-container .form-container {
+  display: flex;
+  flex-direction: column;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .edit-contact-container .mochi-input-decorator {
+  margin-bottom: 10px;
+}
+.email-main-container .email-right-container .panel-container .panel-sub-container .edit-contact-container .mochi-input-decorator input {
+  padding: 10px 0;
+}

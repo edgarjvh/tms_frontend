@@ -1,0 +1,361 @@
+.mochi-contextual-container {
+  display: none;
+}
+.dispatch-container {
+  width: 100%;
+  height: 100%;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.dispatch-container .dispatch-header {
+  width: 100%;
+  height: 25px;
+  color: #000;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 5px #000000;
+}
+.dispatch-container .dispatch-header > div {
+  width: 33%;
+  text-align: center;
+}
+.dispatch-container .dispatch-header > div:first-child {
+  text-align: left;
+}
+.dispatch-container .dispatch-header > div:last-child {
+  text-align: right;
+}
+.dispatch-container .dispatch-content {
+  width: 100%;
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  justify-content: flex-start;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .hsep {
+  margin: 0 1px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .vsep {
+  margin: 1px 0;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container {
+  display: flex;
+  flex-direction: row;
+  width: 70%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container > div .header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container > div .header-section .select-box-container {
+  flex-grow: 1;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container > div .header-section .mochi-button {
+  display: flex;
+  justify-content: center;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container > div .header-section .mochi-button .mochi-button-base {
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+  padding: 0 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .bill-to-section {
+  width: 50%;
+  padding: 5px;
+  position: relative;
+  flex-grow: 1;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .bill-to-section .form-section {
+  min-height: 173px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section {
+  width: 50%;
+  padding: 5px;
+  position: relative;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section .form-section {
+  min-height: 173px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section .input-box-container.box-danger {
+  min-width: 120px;
+  max-width: 120px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section .input-box-container.insurance {
+  min-width: 6.5rem;
+  max-width: 6.5rem;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section .row-section.buttons .mochi-button {
+  font-size: 0.9rem;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section .row-section.buttons .mochi-button .mochi-button-base {
+  margin: 2px 0;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section .select-box-container.equipment,
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .carrier-section .input-box-container.equipment {
+  min-width: 6.5rem;
+  max-width: 6.5rem;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .shipper-section {
+  width: 50%;
+  padding: 5px;
+  position: relative;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .shipper-section .pages-container {
+  width: 100%;
+  overflow: hidden;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .shipper-section .pages-container .pages-wrapper {
+  width: calc(200%);
+  display: flex;
+  transform: translateX(0);
+  transition: transform 0.3s;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .shipper-section .pages-container .pages-wrapper .page {
+  width: 100%;
+  padding: 0 0.5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .shipper-section .pages-container .pages-wrapper .page .splitted-container {
+  display: flex;
+  width: calc(50% - 10px);
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .shipper-section .pages-container .pages-wrapper .separator {
+  margin: 0 5px !important;
+  width: 20px !important;
+  text-align: center;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .consignee-section {
+  width: 50%;
+  padding: 5px;
+  position: relative;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .consignee-section .pages-container {
+  width: 100%;
+  overflow: hidden;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .consignee-section .pages-container .pages-wrapper {
+  width: calc(200%);
+  display: flex;
+  transform: translateX(0);
+  transition: transform 0.3s;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .consignee-section .pages-container .pages-wrapper .page {
+  width: 100%;
+  padding: 0 0.5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .consignee-section .pages-container .pages-wrapper .page .splitted-container {
+  display: flex;
+  width: calc(50% - 10px);
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .forms-section-container .consignee-section .pages-container .pages-wrapper .separator {
+  margin: 0 5px !important;
+  width: 20px !important;
+  text-align: center;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .routing-section {
+  width: 100%;
+  padding: 5px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .routing-section .row-section {
+  min-width: 70%;
+  max-width: 70%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .routing-section .row-section .input-box-container {
+  flex-grow: 1 !important;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .routing-section .row-section .mochi-button {
+  margin: 0 2px;
+  font-size: 1.2rem;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container {
+  display: flex;
+  flex-direction: row;
+  width: 30%;
+  justify-content: space-between;
+  padding: 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: column;
+  padding-top: 0;
+  width: 58%;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .buttons-row {
+  display: flex;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .buttons-row .mochi-button {
+  margin-right: 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .checkboxes-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  margin-top: 9px;
+  width: 100%;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .checkboxes-container .input-checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .checkboxes-container .input-checkbox-container input {
+  margin-right: 3px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .checkboxes-container .input-checkbox-container label {
+  margin: 0;
+  font-size: 0.7rem;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .checkboxes-container .input-checkbox-container:last-child {
+  margin-left: 10px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .mochi-button {
+  width: unset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  white-space: normal;
+  font-size: 0.9rem;
+  padding: 0 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .form-section {
+  flex-grow: 1;
+  width: 100%;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .form-section .section-title {
+  font-size: 0.6rem;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section.left {
+  flex-grow: 1;
+  display: flex;
+  margin-right: 3px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section.left .form-section {
+  width: 100%;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section.right {
+  width: 9.125rem;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section.right .mochi-button {
+  align-self: flex-end;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .form-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin: 0;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .internal-notes-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-right: 3px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .commisions-container {
+  display: flex;
+  flex-direction: row;
+  width: 9.125rem;
+  justify-content: flex-end;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .main-row-section.growed {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .main-row-section.growed .print-event-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  padding: 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .main-row-section.growed .print-event-container .form-section {
+  flex-grow: 1;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .main-row-section.growed .print-event-container .form-section textarea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: 0;
+  background-color: transparent;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-1 {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-1 .row-section {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-1 .row-section .input-box-container.to-fit {
+  flex-grow: 1;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-2 {
+  display: flex;
+  width: 30%;
+  padding-left: 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-2 .row-section {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-2 .row-section .separator {
+  margin: 0 1px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-2 .row-section .input-box-container.to-fit {
+  flex-grow: 1;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-2 .row-section .input-box-container.profit-box,
+.dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-2 .row-section .input-box-container.percentage-box {
+  min-width: 4.5rem !important;
+  max-width: 4.5rem !important;
+}

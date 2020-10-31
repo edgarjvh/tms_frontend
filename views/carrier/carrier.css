@@ -1,0 +1,184 @@
+.carrier-container {
+  width: 100%;
+  height: 100%;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.carrier-container .carrier-content {
+  width: 100%;
+  flex-grow: 1;
+  background-color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+.carrier-container .carrier-content .carrier-wrapper {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: inherit;
+}
+.carrier-container .carrier-content .carrier-wrapper .mochi-contextual-container {
+  display: none;
+}
+.carrier-container .carrier-content .carrier-wrapper .hsep {
+  margin: 0 1px;
+}
+.carrier-container .carrier-content .carrier-wrapper .vsep {
+  margin: 1px 0;
+}
+.carrier-container .carrier-content .carrier-wrapper .main-row-section {
+  height: 33%;
+}
+.carrier-container .carrier-content .carrier-wrapper .main-cell {
+  background-color: inherit;
+  padding: 5px 3px;
+}
+.carrier-container .carrier-content .carrier-wrapper .separator {
+  margin: 0 1px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 {
+  width: 40%;
+  height: initial;
+  display: flex;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section {
+  min-width: 75%;
+  max-width: 75%;
+  justify-content: space-around;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section .row-section.buttons {
+  display: flex;
+  justify-content: center;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section .row-section.buttons .mochi-button {
+  width: unset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section .row-section.buttons .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  display: inline-block;
+  white-space: normal;
+  font-size: 0.7rem;
+  line-height: initial;
+  text-align: center;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section .input-box-container.name-box {
+  width: unset;
+  flex-grow: 1;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section-extra {
+  width: 25%;
+  margin-left: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section-extra .mochi-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section-extra .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  display: inline-block;
+  white-space: normal;
+  font-size: 1rem;
+  line-height: initial;
+  text-align: center;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section-extra .rating-box-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section-extra .rating-box-container a {
+  display: inline-block;
+  color: #95a5a6;
+  text-decoration: none;
+  font-size: 1.5rem;
+  transition: ease 0.1s;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section-extra .rating-box-container:hover a {
+  color: #f39c12;
+  /* amarillo (seleccionado) */
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .form-section-extra .rating-box-container:hover a:hover ~ a {
+  color: #95a5a6;
+  /* gris (normal) */
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .state2,
+.carrier-container .carrier-content .carrier-wrapper .cell-1 .zip-code2 {
+  min-width: 80px;
+  max-width: 80px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 {
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .portal-section {
+  position: relative;
+  width: 100%;
+  flex-grow: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  margin-top: 5px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .input-box-container.drop-down {
+  max-width: 20%;
+}
+.carrier-container .carrier-content .carrier-wrapper .main-row-section:last-child .cell-2 .form-section {
+  flex-grow: 1;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 {
+  width: 25%;
+  display: flex;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section .row-section {
+  flex-wrap: wrap;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section .row-section .name-box {
+  flex-grow: 1;
+  width: 50%;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section .row-section .phone-number {
+  max-width: 7rem;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section .row-section.no-wraping {
+  flex-wrap: nowrap;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section .row-section.buttons {
+  display: flex;
+  justify-content: center;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section .row-section.buttons .mochi-button {
+  width: unset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3 .form-section .row-section.buttons .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  display: inline-block;
+  white-space: normal;
+  font-size: 1rem;
+  line-height: initial;
+  text-align: center;
+}

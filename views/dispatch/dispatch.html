@@ -1,0 +1,1021 @@
+<div class="mochi-contextual-container" id="dispatch-mochi-contextual-container" data-ctrl-id="">
+    <div class="mochi-contextual-popup">
+        <div class="mochi-contextual-popup-content">
+            <div class="mochi-contextual-popup-wrapper">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="swiper-slide" id="swiper-slide-dispatch">
+    <div class="slide-title">Dispatch</div>
+    <div class="dispatch-container main-slide-container" id="dispatch-container">
+        <div class="dispatch-content">
+            <div class="dispatch-wrapper">              
+
+                <div class="main-row-section">
+                    <div class="forms-section-container">
+                        <div class="bill-to-section">
+                            <div class="header-section">
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-agent-number" name="txt-agent-number"
+                                        title="Agent / Employee Number">
+                                    <label for="txt-agent-number">A/E Number</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-order-number" name="txt-order-number"
+                                        title="Order Number" tabindex="1">
+                                    <label for="txt-order-number">Order Number</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-trip-number" name="txt-trip-number"
+                                        title="Trip Number" tabindex="2">
+                                    <label for="txt-trip-number">Trip Number</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="mochi-button text-center">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Clear
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Bill To</div>
+                                    <div class="middle-border"></div>
+                                    <div class="section-btn">
+                                        <div class="mochi-button text-center" id="dispatch-bill-to-search-btn">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Search
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center" id="dispatch-bill-to-company-info-btn" tabindex="7">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Company Info
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center" id="dispatch-bill-to-rate-load-btn">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Rate Load
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+                                    <div class="right-border"></div>
+                                </div>
+
+                                <div class="row-section">
+                                    <div class="input-box-container code shows-popup">
+                                        <input required type="text" id="txt-bill-to-code" name="txt-bill-to-code"
+                                            title="Bill-To Code" maxlength="10" required tabindex="6">
+                                        <label for="txt-bill-to-code">Code</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-bill-to-name" name="txt-bill-to-name"
+                                            title="Bill-To Name" tabindex="7">
+                                        <label for="txt-bill-to-name">Name</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section">
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-bill-to-address-1"
+                                            name="txt-bill-to-address-1" title="Bill-To Address 1">
+                                        <label for="txt-bill-to-address-1">Address 1</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section">
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-bill-to-address-2"
+                                            name="txt-bill-to-address-2" title="Bill-To Address 2">
+                                        <label for="txt-bill-to-address-2">Address 2</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section">
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-bill-to-city" name="txt-bill-to-city"
+                                            title="Bill-To City">
+                                        <label for="txt-bill-to-city">City</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container state shows-popup">
+                                        <input required type="text" id="txt-bill-to-state" name="txt-bill-to-state"
+                                            title="Bill-To State" maxlength="2">
+                                        <label for="txt-bill-to-state">State</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container zip-code shows-popup">
+                                        <input required type="text" id="txt-bill-to-zip"
+                                            name="txt-bill-to-zip-code" title="Bill-To Postal Code">
+                                        <label for="txt-bill-to-zip-code">Postal Code</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section">
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-bill-to-contact-name"
+                                            name="txt-bill-to-contact-name" title="Bill-To Contact Name">
+                                        <label for="txt-bill-to-contact-name">Contact Name</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container phone-number shows-popup">
+                                        <input required type="text" id="txt-bill-to-contact-phone"
+                                            name="txt-bill-to-contact-phone" title="Bill-To Contact Phone">
+                                        <label for="txt-bill-to-contact-phone">Contact Phone</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container phone-ext shows-popup">
+                                        <input required type="text" id="txt-bill-to-contact-phone-ext"
+                                            name="txt-bill-to-contact-phone-ext" title="Bill-To Contact Phone Ext">
+                                        <label for="txt-bill-to-contact-phone-ext">Ext</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carrier-section">
+                            <div class="header-section">
+                                <!-- <div class="select-box-container">
+                                    <select type="text" id="cbo-division" name="cbo-division" title="Division" required>
+                                        <option value="1">Division 1</option>
+                                        <option value="2">Division 2</option>
+                                        <option value="3">Division 3</option>
+                                    </select>
+                                    <label for="cbo-division">Division</label>
+                                </div> -->
+                                <div class="input-box-container drop-down">
+                                    <input required type="text" id="cbo-dispatch-carrier-division"
+                                        name="cbo-dispatch-carrier-division" title="Division" data-selected-index="none" tabindex="3">
+                                    <label for="cbo-dispatch-carrier-division">Division</label>
+                                    <span class="fas fa-sort-down"></span>
+                                </div>
+                                <div class="hsep"></div>
+                                <!-- <div class="select-box-container">
+                                    <select type="text" id="cbo-load-type" name="cbo-load-type" title="Load Types">
+                                        <option value="1">Load Type 1</option>
+                                        <option value="2">Load Type 2</option>
+                                        <option value="3">Load Type 3</option>
+                                    </select>
+                                    <label for="cbo-load-type">Load Types</label>
+                                </div> -->
+                                <div class="input-box-container drop-down">
+                                    <input required type="text" id="cbo-dispatch-carrier-load-type"
+                                        name="cbo-dispatch-carrier-load-type" title="Load Types" data-selected-index="none" tabindex="4">
+                                    <label for="cbo-dispatch-carrier-load-type">Load Types</label>
+                                    <span class="fas fa-sort-down"></span>
+                                </div>
+                                <div class="hsep"></div>
+                                <!-- <div class="select-box-container">
+                                    <select type="text" id="cbo-template" name="cbo-template" title="Templates">
+                                        <option value="1">Template 1</option>
+                                        <option value="2">Template 2</option>
+                                        <option value="3">Template 3</option>
+                                    </select>
+                                    <label for="cbo-template">Templates</label>
+                                </div> -->
+                                <div class="input-box-container drop-down">
+                                    <input required type="text" id="cbo-dispatch-carrier-templates"
+                                        name="cbo-dispatch-carrier-templates" title="Templates" data-selected-index="none" tabindex="5">
+                                    <label for="cbo-dispatch-carrier-templates">Templates</label>
+                                    <span class="fas fa-sort-down"></span>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Carrier</div>
+                                    <div class="middle-border"></div>
+                                    <div class="section-btn">
+                                        <div class="mochi-button text-center" id="dispatch-carrier-info-btn" tabindex="25">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Carrier Info
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+                                    <div class="right-border"></div>
+                                </div>
+                                <div class="row-section">
+                                    <div class="input-box-container code shows-popup">
+                                        <input required type="text" id="txt-carrier-code" name="txt-carrier-code"
+                                            title="carrier-Code" maxlength="10" tabindex="24">
+                                        <label for="txt-carrier-code">Code</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-carrier-name" name="txt-carrier-name"
+                                            title="Carrier Name" tabindex="25">
+                                        <label for="txt-carrier-name">Name</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container insurance shows-popup">
+                                        <input required type="text" id="txt-carrier-insurance"
+                                            name="txt-carrier-insurance" title="Carrier Insurance">
+                                        <label for="txt-carrier-insurance">Insurance</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section">
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-carrier-load-starting-destination"
+                                            name="txt-carrier-load-starting-destination"
+                                            title="Carrier Load Starting and Destination">
+                                        <label for="txt-carrier-load-starting-destination">
+                                            Carrier Load - Starting City State - Destination City State
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section">
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-carrier-contact-name"
+                                            name="txt-carrier-contact-name" title="Carrier Contact Name" tabindex="26">
+                                        <label for="txt-carrier-contact-name">Contact Name</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container phone-number shows-popup">
+                                        <input required type="text" id="txt-carrier-contact-phone-number"
+                                            name="txt-carrier-contact-phone-number"
+                                            title="Carrier Contact Phone Number">
+                                        <label for="txt-carrier-contact-phone-number">Contact Phone</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container phone-ext shows-popup">
+                                        <input required type="text" id="txt-carrier-contact-phone-ext"
+                                            name="txt-carrier-contact-phone-ext" title="Carrier Contact Phone Ext">
+                                        <label for="txt-carrier-contact-phone-ext">Ext</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <!-- <div class="select-box-container equipment">
+                                        <select type="text" id="cbo-carrier-equipment" name="cbo-carrier-equipment"
+                                            title="Carrier Equipments">
+                                            <option value="1">Equip. 1</option>
+                                            <option value="2">Equip. 2</option>
+                                            <option value="3">Equip. 3</option>
+                                        </select>
+                                        <label for="cbo-carrier-equipment">Equipment</label>
+                                    </div> -->
+                                    <div class="input-box-container drop-down equipment">
+                                        <input required type="text" id="cbo-dispatch-carrier-equipment"
+                                            name="cbo-dispatch-carrier-equipment" title="Equipment" data-selected-index="none" tabindex="27">
+                                        <label for="cbo-dispatch-carrier-equipment">Equipment</label>
+                                        <span class="fas fa-sort-down"></span>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section">
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-carrier-driver-name"
+                                            name="txt-carrier-driver-name" title="Carrier Driver Name" tabindex="28">
+                                        <label for="txt-carrier-driver-name">Driver Name</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container phone-number shows-popup">
+                                        <input required type="text" id="txt-carrier-driver-phone-number"
+                                            name="txt-carrier-driver-phone-number" title="Carrier Driver Phone Number" tabindex="29">
+                                        <label for="txt-carrier-driver-phone-number">Driver Phone</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container phone-ext shows-popup">
+                                        <input required type="text" id="txt-carrier-unit-number"
+                                            name="txt-carrier-unit-number" title="Carrier Unit Number" tabindex="30">
+                                        <label for="txt-carrier-unit-number">Unit Number</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container equipment shows-popup">
+                                        <input required type="text" id="txt-carrier-trailer-number"
+                                            name="txt-carrier-trailer-number" title="Carrier Trailer Number" tabindex="31">
+                                        <label for="txt-carrier-trailer-number">Trailer Number</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="row-section buttons">
+                                    <div class="mochi-button text-center">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Rate Confirmation
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center" id="dispatch-carrier-adjust-rate-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Adjust Rate
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Change Carrier
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            E-mail Rate Confirmation
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="functions-section-container">
+                        <div class="button-section left">
+                            <div class="buttons-row">
+                                <div class="mochi-button">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        New Template
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
+                                <div class="mochi-button">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Replicate Order
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+
+                            <div class="checkboxes-container">
+                                <div class="input-toggle-container">
+                                    <input required type="checkbox" id="cbox-haz-mat" name="cbox-haz-mat">
+                                    <label for="cbox-haz-mat" title="HazMat">
+                                        <div class="lbl-toggle-button">HazMat</div>
+                                        <div class="input-toggle-button"></div>
+                                    </label>
+                                </div>
+                                <div class="input-toggle-container">
+                                    <input required type="checkbox" id="cbox-expedited" name="cbox-expedited">
+                                    <label for="cbox-expedited" title="Expedited">
+                                        <div class="lbl-toggle-button">Expedited</div>
+                                        <div class="input-toggle-button"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Notes for Carrier on Rate Conf</div>
+                                    <div class="middle-border"></div>
+                                    <div class="right-border"></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="button-section right">
+                            <div class="mochi-button text-center">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Rate Conf
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="mochi-button text-center" id="dispatch-print-order-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Print Order
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="mochi-button text-center" id="dispatch-print-bol-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Print BOL
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="mochi-button text-center" id="dispatch-documents-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Documents
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="mochi-button text-center" id="dispatch-load-board-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Load Board
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="mochi-button text-center" id="dispatch-rating-screen-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Rate Load
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-row-section">
+                    <div class="routing-section">
+                        <div class="row-section">
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-pu-1" name="txt-routing-pu-1" title="PU 1">
+                                <label for="txt-routing-pu-1">PU 1</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-pu-2" name="txt-routing-pu-2" title="PU 2">
+                                <label for="txt-routing-pu-2">PU 2</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-pu-3" name="txt-routing-pu-3" title="PU 3">
+                                <label for="txt-routing-pu-3">PU 3</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-pu-4" name="txt-routing-pu-4" title="PU 4">
+                                <label for="txt-routing-pu-4">PU 4</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-pu-5" name="txt-routing-pu-5" title="PU 5">
+                                <label for="txt-routing-pu-5">PU 5</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="mochi-button text-center" id="dispatch-routing-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Routing
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-delivery-1" name="txt-routing-delivery-1"
+                                    title="Delivery 1">
+                                <label for="txt-routing-delivery-1">Delivery 1</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-delivery-2" name="txt-routing-delivery-2"
+                                    title="Delivery 2">
+                                <label for="txt-routing-delivery-2">Delivery 2</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-delivery-3" name="txt-routing-delivery-3"
+                                    title="Delivery 3">
+                                <label for="txt-routing-delivery-3">Delivery 3</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-delivery-4" name="txt-routing-delivery-4"
+                                    title="Delivery 4">
+                                <label for="txt-routing-delivery-4">Delivery 4</label>
+                            </div>
+                            <div class="hsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-routing-delivery-5" name="txt-routing-delivery-5"
+                                    title="Delivery 5">
+                                <label for="txt-routing-delivery-5">Delivery 5</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-row-section">
+                    <div class="forms-section-container">
+                        <div class="shipper-section">
+                            <div class="form-section">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Shipper</div>
+                                    <div class="middle-border"></div>
+                                    <div class="section-btn">
+                                        <div class="mochi-button text-center" id="dispatch-shipper-search-btn">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Search
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center" id="dispatch-shipper-company-info-btn" tabindex="9">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Company Info
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center 1page"
+                                            id="dispatch-shipper-switch-page-btn">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                2nd Page
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+                                    <div class="right-border"></div>
+                                </div>
+
+                                <div class="row-section">
+                                    <div class="input-box-container code shows-popup">
+                                        <input required type="text" id="txt-shipper-code" name="txt-shipper-code"
+                                            title="Shipper Code" maxlength="10" tabindex="8">
+                                        <label for="txt-shipper-code">Code</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-shipper-name" name="txt-shipper-name"
+                                            title="Shipper Name" tabindex="9">
+                                        <label for="txt-shipper-name">Name</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="pages-container">
+                                    <div class="pages-wrapper">
+                                        <div class="shipper-first-page-container page">
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-shipper-address-1"
+                                                        name="txt-shipper-address-1" title="Shipper Address 1">
+                                                    <label for="txt-shipper-address-1">Address 1</label>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-shipper-address-2"
+                                                        name="txt-shipper-address-2" title="Shipper Address 2">
+                                                    <label for="txt-shipper-address-2">Address 2</label>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-shipper-city"
+                                                        name="txt-shipper-city" title="Shipper City">
+                                                    <label for="txt-shipper-city">City</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container state shows-popup">
+                                                    <input required type="text" id="txt-shipper-state"
+                                                        name="txt-shipper-state" title="Shipper State" maxlength="2">
+                                                    <label for="txt-shipper-state">State</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container zip-code shows-popup">
+                                                    <input required type="text" id="txt-shipper-zip-code"
+                                                        name="txt-shipper-zip-code" title="Shipper Postal Code">
+                                                    <label for="txt-shipper-zip-code">Postal Code</label>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-shipper-contact-name"
+                                                        name="txt-shipper-contact-name" title="Shipper Contact Name">
+                                                    <label for="txt-shipper-contact-name">Contact Name</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container phone-number shows-popup">
+                                                    <input required type="text" id="txt-shipper-contact-phone"
+                                                        name="txt-shipper-contact-phone" title="Shipper Contact Phone">
+                                                    <label for="txt-shipper-contact-phone">Contact Phone</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container phone-ext shows-popup">
+                                                    <input required type="text" id="txt-shipper-contact-phone-ext"
+                                                        name="txt-shipper-contact-phone-ext"
+                                                        title="Shipper Contact Phone Ext">
+                                                    <label for="txt-shipper-contact-phone-ext">Ext</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="vsep"></div>
+                                        <div class="shipper-second-page-container page">
+                                            <div class="row-section">
+
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-pu-date-1"
+                                                            name="txt-shipper-pu-date-1" title="Shipper PU Date 1" tabindex="10">
+                                                        <label for="txt-shipper-pu-date-1">PU Date 1</label>
+                                                    </div>
+                                                    <div class="hsep"></div>
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-pu-time-1"
+                                                            name="txt-shipper-pu-time-1" title="Shipper PU Time 1" tabindex="11">
+                                                        <label for="txt-shipper-pu-time-1">PU Time 1</label>
+                                                    </div>
+                                                </div>
+                                                <div class="separator">To</div>
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-pu-date-2"
+                                                            name="txt-shipper-pu-date-2" title="Shipper PU Date 2" tabindex="12">
+                                                        <label for="txt-shipper-pu-date-2">PU Date 2</label>
+                                                    </div>
+                                                    <div class="hsep"></div>
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-pu-time-2"
+                                                            name="txt-shipper-pu-time-2" title="Shipper PU Time 2" tabindex="13">
+                                                        <label for="txt-shipper-pu-time-2">PU Time 2</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-bol-number"
+                                                            name="txt-shipper-bol-number" title="Shipper BOL Number" tabindex="14">
+                                                        <label for="txt-shipper-bol-number">BOL Number</label>
+                                                    </div>
+                                                </div>
+                                                <div class="separator"></div>
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-po-number"
+                                                            name="txt-shipper-po-number" title="Shipper PO Number" tabindex="15">
+                                                        <label for="txt-shipper-po-number">PO Number</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-ref-number"
+                                                            name="txt-shipper-ref-number" title="Shipper REF Number" tabindex="16">
+                                                        <label for="txt-shipper-ref-number">REF Number</label>
+                                                    </div>
+                                                </div>
+                                                <div class="separator"></div>
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-shipper-seal-number"
+                                                            name="txt-shipper-seal-number" title="Shipper SEAL Number" tabindex="17">
+                                                        <label for="txt-shipper-seal-number">SEAL Number</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-shipper-special-instructions"
+                                                        name="txt-shipper-special-instructions"
+                                                        title="Shipper Special Instructions">
+                                                    <label for="txt-shipper-special-instructions">Special
+                                                        Instructions</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="consignee-section">
+                            <div class="form-section">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Consignee</div>
+                                    <div class="middle-border"></div>
+                                    <div class="section-btn">
+                                        <div class="mochi-button text-center" id="dispatch-consignee-search-btn">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Search
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center" id="dispatch-consignee-company-info-btn" tabindex="19">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Company Info
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center 1page"
+                                            id="dispatch-consignee-switch-page-btn">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                2nd Page
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+                                    <div class="right-border"></div>
+                                </div>
+
+                                <div class="row-section">
+                                    <div class="input-box-container code shows-popup">
+                                        <input required type="text" id="txt-consignee-code" name="txt-consignee-code"
+                                            title="Consignee Code" maxlength="10" tabindex="18">
+                                        <label for="txt-consignee-code">Code</label>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container shows-popup">
+                                        <input required type="text" id="txt-consignee-name" name="txt-consignee-name"
+                                            title="Consignee Name" tabindex="19">
+                                        <label for="txt-consignee-name">Name</label>
+                                    </div>
+                                </div>
+                                <div class="vsep"></div>
+                                <div class="pages-container">
+                                    <div class="pages-wrapper">
+                                        <div class="consignee-first-page-container page">
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-consignee-address-1"
+                                                        name="txt-consignee-address-1" title="Consignee Address 1">
+                                                    <label for="txt-consignee-address-1">Address 1</label>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-consignee-address-2"
+                                                        name="txt-consignee-address-2" title="Consignee Address 2">
+                                                    <label for="txt-consignee-address-2">Address 2</label>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-consignee-city"
+                                                        name="txt-consignee-city" title="Consignee City">
+                                                    <label for="txt-consignee-city">City</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container state shows-popup">
+                                                    <input required type="text" id="txt-consignee-state"
+                                                        name="txt-consignee-state" title="Consignee State"
+                                                        maxlength="2">
+                                                    <label for="txt-consignee-state">State</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container zip-code shows-popup">
+                                                    <input required type="text" id="txt-consignee-zip-code"
+                                                        name="txt-consignee-zip-code" title="Consignee Postal Code">
+                                                    <label for="txt-consignee-zip-code">Postal Code</label>
+                                                </div>
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-consignee-contact-name"
+                                                        name="txt-consignee-contact-name"
+                                                        title="Consignee Contact Name">
+                                                    <label for="txt-consignee-contact-name">Contact Name</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container phone-number shows-popup">
+                                                    <input required type="text" id="txt-consignee-contact-phone"
+                                                        name="txt-consignee-contact-phone"
+                                                        title="Consignee Contact Phone">
+                                                    <label for="txt-consignee-contact-phone">Contact Phone</label>
+                                                </div>
+                                                <div class="hsep"></div>
+                                                <div class="input-box-container phone-ext shows-popup">
+                                                    <input required type="text" id="txt-consignee-contact-phone-ext"
+                                                        name="txt-consignee-contact-phone-ext"
+                                                        title="Consignee Contact Phone Ext">
+                                                    <label for="txt-consignee-contact-phone-ext">Ext</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="vsep"></div>
+                                        <div class="consignee-second-page-container page">
+                                            <div class="row-section">
+
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-consignee-delivery-date-1"
+                                                            name="txt-consignee-delivery-date-1"
+                                                            title="Consignee Delivery Date 1" tabindex="20">
+                                                        <label for="txt-consignee-delivery-date-1">Delivery Date
+                                                            1</label>
+                                                    </div>
+                                                    <div class="hsep"></div>
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-consignee-delivery-time-1"
+                                                            name="txt-consignee-delivery-time-1"
+                                                            title="Consignee Delivery Time 1" tabindex="21">
+                                                        <label for="txt-consignee-delivery-time-1">Delivery Time
+                                                            1</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="separator">To</div>
+
+                                                <div class="splitted-container">
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-consignee-delivery-date-2"
+                                                            name="txt-consignee-delivery-date-2"
+                                                            title="Consignee Delivery Date 2" tabindex="22">
+                                                        <label for="txt-consignee-delivery-date-2">Delivery Date
+                                                            2</label>
+                                                    </div>
+                                                    <div class="hsep"></div>
+                                                    <div class="input-box-container shows-popup">
+                                                        <input required type="text" id="txt-consignee-delivery-time-2"
+                                                            name="txt-consignee-delivery-time-2"
+                                                            title="Consignee Delivery Time 2" tabindex="23">
+                                                        <label for="txt-consignee-delivery-time-2">Delivery Time
+                                                            2</label>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="vsep"></div>
+                                            <div class="row-section">
+                                                <div class="input-box-container shows-popup">
+                                                    <input required type="text" id="txt-consignee-special-instructions"
+                                                        name="txt-consignee-special-instructions"
+                                                        title="Consignee Special Instructions">
+                                                    <label for="txt-consignee-special-instructions">Special
+                                                        Instructions</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="functions-section-container">
+                        <div class="internal-notes-container">
+                            <div class="form-section">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Internal Notes</div>
+                                    <div class="middle-border"></div>
+                                    <div class="right-border"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="commisions-container">
+                            <div class="form-section">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Commissions</div>
+                                    <div class="middle-border"></div>
+                                    <div class="right-border"></div>
+                                </div>
+                                <div class="row-section">
+                                    <div class="input-box-container">
+                                        <input required type="text" id="txt-commissions-agent-code"
+                                            name="txt-commissions-agent-code" title="Agent Code" maxlength="10" disabled>
+                                        <label for="txt-commissions-agent-code">Agent Code</label>
+                                    </div>
+                                </div>
+                                <div class="row-section">
+                                    <div class="input-box-container">
+                                        <input required type="text" id="txt-commissions-agent-commission"
+                                            name="txt-commissions-agent-commission" title="Agent Commission" disabled>
+                                        <label for="txt-commissions-agent-commission">Agent Commission</label>
+                                    </div>
+                                </div>
+                                <div class="row-section">
+                                    <div class="input-box-container">
+                                        <input required type="text" id="txt-commissions-salesman-code"
+                                            name="txt-commissions-salesman-code" title="Salesman Code" maxlength="10" disabled>
+                                        <label for="txt-commissions-salesman-code">Salesman Code</label>
+                                    </div>
+                                </div>
+                                <div class="row-section">
+                                    <div class="input-box-container">
+                                        <input required type="text" id="txt-commissions-salesman-commission"
+                                            name="txt-commissions-salesman-commission" title="Salesman Commission" disabled>
+                                        <label for="txt-commissions-salesman-commission">Salesman Commission</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="main-row-section">
+                    <div class="carrier-notes-section-container">
+                        <div class="notes-section-1">
+                            <div class="row-section">
+                                <!-- <div class="select-box-container">
+                                    <select type="text" id="cbo-carrier-events" name="cbo-carrier-events"
+                                        title="Carrier Events">
+                                        <option value="1">Event 1</option>
+                                        <option value="2">Event 2</option>
+                                        <option value="3">Event 3</option>
+                                    </select>
+                                    <label for="cbo-carrier-events">Events</label>
+                                </div> -->
+                                <div class="input-box-container drop-down">
+                                    <input required type="text" id="cbo-dispatch-carrier-events" name="cbo-dispatch-carrier-events"
+                                        title="Events" data-selected-index="none" tabindex="32">
+                                    <label for="cbo-dispatch-carrier-events">Events</label>
+                                    <span class="fas fa-sort-down"></span>                                    
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-carrier-event-location"
+                                        name="txt-carrier-event-location" title="Event Location" tabindex="33">
+                                    <label for="txt-carrier-event-location">Event Location</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container to-fit">
+                                    <input required type="text" id="txt-carrier-event-notes"
+                                        name="txt-carrier-event-notes" title="Event Notes" tabindex="34">
+                                    <label for="txt-carrier-event-notes">Event Notes</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notes-section-2">
+                            <div class="row-section">
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-carrier-miles" name="txt-carrier-miles"
+                                        title="Miles" disabled>
+                                    <label for="txt-carrier-miles">Miles</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-carrier-charges" name="txt-carrier-charges"
+                                        title="Charges" disabled>
+                                    <label for="txt-carrier-charges">Charges</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-carrier-order-cost"
+                                        name="txt-carrier-order-cost" title="Order Cost" disabled>
+                                    <label for="txt-carrier-order-cost">Order Cost</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container profit-box">
+                                    <input required type="text" id="txt-carrier-profit" name="txt-carrier-profit"
+                                        title="Profit" disabled>
+                                    <label for="txt-carrier-profit">Profit</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container percentage-box">
+                                    <input required type="text" id="txt-carrier-percentage"
+                                        name="txt-carrier-percentage" title="%" disabled>
+                                    <label for="txt-carrier-percentage">%</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-row-section growed">
+                    <div class="print-event-container">
+                        <div class="form-section">
+                            <div class="top-border-section">
+                                <div class="left-border"></div>
+                                <div class="section-title">Events</div>
+                                <div class="middle-border"></div>
+                                <div class="section-btn">
+                                    <div class="mochi-button text-center" id="print-notes-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Print
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>
+                                <div class="right-border"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="swiper-slide-selectable">
+        <div class="swiper-slide-close-btn">Close</div>
+    </div>
+
+    <div id="dispatch-main-panel-container" class="main-panel-container">
+        <div class="panel-container">
+            <div class="gutter"></div>
+
+
+
+        </div>
+    </div>
+</div>

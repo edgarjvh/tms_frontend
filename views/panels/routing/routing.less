@@ -1,0 +1,148 @@
+#panel-routing{    
+    .panel-routing-content {
+        display: flex;
+        height: 100%;
+        min-width: 590px;
+    
+        .routing-row-content {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+    
+            > .separator{
+                margin: 5px 0;
+            }
+            .select-box-container.equipment,
+            .input-box-container.equipment{
+                max-width: 6rem;
+                min-width: 6rem;
+            }
+    
+            .input-box-container.insurance {
+                min-width: 6rem;
+                max-width: 6rem;
+            }
+    
+            .first{
+                display: flex;
+                flex-direction: row !important;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                width: 50%;
+                margin-bottom: 10px;
+                .separator{
+                    margin: 0 1px;
+                }
+                .input-box-container{
+                    margin: 0;
+                }
+            }
+            .second, .third{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                flex-grow: 1;
+                flex-basis: 50%;
+                > .separator{
+                    margin: 0 5px;
+                }
+                .form-section{
+                    width: 50%;
+                    position: relative;
+                    margin: 0;
+                    > .separator{
+                        margin: 1px 0;
+                    }
+                    .row-section{
+                        .separator{
+                            margin: 0 1px;
+                        }
+                    }
+                    .mochi-button{
+                        width: unset;
+                    }
+                    .mochi-button-base{
+                        font-size: 0.9rem;
+                        white-space: nowrap;
+                    }
+                    .top-border-section{
+                        .mochi-button-base{
+                            font-size: 0.7rem;
+                            white-space: nowrap;
+                        }
+                    }
+                    .row-section.buttons{
+                        justify-content: space-around;
+                    }
+                    .input-box-container{
+                        margin: 0;
+                    }
+                }
+                .form-section.bottom-controls{
+                    .bottom-border-section {
+                        width: 100%;
+                        position: absolute;
+                        bottom: -9px;
+                        height: 18px;
+                        left: 0;
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+    
+    
+                        .left-border {
+                            width: 5px;
+                            border-top: 1px solid rgba(0, 0, 0, 0.5);
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+                        }
+    
+                        .section-title {
+                            position: initial;
+                        }
+    
+                        .section-btn {
+                            position: relative;
+                            top: initial;
+                            left: initial;
+                            overflow: initial;
+                            display: flex;
+                            align-items: center;
+    
+                            .mochi-button {
+                                display: initial;
+                                width: initial;
+                                margin: 0 10px;
+    
+                                .mochi-button-decorator {
+                                    font-size: 0.875rem;
+                                }
+    
+                                .mochi-button-base {
+                                    // flex-grow: 1;
+                                    display: inline-block;
+                                    white-space: normal;
+                                    font-size: 0.8rem;
+                                }
+                            }
+                        }
+    
+                        .middle-border {
+                            flex-grow: 1;
+                            border-top: 1px solid rgba(0, 0, 0, 0.5);
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+                        }
+    
+                        .right-border {
+                            width: 5px;
+                            border-top: 1px solid rgba(0, 0, 0, 0.5);
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+                        }
+                    }
+                }
+            }
+            .third{                
+                margin-bottom: 5px;
+            }
+        }
+    }
+}

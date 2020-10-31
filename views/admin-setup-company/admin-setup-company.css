@@ -1,0 +1,64 @@
+.mochi-contextual-container {
+  display: none;
+}
+.admin-setup-company-container {
+  width: 100%;
+  height: 100%;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.admin-setup-company-container .admin-setup-company-header {
+  width: 100%;
+  height: 25px;
+  color: #000;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 5px #000000;
+}
+.admin-setup-company-container .admin-setup-company-header > div {
+  width: 33%;
+  text-align: center;
+}
+.admin-setup-company-container .admin-setup-company-header > div:first-child {
+  text-align: left;
+}
+.admin-setup-company-container .admin-setup-company-header > div:last-child {
+  text-align: right;
+}
+.admin-setup-company-container .admin-setup-company-content {
+  width: 100%;
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+.admin-setup-company-container .admin-setup-company-content .admin-setup-company-wrapper {
+  width: 100%;
+  max-width: 1024px;
+  height: 100%;
+  position: absolute;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.admin-setup-company-container .admin-setup-company-content .admin-setup-company-wrapper .hsep {
+  margin: 0 1px;
+}
+.admin-setup-company-container .admin-setup-company-content .admin-setup-company-wrapper .vsep {
+  margin: 1px 0;
+}
+.admin-setup-company-container .admin-setup-company-content .admin-setup-company-wrapper p {
+  font-size: 3rem;
+  color: rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,26 @@
+.company-info-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.company-info-content .slider-swiper-slide {
+  background: transparent !important;
+  border: unset;
+  box-shadow: unset;
+  flex-grow: 1;
+}
+.company-info-content .slider-swiper-slide .customer-container {
+  background: transparent !important;
+}
+.company-info-content .slider-swiper-slide .customer-container .customer-wrapper {
+  padding: 0;
+}
+.company-info-content .slider-swiper-slide .customer-container .customer-wrapper .left-column-section {
+  width: 100% !important;
+}
+.company-info-content .right-column-section,
+.company-info-content .slide-title,
+.company-info-content .swiper-slide-selectable,
+.company-info-content .main-panel-container {
+  display: none;
+}

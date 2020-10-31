@@ -1,0 +1,226 @@
+@labelColor: rgba(0, 0, 0, 0.7);
+@sectionTitleFontSize: 12px;
+@sectionTitlePadding: 0 3px;
+
+.carrier-container {
+    width: 100%;
+    height: 100%;
+    background-color: lightgrey;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+
+    .carrier-content {
+        width: 100%;
+        flex-grow: 1;
+        background-color: inherit;
+        position: relative;
+        overflow: hidden;
+
+        .carrier-wrapper {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            background-color: inherit;
+
+            .mochi-contextual-container {
+                display: none;
+            }
+
+            .hsep {
+                margin: 0 1px;
+            }
+
+            .vsep {
+                margin: 1px 0;
+            }
+
+            .main-row-section {
+                height: 33%;
+            }
+
+            .main-cell {
+                background-color: inherit;
+                padding: 5px 3px;
+            }
+
+            .separator{
+                margin: 0 1px;
+            }
+            .cell-1 {
+                width: 40%;
+                height: initial;
+                display: flex;
+
+                .form-section {
+                    min-width: 75%;
+                    max-width: 75%;
+                    justify-content: space-around;
+
+                    .row-section.buttons{
+                        display: flex;
+                        justify-content: center;
+                        .mochi-button {
+                            width: unset;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+    
+                            .mochi-button-base {
+                                flex-grow: 1;
+                                display: inline-block;
+                                white-space: normal;
+                                font-size: 0.7rem;
+                                line-height: initial;
+                                text-align: center;
+                            }
+                        }
+                    }
+                    .input-box-container.name-box{
+                        width: unset;
+                        flex-grow: 1;
+                    }
+                }
+
+                .form-section-extra {
+                    width: 25%;
+                    margin-left: 5px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    align-items: center;
+
+                    .mochi-button {
+                        width: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+
+                        .mochi-button-base {
+                            flex-grow: 1;
+                            display: inline-block;
+                            white-space: normal;
+                            font-size: 1rem;
+                            line-height: initial;
+                            text-align: center;
+                        }
+                    }
+
+                    .rating-box-container {
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0 5px;
+
+                        a {
+                            display: inline-block;
+                            color: #95a5a6;
+                            text-decoration: none;
+                            font-size: 1.5rem;
+                            transition: ease 0.1s;
+                        }                        
+                    }
+                    .rating-box-container:hover a {
+                        color: #f39c12;
+                        /* amarillo (seleccionado) */
+                    }
+
+                    .rating-box-container:hover a:hover~a {
+                        color: #95a5a6;
+                        /* gris (normal) */
+                    }
+
+                }
+
+                // .state,
+                // .zip-code {
+                //     min-width: initial;
+                //     max-width: initial;
+                //     width: 50%;
+                // }
+
+                .state2,
+                .zip-code2 {
+                    min-width: 80px;
+                    max-width: 80px;
+                }
+            }
+
+            .cell-2 {
+                width: 35%;
+                display: flex;
+                flex-direction: column;
+
+                .portal-section {
+                    position: relative;
+                    width: 100%;
+                    flex-grow: 1;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+                    border: 1px solid rgba(0, 0, 0, 0.5);
+                    margin-top: 5px;
+                }
+
+                .input-box-container.drop-down{
+                    max-width: 20%;
+                }
+            }
+
+            .main-row-section:last-child .cell-2 {
+                .form-section {
+                    flex-grow: 1;
+                }
+            }
+
+            .cell-3 {
+                width: 25%;
+                display: flex;
+
+                .form-section {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-around;
+
+                    .row-section {
+                        flex-wrap: wrap;
+
+                        .name-box {
+                            flex-grow: 1;
+                            width: 50%;
+                        }
+                        .phone-number{
+                            max-width: 7rem;
+                        }
+                    }
+                    .row-section.no-wraping{
+                        flex-wrap: nowrap;
+                    }
+                    .row-section.buttons{
+                        display: flex;
+                        justify-content: center;
+                        .mochi-button {
+                            width: unset;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+    
+                            .mochi-button-base {
+                                flex-grow: 1;
+                                display: inline-block;
+                                white-space: normal;
+                                font-size: 1rem;
+                                line-height: initial;
+                                text-align: center;
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+    }
+}

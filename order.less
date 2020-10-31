@@ -1,0 +1,500 @@
+@borderStyle: 1px solid rgba(0, 0, 0, 0.5);
+
+* {
+  box-sizing: border-box;
+}
+body,
+html {
+  background-color: #eaeaea;
+  margin: 0;
+  padding: 0;
+  font-family: "Lato", sans-serif;
+  font-size: 12px;
+}
+
+.order-main-container {
+  width: 215.5mm;
+  height: 279.4mm;
+  background-color: #fff;
+  margin: 0 auto;
+  padding: 15mm 10mm;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    div.label {
+      font-weight: 700;
+    }
+    div.value {
+      color: red;
+      margin-left: 10px;
+    }
+
+    > .date {
+      display: flex;
+      justify-content: flex-start;
+      font-size: 14px;
+    }
+
+    > .company {
+      display: flex;
+      justify-content: center;
+      font-size: 16px;
+      color: red;
+      font-weight: bold;
+    }
+
+    > .numbers {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+
+      > div {
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  .customer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    border: @borderStyle;
+
+    .left {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      flex-basis: 100%;
+      border-right: @borderStyle;
+      padding: 10px;
+    }
+
+    .right {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      flex-basis: 100%;
+      padding: 5px 10px;
+
+      .row {
+        margin-bottom: 7px;
+      }
+
+      .label-col {
+        min-width: unset !important;
+        max-width: unset !important;
+        font-weight: 700;
+      }
+
+      .value-col {
+        color: red;
+        font-weight: bold;
+        margin-left: 5px;
+      }
+
+      .right-col {
+        margin-left: 15px;
+      }
+    }
+
+    .row {
+      display: flex;
+      padding: 1px 0;
+
+      .label-col {
+        min-width: 60px;
+        max-width: 60px;
+        font-weight: 700;
+      }
+      .value-col {
+        color: red;
+        font-weight: bold;
+      }
+      .value-col.code {
+        color: steelblue;
+      }
+    }
+  }
+
+  .order {
+    display: flex;
+    flex-direction: column;
+    border-left: @borderStyle;
+    border-right: @borderStyle;
+    border-bottom: @borderStyle;
+    padding: 10px;
+
+    .info {
+      display: flex;
+      justify-content: space-around;
+
+      > div {
+        display: flex;
+      }
+
+      .label {
+        font-weight: 700;
+      }
+      .value {
+        font-weight: bold;
+        color: red;
+        margin-left: 5px;
+      }
+    }
+
+    .tbl {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+
+      .thead,
+      .tbody {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .thead {
+        .tcol {
+          font-weight: bold;
+          text-decoration: underline;
+        }
+      }
+
+      .tbody {
+        .tcol {
+          color: red;
+          font-weight: bold;
+        }
+      }
+
+      .trow {
+        display: flex;
+        .tcol {
+          padding: 5px;
+        }
+      }
+
+      .tcol.pieces {
+        min-width: 50px;
+        max-width: 50px;
+      }
+      .tcol.type {
+        min-width: 60px;
+        max-width: 60px;
+      }
+      .tcol.weight {
+        min-width: 80px;
+        max-width: 80px;
+      }
+      .tcol.description {
+        flex-grow: 1;
+      }
+      .tcol.rate {
+        min-width: 100px;
+        max-width: 100px;
+      }
+      .tcol.descriptor {
+        min-width: 120px;
+        max-width: 120px;
+      }
+      .tcol.charges {
+        min-width: 100px;
+        max-width: 100px;
+      }
+    }
+  }
+
+  .shipper-consignee {
+    display: flex;
+    justify-content: space-between;
+    border-left: @borderStyle;
+    border-right: @borderStyle;
+    border-bottom: @borderStyle;
+
+    .shipper,
+    .consignee {
+      padding: 10px;      
+      flex-grow: 1;
+      flex-basis: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .shipper{
+        border-right: @borderStyle;
+    }
+
+    .row {
+      display: flex;
+      padding: 1px 0;
+
+      .label-col {
+        min-width: 80px;
+        max-width: 80px;
+        font-weight: 700;
+      }
+      .label-col.underlined {
+        min-width: unset !important;
+        max-width: unset !important;
+        text-decoration: underline;
+      }
+      .value-col {
+        color: red;
+        font-weight: bold;
+      }
+      .value-col.code {
+        color: steelblue;
+      }
+    }
+
+    .right {
+      margin-left: 10px;
+
+      .label-col {
+        min-width: 50px;
+        max-width: 50px;
+        font-weight: 700;
+      }
+    }
+  }
+
+  .carrier-driver {
+    display: flex;
+    justify-content: space-between;
+    border-left: @borderStyle;
+    border-right: @borderStyle;
+    border-bottom: @borderStyle;
+    padding: 10px;
+    align-items: center;
+
+    > div {
+      flex-grow: 1;
+      flex-basis: 100%;
+    }
+
+    .row {
+      display: flex;
+      padding: 1px 0;
+
+      .label-col {
+        min-width: 55px;
+        max-width: 55px;
+        font-weight: 700;
+      }
+      .label-col.title,
+      .label-col.ext {
+        min-width: unset !important;
+        max-width: unset !important;
+      }
+      .label-col.ext {
+        margin-left: 5px;
+      }
+      .value-col {
+        color: red;
+        font-weight: bold;
+      }
+      .value-col.code {
+        color: steelblue;
+      }
+    }
+  }
+
+  .notes-carrier {
+    display: flex;
+    flex-direction: column;
+    border-left: @borderStyle;
+    border-right: @borderStyle;
+    border-bottom: @borderStyle;
+    padding: 10px;
+    min-height: 120px;
+
+    .row {
+      display: flex;
+      padding: 1px 0;
+
+      .label.title {
+        min-width: unset !important;
+        max-width: unset !important;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .value {
+        color: red;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .events {
+    display: flex;
+    flex-direction: column;
+    border-left: @borderStyle;
+    border-right: @borderStyle;
+    border-bottom: @borderStyle;
+    padding: 10px;
+    flex-grow: 1;
+
+    .row {
+      display: flex;
+      padding: 1px 0;
+
+      .label.title {
+        min-width: unset !important;
+        max-width: unset !important;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .value {
+        color: red;
+        font-weight: bold;
+      }
+    }
+
+    .tbl {
+      display: flex;
+      flex-direction: column;
+
+      .thead,
+      .tbody {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .thead {
+        .tcol {
+          font-weight: bold;
+          text-decoration: underline;
+        }
+      }
+
+      .tbody {
+        .tcol {
+          color: red;
+          font-weight: bold;
+        }
+      }
+
+      .trow {
+        display: flex;
+        .tcol {
+          padding: 5px 0;
+        }
+      }
+
+      .tcol.datetime {
+        min-width: 150px;
+        max-width: 150px;
+      }
+      .tcol.event {
+        min-width: 120px;
+        max-width: 120px;
+      }
+      .tcol.location {
+        min-width: 140px;
+        max-width: 140px;
+      }
+      .tcol.notes {
+        flex-grow: 1;
+      }
+      .tcol.user {
+        min-width: 40px;
+        max-width: 40px;
+      }
+    }
+  }
+
+  .totals {
+    display: flex;
+    flex-direction: column;
+    border-left: @borderStyle;
+    border-right: @borderStyle;
+    border-bottom: @borderStyle;
+    padding: 10px;
+
+    .row {
+      display: flex;
+      padding: 1px 0;
+
+      .label.title {
+        min-width: unset !important;
+        max-width: unset !important;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .value {
+        color: red;
+        font-weight: bold;
+      }
+    }
+
+    .tbl {
+      display: flex;
+      flex-direction: column;
+
+      .thead,
+      .tbody {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .thead {
+        .tcol {
+          font-weight: bold;
+          text-decoration: underline;
+        }
+      }
+
+      .tbody {
+        .tcol {
+          color: red;
+          font-weight: bold;
+        }
+      }
+
+      .trow {
+        display: flex;
+        .tcol {
+          padding: 5px 0;
+        }
+      }
+
+      .tcol.pieces {
+        min-width: 90px;
+        max-width: 90px;
+      }
+      .tcol.weight {
+        min-width: 100px;
+        max-width: 100px;
+      }
+      .tcol.charges {
+        min-width: 100px;
+        max-width: 100px;
+      }
+      .tcol.cost {
+        min-width: 100px;
+        max-width: 100px;
+      }
+      .tcol.profit {
+        min-width: 100px;
+        max-width: 100px;
+      }
+      .tcol.percentage {
+        min-width: 100px;
+        max-width: 100px;
+      }
+      .tcol.miles {
+        flex-grow: 1;
+      }
+    }
+  }
+}

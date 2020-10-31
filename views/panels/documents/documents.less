@@ -1,0 +1,86 @@
+#panel-carrier-docs {
+    .input-box-container {
+        margin: 0;
+    }
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+
+        .input-fields-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            > .separator{
+                margin: 2px 0;
+            }
+            .row-fields {
+                display: flex;
+                justify-content: space-between;
+                flex-direction: row;
+                .input-box-container{
+                    flex-grow: 1;
+                }
+
+                .input-box-container.medium-size {
+                    max-width: 100px;
+                }
+
+                .input-box-container.fixed-size {
+                    max-width: 270px;
+                }
+
+                > .separator {
+                    margin: 0 1px;
+                    width: 0;
+                }
+            }
+
+            .row-fields:first-child {
+                justify-content: flex-start;
+            }
+        }
+
+        .buttons-section {
+            width: 120px;
+            margin-left: 5px;
+
+            .mochi-button {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .mochi-button-base {
+                    font-size: 0.9rem;
+                    text-align: center;
+                    flex-grow: 1;
+                    white-space: normal;
+                    line-height: 14px;
+                    font-weight: normal;
+                }
+            }
+        }
+    }
+
+    .row-content{
+        display: flex;
+        flex-direction: row;
+        margin: 3px 0;        
+        height: 200px;
+        > .separator{
+            margin: 0 3px;
+        }
+    }
+    .row-content.growed{
+        flex-grow: 1;
+    }
+
+    .form-section {
+        margin: 0;
+    }
+
+}

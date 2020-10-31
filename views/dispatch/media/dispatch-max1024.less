@@ -1,0 +1,48 @@
+@inputLabelColor: rgba(0, 0, 0, 0.7);
+@sectionTitleFontSize: 12px;
+@sectionTitlePadding: 0 3px;
+
+@media screen and (max-width: 1024px) {
+    .input-box-container,
+    .select-box-container {
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        border-radius: 45px;
+        overflow: hidden;
+        position: relative;
+        background-color: #fff;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        height: 25px;
+        label {
+            background-color: transparent;
+            font-size: 10px;
+            width: 100%;
+            padding: 0 8px;
+            color: @inputLabelColor;
+            font-style: italic;
+            margin: -2px 0;
+            white-space: nowrap;
+        }
+        input {
+            background-color: transparent;
+            border: 1px solid transparent;
+            width: 100%;
+            padding: 0 8px;
+            text-align: left;
+            font-size: @inputFontSize;
+        }
+        select {
+            background-color: transparent;
+            border: 1px solid transparent;
+            width: calc(100% - 2px);
+            padding: 0 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+    }
+    .input-box-container.box-danger,
+    .select-box-container.box-danger {
+        background-color: rgb(223, 157, 157);
+    }
+}

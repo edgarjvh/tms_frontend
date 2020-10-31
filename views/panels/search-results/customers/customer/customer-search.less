@@ -1,0 +1,100 @@
+.search-container {
+	flex-grow: 1;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+
+	.tbl-customers-customer-search-results {
+		display: flex;
+		flex-direction: column;
+        flex-grow: 1;
+        font-size: 0.8rem;
+        margin-top: 10px;
+
+		.thead,
+		.tbody {
+			display: flex;
+			flex-direction: column;
+			.trow {
+				display: flex;
+				.tcol {
+					padding: 10px;
+				}
+			}
+		}
+
+		.thead {
+            border-bottom: 1px solid rgba(0,0,0,0.3);
+			.tcol {
+				font-weight: bold;
+			}
+        }
+        .tbody{
+            flex-grow: 1;
+            position: relative;
+            .wrapper{
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                overflow-y: auto;
+
+                .trow{
+                    align-items: center;
+                    cursor: default;      
+                    .tcol{
+                        span{
+                            text-decoration: underline;
+                        }
+                    }                
+                }
+                .trow:hover{
+                    background-color: rgba(0,0,0,0.05);
+                }
+            }
+        }
+
+		.tcol.hidden {
+			display: none;
+        }
+        
+        .tcol.code{
+            max-width: 90px;
+            min-width: 90px;
+        }
+        .tcol.name{
+            max-width: 160px;
+            min-width: 160px;
+        }
+        .tcol.address1{
+            max-width: 190px;
+            min-width: 190px;
+        }
+        .tcol.address2{
+            max-width: 190px;
+            min-width: 190px;
+        }
+        .tcol.city{
+            max-width: 120px;
+            min-width: 120px;
+        }
+        .tcol.state{
+            max-width: 60px;
+            min-width: 60px;
+        }
+        .tcol.zip{
+            max-width: 100px;
+            min-width: 100px;
+        }
+        .tcol.contact-name{
+            max-width: 160px;
+            min-width: 160px;
+        }
+        .tcol.contact-phone{
+            max-width: 120px;
+            min-width: 120px;
+        }
+        .tcol.ext{
+            flex-grow: 1;
+        }
+	}
+}

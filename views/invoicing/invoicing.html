@@ -1,0 +1,724 @@
+<div class="swiper-slide" id="swiper-slide-invoice">
+    <div class="slide-title">Invoice</div>
+    <div class="invoice-container main-slide-container" id="invoice-container">
+        <div class="invoice-content">
+            <div class="invoice-wrapper">
+
+                <div class="mochi-contextual-container" data-ctrl-id="">
+                    <div class="mochi-contextual-popup">
+                        <div class="mochi-contextual-popup-content">
+                            <div class="mochi-contextual-popup-wrapper">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-section left">
+                    <div class="top-section">
+                        <div class="form-section bottom-controls">
+                            <div class="top-border-section">
+                                <div class="left-border"></div>
+                                <div class="section-title">Bill To</div>
+                                <div class="middle-border"></div>
+                                <div class="section-btn">
+                                    <div class="mochi-button text-center" id="invoice-bill-to-reviewed-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Reviewed
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center" id="invoice-bill-to-docs-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Docs
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center" id="invoice-bill-to-invoice-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Invoice
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>
+                                <div class="right-border"></div>
+                            </div>
+
+                            <div class="row-section">
+                                <!-- <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-customer-charges-rate-type"
+                                        name="txt-panel-rating-screen-customer-charges-rate-type" title="Rate Type">
+                                    <label for="txt-panel-rating-screen-customer-charges-rate-type">Rate Type</label>
+                                </div> -->
+                                <div class="input-box-container drop-down">
+                                    <input required type="text" id="cbo-invoice-bill-to-rate-type" name="cbo-invoice-bill-to-rate-type"
+                                        title="Rate Type" data-selected-index="none">
+                                    <label for="cbo-invoice-bill-to-rate-type">Rate Type</label>
+                                    <span class="fas fa-sort-down"></span>                                    
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text"
+                                        id="txt-panel-rating-screen-customer-charges-rate-description"
+                                        name="txt-panel-rating-screen-customer-charges-rate-description"
+                                        title="Rate Description">
+                                    <label for="txt-panel-rating-screen-customer-charges-rate-description">Rate
+                                        Description</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-customer-charges-units"
+                                        name="txt-panel-rating-screen-customer-charges-units" title="Units">
+                                    <label for="txt-panel-rating-screen-customer-charges-units">Units</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-customer-charges-weight"
+                                        name="txt-panel-rating-screen-customer-charges-weight" title="Weight">
+                                    <label for="txt-panel-rating-screen-customer-charges-weight">Weight</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-customer-charges-miles"
+                                        name="txt-panel-rating-screen-customer-charges-miles" title="Miles">
+                                    <label for="txt-panel-rating-screen-customer-charges-miles">Miles</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-customer-charges-rate"
+                                        name="txt-panel-rating-screen-customer-charges-rate" title="Rate">
+                                    <label for="txt-panel-rating-screen-customer-charges-rate">Rate</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text"
+                                        id="txt-panel-rating-screen-customer-charges-total-charges"
+                                        name="txt-panel-rating-screen-customer-charges-total-charges"
+                                        title="Total Charges">
+                                    <label for="txt-panel-rating-screen-customer-charges-total-charges">Total
+                                        Charges</label>
+                                </div>
+                            </div>
+
+                            <div class="portal-container rounded">
+                                <div class="portal-content">
+                                </div>
+                            </div>
+
+                            <div class="bottom-border-section">
+                                <div class="left-border"></div>
+                                <div class="middle-border"></div>
+                                <div class="section-btn">
+                                    <div class="mochi-button text-center" id="invoice-bill-to-delete-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Delete
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="hsep"></div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container totalize">
+                                        <input required type="text" id="txt-invoice-bill-to-total-charges"
+                                            name="txt-invoice-bill-to-total-charges" title="Total Charges">
+                                        <label for="txt-invoice-bill-to-total-charges">Total Charges</label>
+                                    </div>
+                                </div>
+                                <div class="right-border"></div>
+                            </div>
+                        </div>
+                        <div class="hsep"></div>
+                        <div class="form-section-extra">
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-bill-to-order-number"
+                                    name="txt-invoice-bill-to-order-number" title="Order Number">
+                                <label for="txt-invoice-bill-to-order-number">Order Number</label>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-bill-to-trip-number"
+                                    name="txt-invoice-bill-to-trip-number" title="Trip Number">
+                                <label for="txt-invoice-bill-to-trip-number">Trip Number</label>
+                            </div>
+                            <div class="vsep2"></div>
+                            <div class="form-section bottom-controls">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Docs</div>
+                                    <div class="middle-border"></div>
+                                    <div class="right-border"></div>
+                                </div>
+
+                                <div class="bottom-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="middle-border"></div>
+                                    <!-- <div class="section-btn">
+                                        <div class="mochi-button text-center"
+                                            id="invoice-bill-to-required-docs-scan-new">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Scan New Doc
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center" id="invoice-bill-to-required-docs-delete">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Delete
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div> -->
+                                    <div class="right-border"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vsep"></div>
+
+                    <div class="bottom-section">
+                        <div class="form-section bottom-controls">
+                            <div class="top-border-section">
+                                <div class="left-border"></div>
+                                <div class="section-title">Carrier Charges</div>
+                                <div class="middle-border"></div>
+                                <div class="section-btn">
+                                    <div class="mochi-button text-center" id="invoice-carrier-charges-previewed-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Previewed
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center" id="invoice-carrier-charges-invoice-recd-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Invoice Rec'd
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center" id="invoice-carrier-charges-bol-recd-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            BOL Rec'd
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center"
+                                        id="invoice-carrier-charges-rate-conf-recd-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Rate Conf Rec'd
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center" id="invoice-carrier-charges-add-docs-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Add Documents
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="mochi-button text-center" id="invoice-carrier-charges-Approved-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Approved
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>
+                                <div class="right-border"></div>
+                            </div>
+
+                            <div class="row-section">
+                                <!-- <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-carrier-payments-rate-type"
+                                        name="txt-panel-rating-screen-carrier-payments-rate-type" title="Rate Type">
+                                    <label for="txt-panel-rating-screen-carrier-payments-rate-type">Rate Type</label>
+                                </div> -->
+                                <div class="input-box-container drop-down">
+                                    <input required type="text" id="cbo-invoice-carrier-charges-rate-type" name="cbo-invoice-carrier-charges-rate-type"
+                                        title="Rate Type" data-selected-index="none">
+                                    <label for="cbo-invoice-carrier-charges-rate-type">Rate Type</label>
+                                    <span class="fas fa-sort-down"></span>                                    
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text"
+                                        id="txt-panel-rating-screen-carrier-payments-rate-description"
+                                        name="txt-panel-rating-screen-carrier-payments-rate-description"
+                                        title="Rate Description">
+                                    <label for="txt-panel-rating-screen-carrier-payments-rate-description">Rate
+                                        Description</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-carrier-payments-units"
+                                        name="txt-panel-rating-screen-carrier-payments-units" title="Units">
+                                    <label for="txt-panel-rating-screen-carrier-payments-units">Units</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-carrier-payments-weight"
+                                        name="txt-panel-rating-screen-carrier-payments-weight" title="Weight">
+                                    <label for="txt-panel-rating-screen-carrier-payments-weight">Weight</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-carrier-payments-miles"
+                                        name="txt-panel-rating-screen-carrier-payments-miles" title="Miles">
+                                    <label for="txt-panel-rating-screen-carrier-payments-miles">Miles</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text" id="txt-panel-rating-screen-carrier-payments-rate"
+                                        name="txt-panel-rating-screen-carrier-payments-rate" title="Rate">
+                                    <label for="txt-panel-rating-screen-carrier-payments-rate">Rate</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container">
+                                    <input required type="text"
+                                        id="txt-panel-rating-screen-carrier-payments-total-payments"
+                                        name="txt-panel-rating-screen-carrier-payments-total-payments"
+                                        title="Total Payments">
+                                    <label for="txt-panel-rating-screen-carrier-payments-total-payments">Total
+                                        Payments</label>
+                                </div>
+                            </div>
+
+                            <div class="portal-container rounded">
+                                <div class="portal-content">
+                                </div>
+                            </div>
+
+                            <div class="bottom-border-section">
+                                <div class="left-border"></div>
+                                <div class="input-box-container profit">
+                                    <input required type="text" id="txt-panel-rating-screen-payments-gross-profit"
+                                        name="txt-panel-rating-screen-payments-gross-profit" title="Gross Profit">
+                                    <label for="txt-panel-rating-screen-payments-gross-profit">Gross Profit</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container profit">
+                                    <input required type="text" id="txt-panel-rating-screen-payments-percentage-profit"
+                                        name="txt-panel-rating-screen-payments-percentage-profit"
+                                        title="Percentage Profit">
+                                    <label for="txt-panel-rating-screen-payments-percentage-profit">Percentage
+                                        Profit</label>
+                                </div>
+                                <div class="middle-border"></div>
+                                <div class="section-btn">
+                                    <div class="mochi-button text-center"
+                                        id="panel-rating-screen-carrier-payments-delete-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Delete
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div class="hsep"></div>
+                                    <div class="hsep"></div>
+                                    <div class="hsep"></div>
+                                    <div class="input-box-container totalize">
+                                        <input required type="text" id="txt-panel-rating-screen-payments-grand-total"
+                                            name="txt-panel-rating-screen-payments-grand-total"
+                                            title="Total Carrier Payments">
+                                        <label for="txt-panel-rating-screen-payments-grand-total">Total Carrier
+                                            Payments</label>
+                                    </div>
+                                </div>
+                                <div class="right-border"></div>
+                            </div>
+                        </div>
+                        <div class="hsep"></div>
+                        <div class="form-section-extra">
+                            <div class="form-section bottom-controls">
+                                <div class="top-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="section-title">Docs</div>
+                                    <div class="middle-border"></div>
+                                    <div class="right-border"></div>
+                                </div>
+
+                                <div class="bottom-border-section">
+                                    <div class="left-border"></div>
+                                    <div class="middle-border"></div>
+                                    <!-- <div class="section-btn">
+                                        <div class="mochi-button text-center"
+                                            id="invoice-carrier-charges-required-docs-scan-new">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Scan New Doc
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div class="mochi-button text-center" id="invoice-carrier-charges-required-docs-delete">
+                                            <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div class="mochi-button-base">
+                                                Delete
+                                            </div>
+                                            <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div> -->
+                                    <div class="right-border"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hsep2"></div>
+                <div class="col-section right">
+                    <div class="row-container">
+                        <div class="form-section">
+                            <div class="top-border-section">
+                                <div class="left-border"></div>
+                                <div class="section-title">Bill To</div>
+                                <div class="middle-border"></div>
+                                <div class="section-btn">
+                                    <div class="mochi-button text-center" id="invoice-bill-to-customer-info-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Customer Info
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>                              
+                                <div class="right-border"></div>
+                            </div>
+
+                            <div class="row-section">
+                                <div class="input-box-container code shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-code" name="txt-bill-to-code"
+                                        title="Bill-To Code" maxlength="10" required>
+                                    <label for="txt-invoice-bill-to-code">Code</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-name" name="txt-bill-to-name"
+                                        title="Bill-To Name">
+                                    <label for="txt-invoice-bill-to-name">Name</label>
+                                </div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section">
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-address-1"
+                                        name="txt-bill-to-address-1" title="Bill-To Address 1">
+                                    <label for="txt-invoice-bill-to-address-1">Address 1</label>
+                                </div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section">
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-address-2"
+                                        name="txt-bill-to-address-2" title="Bill-To Address 2">
+                                    <label for="txt-invoice-bill-to-address-2">Address 2</label>
+                                </div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section">
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-city" name="txt-bill-to-city"
+                                        title="Bill-To City">
+                                    <label for="txt-invoice-bill-to-city">City</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container state shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-state" name="txt-bill-to-state"
+                                        title="Bill-To State" maxlength="2">
+                                    <label for="txt-invoice-bill-to-state">State</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container zip-code shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-zip-code"
+                                        name="txt-bill-to-zip-code" title="Bill-To Postal Code">
+                                    <label for="txt-invoice-bill-to-zip-code">Postal Code</label>
+                                </div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section">
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-contact-name"
+                                        name="txt-bill-to-contact-name" title="Bill-To Contact Name">
+                                    <label for="txt-invoice-bill-to-contact-name">Contact Name</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container phone-number shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-contact-phone"
+                                        name="txt-bill-to-contact-phone" title="Bill-To Contact Phone">
+                                    <label for="txt-invoice-bill-to-contact-phone">Contact Phone</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container phone-ext shows-popup">
+                                    <input required type="text" id="txt-invoice-bill-to-contact-phone-ext"
+                                        name="txt-bill-to-contact-phone-ext" title="Bill-To Contact Phone Ext">
+                                    <label for="txt-invoice-bill-to-contact-phone-ext">Ext</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hsep2"></div>
+                        <div class="form-section-extra">
+                            <div class="mochi-button text-center" id="invoice-bill-to-print-invoice-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Print Invoice
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="mochi-button text-center" id="invoice-bill-to-email-invoice-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    E-Mail Invoice
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="mochi-button text-center" id="invoice-bill-to-batch-billing-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Batch Billing
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-bill-to-date-received"
+                                    name="txt-invoice-bill-to-date-received" title="Date Received">
+                                <label for="txt-invoice-bill-to-date-received">Date Received</label>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-bill-to-check-number"
+                                    name="txt-invoice-bill-to-check-number" title="Check Number">
+                                <label for="txt-invoice-bill-to-check-number">Check Number</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vsep2"></div>
+                    <div class="row-container">
+                        <div class="input-box-container">
+                            <input required type="text" id="txt-invoice-bill-to-bol-number"
+                                name="txt-invoice-bill-to-bol-number" title="BOL Number">
+                            <label for="txt-invoice-bill-to-bol-number">BOL Number</label>
+                        </div>
+                        <div class="hsep"></div>
+                        <div class="input-box-container">
+                            <input required type="text" id="txt-invoice-bill-to-ref-number"
+                                name="txt-invoice-bill-to-ref-number" title="Ref Number">
+                            <label for="txt-invoice-bill-to-ref-number">Ref Number</label>
+                        </div>
+                        <div class="hsep"></div>
+                        <div class="input-box-container">
+                            <input required type="text" id="txt-invoice-bill-to-PO-number"
+                                name="txt-invoice-bill-to-PO-number" title="PO Number">
+                            <label for="txt-invoice-bill-to-PO-number">PO Number</label>
+                        </div>
+                        <div class="hsep"></div>
+                        <div class="input-box-container">
+                            <input required type="text" id="txt-invoice-bill-to-seal-number"
+                                name="txt-invoice-bill-to-seal-number" title="Seal Number">
+                            <label for="txt-invoice-bill-to-seal-number">Seal Number</label>
+                        </div>
+                    </div>
+                    <div class="vsep2"></div>
+                    <div class="row-container growed">
+                        <div class="form-section">
+                            <div class="top-border-section">
+                                <div class="left-border"></div>
+                                <div class="section-title">Internal Notes</div>
+                                <div class="middle-border"></div>                                
+                                <div class="right-border"></div>
+                            </div>                            
+                        </div>
+                        <div class="hsep2"></div>
+                        <div class="form-section">
+                            <div class="top-border-section">
+                                <div class="left-border"></div>
+                                <div class="section-title">Billing Notes (Will appear on Invoice)</div>
+                                <div class="middle-border"></div>                                
+                                <div class="right-border"></div>
+                            </div>                            
+                        </div>
+                        <div class="hsep2"></div>
+                    </div>
+                    <div class="vsep2"></div>
+                    <div class="row-container">
+                        <div class="form-section">
+                            <div class="top-border-section">
+                                <div class="left-border"></div>
+                                <div class="section-title">Carrier</div>
+                                <div class="middle-border"></div>
+                                <div class="section-btn">
+                                    <div class="mochi-button text-center" id="invoice-carrier-info-btn">
+                                        <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div class="mochi-button-base">
+                                            Carrier Info
+                                        </div>
+                                        <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>
+                                <div class="right-border"></div>
+                            </div>
+                            <div class="row-section">
+                                <div class="input-box-container code shows-popup">
+                                    <input required type="text" id="txt-carrier-code" name="txt-carrier-code"
+                                        title="carrier-Code" maxlength="10">
+                                    <label for="txt-carrier-code">Code</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-carrier-name" name="txt-carrier-name"
+                                        title="Carrier Name">
+                                    <label for="txt-carrier-name">Name</label>
+                                </div>                                
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section">
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-carrier-load-starting-destination"
+                                        name="txt-carrier-load-starting-destination"
+                                        title="Carrier Load Starting and Destination">
+                                    <label for="txt-carrier-load-starting-destination">
+                                        Carrier Load - Starting City State - Destination City State
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section">
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-carrier-contact-name"
+                                        name="txt-carrier-contact-name" title="Carrier Contact Name">
+                                    <label for="txt-carrier-contact-name">Contact Name</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container phone-number shows-popup">
+                                    <input required type="text" id="txt-carrier-contact-phone-number"
+                                        name="txt-carrier-contact-phone-number"
+                                        title="Carrier Contact Phone Number">
+                                    <label for="txt-carrier-contact-phone-number">Contact Phone</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container phone-ext shows-popup">
+                                    <input required type="text" id="txt-carrier-contact-phone-ext"
+                                        name="txt-carrier-contact-phone-ext" title="Carrier Contact Phone Ext">
+                                    <label for="txt-carrier-contact-phone-ext">Ext</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <!-- <div class="select-box-container equipment">
+                                    <select type="text" id="cbo-carrier-equipment" name="cbo-carrier-equipment"
+                                        title="Carrier Equipments">
+                                        <option value="1">Equip. 1</option>
+                                        <option value="2">Equip. 2</option>
+                                        <option value="3">Equip. 3</option>
+                                    </select>
+                                    <label for="cbo-carrier-equipment">Equipment</label>
+                                </div> -->
+                                <div class="input-box-container drop-down equipment">
+                                    <input required type="text" id="cbo-invoice-carrier-equipment"
+                                        name="cbo-invoice-carrier-equipment" title="Equipment" data-selected-index="none">
+                                    <label for="cbo-invoice-carrier-equipment">Equipment</label>
+                                    <span class="fas fa-sort-down"></span>
+                                </div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section">
+                                <div class="input-box-container shows-popup">
+                                    <input required type="text" id="txt-carrier-driver-name"
+                                        name="txt-carrier-driver-name" title="Carrier Driver Name">
+                                    <label for="txt-carrier-driver-name">Driver Name</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container phone-number shows-popup">
+                                    <input required type="text" id="txt-carrier-driver-phone-number"
+                                        name="txt-carrier-driver-phone-number" title="Carrier Driver Phone Number">
+                                    <label for="txt-carrier-driver-phone-number">Driver Phone</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container phone-ext shows-popup">
+                                    <input required type="text" id="txt-carrier-unit-number"
+                                        name="txt-carrier-unit-number" title="Carrier Unit Number">
+                                    <label for="txt-carrier-unit-number">Unit Number</label>
+                                </div>
+                                <div class="hsep"></div>
+                                <div class="input-box-container equipment shows-popup">
+                                    <input required type="text" id="txt-carrier-trailer-number"
+                                        name="txt-carrier-trailer-number" title="Carrier Trailer Number">
+                                    <label for="txt-carrier-trailer-number">Trailer Number</label>
+                                </div>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="row-section buttons">                                
+                                <div class="mochi-button text-center">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        E-mail Rate Confirmation to Carrier
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hsep2"></div>
+                        <div class="form-section-extra">                           
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-carrier-date-paid"
+                                    name="txt-invoice-carrier-date-paid" title="Date Paid">
+                                <label for="txt-invoice-carrier-date-paid">Date Paid</label>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-carrier-check-number"
+                                    name="txt-invoice-carrier-check-number" title="Check Number">
+                                <label for="txt-invoice-carrier-check-number">Check Number</label>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-carrier-recd-date"
+                                    name="txt-invoice-carrier-recd-date" title="Invoice Rec'd Date">
+                                <label for="txt-invoice-carrier-recd-date">Invoice Rec'd Date</label>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-carrier-number"
+                                    name="txt-invoice-carrier-number" title="Invoice Number">
+                                <label for="txt-invoice-carrier-number">Invoice Number</label>
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container drop-down">
+                                <input required type="text" id="cbo-invoice-carrier-terms" name="cbo-invoice-carrier-terms"
+                                    title="Terms" data-selected-index="none">
+                                <label for="cbo-invoice-carrier-terms">Terms</label>
+                                <span class="fas fa-sort-down"></span>                                    
+                            </div>
+                            <div class="vsep"></div>
+                            <div class="input-box-container">
+                                <input required type="text" id="txt-invoice-carrier-pay-by-date"
+                                    name="txt-invoice-carrier-pay-by-date" title="Pay By Date">
+                                <label for="txt-invoice-carrier-pay-by-date">Pay By Date</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="swiper-slide-selectable">
+        <div class="swiper-slide-close-btn">Close</div>
+    </div>
+
+    <div id="invoice-main-panel-container" class="main-panel-container">
+        <div class="panel-container">
+            <div class="gutter"></div>
+
+
+
+        </div>
+    </div>
+</div>
