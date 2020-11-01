@@ -217,6 +217,9 @@
 .panel-contact-container .contact-info-container .contact-info-form .hidden {
   display: none !important;
 }
+.panel-contact-container .contact-info-container .contact-info-form .contact-info-row.hidden {
+  display: none;
+}
 .panel-contact-container .contact-info-container .contact-info-form .contact-info-row {
   margin-bottom: 15px;
   max-width: 50%;

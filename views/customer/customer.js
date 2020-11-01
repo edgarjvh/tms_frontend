@@ -281,6 +281,15 @@ function eventListeners() {
                         content = content.replace('[CONTACT-BIRTHDAY]', con.birthday);
                         content = content.replace('[CONTACT-WEBSITE]', con.website);
                         content = content.replace('[CONTACT-NOTES]', con.notes);
+                        content = content.replace('[CONTACT-TO]', con.automatic_emails_to);
+                        content = content.replace('[CONTACT-CC]', con.automatic_emails_cc);
+                        content = content.replace('[CONTACT-BCC]', con.automatic_emails_bcc);
+                        content = content.replace('[CONTACT-BOOKED-LOAD]', con.automatic_emails_booked_load);
+                        content = content.replace('[CONTACT-CHECK-CALLS]', con.automatic_emails_check_calls);
+                        content = content.replace('[CONTACT-CARRIER-ARRIVAL-SHIPPER]', con.automatic_emails_carrier_arrival_shipper);
+                        content = content.replace('[CONTACT-CARRIER-ARRIVAL-CONSIGNEE]', con.automatic_emails_carrier_arrival_consignee);
+                        content = content.replace('[CONTACT-LOADED]', con.automatic_emails_loaded);
+                        content = content.replace('[CONTACT-EMPTY]', con.automatic_emails_empty);                        
 
                         if (panelContainer.find('.panel').length === 0) {
 
@@ -368,6 +377,15 @@ function eventListeners() {
                 contactInfoContainer.find('input#txt-panel-contact-info-birthday').val(con.birthday);
                 contactInfoContainer.find('input#txt-panel-contact-info-website').val(con.website);
                 contactInfoContainer.find('input#txt-panel-contact-info-notes').val(con.notes);
+                contactInfoContainer.find('input#txt-panel-contact-info-to').val(con.automatic_emails_to);
+                contactInfoContainer.find('input#txt-panel-contact-info-cc').val(con.automatic_emails_cc);
+                contactInfoContainer.find('input#txt-panel-contact-info-bcc').val(con.automatic_emails_bcc);
+                contactInfoContainer.find('input#txt-panel-contact-info-booked-load').val(con.automatic_emails_booked_load);
+                contactInfoContainer.find('input#txt-panel-contact-info-check-calls').val(con.automatic_emails_check_calls);
+                contactInfoContainer.find('input#txt-panel-contact-info-carrier-arrival-shipper').val(con.automatic_emails_carrier_arrival_shipper);
+                contactInfoContainer.find('input#txt-panel-contact-info-carrier-arrival-consignee').val(con.automatic_emails_carrier_arrival_consignee);
+                contactInfoContainer.find('input#txt-panel-contact-info-loaded').val(con.automatic_emails_loaded);
+                contactInfoContainer.find('input#txt-panel-contact-info-empty').val(con.automatic_emails_empty);
             })
     })
 
@@ -386,7 +404,13 @@ function eventListeners() {
         contactInfoContainer.find('.contact-info-header-data-extra-occupation').text('---');
         contactInfoContainer.find('input#toggle-panel-contacts-primary').prop('checked', false);
         contactInfoContainer.find('.contact-info-form input').val('');
-        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-id').val('0');
+        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-id').val('0');        
+        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-booked-load').val('0');
+        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-check-calls').val('0');
+        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-carrier-arrival-shipper').val('0');
+        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-carrier-arrival-consignee').val('0');
+        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-loaded').val('0');
+        contactInfoContainer.find('.contact-info-form input#txt-panel-contact-info-empty').val('0');
     })
 
     $(document).on('click', '#customer-contacts-add-contact-btn', function (e) {
@@ -488,6 +512,15 @@ function eventListeners() {
                         content = content.replace('[CONTACT-BIRTHDAY]', '');
                         content = content.replace('[CONTACT-WEBSITE]', '');
                         content = content.replace('[CONTACT-NOTES]', '');
+                        content = content.replace('[CONTACT-TO]', '');
+                        content = content.replace('[CONTACT-CC]', '');
+                        content = content.replace('[CONTACT-BCC]', '');
+                        content = content.replace('[CONTACT-BOOKED-LOAD]', 0);
+                        content = content.replace('[CONTACT-CHECK-CALLS]', 0);
+                        content = content.replace('[CONTACT-CARRIER-ARRIVAL-SHIPPER]', 0);
+                        content = content.replace('[CONTACT-CARRIER-ARRIVAL-CONSIGNEE]', 0);
+                        content = content.replace('[CONTACT-LOADED]', 0);
+                        content = content.replace('[CONTACT-EMPTY]', 0);
 
                         if (panelContainer.find('.panel').length === 0) {
 
@@ -750,23 +783,27 @@ function eventListeners() {
 
     $(document).on('click', '#customer-contacts-clear-btn', function (e) {
         let formSection = $(this).closest('.form-section');
+        let automaticEmailsSection = $(this).closest('.forms-section-container').find('.automatic-emails-section');
         formSection.find('input').val('');
         formSection.find('input[type=checkbox]').prop('checked', false);
+        automaticEmailsSection.find('input[type=text]').val('');
+        automaticEmailsSection.find('input[type=checkbox]').prop('checked', false);
     });
 
     $(document).on('change', 'input#txt-customer-customer-id', function () {
         let customer_id = $(this).val();
 
-        console.log(customer_id);
-
         let customerContainer = $(this).closest('.customer-container');
         let contactSection = customerContainer.find('.contacts-section');
+        let automaticEmailsSection = customerContainer.find('.automatic-emails-section');
         let contactListWrapper = customerContainer.find('.customer-contact-list-wrapper');
 
         if (customer_id === '') {
             contactListWrapper.html('');
             contactSection.find('input[type=text]').val('')
             contactSection.find('input[type=checkbox]').prop('checked', false);
+            automaticEmailsSection.find('input[type=text]').val('');
+            automaticEmailsSection.find('input[type=checkbox]').prop('checked', false);
         } else {
             contactListWrapper.html(`
                         <div class="loader">
@@ -802,7 +839,15 @@ function eventListeners() {
                                     data-email-other="${contact.email_other}"
                                     data-is-primary="${contact.is_primary}"
                                     data-is-online="${contact.is_online}"
-                                    data-notes="${contact.notes}">
+                                    data-automatic-emails-to="${contact.automatic_emails_to || ''}"      
+                                    data-automatic-emails-cc="${contact.automatic_emails_cc || ''}"      
+                                    data-automatic-emails-bcc="${contact.automatic_emails_bcc || ''}"      
+                                    data-automatic-emails-booked-load="${contact.automatic_emails_booked_load}"      
+                                    data-automatic-emails-check-calls="${contact.automatic_emails_check_calls}"      
+                                    data-automatic-emails-carrier-arrival-shipper="${contact.automatic_emails_carrier_arrival_shipper}"      
+                                    data-automatic-emails-carrier-arrival-consignee="${contact.automatic_emails_carrier_arrival_consignee}"      
+                                    data-automatic-emails-loaded="${contact.automatic_emails_loaded}"      
+                                    data-automatic-emails-empty="${contact.automatic_emails_empty}">     
 
                                     <div class="item-name">${contact.first_name + ' ' + contact.middle_name + ' ' + contact.last_name}</div>
                                     <div class="item-phone">${contact.phone_work}</div>
@@ -923,6 +968,15 @@ function eventListeners() {
                         content = content.replace('[CONTACT-BIRTHDAY]', con.birthday);
                         content = content.replace('[CONTACT-WEBSITE]', con.website);
                         content = content.replace('[CONTACT-NOTES]', con.notes);
+                        content = content.replace('[CONTACT-TO]', con.automatic_emails_to);
+                        content = content.replace('[CONTACT-CC]', con.automatic_emails_cc);
+                        content = content.replace('[CONTACT-BCC]', con.automatic_emails_bcc);
+                        content = content.replace('[CONTACT-BOOKED-LOAD]', con.automatic_emails_booked_load);
+                        content = content.replace('[CONTACT-CHECK-CALLS]', con.automatic_emails_check_calls);
+                        content = content.replace('[CONTACT-CARRIER-ARRIVAL-SHIPPER]', con.automatic_emails_carrier_arrival_shipper);
+                        content = content.replace('[CONTACT-CARRIER-ARRIVAL-CONSIGNEE]', con.automatic_emails_carrier_arrival_consignee);
+                        content = content.replace('[CONTACT-LOADED]', con.automatic_emails_loaded);
+                        content = content.replace('[CONTACT-EMPTY]', con.automatic_emails_empty);
 
                         if (panelContainer.find('.panel').length === 0) {
 
@@ -972,8 +1026,18 @@ function eventListeners() {
         let isPrimary = $(this).attr('data-is-primary');
         let isOnline = $(this).attr('data-is-online');
         let notes = $(this).attr('data-notes');
+        let automaticEmailsTo = $(this).attr('data-automatic-emails-to');
+        let automaticEmailsCc = $(this).attr('data-automatic-emails-cc');
+        let automaticEmailsBcc = $(this).attr('data-automatic-emails-bcc');
+        let automaticEmailsBookedLoad = $(this).attr('data-automatic-emails-booked-load');
+        let automaticEmailsCheckCalls = $(this).attr('data-automatic-emails-check-calls');
+        let automaticEmailsCarrierArrivalShipper = $(this).attr('data-automatic-emails-carrier-arrival-shipper');
+        let automaticEmailsCarrierArrivalConsignee = $(this).attr('data-automatic-emails-carrier-arrival-consignee');
+        let automaticEmailsLoaded = $(this).attr('data-automatic-emails-loaded');
+        let automaticEmailsEmpty = $(this).attr('data-automatic-emails-empty');
 
         let contactsSection = $(this).closest('.contacts-section');
+        let automaticEmailsSection = $(this).closest('.forms-section-container').find('.automatic-emails-section');
         contactsSection.find('input#txt-customer-contacts-id').val(id);
         contactsSection.find('input#txt-customer-contacts-first-name').val(firstName);
         contactsSection.find('input#txt-customer-contacts-last-name').val(lastName);
@@ -1026,6 +1090,15 @@ function eventListeners() {
 
         contactsSection.find('input#txt-customer-contacts-notes').val(notes);
 
+        automaticEmailsSection.find('input#txt-automatic-emails-email-to').val(automaticEmailsTo);
+        automaticEmailsSection.find('input#txt-automatic-emails-email-cc').val(automaticEmailsCc);
+        automaticEmailsSection.find('input#txt-automatic-emails-email-bcc').val(automaticEmailsBcc);
+        automaticEmailsSection.find('input#cbox-automatic-emails-booked-load').prop('checked', automaticEmailsBookedLoad === '1');
+        automaticEmailsSection.find('input#cbox-automatic-emails-check-calls').prop('checked', automaticEmailsCheckCalls === '1');
+        automaticEmailsSection.find('input#cbox-automatic-emails-carrier-arrival-shipper').prop('checked', automaticEmailsCarrierArrivalShipper === '1');
+        automaticEmailsSection.find('input#cbox-automatic-emails-carrier-arrival-consignee').prop('checked', automaticEmailsCarrierArrivalConsignee === '1');
+        automaticEmailsSection.find('input#cbox-automatic-emails-loaded').prop('checked', automaticEmailsLoaded === '1');
+        automaticEmailsSection.find('input#cbox-automatic-emails-empty').prop('checked', automaticEmailsEmpty === '1');
     })
 
     $(document).on('click', '.btn-panel-contacts-edit', function (e) {
@@ -1068,6 +1141,15 @@ function eventListeners() {
         let website = panelContactContainer.find('input#txt-panel-contact-info-website');
         let notes = panelContactContainer.find('input#txt-panel-contact-info-notes');
         let is_primary = panelContactContainer.find('input#toggle-panel-contacts-primary');
+        let automatic_emails_to = panelContactContainer.find('input#txt-panel-contact-info-to');
+        let automatic_emails_cc = panelContactContainer.find('input#txt-panel-contact-info-cc');
+        let automatic_emails_bcc = panelContactContainer.find('input#txt-panel-contact-info-bcc');
+        let automatic_emails_booked_load = panelContactContainer.find('input#txt-panel-contact-info-booked-load');
+        let automatic_emails_check_calls = panelContactContainer.find('input#txt-panel-contact-info-check-calls');
+        let automatic_emails_carrier_arrival_shipper = panelContactContainer.find('input#txt-panel-contact-info-carrier-arrival-shipper');
+        let automatic_emails_carrier_arrival_consignee = panelContactContainer.find('input#txt-panel-contact-info-carrier-arrival-consignee');
+        let automatic_emails_loaded = panelContactContainer.find('input#txt-panel-contact-info-loaded');
+        let automatic_emails_empty = panelContactContainer.find('input#txt-panel-contact-info-empty');
 
         if (first_name.val().trim() === '') {
             alert('Must enter the first name');
@@ -1113,7 +1195,16 @@ function eventListeners() {
             birthday: birthday.val().trim(),
             website: website.val().trim(),
             notes: notes.val().trim(),
-            is_primary: is_primary.is(':checked') ? 1 : 0
+            is_primary: is_primary.is(':checked') ? 1 : 0,
+            automatic_emails_to: automatic_emails_to.val(),
+            automatic_emails_cc: automatic_emails_cc.val(),
+            automatic_emails_bcc: automatic_emails_bcc.val(),
+            automatic_emails_booked_load: automatic_emails_booked_load.val(),
+            automatic_emails_check_calls: automatic_emails_check_calls.val(),
+            automatic_emails_carrier_arrival_shipper: automatic_emails_carrier_arrival_shipper.val(),
+            automatic_emails_carrier_arrival_consignee: automatic_emails_carrier_arrival_consignee.val(),
+            automatic_emails_loaded: automatic_emails_loaded.val(),
+            automatic_emails_empty: automatic_emails_empty.val()
         })
             .then(res => {
                 let con = res.contact;
@@ -1492,6 +1583,30 @@ function eventListeners() {
         }
     })
 
+    $(document).on('keypress', 'input.input-email', function(e){
+        if (e.keyCode === 32 || e.which === 32){
+            e.preventDefault();
+        }
+    });
+    
+    $(document).on('input', 'input.input-email', function(e){
+        let input = $(this);
+
+        input.val(input.val().trim().replace(/\s/g, ''));       
+    });
+
+    $(document).on('change', 'input.input-email', function(e){
+        let input = $(this);
+
+        input.val(input.val().trim().replace(/\s/g, ''));
+
+        validateContactforSaving();
+    });
+
+    $(document).on('change', 'input.automatic-emails-checkbox', function(e){
+        validateContactforSaving();
+    });
+
     setMaskedInput();
 }
 
@@ -1506,10 +1621,13 @@ function getInitials(length) {
     return result;
 }
 
+
+
 function validateContactforSaving() {
     let swiperSlideCustomer = $(document).find('#swiper-slide-customer');
     let customerSection = swiperSlideCustomer.find('.customer-section');
-    let contactsSection = swiperSlideCustomer.find('.contacts-section');
+    let contactsSection = swiperSlideCustomer.find('.contacts-section'); 
+    let automaticEmailsSection = swiperSlideCustomer.find('.automatic-emails-section'); 
     let customerId = customerSection.find('input#txt-customer-customer-id');
     let contactId = contactsSection.find('input#txt-customer-contacts-id');
     let firstName = contactsSection.find('input#txt-customer-contacts-first-name');
@@ -1519,6 +1637,16 @@ function validateContactforSaving() {
     let isPrimary = contactsSection.find('input#cbox-customer-contacts-phone-primary');
     let email = contactsSection.find('input#txt-customer-contacts-email');
     let notes = contactsSection.find('input#txt-customer-contacts-notes');
+    let automaticEmailsTo = automaticEmailsSection.find('input#txt-automatic-emails-email-to');
+    let automaticEmailsCc = automaticEmailsSection.find('input#txt-automatic-emails-email-cc');
+    let automaticEmailsBcc = automaticEmailsSection.find('input#txt-automatic-emails-email-bcc');
+    let automaticEmailsBookedLoad = automaticEmailsSection.find('input#cbox-automatic-emails-booked-load');
+    let automaticEmailsCheckCalls = automaticEmailsSection.find('input#cbox-automatic-emails-check-calls');
+    let automaticEmailsCarrierArrivalShipper = automaticEmailsSection.find('input#cbox-automatic-emails-carrier-arrival-shipper');
+    let automaticEmailsCarrierArrivalConsignee = automaticEmailsSection.find('input#cbox-automatic-emails-carrier-arrival-consignee');
+    let automaticEmailsLoaded = automaticEmailsSection.find('input#cbox-automatic-emails-loaded');
+    let automaticEmailsEmpty = automaticEmailsSection.find('input#cbox-automatic-emails-empty');
+
     let contactListWrapper = contactsSection.find('.customer-contact-list-wrapper');
 
     if (customerId.val().trim() === '') {
@@ -1540,7 +1668,16 @@ function validateContactforSaving() {
         email_work: email.val().trim(),
         phone_work: phone.val().trim(),
         notes: notes.val().trim(),
-        is_primary: isPrimary.is(':checked') ? 1 : 0
+        is_primary: isPrimary.is(':checked') ? 1 : 0,
+        automatic_emails_to: automaticEmailsTo.val(),
+        automatic_emails_cc: automaticEmailsCc.val(),
+        automatic_emails_bcc: automaticEmailsBcc.val(),
+        automatic_emails_booked_load: automaticEmailsBookedLoad.is(':checked') ? 1 : 0,
+        automatic_emails_check_calls: automaticEmailsCheckCalls.is(':checked') ? 1 : 0,
+        automatic_emails_carrier_arrival_shipper: automaticEmailsCarrierArrivalShipper.is(':checked') ? 1 : 0,
+        automatic_emails_carrier_arrival_consignee: automaticEmailsCarrierArrivalConsignee.is(':checked') ? 1 : 0,
+        automatic_emails_loaded: automaticEmailsLoaded.is(':checked') ? 1 : 0,
+        automatic_emails_empty: automaticEmailsEmpty.is(':checked') ? 1 : 0
     })
         .then(res => {
             if (res.result === 'OK') {
@@ -1567,7 +1704,16 @@ function validateContactforSaving() {
                         data-email-other="${contact.email_other}"
                         data-is-primary="${contact.is_primary}"
                         data-is-online="${contact.is_online}"
-                        data-notes="${contact.notes}">      
+                        data-notes="${contact.notes}"      
+                        data-automatic-emails-to="${contact.automatic_emails_to}"      
+                        data-automatic-emails-cc="${contact.automatic_emails_cc}"      
+                        data-automatic-emails-bcc="${contact.automatic_emails_bcc}"      
+                        data-automatic-emails-booked-load="${contact.automatic_emails_booked_load}"      
+                        data-automatic-emails-check-calls="${contact.automatic_emails_check_calls}"      
+                        data-automatic-emails-carrier-arrival-shipper="${contact.automatic_emails_carrier_arrival_shipper}"      
+                        data-automatic-emails-carrier-arrival-consignee="${contact.automatic_emails_carrier_arrival_consignee}"      
+                        data-automatic-emails-loaded="${contact.automatic_emails_loaded}"      
+                        data-automatic-emails-empty="${contact.automatic_emails_empty}">      
 
                             <div class="item-name">${contact.first_name + ' ' + contact.middle_name + ' ' + contact.last_name}</div>
                             <div class="item-phone">${contact.phone_work}</div>

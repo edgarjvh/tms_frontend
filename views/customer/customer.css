@@ -227,6 +227,9 @@
   flex-grow: 1;
   justify-content: space-around;
 }
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section input.input-email {
+  text-transform: lowercase;
+}
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .portal-section {
   position: relative;
   width: 100%;
