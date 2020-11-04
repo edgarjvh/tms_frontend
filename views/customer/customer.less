@@ -400,15 +400,47 @@
                     max-width: 50%;
                     padding  : 5px;
                     position : relative;
+                    display: flex;
+                    flex-grow: 1;
 
-                    .form-section {
-                        height: 100%;
+                    .form-section-directions-portal {
+                        flex-grow: 1;
 
-                        .portal-section {
-                            position  : relative;
-                            width     : 100%;
-                            height    : 100%;
-                            margin-top: 5px;
+                        .form-section {
+                            height: 100%;
+                            flex-grow: 1;
+
+                            .portal-section {
+                                position  : relative;
+                                width     : 100%;
+                                height    : 100%;
+                                margin-top: 5px;
+                            }
+                        }
+                    }
+
+                    .directions-portal-section-wrapper {
+                        position  : absolute;
+                        width     : 100%;
+                        height    : 100%;
+                        top       : 0;
+                        left      : 0;
+                        overflow-y: auto;
+
+                        .customer-directions-list-item {
+                            padding      : 5px;
+                            cursor       : pointer;
+                            transition   : ease 0.3s;
+                            font-size    : 0.7rem;
+                            font-weight  : bold;
+                            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                            text-overflow: ellipsis;
+                            white-space  : nowrap;
+                            overflow     : hidden;
+                        }
+
+                        .customer-directions-list-item:hover {
+                            background-color: rgba(0, 0, 0, 0.05);
                         }
                     }
                 }
@@ -496,6 +528,91 @@
             }
 
             #customer-customer-notes-save-btn {
+                display: block;
+            }
+        }
+
+        .modal-customer-directions {
+            position        : absolute;
+            top             : 0;
+            left            : 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            width           : 100%;
+            height          : 100%;
+            display         : none;
+
+            .modal-customer-directions-wrapper {
+                position       : relative;
+                width          : 100%;
+                height         : 100%;
+                display        : flex;
+                justify-content: center;
+                align-items    : center;
+
+                .modal-customer-directions-content {
+                    width           : 90%;
+                    max-width       : 400px;
+                    min-height      : 200px;
+                    background-color: white;
+                    border-radius   : 10px;
+                    display         : flex;
+                    flex-direction  : column;
+                    padding         : 10px;
+
+                    .row-textinput {
+                        flex-grow: 1;
+
+                        textarea {
+                            width        : 100%;
+                            min-height   : 200px;
+                            resize       : vertical;
+                            border       : 1px solid rgba(0, 0, 0, 0.05);
+                            padding      : 5px;
+                            border-radius: 10px;
+                            max-height   : 500px;
+                        }
+                    }
+
+                    .row-buttons {
+                        display        : flex;
+                        justify-content: space-between;
+
+                        .mochi-button {
+                            .mochi-button-decorator {
+                                font-size: 1rem;
+                            }
+
+                            .mochi-button-base {
+                                flex-grow  : 1;
+                                display    : inline-block;
+                                white-space: normal;
+                                font-size  : 0.8rem;
+                                line-height: initial;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .modal-customer-directions.showing {
+            textarea {
+                background-color: rgba(0, 0, 0, 0.1);
+                pointer-events  : none;
+            }
+
+            #customer-customer-directions-save-btn {
+                display: none;
+            }
+        }
+
+        .modal-customer-directions.adding {
+            textarea {
+                background-color: white;
+                pointer-events  : all;
+            }
+
+            #customer-customer-directions-save-btn {
                 display: block;
             }
         }

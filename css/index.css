@@ -1242,6 +1242,9 @@ body .admin-layer {
 .main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .hidden {
   display: none !important;
 }
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .contact-info-row.hidden {
+  display: none;
+}
 .main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .contact-info-row {
   margin-bottom: 15px;
   max-width: 50%;
