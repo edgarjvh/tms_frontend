@@ -13,73 +13,81 @@ export class CustomerContainer {
             $.get(
                 location + "views/customer/customer.html",
                 async function (content) {
-                    $.post(serverURL + "/notes")
-                        .then(async (res) => {
-                            let notesList = ``;
 
-                            for (let i = 0; i < res.notes.length; i++) {
-                                notesList += `
-                        <div 
-                            class="customer-notes-list-item" 
-                            data-id="${res.notes[i].id}" 
-                            data-user="${res.notes[i].user}" 
-                            data-note="${res.notes[i].note}" 
-                            data-datetime="${moment(
-                                    res.notes[i].date_time,
-                                    "YYYY-MM-DD HH:mm:ss"
-                                ).format("MM/DD/YYYY:HHmm")}">
-                                ${res.notes[i].note}
-                        </div>
-                        `;
-                            }
+                    content = content.replace("[NOTES-LIST]", "");
+                    content = content.replace("[DIRECTIONS-LIST]", "");
+                    $(container).append(content);
+                    await eventListeners();
+                    await callback();
+                    loader.fadeOut(300);
 
-                            $.post(serverURL + "/directions")
-                                .then(async (res) => {
-                                    let directionsList = ``;
+                    // $.post(serverURL + "/notes")
+                    //     .then(async (res) => {
+                    //         let notesList = ``;
 
-                                    for (let i = 0; i < res.directions.length; i++) {
-                                        directionsList += `
-                        <div 
-                            class="customer-directions-list-item" 
-                            data-id="${res.directions[i].id}" 
-                            data-user="${res.directions[i].user}" 
-                            data-note="${res.directions[i].direction}" 
-                            data-datetime="${moment(
-                                            res.directions[i].date_time,
-                                            "YYYY-MM-DD HH:mm:ss"
-                                        ).format("MM/DD/YYYY:HHmm")}">
-                                ${res.directions[i].direction}
-                        </div>
-                        `;
-                                    }
+                    //         for (let i = 0; i < res.notes.length; i++) {
+                    //             notesList += `
+                    //                         <div 
+                    //                             class="customer-notes-list-item" 
+                    //                             data-id="${res.notes[i].id}" 
+                    //                             data-user="${res.notes[i].user}" 
+                    //                             data-note="${res.notes[i].note}" 
+                    //                             data-datetime="${moment(
+                    //                 res.notes[i].date_time,
+                    //                 "YYYY-MM-DD HH:mm:ss"
+                    //             ).format("MM/DD/YYYY:HHmm")}">
+                    //                                 ${res.notes[i].note}
+                    //                         </div>
+                    //                         `;
+                    //         }
 
-                                    content = content.replace("[NOTES-LIST]", notesList);
-                                    content = content.replace("[DIRECTIONS-LIST]", directionsList);
+                    //         $.post(serverURL + "/directions")
+                    //             .then(async (res) => {
+                    //                 let directionsList = ``;
 
-                                    $(container).append(content);
-                                    await eventListeners();
-                                    await callback();
-                                    loader.fadeOut(300);
-                                })
-                                .catch(async (e) => {
-                                    content = content.replace("[NOTES-LIST]", "");
-                                    content = content.replace("[DIRECTIONS-LIST]", "");
-                                    $(container).append(content);
-                                    await eventListeners();
-                                    await callback();
-                                    loader.fadeOut(300);
-                                });
+                    //                 for (let i = 0; i < res.directions.length; i++) {
+                    //                     directionsList += `
+                    //                                     <div 
+                    //                                         class="customer-directions-list-item" 
+                    //                                         data-id="${res.directions[i].id}" 
+                    //                                         data-user="${res.directions[i].user}" 
+                    //                                         data-note="${res.directions[i].direction}" 
+                    //                                         data-datetime="${moment(
+                    //                         res.directions[i].date_time,
+                    //                         "YYYY-MM-DD HH:mm:ss"
+                    //                     ).format("MM/DD/YYYY:HHmm")}">
+                    //                                             ${res.directions[i].direction}
+                    //                                     </div>
+                    //                                     `;
+                    //                 }
+
+                    //                 content = content.replace("[NOTES-LIST]", notesList);
+                    //                 content = content.replace("[DIRECTIONS-LIST]", directionsList);
+
+                    //                 $(container).append(content);
+                    //                 await eventListeners();
+                    //                 await callback();
+                    //                 loader.fadeOut(300);
+                    //             })
+                    //             .catch(async (e) => {
+                    //                 content = content.replace("[NOTES-LIST]", "");
+                    //                 content = content.replace("[DIRECTIONS-LIST]", "");
+                    //                 $(container).append(content);
+                    //                 await eventListeners();
+                    //                 await callback();
+                    //                 loader.fadeOut(300);
+                    //             });
 
 
-                        })
-                        .catch(async (e) => {
-                            content = content.replace("[NOTES-LIST]", "");
-                            content = content.replace("[DIRECTIONS-LIST]", "");
-                            $(container).append(content);
-                            await eventListeners();
-                            await callback();
-                            loader.fadeOut(300);
-                        });
+                    //     })
+                    //     .catch(async (e) => {
+                    //         content = content.replace("[NOTES-LIST]", "");
+                    //         content = content.replace("[DIRECTIONS-LIST]", "");
+                    //         $(container).append(content);
+                    //         await eventListeners();
+                    //         await callback();
+                    //         loader.fadeOut(300);
+                    //     });
                 },
                 "html"
             );
@@ -290,6 +298,8 @@ function eventListeners() {
                                 }
                             }
 
+                            console.log(typeof contact.middle_name);
+
                             list += `
                                 <div class="contact-info-item" data-contact-id="${contact.id
                                 }">
@@ -304,11 +314,11 @@ function eventListeners() {
                                     
                                     <div class="contact-data">
                                         <div class="contact-name-item">
-                                            ${contact.prefix +
+                                            ${(contact.prefix || '') +
                                 " " +
                                 contact.first_name +
                                 " " +
-                                contact.middle_name +
+                                (contact.middle_name || '') +
                                 " " +
                                 contact.last_name}
                                         </div>                                    
@@ -316,10 +326,8 @@ function eventListeners() {
                                     ? "online"
                                     : "offline"
                                 }"></div>
-                                        <div class="hidden contact-occupation-item">${contact.title
-                                }</div>
-                                        <div class="hidden contact-is-primary-item">${contact.is_primary
-                                }</div>
+                                        <div class="hidden contact-occupation-item">${contact.title || ''}</div>
+                                        <div class="hidden contact-is-primary-item">${contact.is_primary}</div>
                                     </div>
                                 </div>
                                 `;
@@ -349,80 +357,47 @@ function eventListeners() {
                         );
                         content = content.replace(
                             "[CONTACT-NAME]",
-                            con.first_name + " " + con.middle_name + " " + con.last_name
+                            con.first_name + " " + (con.middle_name || '') + " " + con.last_name
                         );
-                        content = content.replace("[CONTACT-OCCUPATION]", con.title);
+                        content = content.replace("[CONTACT-OCCUPATION]", (con.title || ''));
                         content = content.replace(
                             "[IS-PRIMARY]",
                             con.is_primary === 1 ? "checked" : ""
                         );
                         content = content.replace("[CONTACT-ID]", con.id);
-                        content = content.replace("[CONTACT-PREFIX]", con.prefix);
-                        content = content.replace("[CONTACT-FIRST-NAME]", con.first_name);
-                        content = content.replace("[CONTACT-MIDDLE-NAME]", con.middle_name);
-                        content = content.replace("[CONTACT-LAST-NAME]", con.last_name);
-                        content = content.replace("[CONTACT-SUFFIX]", con.suffix);
-                        content = content.replace("[CONTACT-OCCUPATION2]", con.title);
-                        content = content.replace("[CONTACT-DEPARTMENT]", con.department);
-                        content = content.replace("[CONTACT-EMAIL-WORK]", con.email_work);
-                        content = content.replace(
-                            "[CONTACT-EMAIL-PERSONAL]",
-                            con.email_personal
-                        );
-                        content = content.replace("[CONTACT-EMAIL-OTHER]", con.email_other);
-                        content = content.replace("[CONTACT-PHONE-WORK]", con.phone_work);
-                        content = content.replace(
-                            "[CONTACT-PHONE-WORK-FAX]",
-                            con.phone_work_fax
-                        );
-                        content = content.replace(
-                            "[CONTACT-PHONE-MOBILE]",
-                            con.phone_mobile
-                        );
-                        content = content.replace(
-                            "[CONTACT-PHONE-DIRECT]",
-                            con.phone_direct
-                        );
-                        content = content.replace("[CONTACT-PHONE-OTHER]", con.phone_other);
-                        content = content.replace("[CONTACT-COUNTRY]", con.country);
-                        content = content.replace("[CONTACT-ADDRESS1]", con.address1);
-                        content = content.replace("[CONTACT-ADDRESS2]", con.address2);
-                        content = content.replace("[CONTACT-CITY]", con.city);
-                        content = content.replace("[CONTACT-STATE]", con.state);
-                        content = content.replace("[CONTACT-ZIP-CODE]", con.zip_code);
-                        content = content.replace("[CONTACT-BIRTHDAY]", con.birthday);
-                        content = content.replace("[CONTACT-WEBSITE]", con.website);
-                        content = content.replace("[CONTACT-NOTES]", con.notes);
-                        content = content.replace("[CONTACT-TO]", con.automatic_emails_to);
-                        content = content.replace("[CONTACT-CC]", con.automatic_emails_cc);
-                        content = content.replace(
-                            "[CONTACT-BCC]",
-                            con.automatic_emails_bcc
-                        );
-                        content = content.replace(
-                            "[CONTACT-BOOKED-LOAD]",
-                            con.automatic_emails_booked_load
-                        );
-                        content = content.replace(
-                            "[CONTACT-CHECK-CALLS]",
-                            con.automatic_emails_check_calls
-                        );
-                        content = content.replace(
-                            "[CONTACT-CARRIER-ARRIVAL-SHIPPER]",
-                            con.automatic_emails_carrier_arrival_shipper
-                        );
-                        content = content.replace(
-                            "[CONTACT-CARRIER-ARRIVAL-CONSIGNEE]",
-                            con.automatic_emails_carrier_arrival_consignee
-                        );
-                        content = content.replace(
-                            "[CONTACT-LOADED]",
-                            con.automatic_emails_loaded
-                        );
-                        content = content.replace(
-                            "[CONTACT-EMPTY]",
-                            con.automatic_emails_empty
-                        );
+                        content = content.replace("[CONTACT-PREFIX]", con.prefix || '');
+                        content = content.replace("[CONTACT-FIRST-NAME]", con.first_name || '');
+                        content = content.replace("[CONTACT-MIDDLE-NAME]", con.middle_name || '');
+                        content = content.replace("[CONTACT-LAST-NAME]", con.last_name || '');
+                        content = content.replace("[CONTACT-SUFFIX]", con.suffix || '');
+                        content = content.replace("[CONTACT-OCCUPATION2]", con.title || '');
+                        content = content.replace("[CONTACT-DEPARTMENT]", con.department || '');
+                        content = content.replace("[CONTACT-EMAIL-WORK]", con.email_work || '');
+                        content = content.replace("[CONTACT-EMAIL-PERSONAL]", con.email_personal || '');
+                        content = content.replace("[CONTACT-EMAIL-OTHER]", con.email_other || '');
+                        content = content.replace("[CONTACT-PHONE-WORK]", con.phone_work || '');
+                        content = content.replace("[CONTACT-PHONE-WORK-FAX]", con.phone_work_fax || '');
+                        content = content.replace("[CONTACT-PHONE-MOBILE]", con.phone_mobile || '');
+                        content = content.replace("[CONTACT-PHONE-DIRECT]", con.phone_direct || '');
+                        content = content.replace("[CONTACT-PHONE-OTHER]", con.phone_other || '');
+                        content = content.replace("[CONTACT-COUNTRY]", con.country || '');
+                        content = content.replace("[CONTACT-ADDRESS1]", con.address1 || '');
+                        content = content.replace("[CONTACT-ADDRESS2]", con.address2 || '');
+                        content = content.replace("[CONTACT-CITY]", con.city || '');
+                        content = content.replace("[CONTACT-STATE]", con.state || '');
+                        content = content.replace("[CONTACT-ZIP-CODE]", con.zip_code || '');
+                        content = content.replace("[CONTACT-BIRTHDAY]", con.birthday || '');
+                        content = content.replace("[CONTACT-WEBSITE]", con.website || '');
+                        content = content.replace("[CONTACT-NOTES]", con.notes || '');
+                        content = content.replace("[CONTACT-TO]", con.automatic_emails_to || '');
+                        content = content.replace("[CONTACT-CC]", con.automatic_emails_cc || '');
+                        content = content.replace("[CONTACT-BCC]", con.automatic_emails_bcc || '');
+                        content = content.replace("[CONTACT-BOOKED-LOAD]", con.automatic_emails_booked_load || '');
+                        content = content.replace("[CONTACT-CHECK-CALLS]", con.automatic_emails_check_calls || '');
+                        content = content.replace("[CONTACT-CARRIER-ARRIVAL-SHIPPER]", con.automatic_emails_carrier_arrival_shipper || '');
+                        content = content.replace("[CONTACT-CARRIER-ARRIVAL-CONSIGNEE]", con.automatic_emails_carrier_arrival_consignee || '');
+                        content = content.replace("[CONTACT-LOADED]", con.automatic_emails_loaded || '');
+                        content = content.replace("[CONTACT-EMPTY]", con.automatic_emails_empty || '');
 
                         if (panelContainer.find(".panel").length === 0) {
                             mainContainer.css(
@@ -1070,7 +1045,160 @@ function eventListeners() {
             });
     });
 
+    $(document).on('blur', '#txt-customer-customer-code', function (e) {
+        let code = $(this);
+        console.log(code.val());
+        let formsContainer = code.closest('.forms-section-container');
+
+        $.post(serverURL + '/customers', {
+            code: code.val().toLowerCase()
+        }).then(res => {
+
+            if (res.customers.length > 0) {
+                let customer = res.customers[0];
+
+                formsContainer.find(".customer-section input#txt-customer-customer-id").val(customer.id);
+                formsContainer.find(".customer-section input#txt-customer-customer-code").val(customer.code);
+                formsContainer.find(".customer-section input#txt-customer-customer-name").val(customer.name);
+                formsContainer.find(".customer-section input#txt-customer-customer-address-1").val(customer.address1);
+                formsContainer.find(".customer-section input#txt-customer-customer-address-2").val(customer.address2);
+                formsContainer.find(".customer-section input#txt-customer-customer-city").val(customer.city);
+                formsContainer.find(".customer-section input#txt-customer-customer-state").val(customer.state);
+                formsContainer.find(".customer-section input#txt-customer-customer-zip-code").val(customer.zip);
+                formsContainer.find(".customer-section input#txt-customer-customer-contact-name").val(customer.contact_name);
+                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone").val(customer.contact_phone);
+                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone-ext").val(customer.ext);
+                formsContainer.find(".customer-section input#txt-customer-customer-email").val(customer.email);
+
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-code").val(customer.mailing_code + (customer.mailing_code_number === 0 ? '' : customer.mailing_code_number));
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-name").val(customer.mailing_name);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-1").val(customer.mailing_address1);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-2").val(customer.mailing_address2);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-city").val(customer.mailing_city);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-state").val(customer.mailing_state);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-zip-code").val(customer.mailing_zip);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-name").val(customer.mailing_contact_name);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone").val(customer.mailing_contact_phone);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone-ext").val(customer.mailing_ext);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-email").val(customer.mailing_email);
+
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-bill-to").val(customer.mailing_bill_to === '' ? '' : customer.mailing_code + (customer.mailing_code_number === 0 ? '' : customer.mailing_code_number));
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-division").val(customer.mailing_division);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-agent-code").val(customer.mailing_agent_code);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-salesman").val(customer.mailing_salesman);
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-fid").val(customer.mailing_fid);
+
+                $("#customer-container .customer-section input#txt-customer-customer-id").change();
+            } else {
+                formsContainer.find(".customer-section input#txt-customer-customer-id").val('');
+                // formsContainer.find(".customer-section input#txt-customer-customer-code").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-name").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-address-1").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-address-2").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-city").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-state").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-zip-code").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-contact-name").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone-ext").val('');
+                formsContainer.find(".customer-section input#txt-customer-customer-email").val('');
+
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-code").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-name").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-1").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-2").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-city").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-state").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-zip-code").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-name").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone-ext").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-email").val('');
+
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-bill-to").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-division").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-agent-code").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-salesman").val('');
+                formsContainer.find(".mailing-address-section input#txt-mailing-address-fid").val('');
+
+                $("#customer-container .customer-section input#txt-customer-customer-id").change();
+            }
+        })
+    })
+
     $(document).on("dblclick", "#tbl-customers-customer-search-results .wrapper .trow", function (e) {
+        let row = $(this);
+
+        let id = row.find(".customer-id").text();
+        let code = row.find(".code").text();
+        let name = row.find(".name").text();
+        let address1 = row.find(".address1").text();
+        let address2 = row.find(".address2").text();
+        let city = row.find(".city").text();
+        let state = row.find(".state").text();
+        let zip = row.find(".zip").text();
+        let contact_name = row.find(".contact-name").text();
+        let contact_phone = row.find(".contact-phone").text();
+        let ext = row.find(".ext").text();
+        let email = row.find(".email").text();
+
+        let mailing_code = row.find(".mailing-code").text();
+        let mailing_name = row.find(".mailing-name").text();
+        let mailing_address1 = row.find(".mailing-address1").text();
+        let mailing_address2 = row.find(".mailing-address2").text();
+        let mailing_city = row.find(".mailing-city").text();
+        let mailing_state = row.find(".mailing-state").text();
+        let mailing_zip = row.find(".mailing-zip").text();
+        let mailing_contact_name = row.find(".mailing-contact-name").text();
+        let mailing_contact_phone = row.find(".mailing-contact-phone").text();
+        let mailing_ext = row.find(".mailing-ext").text();
+        let mailing_email = row.find(".mailing-email").text();
+
+        let mailing_bill_to = row.find(".mailing-bill-to").text();
+        let mailing_division = row.find(".mailing-division").text();
+        let mailing_agent_code = row.find(".mailing-agent-code").text();
+        let mailing_salesman = row.find(".mailing-salesman").text();
+        let mailing_fid = row.find(".mailing-fid").text();
+
+        $("#customer-container .customer-section input#txt-customer-customer-id").val(id);
+        $("#customer-container .customer-section input#txt-customer-customer-code").val(code);
+        $("#customer-container .customer-section input#txt-customer-customer-name").val(name);
+        $("#customer-container .customer-section input#txt-customer-customer-address-1").val(address1);
+        $("#customer-container .customer-section input#txt-customer-customer-address-2").val(address2);
+        $("#customer-container .customer-section input#txt-customer-customer-city").val(city);
+        $("#customer-container .customer-section input#txt-customer-customer-state").val(state);
+        $("#customer-container .customer-section input#txt-customer-customer-zip-code").val(zip);
+        $("#customer-container .customer-section input#txt-customer-customer-contact-name").val(contact_name);
+        $("#customer-container .customer-section input#txt-customer-customer-contact-phone").val(contact_phone);
+        $("#customer-container .customer-section input#txt-customer-customer-contact-phone-ext").val(ext);
+        $("#customer-container .customer-section input#txt-customer-customer-email").val(email);
+
+        $("#customer-container .mailing-address-section input#txt-mailing-address-code").val(mailing_code);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-name").val(mailing_name);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-address-1").val(mailing_address1);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-address-2").val(mailing_address2);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-city").val(mailing_city);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-state").val(mailing_state);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-zip-code").val(mailing_zip);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-contact-name").val(mailing_contact_name);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-contact-phone").val(mailing_contact_phone);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-contact-phone-ext").val(mailing_ext);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-email").val(mailing_email);
+
+        $("#customer-container .mailing-address-section input#txt-mailing-address-bill-to").val(mailing_bill_to === "" ? mailing_bill_to : mailing_code);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-division").val(mailing_division);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-agent-code").val(mailing_agent_code);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-salesman").val(mailing_salesman);
+        $("#customer-container .mailing-address-section input#txt-mailing-address-fid").val(mailing_fid);
+
+        let panel = row.closest(".panel");
+
+        $("#customer-container .customer-section input#txt-customer-customer-id").change();
+
+        panel.find(".panel-close-btn").click();
+    });
+
+    $(document).on("dblclick", "#tbl-customers-contact-search-results .wrapper .trow", function (e) {
         let row = $(this);
 
         let id = row.find(".customer-id").text();
@@ -1171,27 +1299,48 @@ function eventListeners() {
         let contactSection = customerContainer.find(".contacts-section");
         let automaticEmailsSection = customerContainer.find(".automatic-emails-section");
         let contactListWrapper = customerContainer.find(".customer-contact-list-wrapper");
+        let contactListFormSection = contactListWrapper.closest(".form-section");
+        let notesListWrapper = customerContainer.find(".notes-portal-section-wrapper");
+        let directionsListWrapper = customerContainer.find(".directions-portal-section-wrapper");
 
         if (customer_id === "") {
             contactListWrapper.html("");
+            notesListWrapper.html("");
+            directionsListWrapper.html("");
             mailingAddressSection.find('input').val("");
             contactSection.find("input[type=text]").val("");
             contactSection.find("input[type=checkbox]").prop("checked", false);
             automaticEmailsSection.find("input[type=text]").val("");
             automaticEmailsSection.find("input[type=checkbox]").prop("checked", false);
         } else {
+            contactListFormSection.attr('class', 'form-section');
+
             contactListWrapper.html(`
                         <div class="loader">
                             <span class="fas fa-spin fa-spinner"></span>
                         </div>
                     `);
 
-            $.post(serverURL + "/getContactsByCustomerId", {
+            notesListWrapper.html(`
+                        <div class="loader">
+                            <span class="fas fa-spin fa-spinner"></span>
+                        </div>
+                    `);
+
+            directionsListWrapper.html(`
+                        <div class="loader">
+                            <span class="fas fa-spin fa-spinner"></span>
+                        </div>
+                    `);
+
+            $.post(serverURL + "/getCustomerPayload", {
                 customer_id: customer_id,
             }).then((res) => {
-                console.log(res);
+
                 if (res.result === "OK") {
                     let contactItems = ``;
+                    let notesItems = ``;
+                    let directionsItems = ``;
 
                     for (let i = 0; i < res.contacts.length; i++) {
                         let contact = res.contacts[i];
@@ -1199,37 +1348,65 @@ function eventListeners() {
                         contactItems += `
                                 <div class="customer-contact-list-item" 
                                     data-id="${contact.id}" 
-                                    data-first-name="${contact.first_name}"
-                                    data-last-name="${contact.last_name}"
-                                    data-phone-work="${contact.phone_work}"
-                                    data-phone-work-fax="${contact.phone_work_fax}"
-                                    data-phone-mobile="${contact.phone_mobile}"
-                                    data-phone-direct="${contact.phone_direct}"
-                                    data-phone-other="${contact.phone_other}"
-                                    data-phone-ext="${contact.phone_ext}"
-                                    data-email-work="${contact.email_work}"
-                                    data-email-personal="${contact.email_personal}"
-                                    data-email-other="${contact.email_other}"
-                                    data-is-primary="${contact.is_primary}"
-                                    data-is-online="${contact.is_online}"
+                                    data-first-name="${contact.first_name || ''}"
+                                    data-last-name="${contact.last_name || ''}"
+                                    data-phone-work="${contact.phone_work || ''}"
+                                    data-phone-work-fax="${contact.phone_work_fax || ''}"
+                                    data-phone-mobile="${contact.phone_mobile || ''}"
+                                    data-phone-direct="${contact.phone_direct || ''}"
+                                    data-phone-other="${contact.phone_other || ''}"
+                                    data-phone-ext="${contact.phone_ext || ''}"
+                                    data-email-work="${contact.email_work || ''}"
+                                    data-email-personal="${contact.email_personal || ''}"
+                                    data-email-other="${contact.email_other || ''}"
+                                    data-is-primary="${contact.is_primary || ''}"
+                                    data-is-online="${contact.is_online || ''}"
                                     data-automatic-emails-to="${contact.automatic_emails_to || ""}"      
                                     data-automatic-emails-cc="${contact.automatic_emails_cc || ""}"      
                                     data-automatic-emails-bcc="${contact.automatic_emails_bcc || ""}"      
-                                    data-automatic-emails-booked-load="${contact.automatic_emails_booked_load}"      
-                                    data-automatic-emails-check-calls="${contact.automatic_emails_check_calls}"      
-                                    data-automatic-emails-carrier-arrival-shipper="${contact.automatic_emails_carrier_arrival_shipper}"      
-                                    data-automatic-emails-carrier-arrival-consignee="${contact.automatic_emails_carrier_arrival_consignee}"      
-                                    data-automatic-emails-loaded="${contact.automatic_emails_loaded}"      
-                                    data-automatic-emails-empty="${contact.automatic_emails_empty}">     
+                                    data-automatic-emails-booked-load="${contact.automatic_emails_booked_load || ''}"      
+                                    data-automatic-emails-check-calls="${contact.automatic_emails_check_calls || ''}"      
+                                    data-automatic-emails-carrier-arrival-shipper="${contact.automatic_emails_carrier_arrival_shipper || ''}"      
+                                    data-automatic-emails-carrier-arrival-consignee="${contact.automatic_emails_carrier_arrival_consignee || ''}"      
+                                    data-automatic-emails-loaded="${contact.automatic_emails_loaded || ''}"      
+                                    data-automatic-emails-empty="${contact.automatic_emails_empty || ''}">     
 
-                                    <div class="item-name">${contact.first_name + " " + contact.middle_name + " " + contact.last_name}</div>
-                                    <div class="item-phone">${contact.phone_work}</div>
-                                    <div class="item-email">${contact.email_work}</div>
+                                    <div class="item-name">${(contact.first_name || '') + " " + (contact.middle_name || '') + " " + (contact.last_name || '')}</div>
+                                    <div class="item-phone">${contact.phone_work || ''}</div>
+                                    <div class="item-email">${contact.email_work || ''}</div>
                                 </div>           
-                    `;
+                        `;
+                    }
+
+                    for (let i = 0; i < res.notes.length; i++) {
+                        notesItems += `
+                                    <div 
+                                        class="customer-notes-list-item" 
+                                        data-id="${res.notes[i].id}" 
+                                        data-user="${res.notes[i].user}" 
+                                        data-note="${res.notes[i].note}" 
+                                        data-datetime="${moment(res.notes[i].date_time, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY:HHmm")}">
+                                            ${res.notes[i].note}
+                                    </div>
+                                    `;
+                    }
+
+                    for (let i = 0; i < res.directions.length; i++) {
+                        directionsItems += `
+                                        <div 
+                                            class="customer-directions-list-item" 
+                                            data-id="${res.directions[i].id}" 
+                                            data-user="${res.directions[i].user}" 
+                                            data-note="${res.directions[i].direction}" 
+                                            data-datetime="${moment(res.directions[i].date_time, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY:HHmm")}">
+                                                ${res.directions[i].direction}
+                                        </div>
+                                        `;
                     }
 
                     contactListWrapper.html(contactItems);
+                    notesListWrapper.html(notesItems);
+                    directionsListWrapper.html(directionsItems);
                 } else {
                     contactListWrapper.html("");
                 }
@@ -1724,6 +1901,13 @@ function eventListeners() {
 
     $(document).on("click", "#customer-notes-add-note-btn", function (e) {
         let customerContent = $(this).closest(".customer-content");
+        let customerId = customerContent.find('#txt-customer-customer-id').val();
+
+        if (customerId === '') {
+            alert('You must select a customer first');
+            return;
+        }
+
         let modal = customerContent.find(".modal-customer-notes");
         modal.attr("class", "modal-customer-notes adding");
         modal.find("textarea").val("");
@@ -1742,10 +1926,14 @@ function eventListeners() {
     $(document).on("click", "#customer-customer-notes-save-btn", function (e) {
         let modalContainer = $(this).closest(".modal-customer-notes-content");
         let customerContent = $(this).closest(".customer-content");
-        let notesPortalSectionWrapper = customerContent.find(
-            ".notes-portal-section-wrapper"
-        );
+        let customerId = customerContent.find('#txt-customer-customer-id').val();
+        let notesPortalSectionWrapper = customerContent.find(".notes-portal-section-wrapper");
         let textarea = modalContainer.find("textarea");
+
+        if (customerId === '') {
+            alert('You must select a customer first!');
+            return;
+        }
 
         if (textarea.val().trim() === "") {
             alert("You must type some text");
@@ -1756,6 +1944,7 @@ function eventListeners() {
         let datetime = moment().format("YYYY-MM-DD HH:mm:ss");
 
         $.post(serverURL + "/saveNote", {
+            customer_id: customerId,
             note: textarea.val().trim(),
             user: userInitials,
             datetime: datetime,
@@ -1783,7 +1972,7 @@ function eventListeners() {
         });
     });
 
-    $(document).on("dblclick", ".customer-notes-list-item", function (e) {
+    $(document).on("click", ".customer-notes-list-item", function (e) {
         let noteUser = $(this).attr("data-user");
         let noteDateTime = $(this).attr("data-datetime");
         let noteText = $(this).text().trim();
@@ -1806,6 +1995,13 @@ function eventListeners() {
 
     $(document).on("click", "#customer-directions-add-direction-btn", function (e) {
         let customerContent = $(this).closest(".customer-content");
+        let customerId = customerContent.find('#txt-customer-customer-id').val();
+
+        if (customerId === '') {
+            alert('You must select a customer first');
+            return;
+        }
+
         let modal = customerContent.find(".modal-customer-directions");
         modal.attr("class", "modal-customer-directions adding");
         modal.find("textarea").val("");
@@ -1813,17 +2009,29 @@ function eventListeners() {
         modal.find("textarea").focus();
     });
 
+    $(document).on("click", "#customer-customer-directions-edit-btn", function (e) {
+        let customerContent = $(this).closest(".customer-content");
+
+        let modal = customerContent.find(".modal-customer-directions");
+        modal.attr("class", "modal-customer-directions editing");
+        modal.find("textarea").focus();
+    });
+
     $(document).on("click", "#customer-customer-directions-cancel-btn", function (e) {
         let customerContent = $(this).closest(".customer-content");
         let modal = customerContent.find(".modal-customer-directions");
-
-        modal.find("textarea").val();
+        modal.attr('data-id', '0');
+        modal.find("textarea").val('');
         modal.fadeOut();
     });
 
     $(document).on("click", "#customer-customer-directions-save-btn", function (e) {
-        let modalContainer = $(this).closest(".modal-customer-directions-content");
-        let customerContent = $(this).closest(".customer-content");
+        let modal = $(this).closest(".modal-customer-directions");
+        let directionId = modal.attr('data-id');
+        let modalContainer = modal.find(".modal-customer-directions-content");
+        let customerContent = modal.closest(".customer-content");
+        let customerId = customerContent.find('#txt-customer-customer-id').val();
+
         let directionsPortalSectionWrapper = customerContent.find(".directions-portal-section-wrapper");
         let textarea = modalContainer.find("textarea");
 
@@ -1836,6 +2044,8 @@ function eventListeners() {
         let datetime = moment().format("YYYY-MM-DD HH:mm:ss");
 
         $.post(serverURL + "/saveDirection", {
+            direction_id: directionId,
+            customer_id: customerId,
             direction: textarea.val().trim(),
             user: userInitials,
             datetime: datetime,
@@ -1849,10 +2059,7 @@ function eventListeners() {
                     data-id="${res.directions[i].id}" 
                     data-user="${res.directions[i].user}" 
                     data-direction="${res.directions[i].direction}" 
-                    data-datetime="${moment(
-                    res.directions[i].date_time,
-                    "YYYY-MM-DD HH:mm:ss"
-                ).format("MM/DD/YYYY:HHmm")}">
+                    data-datetime="${moment(res.directions[i].date_time, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY:HHmm")}">
                         ${res.directions[i].direction}
                 </div>
                 `;
@@ -1863,16 +2070,15 @@ function eventListeners() {
         });
     });
 
-    $(document).on("dblclick", ".customer-directions-list-item", function (e) {
-        let directionUser = $(this).attr("data-user");
-        let directionDateTime = $(this).attr("data-datetime");
+    $(document).on("click", ".customer-directions-list-item", function (e) {
         let directionText = $(this).text().trim();
         let customerContent = $(this).closest(".customer-content");
         let modal = customerContent.find(".modal-customer-directions");
+        modal.attr('data-id', $(this).attr('data-id'));
         let textarea = modal.find("textarea");
         modal.attr("class", "modal-customer-directions showing");
 
-        textarea.val(directionUser + ":" + directionDateTime + " " + directionText);
+        textarea.val(directionText);
         modal.fadeIn();
     });
 
@@ -2127,6 +2333,241 @@ function eventListeners() {
         validateCustomerForSaving(true);
     })
 
+    $(document).on('blur', '.input-time', function (e) {
+        let input = $(this);
+
+        if (moment(input.val().trim(), 'HH:mm').format('HH:mm') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'HH:mm').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'H:mm').format('H:mm') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'H:mm').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'Hmm').format('Hmm') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'Hmm').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hh:mm a').format('hh:mm a') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hh:mm a').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'h:mm a').format('h:mm a') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'h:mm a').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hh:mma').format('hh:mma') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hh:mma').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'h:mma').format('h:mma') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'h:mma').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hhmm a').format('hhmm a') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hhmm a').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hmm a').format('hmm a') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hmm a').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hhmma').format('hhmma') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hhmma').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hmma').format('hmma') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hmma').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'H').format('H') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'H').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'HH').format('HH') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'HH').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'h a').format('h a') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'h a').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hh a').format('hh a') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hh a').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'ha').format('ha') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'ha').format('HHmm'));
+        }
+
+        if (moment(input.val().trim(), 'hha').format('hha') === input.val().trim()) {
+            input.val(moment(input.val().trim(), 'hha').format('HHmm'));
+        }
+
+    });
+
+    $(document).on('click', '#customer-contacts-list-search-btn', function (e) {
+        let customerId = $(this).closest('.customer-content').find('#txt-customer-customer-id').val();
+
+        if (customerId !== '') {
+            return;
+        }
+
+        let formSection = $(this).closest('.form-section');
+
+        formSection.attr('class', 'form-section searching');
+    });
+
+    $(document).on('click', '#customer-contacts-list-cancel-btn', function (e) {
+        let formSection = $(this).closest('.form-section');
+        formSection.find('input').val('');
+        formSection.attr('class', 'form-section');
+    });
+
+    $(document).on('click', '#customer-contacts-list-send-btn', function (e) {
+        e.preventDefault();
+        let form = $(this).closest(".form-section");
+        let mainContainer = form.closest(".swiper-slide").find(".main-panel-container");
+        let panelContainer = mainContainer.find(".panel-container");
+
+        let first_name = form.find("input#txt-customer-contacts-search-first-name").val();
+        let last_name = form.find("input#txt-customer-contacts-search-last-name").val();
+        let address1 = form.find("input#txt-customer-contacts-search-address1").val();
+        let address2 = form.find("input#txt-customer-contacts-search-address2").val();
+        let city = form.find("input#txt-customer-contacts-search-city").val();
+        let state = form.find("input#txt-customer-contacts-search-state").val();
+        let phone = form.find("input#txt-customer-contacts-search-phone").val();
+        let email = form.find("input#txt-customer-contacts-search-email").val();
+
+        let data = {
+            first_name: first_name.toLowerCase(),
+            last_name: last_name.toLowerCase(),
+            address1: address1.toLowerCase(),
+            address2: address2.toLowerCase(),
+            city: city.toLowerCase(),
+            state: state,
+            phone: phone,
+            email: email.toLowerCase()
+        };
+
+        $.post(serverURL + "/getContacts", data)
+            .then((res) => {
+                $.get(location + "views/panels/search-results/customers/contacts/contact-search.html", async function (content) {
+                    let filter = "";
+
+                    if (first_name.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">First Name:</div> <div class="value">' + first_name.trim() + "</div> </div>";
+                    }
+                    if (last_name.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Last Name:</div> <div class="value">' + last_name.trim() + "</div> </div>";
+                    }
+                    if (address1.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Address 1:</div> <div class="value">' + address1.trim() + "</div> </div>";
+                    }
+                    if (address2.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Address 2:</div> <div class="value">' + address2.trim() + "</div> </div>";
+                    }
+                    if (city.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">City:</div> <div class="value">' + city.trim() + "</div> </div>";
+                    }
+                    if (state.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">State:</div> <div class="value">' + state.trim() + "</div> </div>";
+                    }                    
+                    if (phone.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Phone:</div> <div class="value">' + phone.trim() + "</div> </div>";
+                    }
+                    if (email.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">E-mail:</div> <div class="value">' + email.trim() + "</div> </div>";
+                    }
+
+                    content = content.replace("[FILTER]", filter);
+
+                    let rows = ``;
+
+                    for (let i = 0; i < res.contacts.length; i++) {
+                        let row = res.contacts[i];
+
+                        rows +=
+                            `
+                    <div class="trow">
+                        <div class="tcol contact-id hidden">` + row.id + `</div>
+                        <div class="tcol contact-first-name">` + row.first_name + `</div>
+                        <div class="tcol contact-last-name">` + row.last_name + `</div>
+                        <div class="tcol contact-address1">` + row.address1 + `</div>
+                        <div class="tcol contact-address2">` + row.address2 + `</div>
+                        <div class="tcol contact-city">` + row.city + `</div>
+                        <div class="tcol contact-state">` + row.state + `</div>
+                        <div class="tcol contact-phone-work">` + row.phone_work + `</div>
+                        <div class="tcol contact-email-work">` + row.email_work + `</div>
+
+                        <div class="tcol customer-id hidden">` + row.customer.id + `</div>
+                        <div class="tcol code hidden">` + row.customer.code + (row.customer.code_number === 0 ? "" : row.customer.code_number) + `</div>
+                        <div class="tcol name hidden">` + row.customer.name + `</div>
+                        <div class="tcol address1 hidden">` + row.customer.address1 + `</div>
+                        <div class="tcol address2 hidden">` + row.customer.address2 + `</div>
+                        <div class="tcol city hidden">` + row.customer.city + `</div>
+                        <div class="tcol state hidden">` + row.customer.state + `</div>
+                        <div class="tcol zip hidden">` + row.customer.zip + `</div>
+                        <div class="tcol contact-name hidden">` + row.customer.contact_name + `</div>
+                        <div class="tcol contact-phone hidden">` + row.customer.contact_phone + `</div>
+                        <div class="tcol ext hidden">` + row.customer.ext + `</div>
+                        <div class="tcol hidden email">` + row.customer.email + `</div>
+
+                        <div class="tcol hidden mailing-code">` + row.customer.mailing_code + (row.customer.mailing_code_number === 0 ? "" : row.customer.mailing_code_number) + `</div>
+                        <div class="tcol hidden mailing-name">` + row.customer.mailing_name + `</div>
+                        <div class="tcol hidden mailing-address1">` + row.customer.mailing_address1 + `</div>
+                        <div class="tcol hidden mailing-address2">` + row.customer.mailing_address2 + `</div>
+                        <div class="tcol hidden mailing-city">` + row.customer.mailing_city + `</div>
+                        <div class="tcol hidden mailing-state">` + row.customer.mailing_state + `</div>
+                        <div class="tcol hidden mailing-zip">` + row.customer.mailing_zip + `</div>
+                        <div class="tcol hidden mailing-contact-name">` + row.customer.mailing_contact_name + `</div>
+                        <div class="tcol hidden mailing-contact-phone">` + row.customer.mailing_contact_phone + `</div>
+                        <div class="tcol hidden mailing-ext">` + row.customer.mailing_ext + `</div>
+                        <div class="tcol hidden mailing-email">` + row.customer.mailing_email + `</div>
+
+                        <div class="tcol hidden mailing-bill-to">` + row.customer.mailing_bill_to + `</div>
+                        <div class="tcol hidden mailing-division">` + row.customer.mailing_division + `</div>
+                        <div class="tcol hidden mailing-agent-code">` + row.customer.mailing_agent_code + `</div>
+                        <div class="tcol hidden mailing-salesman">` + row.customer.mailing_salesman + `</div>
+                        <div class="tcol hidden mailing-fid">` + row.customer.mailing_fid + `</div>
+                    </div>
+                    `;
+                    }
+
+                    content = content.replace("[RESULTS]", rows);
+
+                    if (panelContainer.find(".panel").length === 0) {
+                        mainContainer.css("left", $(window).width() - mainContainer.width() + "px");
+                        panelContainer.append(content);
+                        reorderCustomerPanels();
+                    } else {
+                        let exist = false;
+
+                        for (let i = 0; i < panelContainer.find(".panel").length; i++) {
+                            let panel = panelContainer.find(".panel").eq(i);
+
+                            if (panel.attr("id") === "panel-customers-contact-search-result") {
+                                panel.appendTo(panelContainer);
+                                reorderCustomerPanels();
+                                exist = true;
+                                break;
+                            }
+                        }
+
+                        if (!exist) {
+                            panelContainer.append(content);
+                            reorderCustomerPanels();
+                        }
+                    }
+                },
+                    "html"
+                );
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    });
+
     setMaskedInput();
 }
 
@@ -2187,22 +2628,10 @@ function validateContactforSaving() {
         automatic_emails_to: automaticEmailsTo.val(),
         automatic_emails_cc: automaticEmailsCc.val(),
         automatic_emails_bcc: automaticEmailsBcc.val(),
-        automatic_emails_booked_load: automaticEmailsBookedLoad.is(":checked")
-            ? 1
-            : 0,
-        automatic_emails_check_calls: automaticEmailsCheckCalls.is(":checked")
-            ? 1
-            : 0,
-        automatic_emails_carrier_arrival_shipper: automaticEmailsCarrierArrivalShipper.is(
-            ":checked"
-        )
-            ? 1
-            : 0,
-        automatic_emails_carrier_arrival_consignee: automaticEmailsCarrierArrivalConsignee.is(
-            ":checked"
-        )
-            ? 1
-            : 0,
+        automatic_emails_booked_load: automaticEmailsBookedLoad.is(":checked") ? 1 : 0,
+        automatic_emails_check_calls: automaticEmailsCheckCalls.is(":checked") ? 1 : 0,
+        automatic_emails_carrier_arrival_shipper: automaticEmailsCarrierArrivalShipper.is(":checked") ? 1 : 0,
+        automatic_emails_carrier_arrival_consignee: automaticEmailsCarrierArrivalConsignee.is(":checked") ? 1 : 0,
         automatic_emails_loaded: automaticEmailsLoaded.is(":checked") ? 1 : 0,
         automatic_emails_empty: automaticEmailsEmpty.is(":checked") ? 1 : 0,
     }).then((res) => {
@@ -2217,46 +2646,33 @@ function validateContactforSaving() {
                 contactItems += `
                     <div class="customer-contact-list-item" 
                         data-id="${contact.id}" 
-                        data-first-name="${contact.first_name}"
-                        data-last-name="${contact.last_name}"
-                        data-phone-work="${contact.phone_work}"
-                        data-phone-work-fax="${contact.phone_work_fax}"
-                        data-phone-mobile="${contact.phone_mobile}"
-                        data-phone-direct="${contact.phone_direct}"
-                        data-phone-other="${contact.phone_other}"
-                        data-phone-ext="${contact.phone_ext}"
-                        data-email-work="${contact.email_work}"
-                        data-email-personal="${contact.email_personal}"
-                        data-email-other="${contact.email_other}"
-                        data-is-primary="${contact.is_primary}"
-                        data-is-online="${contact.is_online}"
-                        data-notes="${contact.notes}"      
-                        data-automatic-emails-to="${contact.automatic_emails_to
-                    }"      
-                        data-automatic-emails-cc="${contact.automatic_emails_cc
-                    }"      
-                        data-automatic-emails-bcc="${contact.automatic_emails_bcc
-                    }"      
-                        data-automatic-emails-booked-load="${contact.automatic_emails_booked_load
-                    }"      
-                        data-automatic-emails-check-calls="${contact.automatic_emails_check_calls
-                    }"      
-                        data-automatic-emails-carrier-arrival-shipper="${contact.automatic_emails_carrier_arrival_shipper
-                    }"      
-                        data-automatic-emails-carrier-arrival-consignee="${contact.automatic_emails_carrier_arrival_consignee
-                    }"      
-                        data-automatic-emails-loaded="${contact.automatic_emails_loaded
-                    }"      
-                        data-automatic-emails-empty="${contact.automatic_emails_empty
-                    }">      
+                        data-first-name="${contact.first_name || ''}"
+                        data-last-name="${contact.last_name || ''}"
+                        data-phone-work="${contact.phone_work || ''}"
+                        data-phone-work-fax="${contact.phone_work_fax || ''}"
+                        data-phone-mobile="${contact.phone_mobile || ''}"
+                        data-phone-direct="${contact.phone_direct || ''}"
+                        data-phone-other="${contact.phone_other || ''}"
+                        data-phone-ext="${contact.phone_ext || ''}"
+                        data-email-work="${contact.email_work || ''}"
+                        data-email-personal="${contact.email_personal || ''}"
+                        data-email-other="${contact.email_other || ''}"
+                        data-is-primary="${contact.is_primary || ''}"
+                        data-is-online="${contact.is_online || ''}"
+                        data-notes="${contact.notes || ''}"      
+                        data-automatic-emails-to="${contact.automatic_emails_to || ''}"      
+                        data-automatic-emails-cc="${contact.automatic_emails_cc || ''}"      
+                        data-automatic-emails-bcc="${contact.automatic_emails_bcc || ''}"      
+                        data-automatic-emails-booked-load="${contact.automatic_emails_booked_load || ''}"      
+                        data-automatic-emails-check-calls="${contact.automatic_emails_check_calls || ''}"      
+                        data-automatic-emails-carrier-arrival-shipper="${contact.automatic_emails_carrier_arrival_shipper || ''}"      
+                        data-automatic-emails-carrier-arrival-consignee="${contact.automatic_emails_carrier_arrival_consignee || ''}"      
+                        data-automatic-emails-loaded="${contact.automatic_emails_loaded || ''}"      
+                        data-automatic-emails-empty="${contact.automatic_emails_empty || ''}">      
 
-                            <div class="item-name">${contact.first_name +
-                    " " +
-                    contact.middle_name +
-                    " " +
-                    contact.last_name}</div>
-                            <div class="item-phone">${contact.phone_work}</div>
-                            <div class="item-email">${contact.email_work}</div>
+                            <div class="item-name">${contact.first_name || '' + " " + contact.middle_name || '' + " " + contact.last_name || ''}</div>
+                            <div class="item-phone">${contact.phone_work || ''}</div>
+                            <div class="item-email">${contact.email_work || ''}</div>
                     </div>           
                 `;
             }
@@ -2275,8 +2691,6 @@ function setMaskedInput() {
     $(document)
         .find(".birthday")
         .mask("00/00/0000");
-
-    console.log(moment());
 }
 
 function validateCustomerForSaving(bill_to = false) {
@@ -2387,10 +2801,12 @@ function validateCustomerForSaving(bill_to = false) {
             id.val(c.id);
             code.val(c.code + (c.code_number !== 0 ? c.code_number : ""));
             mailing_code.val(c.mailing_code + (c.mailing_code_number !== 0 ? c.mailing_code_number : ""));
-            
-            if (bill_to){
+
+            if (bill_to) {
                 mailing_bill_to.val(c.mailing_code + (c.mailing_code_number !== 0 ? c.mailing_code_number : ""));
             }
+
+            $("#customer-container .customer-section input#txt-customer-customer-id").change();
         });
     } else {
         if (id.val() !== "") {

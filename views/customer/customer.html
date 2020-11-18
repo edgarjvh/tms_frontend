@@ -40,7 +40,8 @@
                                         </div>
                                         <div class="input-box-container code">
                                             <input required type="text" id="txt-customer-customer-code"
-                                                name="txt-customer-customer-code" title="Customer Code">
+                                                name="txt-customer-customer-code" title="Customer Code"
+                                                style="pointer-events: all;">
                                             <label for="txt-customer-customer-code">Code</label>
                                         </div>
                                         <div class="hsep"></div>
@@ -127,8 +128,7 @@
                                         <div class="section-title">Mailing Address</div>
                                         <div class="middle-border"></div>
                                         <div class="section-btn">
-                                            <div class="mochi-button text-center"
-                                                id="mailing-address-bill-to-btn">
+                                            <div class="mochi-button text-center" id="mailing-address-bill-to-btn">
                                                 <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
                                                 <div class="mochi-button-base">
                                                     Bill To
@@ -292,9 +292,9 @@
                                     </div>
                                     <div class="row-section">
                                         <div class="input-box-container">
-                                            <input required type="text" id="txt-credit-dispatched"
-                                                name="txt-credit-dispatched" title="Credit Dispatched">
-                                            <label for="txt-credit-dispatched">Credit Dispatched</label>
+                                            <input required type="text" id="txt-credit-ordered"
+                                                name="txt-credit-ordered" title="Credit Ordered">
+                                            <label for="txt-credit-ordered">Credit Ordered</label>
                                         </div>
                                     </div>
                                     <div class="row-section">
@@ -429,14 +429,114 @@
                                                 </div>
                                                 <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
                                             </div>
+
+                                            <div class="mochi-button text-center"
+                                                id="customer-contacts-list-cancel-btn">
+                                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                <div class="mochi-button-base">
+                                                    Cancel
+                                                </div>
+                                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                            </div>
+
+                                            <div class="mochi-button text-center"
+                                                id="customer-contacts-list-send-btn">
+                                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                <div class="mochi-button-base">
+                                                    Send
+                                                </div>
+                                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                            </div>
                                         </div>
                                         <div class="right-border"></div>
                                     </div>
 
                                     <div class="customer-contact-list-section">
-                                        <div class="customer-contact-list-wrapper">
+                                        <div class="customer-contact-main-container">
+                                            <div class="customer-contact-list-container">
+                                                <div class="customer-contact-list-wrapper">
 
+                                                </div>
+                                            </div>
+
+                                            <div class="customer-contact-search-container">
+                                                <div class="row-section">
+                                                    <div class="input-box-container name-box">
+                                                        <input required type="text"
+                                                            id="txt-customer-contacts-search-first-name"
+                                                            name="txt-customer-contacts-search-first-name"
+                                                            title="Contact First Name">
+                                                        <label for="txt-customer-contacts-search-first-name">First
+                                                            Name</label>
+                                                    </div>
+                                                    <div class="hsep"></div>
+                                                    <div class="input-box-container name-box">
+                                                        <input required type="text"
+                                                            id="txt-customer-contacts-search-last-name"
+                                                            name="txt-customer-contacts-search-last-name"
+                                                            title="Contact Last Name">
+                                                        <label for="txt-customer-contacts-search-last-name">Last
+                                                            Name</label>
+                                                    </div>
+                                                </div>
+                                                <div class="vsep"></div>
+                                                <div class="row-section">
+                                                    <div class="input-box-container">
+                                                        <input required type="text"
+                                                            id="txt-customer-contacts-search-address1"
+                                                            name="txt-customer-contacts-search-address1"
+                                                            title="Address 1">
+                                                        <label for="txt-customer-contacts-search-address1">Address
+                                                            1</label>
+                                                    </div>
+                                                </div>
+                                                <div class="vsep"></div>
+                                                <div class="row-section">
+                                                    <div class="input-box-container">
+                                                        <input required type="text"
+                                                            id="txt-customer-contacts-search-address2"
+                                                            name="txt-customer-contacts-search-address2"
+                                                            title="Address 2">
+                                                        <label for="txt-customer-contacts-search-address2">Address
+                                                            2</label>
+                                                    </div>
+                                                </div>
+                                                <div class="vsep"></div>
+                                                <div class="row-section">
+                                                    <div class="input-box-container">
+                                                        <input required type="text" id="txt-customer-contacts-search-city"
+                                                            name="txt-customer-contacts-search-city"
+                                                            title="City">
+                                                        <label for="txt-customer-contacts-search-city">City</label>
+                                                    </div>
+                                                    <div class="hsep"></div>
+                                                    <div class="input-box-container state">
+                                                        <input required type="text" id="txt-customer-contacts-search-state"
+                                                            name="txt-customer-contacts-search-state"
+                                                            title="State" maxlength="2">
+                                                        <label for="txt-customer-contacts-search-state">State</label>
+                                                    </div>
+                                                    <div class="hsep"></div>
+                                                    <div class="input-box-container">
+                                                        <input class="contact-phone" required type="text"
+                                                            id="txt-customer-contacts-search-phone"
+                                                            name="txt-customer-contacts-search-phone" title="Phone (Work-Mobile-Fax)">
+                                                        <label for="txt-customer-contacts-search-phone">Phone (Work-Mobile-Fax)</label>
+                                                    </div>
+                                                </div>
+                                                <div class="vsep"></div>
+                                                <div class="row-section">
+                                                    <div class="input-box-container">
+                                                        <input required type="text"
+                                                            id="txt-customer-contacts-search-email"
+                                                            name="txt-customer-contacts-search-email"
+                                                            title="Contact E-mail">
+                                                        <label for="txt-customer-contacts-search-email">E-mail</label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -578,13 +678,15 @@
                                         </div>
                                         <div class="row-section">
                                             <div class="input-box-container">
-                                                <input required type="text" id="txt-customer-notes-hours-open"
+                                                <input class="input-time" required type="text"
+                                                    id="txt-customer-notes-hours-open"
                                                     name="txt-customer-notes-hours-open" title="Hours Open">
                                                 <label for="txt-customer-notes-hours-open">Open</label>
                                             </div>
 
                                             <div class="input-box-container">
-                                                <input required type="text" id="txt-customer-notes-hours-close"
+                                                <input class="input-time" required type="text"
+                                                    id="txt-customer-notes-hours-close"
                                                     name="txt-customer-notes-hours-close" title="Hours Close">
                                                 <label for="txt-customer-notes-hours-close">Close</label>
                                             </div>
@@ -599,14 +701,16 @@
                                         </div>
                                         <div class="row-section">
                                             <div class="input-box-container">
-                                                <input required type="text" id="txt-customer-notes-delivery-hours-open"
+                                                <input class="input-time" required type="text"
+                                                    id="txt-customer-notes-delivery-hours-open"
                                                     name="txt-customer-notes-delivery-hours-open"
                                                     title="Delivery Hours Open">
                                                 <label for="txt-customer-notes-delivery-hours-open">Open</label>
                                             </div>
 
                                             <div class="input-box-container">
-                                                <input required type="text" id="txt-customer-notes-delivery-hours-close"
+                                                <input class="input-time" required type="text"
+                                                    id="txt-customer-notes-delivery-hours-close"
                                                     name="txt-customer-notes-delivery-hours-close"
                                                     title="Delivery Hours Close">
                                                 <label for="txt-customer-notes-delivery-hours-close">Close</label>
@@ -655,7 +759,7 @@
                                         <div class="portal-section">
                                             <div class="notes-portal-content">
                                                 <div class="notes-portal-section-wrapper">
-                                                    [NOTES-LIST]
+
                                                 </div>
                                             </div>
                                         </div>
@@ -704,7 +808,7 @@
                                         <div class="portal-section">
                                             <div class="directions-portal-content">
                                                 <div class="directions-portal-section-wrapper">
-                                                    [DIRECTIONS-LIST]
+
                                                 </div>
                                             </div>
                                         </div>
@@ -815,6 +919,14 @@
                                 <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div class="mochi-button-base">
                                     Save
+                                </div>
+                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+
+                            <div class="mochi-button text-center" id="customer-customer-directions-edit-btn">
+                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div class="mochi-button-base">
+                                    Edit
                                 </div>
                                 <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>

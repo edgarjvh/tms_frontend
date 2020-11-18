@@ -172,13 +172,16 @@ function eventListeners(swiper, email, dispatch, customer, carrier, loadBoard, i
                         swiperWrapper.css('margin-left', '0');
 
                         $(document).find('.swiper-slide-selectable').show();
+                        
                     }, 300);
                 } else {                    
                     swiperWrapper.css('transform', 'translateX(-' + (winRes * count) + 'px)');
-                    swiperWrapper.css('margin-left', '0');
+                    swiperWrapper.css('margin-left', '0');                    
                 }
             });
         }
+
+        $(document).find('#txt-customer-customer-code').focus();
     });
 
     $(document).on('click', '#btn-carriers', () => {
