@@ -41,7 +41,7 @@
                                         <div class="input-box-container code">
                                             <input required type="text" id="txt-customer-customer-code"
                                                 name="txt-customer-customer-code" title="Customer Code"
-                                                style="pointer-events: all;">
+                                                style="pointer-events: all;" autocomplete="off">
                                             <label for="txt-customer-customer-code">Code</label>
                                         </div>
                                         <div class="hsep"></div>
@@ -155,7 +155,7 @@
                                     <div class="row-section">
                                         <div class="input-box-container code">
                                             <input required type="text" id="txt-mailing-address-code"
-                                                name="txt-mailing-address-code" title="Mailing Address Code">
+                                                name="txt-mailing-address-code" title="Mailing Address Code" autocomplete="off">
                                             <label for="txt-mailing-address-code">Code</label>
                                         </div>
                                         <div class="hsep"></div>
@@ -391,9 +391,9 @@
                                         </div>
 
                                         <div class="input-toggle-container">
-                                            <input required type="checkbox" id="cbox-customer-contacts-phone-primary"
-                                                name="cbox-customer-contacts-phone-primary">
-                                            <label for="cbox-customer-contacts-phone-primary" title="Primary">
+                                            <input required type="checkbox" id="cbox-carrier-contacts-phone-primary"
+                                                name="cbox-carrier-contacts-phone-primary">
+                                            <label for="cbox-carrier-contacts-phone-primary" title="Primary">
                                                 <div class="lbl-toggle-button">Primary</div>
                                                 <div class="input-toggle-button"></div>
                                             </label>
@@ -412,6 +412,37 @@
                                                 name="txt-customer-contacts-notes" title="Contact Notes">
                                             <label for="txt-customer-contacts-notes">Notes</label>
                                         </div>
+
+                                        <input type="text" class="hidden" id="txt-customer-contacts-prefix" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-middle-name" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-suffix" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-title" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-department" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-email-personal" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-email-other" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-phone-work-fax" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-phone-mobile" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-phone-direct" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-phone-other" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-phone-ext" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-country" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-address1" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-address2" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-city" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-state" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-zip-code" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-birthday" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-website" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-is-online" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-to" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-cc" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-bcc" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-booked-load" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-check-calls" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-carrier-arrival-shipper" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-carrier-arrival-consignee" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-loaded" />
+                                        <input type="text" class="hidden" id="txt-customer-contacts-automatic-emails-empty" />
                                     </div>
                                 </div>
                                 <div class="form-section" style="min-height: 10.625rem; margin-top:10px;">
@@ -439,8 +470,7 @@
                                                 <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
                                             </div>
 
-                                            <div class="mochi-button text-center"
-                                                id="customer-contacts-list-send-btn">
+                                            <div class="mochi-button text-center" id="customer-contacts-list-send-btn">
                                                 <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
                                                 <div class="mochi-button-base">
                                                     Send
@@ -504,24 +534,27 @@
                                                 <div class="vsep"></div>
                                                 <div class="row-section">
                                                     <div class="input-box-container">
-                                                        <input required type="text" id="txt-customer-contacts-search-city"
-                                                            name="txt-customer-contacts-search-city"
-                                                            title="City">
+                                                        <input required type="text"
+                                                            id="txt-customer-contacts-search-city"
+                                                            name="txt-customer-contacts-search-city" title="City">
                                                         <label for="txt-customer-contacts-search-city">City</label>
                                                     </div>
                                                     <div class="hsep"></div>
                                                     <div class="input-box-container state">
-                                                        <input required type="text" id="txt-customer-contacts-search-state"
-                                                            name="txt-customer-contacts-search-state"
-                                                            title="State" maxlength="2">
+                                                        <input required type="text"
+                                                            id="txt-customer-contacts-search-state"
+                                                            name="txt-customer-contacts-search-state" title="State"
+                                                            maxlength="2">
                                                         <label for="txt-customer-contacts-search-state">State</label>
                                                     </div>
                                                     <div class="hsep"></div>
                                                     <div class="input-box-container">
                                                         <input class="contact-phone" required type="text"
                                                             id="txt-customer-contacts-search-phone"
-                                                            name="txt-customer-contacts-search-phone" title="Phone (Work-Mobile-Fax)">
-                                                        <label for="txt-customer-contacts-search-phone">Phone (Work-Mobile-Fax)</label>
+                                                            name="txt-customer-contacts-search-phone"
+                                                            title="Phone (Work-Mobile-Fax)">
+                                                        <label for="txt-customer-contacts-search-phone">Phone
+                                                            (Work-Mobile-Fax)</label>
                                                     </div>
                                                 </div>
                                                 <div class="vsep"></div>
@@ -612,9 +645,9 @@
                                     <div class="row-section">
                                         <div class="input-box-container">
                                             <input class="input-email" required type="text"
-                                                id="txt-automatic-emails-email-bbc"
-                                                name="txt-automatic-emails-email-bbc" title="E-Mail BBC">
-                                            <label for="txt-automatic-emails-email-bbc">E-Mail Bcc</label>
+                                                id="txt-automatic-emails-email-bcc"
+                                                name="txt-automatic-emails-email-bcc" title="E-Mail BBC">
+                                            <label for="txt-automatic-emails-email-bcc">E-Mail Bcc</label>
                                         </div>
                                         <div class="hsep"></div>
                                         <div class="input-toggle-container">
@@ -758,7 +791,8 @@
 
                                         <div class="portal-section">
                                             <div class="notes-portal-content">
-                                                <div class="notes-portal-section-wrapper">
+                                                <div class="notes-portal-section-wrapper"
+                                                    id="notes-portal-section-wrapper">
 
                                                 </div>
                                             </div>
@@ -915,21 +949,32 @@
                                 <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
 
-                            <div class="mochi-button text-center" id="customer-customer-directions-save-btn">
-                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div class="mochi-button-base">
-                                    Save
+                            <div class="group-btn">
+                                <div class="mochi-button text-center" id="customer-customer-directions-save-btn">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Save
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+
+                                <div class="mochi-button text-center" id="customer-customer-directions-delete-btn">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Delete
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
+                                <div class="mochi-button text-center" id="customer-customer-directions-edit-btn">
+                                    <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div class="mochi-button-base">
+                                        Edit
+                                    </div>
+                                    <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
                             </div>
 
-                            <div class="mochi-button text-center" id="customer-customer-directions-edit-btn">
-                                <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div class="mochi-button-base">
-                                    Edit
-                                </div>
-                                <div class="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
                         </div>
                     </div>
                 </div>

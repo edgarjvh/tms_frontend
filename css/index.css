@@ -1234,6 +1234,15 @@ body .admin-layer {
 .main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div {
   margin-right: 20px;
 }
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div span {
+  margin-right: 5px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div span:nth-child(odd) {
+  color: black;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div span:nth-child(even) {
+  color: rgba(0, 0, 0, 0.7);
+}
 .main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form {
   flex-grow: 1;
   overflow-y: auto;
@@ -1344,6 +1353,356 @@ body .admin-layer {
 .main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .upload-avatar-btn,
 .main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .remove-avatar-btn,
 .main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .remove-avatar-btn {
+  pointer-events: all;
+  color: #000000;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container::after {
+  z-index: 0;
+  content: "";
+  position: absolute;
+  -webkit-box-shadow: 0 0 10px 5px #000000;
+  -moz-box-shadow: 0 0 10px 5px #000000;
+  box-shadow: 0 0 10px 5px #000000;
+  height: calc(95% + 84px);
+  left: 7px;
+  right: 10%;
+  width: 3px;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  top: 45%;
+  transform: translateY(-50%);
+}
+.main-panel-container .panel-container .panel-close-btn {
+  z-index: 2;
+}
+.main-panel-container .panel-container .panel-contact-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content {
+  flex-grow: 1;
+  position: relative;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  left: -5px;
+  padding-left: 5px;
+  overflow: auto;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-header-item {
+  font-size: 2.5rem;
+  font-weight: normal;
+  font-family: "Mochi Light";
+  margin: 10px 0;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item:hover .contact-name-item {
+  font-weight: bold !important;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item {
+  display: flex;
+  flex-direction: row;
+  margin: 10px 0;
+  cursor: pointer;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .hidden {
+  display: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-image-item {
+  min-width: 50px;
+  min-height: 50px;
+  max-width: 50px;
+  max-height: 50px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-right: 10px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-name-item {
+  font-style: italic;
+  font-weight: normal;
+  font-family: "Mochi Light";
+  font-size: 0.9rem;
+  transition: ease 0.2s;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-status-item {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-status-item.online {
+  background-color: green;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-status-item.offline {
+  background-color: red;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-list-container #carrier-contacts-add-contact-btn {
+  margin: 20px 0 0 0 !important;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+  margin-left: 5px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-container-wrapper {
+  position: absolute;
+  width: calc(100% + 10px);
+  height: calc(100% + 94px);
+  z-index: 1;
+  left: 0;
+  padding-left: 20px;
+  padding-top: 40px;
+  padding-right: 10px;
+  top: -84px;
+  background-color: #efefef;
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header {
+  display: flex;
+  flex-direction: row;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image {
+  min-width: 200px;
+  max-width: 200px;
+  min-height: 200px;
+  max-height: 200px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-right: 30px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+  border-radius: 50% 0 50% 50%;
+  position: relative;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .avatar-container {
+  overflow: hidden;
+  border-radius: 50% 0 50% 50%;
+  width: 100%;
+  height: 100%;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .avatar-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-carrier-avatar-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  cursor: pointer;
+  display: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-carrier-avatar-btn span {
+  font-size: 18px;
+  transition: ease 0.2s;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-carrier-avatar-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: pointer;
+  display: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-carrier-avatar-btn span {
+  font-size: 28px;
+  transition: ease 0.2s;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-carrier-avatar-btn:hover span,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-carrier-avatar-btn:hover span {
+  color: rgba(0, 0, 0, 0.5);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-top: -3px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-name {
+  text-transform: uppercase;
+  font-family: 'Mochi Light';
+  font-size: 2.5rem;
+  line-height: 0.1rem;
+  margin-top: -30px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-info-header-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-info-header-buttons .mochi-button {
+  font-size: 1rem;
+  text-align: right !important;
+  padding-right: 5px;
+  pointer-events: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-name .contact-info-header-buttons .mochi-button .mochi-button-base {
+  color: rgba(124, 16, 8, 0.5);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  font-family: 'Mochi Light';
+  font-style: italic;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding-left: 3px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div {
+  margin-right: 20px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div span {
+  margin-right: 5px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div span:nth-child(odd) {
+  color: black;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data .contact-info-header-data-extra > div span:nth-child(even) {
+  color: rgba(0, 0, 0, 0.7);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .hidden {
+  display: none !important;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .contact-info-row.hidden {
+  display: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .contact-info-row {
+  margin-bottom: 15px;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .contact-info-row label {
+  margin: 0;
+  font-family: 'lato', sans-serif;
+  font-style: italic;
+  font-weight: bold;
+  pointer-events: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-form .contact-info-row input {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  border-bottom: 0;
+  background-color: transparent;
+  font-family: 'Mochi Light';
+  pointer-events: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px 10px;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-footer span {
+  cursor: pointer;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-carrier-contacts-save {
+  display: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-carrier-contacts-edit {
+  pointer-events: none;
+  color: rgba(0, 0, 0, 0.3);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing span.btn-panel-carrier-contacts-save {
+  display: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing span.btn-panel-carrier-contacts-edit {
+  display: unset;
+  pointer-events: all;
+  color: #000000;
+  transition: ease color 0.3s;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing span.btn-panel-carrier-contacts-edit:hover {
+  color: rgba(0, 0, 0, 0.5);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing .input-toggle-container input,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing .input-toggle-container label {
+  pointer-events: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing .upload-carrier-avatar-btn,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing .remove-carrier-avatar-btn {
+  pointer-events: none;
+  color: rgba(0, 0, 0, 0.5);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing .contact-info-header-data .mochi-button {
+  pointer-events: all !important;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.showing .contact-info-header-data .mochi-button .mochi-button-base {
+  color: #7c1008 !important;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .contact-info-header-data .mochi-button {
+  pointer-events: all !important;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .contact-info-header-data .mochi-button .mochi-button-base {
+  color: #7c1008 !important;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .contact-info-header-data .mochi-button {
+  pointer-events: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .contact-info-header-data .mochi-button .mochi-button-base {
+  color: rgba(124, 16, 8, 0.5);
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing span.btn-panel-carrier-contacts-save,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding span.btn-panel-carrier-contacts-save {
+  display: unset;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing span.btn-panel-carrier-contacts-edit,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding span.btn-panel-carrier-contacts-edit {
+  display: none;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .contact-info-row input,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .contact-info-row input {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  pointer-events: all;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .input-toggle-container input,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .input-toggle-container input,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .input-toggle-container label,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .input-toggle-container label {
+  pointer-events: all;
+}
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .upload-carrier-avatar-btn,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .upload-carrier-avatar-btn,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.editing .remove-carrier-avatar-btn,
+.main-panel-container .panel-container .panel-contact-container .contact-info-container.adding .remove-carrier-avatar-btn {
   pointer-events: all;
   color: #000000;
 }
@@ -3006,6 +3365,187 @@ body .admin-layer {
   min-width: 130px;
 }
 .main-panel-container .panel-container .search-container .tbl-customers-contact-search-results .tcol.contact-email-work {
+  max-width: 160px;
+  min-width: 160px;
+}
+.main-panel-container .panel-container .search-container {
+  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .thead,
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody {
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .thead .trow,
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody .trow {
+  display: flex;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .thead .trow .tcol,
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody .trow .tcol {
+  padding: 10px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .thead {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .thead .tcol {
+  font-weight: bold;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody {
+  flex-grow: 1;
+  position: relative;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody .wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody .wrapper .trow {
+  align-items: center;
+  cursor: default;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody .wrapper .trow .tcol span {
+  text-decoration: underline;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tbody .wrapper .trow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.hidden {
+  display: none;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.code {
+  max-width: 90px;
+  min-width: 90px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.name {
+  max-width: 160px;
+  min-width: 160px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.address1 {
+  max-width: 190px;
+  min-width: 190px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.address2 {
+  max-width: 190px;
+  min-width: 190px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.city {
+  max-width: 120px;
+  min-width: 120px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.state {
+  max-width: 60px;
+  min-width: 60px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.zip {
+  max-width: 100px;
+  min-width: 100px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.contact-name {
+  max-width: 160px;
+  min-width: 160px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.contact-phone {
+  max-width: 120px;
+  min-width: 120px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-carrier-search-results .tcol.ext {
+  flex-grow: 1;
+}
+.main-panel-container .panel-container .search-container {
+  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .thead,
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody {
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .thead .trow,
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody .trow {
+  display: flex;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .thead .trow .tcol,
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody .trow .tcol {
+  padding: 10px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .thead {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .thead .tcol {
+  font-weight: bold;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody {
+  flex-grow: 1;
+  position: relative;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody .wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody .wrapper .trow {
+  align-items: center;
+  cursor: default;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody .wrapper .trow .tcol span {
+  text-decoration: underline;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tbody .wrapper .trow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.hidden {
+  display: none;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-first-name {
+  max-width: 110px;
+  min-width: 110px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-last-name {
+  max-width: 110px;
+  min-width: 110px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-address1 {
+  max-width: 170px;
+  min-width: 170px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-address2 {
+  max-width: 170px;
+  min-width: 170px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-city {
+  max-width: 120px;
+  min-width: 120px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-state {
+  max-width: 60px;
+  min-width: 60px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-phone-work {
+  max-width: 130px;
+  min-width: 130px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-email-work {
   max-width: 160px;
   min-width: 160px;
 }

@@ -513,6 +513,9 @@
   display: flex;
   justify-content: space-between;
 }
+.customer-container .customer-content .modal-customer-directions .modal-customer-directions-wrapper .modal-customer-directions-content .row-buttons .group-btn {
+  display: flex;
+}
 .customer-container .customer-content .modal-customer-directions .modal-customer-directions-wrapper .modal-customer-directions-content .row-buttons .mochi-button .mochi-button-decorator {
   font-size: 1rem;
 }
@@ -533,6 +536,9 @@
 .customer-container .customer-content .modal-customer-directions.showing #customer-customer-directions-edit-btn {
   display: block;
 }
+.customer-container .customer-content .modal-customer-directions.showing #customer-customer-directions-delete-btn {
+  display: block;
+}
 .customer-container .customer-content .modal-customer-directions.adding textarea,
 .customer-container .customer-content .modal-customer-directions.editing textarea {
   background-color: white;
@@ -541,6 +547,10 @@
 .customer-container .customer-content .modal-customer-directions.adding #customer-customer-directions-save-btn,
 .customer-container .customer-content .modal-customer-directions.editing #customer-customer-directions-save-btn {
   display: block;
+}
+.customer-container .customer-content .modal-customer-directions.adding #customer-customer-directions-delete-btn,
+.customer-container .customer-content .modal-customer-directions.editing #customer-customer-directions-delete-btn {
+  display: none;
 }
 .customer-container .customer-content .modal-customer-directions.adding #customer-customer-directions-edit-btn,
 .customer-container .customer-content .modal-customer-directions.editing #customer-customer-directions-edit-btn {

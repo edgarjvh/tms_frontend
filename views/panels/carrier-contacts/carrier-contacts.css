@@ -85,7 +85,7 @@
 .panel-contact-container .contact-list-container .contact-list-content .contact-list-wrapper .contact-info-item .contact-data .contact-status-item.offline {
   background-color: red;
 }
-.panel-contact-container .contact-list-container #customer-contacts-add-contact-btn {
+.panel-contact-container .contact-list-container #carrier-contacts-add-contact-btn {
   margin: 20px 0 0 0 !important;
 }
 .panel-contact-container .contact-info-container {
@@ -136,30 +136,30 @@
   height: 100%;
   object-fit: cover;
 }
-.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-avatar-btn {
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-carrier-avatar-btn {
   position: absolute;
   left: 0;
   top: 0;
   cursor: pointer;
   display: none;
 }
-.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-avatar-btn span {
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-carrier-avatar-btn span {
   font-size: 18px;
   transition: ease 0.2s;
 }
-.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-avatar-btn {
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-carrier-avatar-btn {
   position: absolute;
   right: 0;
   bottom: 0;
   cursor: pointer;
   display: none;
 }
-.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-avatar-btn span {
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-carrier-avatar-btn span {
   font-size: 28px;
   transition: ease 0.2s;
 }
-.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-avatar-btn:hover span,
-.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-avatar-btn:hover span {
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .upload-carrier-avatar-btn:hover span,
+.panel-contact-container .contact-info-container .contact-info-header .contact-info-header-image .remove-carrier-avatar-btn:hover span {
   color: rgba(0, 0, 0, 0.5);
 }
 .panel-contact-container .contact-info-container .contact-info-header .contact-info-header-data {
@@ -259,31 +259,31 @@
 .panel-contact-container .contact-info-container .contact-info-footer span {
   cursor: pointer;
 }
-.panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-contacts-save {
+.panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-carrier-contacts-save {
   display: none;
 }
-.panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-contacts-edit {
+.panel-contact-container .contact-info-container .contact-info-footer span.btn-panel-carrier-contacts-edit {
   pointer-events: none;
   color: rgba(0, 0, 0, 0.3);
 }
-.panel-contact-container .contact-info-container.showing span.btn-panel-contacts-save {
+.panel-contact-container .contact-info-container.showing span.btn-panel-carrier-contacts-save {
   display: none;
 }
-.panel-contact-container .contact-info-container.showing span.btn-panel-contacts-edit {
+.panel-contact-container .contact-info-container.showing span.btn-panel-carrier-contacts-edit {
   display: unset;
   pointer-events: all;
   color: #000000;
   transition: ease color 0.3s;
 }
-.panel-contact-container .contact-info-container.showing span.btn-panel-contacts-edit:hover {
+.panel-contact-container .contact-info-container.showing span.btn-panel-carrier-contacts-edit:hover {
   color: rgba(0, 0, 0, 0.5);
 }
 .panel-contact-container .contact-info-container.showing .input-toggle-container input,
 .panel-contact-container .contact-info-container.showing .input-toggle-container label {
   pointer-events: none;
 }
-.panel-contact-container .contact-info-container.showing .upload-avatar-btn,
-.panel-contact-container .contact-info-container.showing .remove-avatar-btn {
+.panel-contact-container .contact-info-container.showing .upload-carrier-avatar-btn,
+.panel-contact-container .contact-info-container.showing .remove-carrier-avatar-btn {
   pointer-events: none;
   color: rgba(0, 0, 0, 0.5);
 }
@@ -305,12 +305,12 @@
 .panel-contact-container .contact-info-container.adding .contact-info-header-data .mochi-button .mochi-button-base {
   color: rgba(124, 16, 8, 0.5);
 }
-.panel-contact-container .contact-info-container.editing span.btn-panel-contacts-save,
-.panel-contact-container .contact-info-container.adding span.btn-panel-contacts-save {
+.panel-contact-container .contact-info-container.editing span.btn-panel-carrier-contacts-save,
+.panel-contact-container .contact-info-container.adding span.btn-panel-carrier-contacts-save {
   display: unset;
 }
-.panel-contact-container .contact-info-container.editing span.btn-panel-contacts-edit,
-.panel-contact-container .contact-info-container.adding span.btn-panel-contacts-edit {
+.panel-contact-container .contact-info-container.editing span.btn-panel-carrier-contacts-edit,
+.panel-contact-container .contact-info-container.adding span.btn-panel-carrier-contacts-edit {
   display: none;
 }
 .panel-contact-container .contact-info-container.editing .contact-info-row input,
@@ -324,10 +324,10 @@
 .panel-contact-container .contact-info-container.adding .input-toggle-container label {
   pointer-events: all;
 }
-.panel-contact-container .contact-info-container.editing .upload-avatar-btn,
-.panel-contact-container .contact-info-container.adding .upload-avatar-btn,
-.panel-contact-container .contact-info-container.editing .remove-avatar-btn,
-.panel-contact-container .contact-info-container.adding .remove-avatar-btn {
+.panel-contact-container .contact-info-container.editing .upload-carrier-avatar-btn,
+.panel-contact-container .contact-info-container.adding .upload-carrier-avatar-btn,
+.panel-contact-container .contact-info-container.editing .remove-carrier-avatar-btn,
+.panel-contact-container .contact-info-container.adding .remove-carrier-avatar-btn {
   pointer-events: all;
   color: #000000;
 }

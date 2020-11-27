@@ -7,12 +7,24 @@
   justify-content: space-between;
   overflow: hidden;
 }
+.carrier-container .hidden {
+  display: none;
+}
 .carrier-container .carrier-content {
   width: 100%;
   flex-grow: 1;
   background-color: inherit;
   position: relative;
   overflow: hidden;
+}
+.carrier-container .carrier-content .insurance.expired {
+  background-color: lightcoral;
+}
+.carrier-container .carrier-content .insurance.active {
+  background-color: lightgreen;
+}
+.carrier-container .carrier-content .insurance.warning {
+  background-color: lightyellow;
 }
 .carrier-container .carrier-content .carrier-wrapper {
   width: 100%;
@@ -23,6 +35,13 @@
   flex-direction: column;
   padding: 10px;
   background-color: inherit;
+}
+.carrier-container .carrier-content .carrier-wrapper .input-box-container.code input {
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.carrier-container .carrier-content .carrier-wrapper .input-box-container.code label {
+  pointer-events: none;
 }
 .carrier-container .carrier-content .carrier-wrapper .mochi-contextual-container {
   display: none;
@@ -128,16 +147,166 @@
   display: flex;
   flex-direction: column;
 }
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .input-box-container.drop-down {
+  max-width: 140px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .hidden {
+  display: none;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container {
+  position: absolute;
+  width: calc(200% + 10px);
+  height: 100%;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  transition: left ease 0.3s;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container {
+  position: relative;
+  width: calc(50% - 5px);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .carrier-contact-list-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: ease 0.3s;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-x: hidden;
+  width: 100%;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .carrier-contact-list-item > div:not(:last-child) {
+  margin-right: 10px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .carrier-contact-list-item .item-name,
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .carrier-contact-list-item .item-phone {
+  white-space: nowrap;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .carrier-contact-list-item .item-email {
+  flex-grow: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .carrier-contact-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .loader {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-list-container .carrier-contact-list-wrapper .loader span {
+  color: black;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .carrier-contact-list-section .carrier-contact-main-container .carrier-contact-search-container {
+  position: relative;
+  width: calc(50% - 5px);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section .carrier-contact-main-container {
+  left: 0;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section #carrier-contacts-list-search-btn {
+  display: block;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section #carrier-contacts-list-cancel-btn {
+  display: none;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section #carrier-contacts-list-send-btn {
+  display: none;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section.searching .carrier-contact-main-container {
+  left: calc(-100% - 10px);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section.searching #carrier-contacts-list-search-btn {
+  display: none;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section.searching #carrier-contacts-list-cancel-btn {
+  display: block;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .form-section.searching #carrier-contacts-list-send-btn {
+  display: block;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .row-section {
+  flex-wrap: wrap;
+}
 .carrier-container .carrier-content .carrier-wrapper .cell-2 .portal-section {
   position: relative;
   width: 100%;
-  flex-grow: 1;
+  min-height: 10.625rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.5);
   margin-top: 5px;
 }
-.carrier-container .carrier-content .carrier-wrapper .cell-2 .input-box-container.drop-down {
-  max-width: 20%;
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .in-between {
+  flex-direction: row;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .in-between .left-container {
+  display: flex;
+  flex-direction: row;
+  min-width: calc(50% + 46px);
+  max-width: calc(50% + 46px);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section .form-section-notes-portal {
+  flex-grow: 1;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section .form-section-notes-portal .form-section {
+  height: 100%;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section .form-section-notes-portal .form-section .portal-section {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-top: 5px;
+  border: 0 !important;
+  box-shadow: unset;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section .notes-portal-section-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section .notes-portal-section-wrapper .carrier-notes-list-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: ease 0.3s;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section .notes-portal-section-wrapper .carrier-notes-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 .carrier-container .carrier-content .carrier-wrapper .main-row-section:last-child .cell-2 .form-section {
   flex-grow: 1;
@@ -181,4 +350,144 @@
   font-size: 1rem;
   line-height: initial;
   text-align: center;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.past-orders-section .form-section {
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.past-orders-section .form-section .past-orders-container {
+  position: relative;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-grow: 1;
+  overflow: hidden;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.past-orders-section .form-section .past-orders-container .past-orders-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.past-orders-section .form-section .past-orders-container .past-orders-wrapper .past-order-list-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: ease 0.3s;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-x: hidden;
+  width: 100%;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.past-orders-section .form-section .past-orders-container .past-orders-wrapper .past-order-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.driver-information-section .form-section {
+  justify-content: space-between;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.driver-information-section .form-section .vsep {
+  margin: 2px 0;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.drivers-list-section .carrier-drivers-list-container {
+  position: relative;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-grow: 1;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.drivers-list-section .carrier-drivers-list-container .carrier-drivers-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.drivers-list-section .carrier-drivers-list-container .carrier-drivers-list-wrapper .carrier-drivers-list-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: ease 0.3s;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-x: hidden;
+  width: 100%;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.drivers-list-section .carrier-drivers-list-container .carrier-drivers-list-wrapper .carrier-drivers-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.drivers-list-section .carrier-drivers-list-container .carrier-drivers-list-wrapper .carrier-drivers-list-item > div {
+  margin-right: 5px;
+}
+.carrier-container .carrier-content .modal-carrier-notes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+.carrier-container .carrier-content .modal-carrier-notes .modal-carrier-notes-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.carrier-container .carrier-content .modal-carrier-notes .modal-carrier-notes-wrapper .modal-carrier-notes-content {
+  width: 90%;
+  max-width: 400px;
+  min-height: 200px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+.carrier-container .carrier-content .modal-carrier-notes .modal-carrier-notes-wrapper .modal-carrier-notes-content .row-textinput {
+  flex-grow: 1;
+}
+.carrier-container .carrier-content .modal-carrier-notes .modal-carrier-notes-wrapper .modal-carrier-notes-content .row-textinput textarea {
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 5px;
+  border-radius: 10px;
+  max-height: 500px;
+}
+.carrier-container .carrier-content .modal-carrier-notes .modal-carrier-notes-wrapper .modal-carrier-notes-content .row-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+.carrier-container .carrier-content .modal-carrier-notes .modal-carrier-notes-wrapper .modal-carrier-notes-content .row-buttons .mochi-button .mochi-button-decorator {
+  font-size: 1rem;
+}
+.carrier-container .carrier-content .modal-carrier-notes .modal-carrier-notes-wrapper .modal-carrier-notes-content .row-buttons .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  display: inline-block;
+  white-space: normal;
+  font-size: 0.8rem;
+  line-height: initial;
+}
+.carrier-container .carrier-content .modal-carrier-notes.showing textarea {
+  background-color: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+.carrier-container .carrier-content .modal-carrier-notes.showing #carrier-carrier-notes-save-btn {
+  display: none;
+}
+.carrier-container .carrier-content .modal-carrier-notes.adding textarea {
+  background-color: white;
+  pointer-events: all;
+}
+.carrier-container .carrier-content .modal-carrier-notes.adding #carrier-carrier-notes-save-btn {
+  display: block;
 }
