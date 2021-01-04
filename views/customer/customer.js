@@ -785,7 +785,7 @@ function eventListeners() {
                         <div class="tcol hidden mailing-division">` + row.mailing_division + `</div>
                         <div class="tcol hidden mailing-agent-code">` + row.mailing_agent_code + `</div>
                         <div class="tcol hidden mailing-salesman">` + row.mailing_salesman + `</div>
-                        <div class="tcol hidden mailing-fid">` + row.mailing_fid + `</div>
+                        <div class="tcol hidden mailing-fid">` + row.mailing_fid + `</div>                        
                     </div>
                     `;
                     }
@@ -826,7 +826,6 @@ function eventListeners() {
 
     $(document).on('blur', '#txt-customer-customer-code', function (e) {
         let code = $(this);
-        console.log(code.val());
         let formsContainer = code.closest('.forms-section-container');
 
         $.post(serverURL + '/customers', {
@@ -1062,12 +1061,9 @@ function eventListeners() {
     });
 
     $(document).on("click", "#customer-contacts-clear-btn", function (e) {
-        let formSection = $(this).closest(".form-section");
-        let automaticEmailsSection = $(this).closest(".forms-section-container").find(".automatic-emails-section");
+        let formSection = $(this).closest(".form-section");        
         formSection.find("input").val("");
         formSection.find("input[type=checkbox]").prop("checked", false);
-        automaticEmailsSection.find("input[type=text]").val("");
-        automaticEmailsSection.find("input[type=checkbox]").prop("checked", false);
     });
 
     $(document).on("change", "input#txt-customer-customer-id", function () {
@@ -1081,6 +1077,7 @@ function eventListeners() {
         let contactListFormSection = contactListWrapper.closest(".form-section");
         let notesListWrapper = customerContainer.find(".notes-portal-section-wrapper");
         let directionsListWrapper = customerContainer.find(".directions-portal-section-wrapper");
+        let formSectionHours = customerContainer.find(".form-section-hours");
 
         if (customer_id === "") {
             contactListWrapper.html("");
@@ -1089,8 +1086,10 @@ function eventListeners() {
             mailingAddressSection.find('input').val("");
             contactSection.find("input[type=text]").val("");
             contactSection.find("input[type=checkbox]").prop("checked", false);
-            automaticEmailsSection.find("input[type=text]").val("");
+            automaticEmailsSection.find(".input-box-container").attr('class', 'input-box-container');
+            automaticEmailsSection.find(".inputted-email").remove();
             automaticEmailsSection.find("input[type=checkbox]").prop("checked", false);
+            formSectionHours.find('input').val('');
         } else {
             contactListFormSection.attr('class', 'form-section');
 
@@ -1116,10 +1115,81 @@ function eventListeners() {
                 customer_id: customer_id,
             }).then((res) => {
 
+                console.log(res);
+
                 if (res.result === "OK") {
                     let contactItems = ``;
                     let notesItems = ``;
                     let directionsItems = ``;
+
+                    if (res.customer_hours){
+                        formSectionHours.find('#txt-customer-notes-hours-open').val(res.customer_hours.hours_open);
+                        formSectionHours.find('#txt-customer-notes-hours-close').val(res.customer_hours.hours_close);
+                        formSectionHours.find('#txt-customer-notes-delivery-hours-open').val(res.customer_hours.delivery_hours_open);
+                        formSectionHours.find('#txt-customer-notes-delivery-hours-close').val(res.customer_hours.delivery_hours_close);
+                    }
+
+                    if (res.automatic_emails){
+                        let ae = res.automatic_emails;
+                        let inputBoxContainerTo = automaticEmailsSection.find('#txt-automatic-emails-email-to');
+                        let inputBoxContainerCc = automaticEmailsSection.find('#txt-automatic-emails-email-cc');
+                        let inputBoxContainerBcc = automaticEmailsSection.find('#txt-automatic-emails-email-bcc');
+    
+                        if (ae.automatic_emails_to !== '') {
+                            let arrEmailsTo = ae.automatic_emails_to.split(' ');
+                            inputBoxContainerTo.find('.inputted-email').remove();
+    
+                            for (let i = 0; i < arrEmailsTo.length; i++) {
+                                inputBoxContainerTo.append(`
+                                    <div class="inputted-email">
+                                        <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                                        <span class="inputted-email-address" role="textbox">${arrEmailsTo[i]}</span>
+                                    </div>
+                                `);
+                            }
+    
+                            inputBoxContainerTo.addClass('focusin');
+                        }
+    
+                        if (ae.automatic_emails_cc !== '') {
+                            let arrEmailsCc = ae.automatic_emails_cc.split(' ');
+                            inputBoxContainerCc.find('.inputted-email').remove();
+    
+                            for (let i = 0; i < arrEmailsCc.length; i++) {
+                                inputBoxContainerCc.append(`
+                                    <div class="inputted-email">
+                                        <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                                        <span class="inputted-email-address" role="textbox">${arrEmailsCc[i]}</span>
+                                    </div>
+                                `);
+                            }
+    
+                            inputBoxContainerCc.addClass('focusin');
+                        }
+    
+                        if (ae.automatic_emails_bcc !== '') {
+                            let arrEmailsBcc = ae.automatic_emails_bcc.split(' ');
+                            inputBoxContainerBcc.find('.inputted-email').remove();
+    
+                            for (let i = 0; i < arrEmailsBcc.length; i++) {
+                                inputBoxContainerBcc.append(`
+                                    <div class="inputted-email">
+                                        <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                                        <span class="inputted-email-address" role="textbox">${arrEmailsBcc[i]}</span>
+                                    </div>
+                                `);
+                            }
+    
+                            inputBoxContainerBcc.addClass('focusin');
+                        }
+    
+                        automaticEmailsSection.find('#cbox-automatic-emails-booked-load').prop('checked', ae.automatic_emails_booked_load === 1);
+                        automaticEmailsSection.find('#cbox-automatic-emails-check-calls').prop('checked', ae.automatic_emails_check_calls === 1);
+                        automaticEmailsSection.find('#cbox-automatic-emails-carrier-arrival-shipper').prop('checked', ae.automatic_emails_carrier_arrival_shipper === 1);
+                        automaticEmailsSection.find('#cbox-automatic-emails-carrier-arrival-consignee').prop('checked', ae.automatic_emails_carrier_arrival_consignee === 1);
+                        automaticEmailsSection.find('#cbox-automatic-emails-loaded').prop('checked', ae.automatic_emails_loaded === 1);
+                        automaticEmailsSection.find('#cbox-automatic-emails-empty').prop('checked', ae.automatic_emails_empty === 1);
+                    }                    
 
                     for (let i = 0; i < res.contacts.length; i++) {
                         let contact = res.contacts[i];
@@ -1458,15 +1528,15 @@ function eventListeners() {
         contactsSection.find("input#txt-customer-contacts-birthday").val(birthday);
         contactsSection.find("input#txt-customer-contacts-website").val(website);
 
-        automaticEmailsSection.find("input#txt-automatic-emails-email-to").val(automaticEmailsTo);
-        automaticEmailsSection.find("input#txt-automatic-emails-email-cc").val(automaticEmailsCc);
-        automaticEmailsSection.find("input#txt-automatic-emails-email-bcc").val(automaticEmailsBcc);
-        automaticEmailsSection.find("input#cbox-automatic-emails-booked-load").prop("checked", automaticEmailsBookedLoad === "1");
-        automaticEmailsSection.find("input#cbox-automatic-emails-check-calls").prop("checked", automaticEmailsCheckCalls === "1");
-        automaticEmailsSection.find("input#cbox-automatic-emails-carrier-arrival-shipper").prop("checked", automaticEmailsCarrierArrivalShipper === "1");
-        automaticEmailsSection.find("input#cbox-automatic-emails-carrier-arrival-consignee").prop("checked", automaticEmailsCarrierArrivalConsignee === "1");
-        automaticEmailsSection.find("input#cbox-automatic-emails-loaded").prop("checked", automaticEmailsLoaded === "1");
-        automaticEmailsSection.find("input#cbox-automatic-emails-empty").prop("checked", automaticEmailsEmpty === "1");
+        // automaticEmailsSection.find("input#txt-automatic-emails-email-to").val(automaticEmailsTo);
+        // automaticEmailsSection.find("input#txt-automatic-emails-email-cc").val(automaticEmailsCc);
+        // automaticEmailsSection.find("input#txt-automatic-emails-email-bcc").val(automaticEmailsBcc);
+        // automaticEmailsSection.find("input#cbox-automatic-emails-booked-load").prop("checked", automaticEmailsBookedLoad === "1");
+        // automaticEmailsSection.find("input#cbox-automatic-emails-check-calls").prop("checked", automaticEmailsCheckCalls === "1");
+        // automaticEmailsSection.find("input#cbox-automatic-emails-carrier-arrival-shipper").prop("checked", automaticEmailsCarrierArrivalShipper === "1");
+        // automaticEmailsSection.find("input#cbox-automatic-emails-carrier-arrival-consignee").prop("checked", automaticEmailsCarrierArrivalConsignee === "1");
+        // automaticEmailsSection.find("input#cbox-automatic-emails-loaded").prop("checked", automaticEmailsLoaded === "1");
+        // automaticEmailsSection.find("input#cbox-automatic-emails-empty").prop("checked", automaticEmailsEmpty === "1");
     });
 
     $(document).on("click", ".btn-panel-contacts-edit", function (e) {
@@ -2181,73 +2251,92 @@ function eventListeners() {
 
     $(document).on('blur', '.input-time', function (e) {
         let input = $(this);
+        let formSectionHours = input.closest('.form-section-hours');
+        let customer_id = $('input#txt-customer-customer-id').val();
 
-        if (moment(input.val().trim(), 'HH:mm').format('HH:mm') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'HH:mm').format('HHmm'));
-        }
+        if (customer_id === '') {
+            formSectionHours.find('input').val('');
+        } else {
+            if (moment(input.val().trim(), 'HH:mm').format('HH:mm') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'HH:mm').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'H:mm').format('H:mm') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'H:mm').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'H:mm').format('H:mm') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'H:mm').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'Hmm').format('Hmm') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'Hmm').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'Hmm').format('Hmm') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'Hmm').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hh:mm a').format('hh:mm a') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hh:mm a').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'hh:mm a').format('hh:mm a') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hh:mm a').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'h:mm a').format('h:mm a') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'h:mm a').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'h:mm a').format('h:mm a') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'h:mm a').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hh:mma').format('hh:mma') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hh:mma').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'hh:mma').format('hh:mma') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hh:mma').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'h:mma').format('h:mma') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'h:mma').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'h:mma').format('h:mma') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'h:mma').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hhmm a').format('hhmm a') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hhmm a').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'hhmm a').format('hhmm a') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hhmm a').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hmm a').format('hmm a') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hmm a').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'hmm a').format('hmm a') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hmm a').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hhmma').format('hhmma') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hhmma').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'hhmma').format('hhmma') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hhmma').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hmma').format('hmma') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hmma').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'hmma').format('hmma') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hmma').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'H').format('H') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'H').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'H').format('H') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'H').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'HH').format('HH') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'HH').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'HH').format('HH') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'HH').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'h a').format('h a') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'h a').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'h a').format('h a') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'h a').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hh a').format('hh a') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hh a').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'hh a').format('hh a') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hh a').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'ha').format('ha') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'ha').format('HHmm'));
-        }
+            if (moment(input.val().trim(), 'ha').format('ha') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'ha').format('HHmm'));
+            }
 
-        if (moment(input.val().trim(), 'hha').format('hha') === input.val().trim()) {
-            input.val(moment(input.val().trim(), 'hha').format('HHmm'));
+            if (moment(input.val().trim(), 'hha').format('hha') === input.val().trim()) {
+                input.val(moment(input.val().trim(), 'hha').format('HHmm'));
+            }
+
+            let data = {
+                customer_id: customer_id,
+                hours_open: formSectionHours.find('input#txt-customer-notes-hours-open').val().trim(),
+                hours_close: formSectionHours.find('input#txt-customer-notes-hours-close').val().trim(),
+                delivery_hours_open: formSectionHours.find('input#txt-customer-notes-delivery-hours-open').val().trim(),
+                delivery_hours_close: formSectionHours.find('input#txt-customer-notes-delivery-hours-close').val().trim()
+            };
+
+            $.post(serverURL + '/saveCustomerHours', data)
+                .then(res => {
+                    console.log(res.result);
+                })
         }
 
     });
@@ -2469,7 +2558,182 @@ function eventListeners() {
         validateContactforSaving();
     })
 
+    $(document).on('click', '.btn-delete-inputted-email-address', function () {
+        let inputBoxContainer = $(this).closest('.input-box-container');
+        let inputtedContainer = $(this).closest('.inputted-email');
+        inputtedContainer.remove();
+
+        if (inputBoxContainer.find('.inputted-email').length === 0) {
+            inputBoxContainer.removeClass('focusin');
+        }
+
+        validateAutomaticEmailsForSaving();
+    })
+
+    $(document).on('click', '.btn-add-inputted-email-address', function () {
+        let inputBoxContainer = $(this).closest('.input-box-container');
+
+        inputBoxContainer.attr('class', 'input-box-container adding focusin');
+
+        inputBoxContainer.append(`
+            <div class="inputted-email editing">
+                <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                <span class="inputted-email-address" contenteditable role="textbox"></span>
+            </div>
+        `);
+
+        setTimeout(function () {
+            inputBoxContainer.find('.inputted-email.editing span.inputted-email-address').focus();
+        }, 50);
+    })
+
+    $(document).on('click', '.btn-cancel-inputted-email-address', function () {
+        let inputBoxContainer = $(this).closest('.input-box-container');
+
+        inputBoxContainer.removeClass('adding');
+        inputBoxContainer.find('.inputted-email.editing').remove();
+
+        if (inputBoxContainer.find('.inputted-email').length === 0) {
+            inputBoxContainer.removeClass('focusin');
+        }
+    })
+
+    $(document).on('change', '.automatic-emails-section input[type=checkbox]', function (e) {
+        validateAutomaticEmailsForSaving();
+    })
+
+    $(document).on('keydown', '.inputted-email.editing span.inputted-email-address', function (e) {
+        let keycode = e.keyCode || e.which;
+        let inputBoxContainer = $(this).closest('.input-box-container');
+        let inputtedEmail = $(this).closest('.inputted-email');
+
+        if (keycode === 9) {
+            if (ValidateEmail($(this).text().trim())) {
+
+                inputtedEmail.removeClass('editing');
+                $(this).prop('contenteditable', false);
+
+                inputBoxContainer.append(`
+                    <div class="inputted-email editing">
+                        <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                        <span class="inputted-email-address" contenteditable role="textbox"></span>
+                    </div>
+                `);
+
+                validateAutomaticEmailsForSaving();
+
+                setTimeout(function () {
+                    inputBoxContainer.find('.inputted-email.editing span.inputted-email-address').focus();
+                }, 50);
+            }
+        } else if (keycode === 27) {
+            inputBoxContainer.removeClass('adding');
+            inputBoxContainer.find('.inputted-email.editing').remove();
+
+            if (inputBoxContainer.find('.inputted-email').length === 0) {
+                inputBoxContainer.removeClass('focusin');
+            }
+        }
+    })
+
+    $(document).on('input', '.inputted-email.editing span.inputted-email-address', function (e) {
+        let input = $(this);
+        let inputBoxContainer = $(this).closest('.input-box-container');
+        let popupContainer = input.closest('.customer-wrapper').find('.mochi-contextual-container');
+        let popup = popupContainer.find('.mochi-contextual-popup');
+
+        if (input.text().trim() === '') {
+            popup.html('');
+            popupContainer.fadeOut('fast');
+            return;
+        }
+
+        $.post(serverURL + '/getContactsByEmail', { email: input.text().trim() })
+            .then(res => {
+
+                if (res.contacts.length > 0) {
+                    let html = `<div class="mochi-contextual-popup-content">
+                    <div class="mochi-contextual-popup-wrapper">`;
+
+                    for (let i = 0; i < res.contacts.length; i++) {
+                        let emailWork = res.contacts[i].email_work;
+                        let emailPersonal = res.contacts[i].email_personal;
+                        let emailOther = res.contacts[i].email_other;
+
+                        let email = emailWork.indexOf(input.text().trim()) > -1 ? emailWork :
+                            emailPersonal.indexOf(input.text().trim()) ? emailPersonal : emailOther
+
+                        html += `
+                            <p class="mochi-contextual-popup-item">${email}</p>
+                        `;
+                    }
+
+                    html += ` </div>
+                         </div>`;
+
+                    popup.html(html);
+
+                    let pos = getPopupPosition(input, popupContainer);
+
+                    popup.attr('data-ctrl-id', inputBoxContainer.attr('id'));
+
+                    popup.attr('class',
+                        'mochi-contextual-popup is-dropdown ' +
+                        pos.isAboveBelow +
+                        pos.isCorner +
+                        pos.isLeftRight +
+                        pos.isVerticalHorizontal +
+                        pos.isLowHigh);
+
+                    popup.find('.mochi-contextual-popup-item').eq(input.attr('data-selected-index')).css('background-color', 'rgba(0,0,0,0.1)');
+
+                    popupContainer.fadeIn('fast');
+                } else {
+                    popup.html('');
+                    popupContainer.fadeOut('fast');
+                }
+            })
+    })
+
+    $(document).on('click', '.mochi-contextual-popup-item', function () {
+        let item = $(this);
+        let popup = item.closest('.mochi-contextual-popup');
+
+        if (popup.hasClass('is-dropdown')) {
+            let input = $(document).find('#' + popup.attr('data-ctrl-id')).find('.inputted-email.editing span.inputted-email-address');
+            input.text(item.text());
+            input.attr('data-selected-index', item.index());
+
+            let inputBoxContainer = $(document).find('#' + popup.attr('data-ctrl-id'));
+            let inputtedEmail = inputBoxContainer.find('.inputted-email.editing');
+            let inputtedEmailAddress = inputtedEmail.find('.inputted-email-address');
+
+            inputtedEmail.removeClass('editing');
+            inputtedEmailAddress.prop('contenteditable', false);
+
+            inputBoxContainer.append(`
+                    <div class="inputted-email editing">
+                        <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                        <span class="inputted-email-address" contenteditable role="textbox"></span>
+                    </div>
+                `);
+
+            validateAutomaticEmailsForSaving();
+
+            setTimeout(function () {
+                inputBoxContainer.find('.inputted-email.editing span.inputted-email-address').focus();
+            }, 50);
+
+            popup.closest('.mochi-contextual-container').hide();
+        }
+    });
+
     setMaskedInput();
+}
+
+function ValidateEmail(inputText) {
+    var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    return inputText.match(mailformat);
 }
 
 function Popup(data) {
@@ -2487,6 +2751,66 @@ function Popup(data) {
     return true;
 }
 
+function getPopupPosition(input, popupContainer) {
+    let offset = input.offset();
+    let windowWidth = $(window).width();
+    let windowHeight = $(window).height();
+
+    let isAboveBelow = '';
+    let isLeftRight = '';
+    let isVerticalHorizontal = '';
+    let isCorner = '';
+    let isLowHigh = '';
+
+    if ((windowHeight - 170 - 30) > offset.top) {
+        isAboveBelow = ' below';
+        isVerticalHorizontal = ' vertical';
+        popupContainer.css('top', offset.top + 10);
+    } else {
+        isAboveBelow = ' above';
+        isVerticalHorizontal = ' vertical';
+        popupContainer.css('top', offset.top - 170 - input.height());
+    }
+
+    let screenWSection = windowWidth / 3;
+
+    if (offset.left <= (screenWSection * 1)) {
+
+        isLeftRight = ' right';
+        popupContainer.css('left', offset.left);
+
+        if (input.width() < 70) {
+            popupContainer.css('left', offset.left - 60 + (input.width() / 2));
+
+            if (offset.left < 30) {
+                isCorner = ' corner';
+                popupContainer.css('left', offset.left + (input.width() / 2));
+            }
+        }
+
+    } else if (offset.left <= (screenWSection * 2)) {
+
+        popupContainer.css('left', offset.left - 100);
+    } else {
+
+        popupContainer.css('left', offset.left - 200);
+        isLeftRight = ' left';
+
+        if ((windowWidth - offset.left) < 100) {
+            popupContainer.css('left', (offset.left) - (300 - (input.width() / 2)));
+            isCorner = ' corner';
+        }
+    }
+
+    return {
+        isAboveBelow: isAboveBelow,
+        isCorner: isCorner,
+        isLeftRight: isLeftRight,
+        isVerticalHorizontal: isVerticalHorizontal,
+        isLowHigh: isLowHigh
+    }
+}
+
 function getInitials(length) {
     var result = "";
     // var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -2498,11 +2822,68 @@ function getInitials(length) {
     return result;
 }
 
+function validateAutomaticEmailsForSaving() {
+    let swiperSlideCustomer = $(document).find("#swiper-slide-customer");
+    let customerSection = swiperSlideCustomer.find(".customer-section");
+    let automaticEmailsSection = swiperSlideCustomer.find(".automatic-emails-section");
+    let customerId = customerSection.find("input#txt-customer-customer-id");
+    let automaticEmailsEmailTo = '';
+    let automaticEmailsEmailCc = '';
+    let automaticEmailsEmailBcc = '';
+    let automaticEmailsBookedLoad = automaticEmailsSection.find('input#cbox-automatic-emails-booked-load').is(':checked') ? 1 : 0;
+    let automaticEmailsCheckCalls = automaticEmailsSection.find('input#cbox-automatic-emails-check-calls').is(':checked') ? 1 : 0;
+    let automaticEmailsCarrierArrivalShipper = automaticEmailsSection.find('input#cbox-automatic-emails-carrier-arrival-shipper').is(':checked') ? 1 : 0;
+    let automaticEmailsCarrierArrivalConsignee = automaticEmailsSection.find('input#cbox-automatic-emails-carrier-arrival-consignee').is(':checked') ? 1 : 0;
+    let automaticEmailsLoaded = automaticEmailsSection.find('input#cbox-automatic-emails-loaded').is(':checked') ? 1 : 0;
+    let automaticEmailsEmpty = automaticEmailsSection.find('input#cbox-automatic-emails-empty').is(':checked') ? 1 : 0;
+
+    console.log(customerId.val());
+
+    if (customerId.val().trim() !== '') {
+        let emailsToContainer = automaticEmailsSection.find('#txt-automatic-emails-email-to');
+        let emailsCcContainer = automaticEmailsSection.find('#txt-automatic-emails-email-cc');
+        let emailsBccContainer = automaticEmailsSection.find('#txt-automatic-emails-email-bcc');
+
+        for (let i = 0; i < emailsToContainer.find('.inputted-email:not(.editing)').length; i++) {
+            automaticEmailsEmailTo += emailsToContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').text().trim() + ' ';
+        }
+
+        for (let i = 0; i < emailsCcContainer.find('.inputted-email:not(.editing)').length; i++) {
+            automaticEmailsEmailCc += emailsCcContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').text().trim() + ' ';
+        }
+
+        for (let i = 0; i < emailsBccContainer.find('.inputted-email:not(.editing)').length; i++) {
+            automaticEmailsEmailBcc += emailsBccContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').text().trim() + ' ';
+        }
+
+        automaticEmailsEmailTo = automaticEmailsEmailTo.trim();
+        automaticEmailsEmailCc = automaticEmailsEmailCc.trim();
+        automaticEmailsEmailBcc = automaticEmailsEmailBcc.trim();
+
+        let data = {
+            customer_id: customerId.val().trim(),
+            automatic_emails_to: automaticEmailsEmailTo,
+            automatic_emails_cc: automaticEmailsEmailCc,
+            automatic_emails_bcc: automaticEmailsEmailBcc,
+            automatic_emails_booked_load: automaticEmailsBookedLoad,
+            automatic_emails_check_calls: automaticEmailsCheckCalls,
+            automatic_emails_carrier_arrival_shipper: automaticEmailsCarrierArrivalShipper,
+            automatic_emails_carrier_arrival_consignee: automaticEmailsCarrierArrivalConsignee,
+            automatic_emails_loaded: automaticEmailsLoaded,
+            automatic_emails_empty: automaticEmailsEmpty,
+        }
+
+        $.post(serverURL + '/saveAutomaticEmails', data)
+            .then(res => {
+                console.log(res);
+            })
+    }
+}
+
 function validateContactforSaving() {
     let swiperSlideCustomer = $(document).find("#swiper-slide-customer");
     let customerSection = swiperSlideCustomer.find(".customer-section");
     let contactsSection = swiperSlideCustomer.find(".contacts-section");
-    let automaticEmailsSection = swiperSlideCustomer.find(".automatic-emails-section");
     let customerId = customerSection.find("input#txt-customer-customer-id");
     let contactId = contactsSection.find("input#txt-customer-contacts-id");
     let prefix = contactsSection.find("input#txt-customer-contacts-prefix");
@@ -2532,15 +2913,6 @@ function validateContactforSaving() {
     let birthday = contactsSection.find("input#txt-customer-contacts-birthday");
     let website = contactsSection.find("input#txt-customer-contacts-website");
     let notes = contactsSection.find("input#txt-customer-contacts-notes");
-    let automaticEmailsTo = automaticEmailsSection.find("input#txt-automatic-emails-email-to");
-    let automaticEmailsCc = automaticEmailsSection.find("input#txt-automatic-emails-email-cc");
-    let automaticEmailsBcc = automaticEmailsSection.find("input#txt-automatic-emails-email-bcc");
-    let automaticEmailsBookedLoad = automaticEmailsSection.find("input#cbox-automatic-emails-booked-load");
-    let automaticEmailsCheckCalls = automaticEmailsSection.find("input#cbox-automatic-emails-check-calls");
-    let automaticEmailsCarrierArrivalShipper = automaticEmailsSection.find("input#cbox-automatic-emails-carrier-arrival-shipper");
-    let automaticEmailsCarrierArrivalConsignee = automaticEmailsSection.find("input#cbox-automatic-emails-carrier-arrival-consignee");
-    let automaticEmailsLoaded = automaticEmailsSection.find("input#cbox-automatic-emails-loaded");
-    let automaticEmailsEmpty = automaticEmailsSection.find("input#cbox-automatic-emails-empty");
 
     let contactListWrapper = contactsSection.find(".customer-contact-list-wrapper");
 
@@ -2550,6 +2922,14 @@ function validateContactforSaving() {
 
     if (firstName.val().trim() === "" || lastName.val().trim() === "" || phone.val().trim() === "" || email.val().trim() === "") {
         return;
+    }
+
+    if (address1.val().trim() === '' && address2.val().trim() === ''){
+        address1.val(customerSection.find('#txt-customer-customer-address-1').val().trim());
+        address2.val(customerSection.find('#txt-customer-customer-address-2').val().trim());
+        city.val(customerSection.find('#txt-customer-customer-city').val().trim());
+        state.val(customerSection.find('#txt-customer-customer-state').val().trim());
+        zipCode.val(customerSection.find('#txt-customer-customer-zip-code').val().trim());
     }
 
     let data = {
@@ -2581,16 +2961,7 @@ function validateContactforSaving() {
         website: website.val().trim(),
         notes: notes.val().trim(),
         is_primary: isPrimary.is(":checked") ? 1 : 0,
-        is_online: isOnline.val().trim(),
-        automatic_emails_to: automaticEmailsTo.val(),
-        automatic_emails_cc: automaticEmailsCc.val(),
-        automatic_emails_bcc: automaticEmailsBcc.val(),
-        automatic_emails_booked_load: automaticEmailsBookedLoad.is(":checked") ? 1 : 0,
-        automatic_emails_check_calls: automaticEmailsCheckCalls.is(":checked") ? 1 : 0,
-        automatic_emails_carrier_arrival_shipper: automaticEmailsCarrierArrivalShipper.is(":checked") ? 1 : 0,
-        automatic_emails_carrier_arrival_consignee: automaticEmailsCarrierArrivalConsignee.is(":checked") ? 1 : 0,
-        automatic_emails_loaded: automaticEmailsLoaded.is(":checked") ? 1 : 0,
-        automatic_emails_empty: automaticEmailsEmpty.is(":checked") ? 1 : 0
+        is_online: isOnline.val().trim()
     };
 
     $.post(serverURL + "/saveContact", data).then((res) => {
@@ -2632,16 +3003,7 @@ function validateContactforSaving() {
                         data-website="${contact.website || ''}"
                         data-is-primary="${contact.is_primary || ''}"
                         data-is-online="${contact.is_online || ''}"
-                        data-notes="${contact.notes || ''}"      
-                        data-automatic-emails-to="${contact.automatic_emails_to || ''}"      
-                        data-automatic-emails-cc="${contact.automatic_emails_cc || ''}"      
-                        data-automatic-emails-bcc="${contact.automatic_emails_bcc || ''}"      
-                        data-automatic-emails-booked-load="${contact.automatic_emails_booked_load || ''}"      
-                        data-automatic-emails-check-calls="${contact.automatic_emails_check_calls || ''}"      
-                        data-automatic-emails-carrier-arrival-shipper="${contact.automatic_emails_carrier_arrival_shipper || ''}"      
-                        data-automatic-emails-carrier-arrival-consignee="${contact.automatic_emails_carrier_arrival_consignee || ''}"      
-                        data-automatic-emails-loaded="${contact.automatic_emails_loaded || ''}"      
-                        data-automatic-emails-empty="${contact.automatic_emails_empty || ''}">      
+                        data-notes="${contact.notes || ''}">      
 
                             <div class="item-name">${(contact.first_name || '') + " " + (contact.middle_name || '') + " " + (contact.last_name || '')}</div>
                             <div class="item-phone">${contact.phone_work || ''}</div>
@@ -2784,6 +3146,8 @@ function validateCustomerForSaving(bill_to = false) {
         }
     }
 }
+
+
 
 function setPanelDraggable() {
     $(".panel").draggable({

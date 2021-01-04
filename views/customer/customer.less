@@ -1,704 +1,791 @@
-@labelColor          : rgba(0, 0, 0, 0.7);
+@labelcolor : rgba(0, 0, 0, 0.7);
 @sectionTitleFontSize: 12px;
-@sectionTitlePadding : 0 3px;
+@sectiontitlepadding : 0 3px;
 
 .customer-container {
-    width           : 100%;
-    height          : 100%;
-    background-color: lightgrey;
-    display         : flex;
-    flex-direction  : column;
-    justify-content : space-between;
-    overflow        : hidden;
+  width: 100%;
+  height: 100%;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
 
-    .customer-content {
-        width    : 100%;
-        flex-grow: 1;
+  .customer-content {
+    width: 100%;
+    flex-grow: 1;
 
-        position: relative;
+    position: relative;
+    overflow: hidden;
+
+    .hidden {
+      display: none;
+    }
+
+    .customer-wrapper {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: row;
+      padding: 10px;
+
+      left: 0;
+      top: 0;
+      justify-content: space-between;
+
+      .input-box-container.code {
+        input {
+          text-transform: uppercase;
+          pointer-events: none;
+        }
+
+        label {
+          pointer-events: none;
+        }
+      }
+
+      .mochi-contextual-container {
+        display: none;
+      }
+
+      .hsep {
+        margin: 0 1px;
+      }
+
+      .vsep {
+        margin: 1px 0;
+      }
+
+      .left-column-section,
+      .right-column-section {
+        height: 100%;
+      }
+
+      .left-column-section {
+        width: ~"calc(100% - 8.75rem)";
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
 
-        .hidden {
-            display: none;
+        .main-row-section.growed {
+          flex-grow: 1;
+          display: flex;
+          flex-direction: row;
+
+          .forms-section-container {
+            flex-grow: 1;
+          }
         }
 
+        .customer-contact-list-section {
+          flex-grow: 1;
+          position: relative;
+          overflow: hidden;
 
-        .customer-wrapper {
-            width         : 100%;
-            height        : 100%;
-            position      : absolute;
-            overflow-y    : auto;
-            overflow-x    : hidden;
-            display       : flex;
-            flex-direction: row;
-            padding       : 10px;
+          .customer-contact-main-container {
+            position: absolute;
+            width: calc(200% + 10px);
+            height: 100%;
+            left: 0;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            transition: left ease 0.3s;
 
-            left           : 0;
-            top            : 0;
+            .customer-contact-list-container {
+              position: relative;
+              width: calc(50% - 5px);
+
+              .customer-contact-list-wrapper {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                overflow-y: auto;
+
+                .customer-contact-list-item {
+                  padding: 5px;
+                  cursor: pointer;
+                  transition: ease 0.3s;
+                  font-size: 0.7rem;
+                  font-weight: bold;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  overflow-x: hidden;
+                  width: 100%;
+
+                  > div:not(:last-child) {
+                    margin-right: 10px;
+                  }
+
+                  .item-name,
+                  .item-phone {
+                    white-space: nowrap;
+                  }
+
+                  .item-email {
+                    flex-grow: 1;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  }
+                }
+
+                .customer-contact-list-item:hover {
+                  background-color: rgba(0, 0, 0, 0.05);
+                }
+
+                .loader {
+                  width: 100%;
+                  height: 100%;
+                  background-color: rgba(0, 0, 0, 0.1);
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+
+                  span {
+                    color: black;
+                  }
+                }
+              }
+            }
+
+            .customer-contact-search-container {
+              position: relative;
+              width: calc(50% - 5px);
+            }
+          }
+        }
+      }
+
+      .right-column-section {
+        width: 8.75rem;
+        min-width: 8.75rem;
+        padding: 0 5px;
+        margin-left: 0.8rem;
+
+        .mochi-button {
+          width: 100%;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .mochi-button-base {
+            flex-grow: 1;
+            display: inline-block;
+            white-space: normal;
+            font-size: 1rem;
+            line-height: initial;
+          }
+        }
+      }
+
+      .forms-section-container {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        overflow: hidden;
+
+        .customer-section {
+          min-width: 35%;
+          max-width: 35%;
+          padding: 5px;
+          position: relative;
+
+          .row-section {
+            flex-grow: 1;
+          }
+        }
+
+        .mailing-address-section {
+          min-width: 50%;
+          max-width: 50%;
+          padding: 5px;
+          position: relative;
+          display: flex;
+
+          .form-section {
+            flex-grow: 1;
+            max-width: 69.5%;
+            // max-height: 238px;
+          }
+
+          .form-section-extra {
+            flex-grow: 1;
+            // max-height: 238px;
+            // margin-top: 10px;
+            padding-left: 5px;
+            display: flex;
+            flex-direction: column;
             justify-content: space-between;
 
-            .input-box-container.code {
-                input {
-                    text-transform: uppercase;
-                    pointer-events: none;
-                }
+            .input-box-container {
+              margin: 0;
+            }
+          }
+        }
 
-                label {
-                    pointer-events: none;
-                }
+        .credit-section {
+          padding: 5px;
+          position: relative;
+          display: flex;
+          width: 100%;
+          flex-direction: column;
+          box-sizing: border-box;
+
+          .form-section {
+            // width: 100%;
+            flex-grow: 1;
+            justify-content: space-around;
+          }
+        }
+
+        .contacts-section {
+          min-width: 35%;
+          max-width: 35%;
+          padding: 5px;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+
+          .form-section {
+            flex-grow: 1;
+
+            .customer-contact-main-container {
+              left: 0;
             }
 
-            .mochi-contextual-container {
+            #customer-contacts-list-search-btn {
+              display: block;
+            }
+
+            #customer-contacts-list-cancel-btn {
+              display: none;
+            }
+
+            #customer-contacts-list-send-btn {
+              display: none;
+            }
+          }
+
+          .form-section.searching {
+            .customer-contact-main-container {
+              left: calc(-100% - 10px);
+            }
+
+            #customer-contacts-list-search-btn {
+              display: none;
+            }
+
+            #customer-contacts-list-cancel-btn {
+              display: block;
+            }
+
+            #customer-contacts-list-send-btn {
+              display: block;
+            }
+          }
+
+          .row-section {
+            flex-wrap: wrap;
+          }
+
+          .portal-section {
+            position: relative;
+            width: 100%;
+            min-height: 10.625rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            margin-top: 5px;
+          }
+
+          .in-between {
+            flex-direction: row;
+
+            .left-container {
+              display: flex;
+              flex-direction: row;
+              min-width: calc(50% + 46px);
+              max-width: calc(50% + 46px);
+            }
+          }
+        }
+
+        .automatic-emails-section {
+          min-width: 50%;
+          max-width: 50%;
+          padding: 5px;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+
+          .form-section {
+            flex-grow: 1;
+            justify-content: space-around;
+
+            input.input-email {
+              text-transform: lowercase;
+            }
+
+            .input-box-container {
+              align-items: flex-end !important;
+              padding: 0 20px 0 5px !important;
+              flex-wrap: nowrap;
+
+              label{
+                  width: unset !important;
+              }
+
+              input {
+                width: 100%;
+                min-width: 140px;
+                font-size: 0.7rem;
+              }
+            }
+
+            .input-box-container.focusin {
+              label {
+                top: 4px;
+                color: darkred;
+                font-size: 0.65rem;
+              }
+            }
+
+            .input-box-container.adding {
+              span.btn-add-inputted-email-address {
                 display: none;
+              }
+              span.btn-cancel-inputted-email-address {
+                display: block;
+              }
             }
 
-            .hsep {
-                margin: 0 1px;
+            .inputted-email {
+              position: relative;
+              display: flex;
+              align-items: center;
+              background-color: lightgray;
+              padding: 3px 5px;
+              border-radius: 10px;
+              height: 20px;
+              margin-right: 3px;
+
+              span {
+                font-size: 0.6rem;
+              }
+
+              span.btn-delete-inputted-email-address {
+                margin-right: 5px;
+                cursor: pointer;
+                transition: 0.3s;
+                display: block;
+              }
+
+              span.btn-delete-inputted-email-address:hover {
+                color: rgba(0, 0, 0, 0.7);
+              }
             }
 
-            .vsep {
-                margin: 1px 0;
+            .inputted-email.editing {
+              background-color: white;
+              span.btn-delete-inputted-email-address {
+                display: none;
+              }
+
+              span.inputted-email-address {
+                background-color: lightyellow;
+                min-width: 20px;
+                max-width: 100%;
+              }
             }
 
-            .left-column-section,
-            .right-column-section {
+            span.btn-add-inputted-email-address {
+              font-size: 0.8rem;
+              position: absolute;
+              top: 50%;
+              right: 5px;
+              transform: translateY(-50%);
+              transition: 0.3s;
+              cursor: pointer;
+              display: block;
+            }
+            span.btn-add-inputted-email-address:hover {
+              color: rgba(0, 0, 0, 0.7);
+            }
 
+            span.btn-cancel-inputted-email-address {
+              font-size: 0.8rem;
+              position: absolute;
+              top: 50%;
+              right: 5px;
+              transform: translateY(-50%);
+              transition: 0.3s;
+              cursor: pointer;
+              display: none;
+            }
+            span.btn-cancel-inputted-email-address:hover {
+              color: rgba(0, 0, 0, 0.7);
+            }
+          }
+
+          .portal-section {
+            position: relative;
+            width: 100%;
+            min-height: 10.625rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            margin-top: 5px;
+          }
+        }
+
+        .aditional-docs-section {
+          padding: 5px;
+          position: relative;
+          display: flex;
+          width: 100%;
+          flex-direction: column;
+
+          > .form-section {
+            width: 100%;
+            flex-grow: 1;
+            justify-content: flex-start;
+
+            .row-section {
+              display: flex;
+              justify-content: flex-start;
+            }
+
+            .section-title {
+              font-size: 0.6rem;
+            }
+
+            // .input-toggle-container {
+            //     width: 100%;
+            // }
+          }
+
+          .form-section-hours {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 10.625rem;
+            margin-top: 10px;
+
+            .form-section {
+              //height: 100%;
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              flex-grow: 1;
+            }
+
+            .form-section:not(:first-child) {
+              margin-top: 5px;
+            }
+
+            input.input-time {
+              text-transform: lowercase;
+            }
+          }
+        }
+
+        .notes-section {
+          min-width: 35%;
+          max-width: 35%;
+          padding: 5px;
+          position: relative;
+          display: flex;
+
+          .form-section-notes-portal {
+            flex-grow: 1;
+
+            .form-section {
+              height: 100%;
+
+              .portal-section {
+                position: relative;
+                width: 100%;
                 height: 100%;
+                margin-top: 5px;
+              }
+            }
+          }
+
+          .notes-portal-section-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+
+            .customer-notes-list-item {
+              padding: 5px;
+              cursor: pointer;
+              transition: ease 0.3s;
+              font-size: 0.7rem;
+              font-weight: bold;
+              border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
             }
 
-            .left-column-section {
-                width         : ~"calc(100% - 8.75rem)";
-                display       : flex;
-                flex-direction: column;
-                overflow      : hidden;
-
-                .main-row-section.growed {
-                    flex-grow     : 1;
-                    display       : flex;
-                    flex-direction: row;
-
-                    .forms-section-container {
-                        flex-grow: 1;
-                    }
-                }
-
-
-                .customer-contact-list-section {
-                    flex-grow: 1;
-                    position : relative;
-                    overflow: hidden;
-
-                    .customer-contact-main-container{
-                        position: absolute;
-                        width: calc(200% + 10px);
-                        height: 100%;
-                        left: 0;
-                        top: 0;
-                        display: flex;
-                        justify-content: space-between;                        
-                        transition: left ease 0.3s;
-
-                        .customer-contact-list-container{
-                            position: relative;
-                            width: calc(50% - 5px);
-
-
-                            .customer-contact-list-wrapper {
-                                position  : absolute;
-                                width     : 100%;
-                                height    : 100%;
-                                top       : 0;
-                                left      : 0;
-                                overflow-y: auto;
-        
-                                .customer-contact-list-item {
-                                    padding      : 5px;
-                                    cursor       : pointer;
-                                    transition   : ease 0.3s;
-                                    font-size    : 0.7rem;
-                                    font-weight  : bold;
-                                    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                                    display: flex;
-                                    flex-direction: row;
-                                    align-items: center;
-                                    overflow-x: hidden;
-                                    width: 100%;
-        
-                                    > div:not(:last-child){
-                                        margin-right: 10px;
-                                    }
-        
-                                    .item-name,
-                                    .item-phone{
-                                        white-space: nowrap;
-                                    }
-        
-                                    .item-email{
-                                        flex-grow: 1;
-                                        text-overflow: ellipsis;
-                                        white-space: nowrap;
-                                    }
-        
-                                }
-        
-                                .customer-contact-list-item:hover {
-                                    background-color: rgba(0, 0, 0, 0.05);
-                                }
-        
-                                .loader {
-                                    width           : 100%;
-                                    height          : 100%;
-                                    background-color: rgba(0, 0, 0, 0.1);
-                                    display         : flex;
-                                    justify-content : center;
-                                    align-items     : center;
-        
-                                    span {
-                                        color: black;
-                                    }
-                                }
-                            }
-                        }
-
-                        .customer-contact-search-container{
-                            position: relative;
-                            width: calc(50% - 5px);
-                        }
-                    }
-
-                    
-                }
+            .customer-notes-list-item:hover {
+              background-color: rgba(0, 0, 0, 0.05);
             }
-
-            .right-column-section {
-                width      : 8.75rem;
-                min-width  : 8.75rem;
-                padding    : 0 5px;
-                margin-left: 0.8rem;
-
-                .mochi-button {
-                    width          : 100%;
-                    margin-bottom  : 20px;
-                    display        : flex;
-                    align-items    : center;
-                    justify-content: space-between;
-
-                    .mochi-button-base {
-                        flex-grow  : 1;
-                        display    : inline-block;
-                        white-space: normal;
-                        font-size  : 1rem;
-                        line-height: initial;
-                    }
-                }
-            }
-
-            .forms-section-container {
-                display       : flex;
-                flex-direction: row;
-                width         : 100%;
-                overflow      : hidden;
-
-                .customer-section {
-                    min-width: 35%;
-                    max-width: 35%;
-                    padding  : 5px;
-                    position : relative;
-
-                    .row-section {
-                        flex-grow: 1;
-                    }
-                }
-
-                .mailing-address-section {
-                    min-width: 50%;
-                    max-width: 50%;
-                    padding  : 5px;
-                    position : relative;
-                    display  : flex;
-
-                    .form-section {
-                        flex-grow    : 1;
-                        max-width    : 69.5%;
-                        // max-height: 238px;
-                    }
-
-                    .form-section-extra {
-                        flex-grow      : 1;
-                        // max-height: 238px;
-                        // margin-top: 10px;
-                        padding-left   : 5px;
-                        display        : flex;
-                        flex-direction : column;
-                        justify-content: space-between;
-
-                        .input-box-container {
-                            margin: 0;
-                        }
-                    }
-                }
-
-                .credit-section {
-                    padding       : 5px;
-                    position      : relative;
-                    display       : flex;
-                    width         : 100%;
-                    flex-direction: column;
-                    box-sizing    : border-box;
-
-                    .form-section {
-                        // width: 100%;
-                        flex-grow      : 1;
-                        justify-content: space-around;
-                    }
-                }
-
-                .contacts-section {
-                    min-width      : 35%;
-                    max-width      : 35%;
-                    padding        : 5px;
-                    position       : relative;
-                    display        : flex;
-                    flex-direction : column;
-                    justify-content: flex-start;
-
-                    .form-section {
-                        flex-grow: 1;
-
-                        .customer-contact-main-container{
-                            left: 0;
-                        }
-
-                        #customer-contacts-list-search-btn{
-                            display: block;
-                        }
-
-                        #customer-contacts-list-cancel-btn{
-                            display: none;
-                        }
-
-                        #customer-contacts-list-send-btn{
-                            display: none;
-                        }
-                    }
-
-                    .form-section.searching{
-                        .customer-contact-main-container{
-                            left: calc(-100% - 10px);
-                        }
-
-                        #customer-contacts-list-search-btn{
-                            display: none;
-                        }
-
-                        #customer-contacts-list-cancel-btn{
-                            display: block;
-                        }
-
-                        #customer-contacts-list-send-btn{
-                            display: block;
-                        }
-                    }
-
-                    .row-section {
-                        flex-wrap: wrap;
-
-
-                    }
-
-                    .portal-section {
-                        position  : relative;
-                        width     : 100%;
-                        min-height: 10.625rem;
-                        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-                        border    : 1px solid rgba(0, 0, 0, 0.5);
-                        margin-top: 5px;
-
-                    }
-
-                    .in-between{
-                        flex-direction: row;                        
-
-                        .left-container{
-                            display: flex;
-                            flex-direction: row;
-                            min-width: calc(50% + 46px);
-                            max-width: calc(50% + 46px);
-                        }
-                    }
-                }
-
-                .automatic-emails-section {
-                    min-width      : 50%;
-                    max-width      : 50%;
-                    padding        : 5px;
-                    position       : relative;
-                    display        : flex;
-                    flex-direction : column;
-                    justify-content: flex-start;
-
-                    .form-section {
-                        flex-grow      : 1;
-                        justify-content: space-around;
-
-                        input.input-email{
-                            text-transform: lowercase;
-                        }
-                    }
-
-                    .portal-section {
-                        position  : relative;
-                        width     : 100%;
-                        min-height: 10.625rem;
-                        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-                        border    : 1px solid rgba(0, 0, 0, 0.5);
-                        margin-top: 5px;
-
-                    }
-                }
-
-                .aditional-docs-section {
-                    padding       : 5px;
-                    position      : relative;
-                    display       : flex;
-                    width         : 100%;
-                    flex-direction: column;
-
-                    >.form-section {
-                        width          : 100%;
-                        flex-grow      : 1;
-                        justify-content: flex-start;
-
-                        .row-section {
-                            display        : flex;
-                            justify-content: flex-start;
-
-                        }
-
-                        .section-title {
-                            font-size: 0.6rem;
-                        }
-
-                        // .input-toggle-container {
-                        //     width: 100%;
-                        // }
-                    }
-
-                    .form-section-hours {
-                        display        : flex;
-                        flex-direction : column;
-                        justify-content: space-between;
-                        min-height     : 10.625rem;
-                        margin-top     : 10px;
-
-                        .form-section {
-                            //height: 100%;
-                            display       : flex;
-                            flex-direction: row;
-                            align-items   : center;
-                            flex-grow     : 1;
-                        }
-
-                        .form-section:not(:first-child) {
-                            margin-top: 5px;
-                        }
-
-                        input.input-time{
-                            text-transform: lowercase;
-                        }
-                    }
-                }
-
-                .notes-section {
-                    min-width: 35%;
-                    max-width: 35%;
-                    padding  : 5px;
-                    position : relative;
-                    display  : flex;
-
-                    .form-section-notes-portal {
-                        flex-grow: 1;
-
-                        .form-section {
-                            height: 100%;
-
-                            .portal-section {
-                                position  : relative;
-                                width     : 100%;
-                                height    : 100%;
-                                margin-top: 5px;
-                            }
-                        }
-                    }
-
-                    .notes-portal-section-wrapper {
-                        position  : absolute;
-                        width     : 100%;
-                        height    : 100%;
-                        top       : 0;
-                        left      : 0;
-                        overflow-y: auto;
-
-                        .customer-notes-list-item {
-                            padding      : 5px;
-                            cursor       : pointer;
-                            transition   : ease 0.3s;
-                            font-size    : 0.7rem;
-                            font-weight  : bold;
-                            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                            text-overflow: ellipsis;
-                            white-space  : nowrap;
-                            overflow     : hidden;
-                        }
-
-                        .customer-notes-list-item:hover {
-                            background-color: rgba(0, 0, 0, 0.05);
-                        }
-                    }
-
-                }
-
-                .directions-section {
-                    min-width: 50%;
-                    max-width: 50%;
-                    padding  : 5px;
-                    position : relative;
-                    display: flex;
-                    flex-grow: 1;
-
-                    .form-section-directions-portal {
-                        flex-grow: 1;
-
-                        .form-section {
-                            height: 100%;
-                            flex-grow: 1;
-
-                            .portal-section {
-                                position  : relative;
-                                width     : 100%;
-                                height    : 100%;
-                                margin-top: 5px;
-                            }
-                        }
-                    }
-
-                    .directions-portal-section-wrapper {
-                        position  : absolute;
-                        width     : 100%;
-                        height    : 100%;
-                        top       : 0;
-                        left      : 0;
-                        overflow-y: auto;
-
-                        .customer-directions-list-item {
-                            padding      : 5px;
-                            cursor       : pointer;
-                            transition   : ease 0.3s;
-                            font-size    : 0.7rem;
-                            font-weight  : bold;
-                            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                            text-overflow: ellipsis;
-                            white-space  : nowrap;
-                            overflow     : hidden;
-                        }
-
-                        .customer-directions-list-item:hover {
-                            background-color: rgba(0, 0, 0, 0.05);
-                        }
-                    }
-                }
-            }
+          }
         }
 
-        .modal-customer-notes {
-            position        : absolute;
-            top             : 0;
-            left            : 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            width           : 100%;
-            height          : 100%;
-            display         : none;
+        .directions-section {
+          min-width: 50%;
+          max-width: 50%;
+          padding: 5px;
+          position: relative;
+          display: flex;
+          flex-grow: 1;
 
-            .modal-customer-notes-wrapper {
-                position       : relative;
-                width          : 100%;
-                height         : 100%;
-                display        : flex;
-                justify-content: center;
-                align-items    : center;
+          .form-section-directions-portal {
+            flex-grow: 1;
 
-                .modal-customer-notes-content {
-                    width           : 90%;
-                    max-width       : 400px;
-                    min-height      : 200px;
-                    background-color: white;
-                    border-radius   : 10px;
-                    display         : flex;
-                    flex-direction  : column;
-                    padding         : 10px;
+            .form-section {
+              height: 100%;
+              flex-grow: 1;
 
-                    .row-textinput {
-                        flex-grow: 1;
-
-                        textarea {
-                            width        : 100%;
-                            min-height   : 200px;
-                            resize       : vertical;
-                            border       : 1px solid rgba(0, 0, 0, 0.05);
-                            padding      : 5px;
-                            border-radius: 10px;
-                            max-height   : 500px;
-                        }
-                    }
-
-                    .row-buttons {
-                        display        : flex;
-                        justify-content: space-between;
-
-                        .mochi-button {
-                            .mochi-button-decorator {
-                                font-size: 1rem;
-                            }
-
-                            .mochi-button-base {
-                                flex-grow  : 1;
-                                display    : inline-block;
-                                white-space: normal;
-                                font-size  : 0.8rem;
-                                line-height: initial;
-                            }
-                        }
-                    }
-                }
+              .portal-section {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                margin-top: 5px;
+              }
             }
+          }
+
+          .directions-portal-section-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+
+            .customer-directions-list-item {
+              padding: 5px;
+              cursor: pointer;
+              transition: ease 0.3s;
+              font-size: 0.7rem;
+              font-weight: bold;
+              border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+            }
+
+            .customer-directions-list-item:hover {
+              background-color: rgba(0, 0, 0, 0.05);
+            }
+          }
         }
-
-        .modal-customer-notes.showing {
-            textarea {
-                background-color: rgba(0, 0, 0, 0.1);
-                pointer-events  : none;
-            }
-
-            #customer-customer-notes-save-btn {
-                display: none;
-            }
-        }
-
-        .modal-customer-notes.adding {
-            textarea {
-                background-color: white;
-                pointer-events  : all;
-            }
-
-            #customer-customer-notes-save-btn {
-                display: block;
-            }
-        }
-
-        .modal-customer-directions {
-            position        : absolute;
-            top             : 0;
-            left            : 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            width           : 100%;
-            height          : 100%;
-            display         : none;
-
-            .modal-customer-directions-wrapper {
-                position       : relative;
-                width          : 100%;
-                height         : 100%;
-                display        : flex;
-                justify-content: center;
-                align-items    : center;
-
-                .modal-customer-directions-content {
-                    width           : 90%;
-                    max-width       : 400px;
-                    min-height      : 200px;
-                    background-color: white;
-                    border-radius   : 10px;
-                    display         : flex;
-                    flex-direction  : column;
-                    padding         : 10px;
-
-                    .row-textinput {
-                        flex-grow: 1;
-
-                        textarea {
-                            width        : 100%;
-                            min-height   : 200px;
-                            resize       : vertical;
-                            border       : 1px solid rgba(0, 0, 0, 0.05);
-                            padding      : 5px;
-                            border-radius: 10px;
-                            max-height   : 500px;
-                        }
-                    }
-
-                    .row-buttons {
-                        display        : flex;
-                        justify-content: space-between;
-
-                        .group-btn{
-                            display: flex;
-                        }
-
-                        .mochi-button {
-                            .mochi-button-decorator {
-                                font-size: 1rem;
-                            }
-
-                            .mochi-button-base {
-                                flex-grow  : 1;
-                                display    : inline-block;
-                                white-space: normal;
-                                font-size  : 0.8rem;
-                                line-height: initial;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        .modal-customer-directions.showing {
-            textarea {
-                background-color: rgba(0, 0, 0, 0.1);
-                pointer-events  : none;
-            }
-
-            #customer-customer-directions-save-btn {
-                display: none;
-            }
-
-            #customer-customer-directions-edit-btn {
-                display: block;
-            }
-
-            #customer-customer-directions-delete-btn {
-                display: block;
-            }
-        }
-
-        .modal-customer-directions.adding,
-        .modal-customer-directions.editing {
-            textarea {
-                background-color: white;
-                pointer-events  : all;
-            }
-
-            #customer-customer-directions-save-btn {
-                display: block;
-            }
-
-            #customer-customer-directions-delete-btn {
-                display: none;
-            }
-
-            #customer-customer-directions-edit-btn {
-                display: none;
-            }
-        }
+      }
     }
+
+    .modal-customer-notes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      width: 100%;
+      height: 100%;
+      display: none;
+
+      .modal-customer-notes-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .modal-customer-notes-content {
+          width: 90%;
+          max-width: 400px;
+          min-height: 200px;
+          background-color: white;
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          padding: 10px;
+
+          .row-textinput {
+            flex-grow: 1;
+
+            textarea {
+              width: 100%;
+              min-height: 200px;
+              resize: vertical;
+              border: 1px solid rgba(0, 0, 0, 0.05);
+              padding: 5px;
+              border-radius: 10px;
+              max-height: 500px;
+            }
+          }
+
+          .row-buttons {
+            display: flex;
+            justify-content: space-between;
+
+            .mochi-button {
+              .mochi-button-decorator {
+                font-size: 1rem;
+              }
+
+              .mochi-button-base {
+                flex-grow: 1;
+                display: inline-block;
+                white-space: normal;
+                font-size: 0.8rem;
+                line-height: initial;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .modal-customer-notes.showing {
+      textarea {
+        background-color: rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+      }
+
+      #customer-customer-notes-save-btn {
+        display: none;
+      }
+    }
+
+    .modal-customer-notes.adding {
+      textarea {
+        background-color: white;
+        pointer-events: all;
+      }
+
+      #customer-customer-notes-save-btn {
+        display: block;
+      }
+    }
+
+    .modal-customer-directions {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      width: 100%;
+      height: 100%;
+      display: none;
+
+      .modal-customer-directions-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .modal-customer-directions-content {
+          width: 90%;
+          max-width: 400px;
+          min-height: 200px;
+          background-color: white;
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          padding: 10px;
+
+          .row-textinput {
+            flex-grow: 1;
+
+            textarea {
+              width: 100%;
+              min-height: 200px;
+              resize: vertical;
+              border: 1px solid rgba(0, 0, 0, 0.05);
+              padding: 5px;
+              border-radius: 10px;
+              max-height: 500px;
+            }
+          }
+
+          .row-buttons {
+            display: flex;
+            justify-content: space-between;
+
+            .group-btn {
+              display: flex;
+            }
+
+            .mochi-button {
+              .mochi-button-decorator {
+                font-size: 1rem;
+              }
+
+              .mochi-button-base {
+                flex-grow: 1;
+                display: inline-block;
+                white-space: normal;
+                font-size: 0.8rem;
+                line-height: initial;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .modal-customer-directions.showing {
+      textarea {
+        background-color: rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+      }
+
+      #customer-customer-directions-save-btn {
+        display: none;
+      }
+
+      #customer-customer-directions-edit-btn {
+        display: block;
+      }
+
+      #customer-customer-directions-delete-btn {
+        display: block;
+      }
+    }
+
+    .modal-customer-directions.adding,
+    .modal-customer-directions.editing {
+      textarea {
+        background-color: white;
+        pointer-events: all;
+      }
+
+      #customer-customer-directions-save-btn {
+        display: block;
+      }
+
+      #customer-customer-directions-delete-btn {
+        display: none;
+      }
+
+      #customer-customer-directions-edit-btn {
+        display: none;
+      }
+    }
+  }
 }

@@ -273,6 +273,89 @@
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section input.input-email {
   text-transform: lowercase;
 }
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container {
+  align-items: flex-end !important;
+  padding: 0 20px 0 5px !important;
+  flex-wrap: nowrap;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container label {
+  width: unset !important;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container input {
+  width: 100%;
+  min-width: 140px;
+  font-size: 0.7rem;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container.focusin label {
+  top: 4px;
+  color: darkred;
+  font-size: 0.65rem;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container.adding span.btn-add-inputted-email-address {
+  display: none;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container.adding span.btn-cancel-inputted-email-address {
+  display: block;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: lightgray;
+  padding: 3px 5px;
+  border-radius: 10px;
+  height: 20px;
+  margin-right: 3px;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email span {
+  font-size: 0.6rem;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email span.btn-delete-inputted-email-address {
+  margin-right: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: block;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email span.btn-delete-inputted-email-address:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email.editing {
+  background-color: white;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email.editing span.btn-delete-inputted-email-address {
+  display: none;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email.editing span.inputted-email-address {
+  background-color: lightyellow;
+  min-width: 20px;
+  max-width: 100%;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section span.btn-add-inputted-email-address {
+  font-size: 0.8rem;
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  transition: 0.3s;
+  cursor: pointer;
+  display: block;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section span.btn-add-inputted-email-address:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section span.btn-cancel-inputted-email-address {
+  font-size: 0.8rem;
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  transition: 0.3s;
+  cursor: pointer;
+  display: none;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section span.btn-cancel-inputted-email-address:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .portal-section {
   position: relative;
   width: 100%;
