@@ -826,83 +826,83 @@ function eventListeners() {
 
     $(document).on('blur', '#txt-customer-customer-code', function (e) {
         let code = $(this);
-        let formsContainer = code.closest('.forms-section-container');
 
-        $.post(serverURL + '/customers', {
-            code: code.val().toLowerCase()
-        }).then(res => {
+        if (code.val().trim() !== '') {
+            let formsContainer = code.closest('.forms-section-container');
 
-            if (res.customers.length > 0) {
-                let customer = res.customers[0];
+            $.post(serverURL + '/customers', { code: code.val().toLowerCase() }).then(res => {
+                if (res.customers.length > 0) {
+                    let customer = res.customers[0];
 
-                formsContainer.find(".customer-section input#txt-customer-customer-id").val(customer.id);
-                formsContainer.find(".customer-section input#txt-customer-customer-code").val(customer.code);
-                formsContainer.find(".customer-section input#txt-customer-customer-name").val(customer.name);
-                formsContainer.find(".customer-section input#txt-customer-customer-address-1").val(customer.address1);
-                formsContainer.find(".customer-section input#txt-customer-customer-address-2").val(customer.address2);
-                formsContainer.find(".customer-section input#txt-customer-customer-city").val(customer.city);
-                formsContainer.find(".customer-section input#txt-customer-customer-state").val(customer.state);
-                formsContainer.find(".customer-section input#txt-customer-customer-zip-code").val(customer.zip);
-                formsContainer.find(".customer-section input#txt-customer-customer-contact-name").val(customer.contact_name);
-                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone").val(customer.contact_phone);
-                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone-ext").val(customer.ext);
-                formsContainer.find(".customer-section input#txt-customer-customer-email").val(customer.email);
+                    formsContainer.find(".customer-section input#txt-customer-customer-id").val(customer.id);
+                    formsContainer.find(".customer-section input#txt-customer-customer-code").val(customer.code);
+                    formsContainer.find(".customer-section input#txt-customer-customer-name").val(customer.name);
+                    formsContainer.find(".customer-section input#txt-customer-customer-address-1").val(customer.address1);
+                    formsContainer.find(".customer-section input#txt-customer-customer-address-2").val(customer.address2);
+                    formsContainer.find(".customer-section input#txt-customer-customer-city").val(customer.city);
+                    formsContainer.find(".customer-section input#txt-customer-customer-state").val(customer.state);
+                    formsContainer.find(".customer-section input#txt-customer-customer-zip-code").val(customer.zip);
+                    formsContainer.find(".customer-section input#txt-customer-customer-contact-name").val(customer.contact_name);
+                    formsContainer.find(".customer-section input#txt-customer-customer-contact-phone").val(customer.contact_phone);
+                    formsContainer.find(".customer-section input#txt-customer-customer-contact-phone-ext").val(customer.ext);
+                    formsContainer.find(".customer-section input#txt-customer-customer-email").val(customer.email);
 
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-code").val(customer.mailing_code + (customer.mailing_code_number === 0 ? '' : customer.mailing_code_number));
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-name").val(customer.mailing_name);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-1").val(customer.mailing_address1);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-2").val(customer.mailing_address2);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-city").val(customer.mailing_city);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-state").val(customer.mailing_state);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-zip-code").val(customer.mailing_zip);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-name").val(customer.mailing_contact_name);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone").val(customer.mailing_contact_phone);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone-ext").val(customer.mailing_ext);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-email").val(customer.mailing_email);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-code").val(customer.mailing_code + (customer.mailing_code_number === 0 ? '' : customer.mailing_code_number));
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-name").val(customer.mailing_name);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-address-1").val(customer.mailing_address1);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-address-2").val(customer.mailing_address2);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-city").val(customer.mailing_city);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-state").val(customer.mailing_state);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-zip-code").val(customer.mailing_zip);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-name").val(customer.mailing_contact_name);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone").val(customer.mailing_contact_phone);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone-ext").val(customer.mailing_ext);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-email").val(customer.mailing_email);
 
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-bill-to").val(customer.mailing_bill_to === '' ? '' : customer.mailing_code + (customer.mailing_code_number === 0 ? '' : customer.mailing_code_number));
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-division").val(customer.mailing_division);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-agent-code").val(customer.mailing_agent_code);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-salesman").val(customer.mailing_salesman);
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-fid").val(customer.mailing_fid);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-bill-to").val(customer.mailing_bill_to === '' ? '' : customer.mailing_code + (customer.mailing_code_number === 0 ? '' : customer.mailing_code_number));
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-division").val(customer.mailing_division);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-agent-code").val(customer.mailing_agent_code);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-salesman").val(customer.mailing_salesman);
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-fid").val(customer.mailing_fid);
 
-                $("#customer-container .customer-section input#txt-customer-customer-id").change();
-            } else {
-                formsContainer.find(".customer-section input#txt-customer-customer-id").val('');
-                // formsContainer.find(".customer-section input#txt-customer-customer-code").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-name").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-address-1").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-address-2").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-city").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-state").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-zip-code").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-contact-name").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-contact-phone-ext").val('');
-                formsContainer.find(".customer-section input#txt-customer-customer-email").val('');
+                    $("#customer-container .customer-section input#txt-customer-customer-id").change();
+                } else {
+                    formsContainer.find(".customer-section input#txt-customer-customer-id").val('');
+                    // formsContainer.find(".customer-section input#txt-customer-customer-code").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-name").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-address-1").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-address-2").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-city").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-state").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-zip-code").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-contact-name").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-contact-phone").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-contact-phone-ext").val('');
+                    formsContainer.find(".customer-section input#txt-customer-customer-email").val('');
 
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-code").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-name").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-1").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-address-2").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-city").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-state").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-zip-code").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-name").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone-ext").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-email").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-code").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-name").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-address-1").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-address-2").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-city").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-state").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-zip-code").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-name").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-contact-phone-ext").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-email").val('');
 
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-bill-to").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-division").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-agent-code").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-salesman").val('');
-                formsContainer.find(".mailing-address-section input#txt-mailing-address-fid").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-bill-to").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-division").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-agent-code").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-salesman").val('');
+                    formsContainer.find(".mailing-address-section input#txt-mailing-address-fid").val('');
 
-                $("#customer-container .customer-section input#txt-customer-customer-id").change();
-            }
-        })
-    })
+                    $("#customer-container .customer-section input#txt-customer-customer-id").change();
+                }
+            });
+        }
+    });
 
     $(document).on("dblclick", "#tbl-customers-customer-search-results .wrapper .trow", function (e) {
         let row = $(this);
@@ -1061,7 +1061,7 @@ function eventListeners() {
     });
 
     $(document).on("click", "#customer-contacts-clear-btn", function (e) {
-        let formSection = $(this).closest(".form-section");        
+        let formSection = $(this).closest(".form-section");
         formSection.find("input").val("");
         formSection.find("input[type=checkbox]").prop("checked", false);
     });
@@ -1093,23 +1093,23 @@ function eventListeners() {
         } else {
             contactListFormSection.attr('class', 'form-section');
 
-            contactListWrapper.html(`
-                        <div class="loader">
-                            <span class="fas fa-spin fa-spinner"></span>
-                        </div>
-                    `);
+            // contactListWrapper.html(`
+            //             <div class="loader">
+            //                 <span class="fas fa-spin fa-spinner"></span>
+            //             </div>
+            //         `);
 
-            notesListWrapper.html(`
-                        <div class="loader">
-                            <span class="fas fa-spin fa-spinner"></span>
-                        </div>
-                    `);
+            // notesListWrapper.html(`
+            //             <div class="loader">
+            //                 <span class="fas fa-spin fa-spinner"></span>
+            //             </div>
+            //         `);
 
-            directionsListWrapper.html(`
-                        <div class="loader">
-                            <span class="fas fa-spin fa-spinner"></span>
-                        </div>
-                    `);
+            // directionsListWrapper.html(`
+            //             <div class="loader">
+            //                 <span class="fas fa-spin fa-spinner"></span>
+            //             </div>
+            //         `);
 
             $.post(serverURL + "/getCustomerPayload", {
                 customer_id: customer_id,
@@ -1122,74 +1122,83 @@ function eventListeners() {
                     let notesItems = ``;
                     let directionsItems = ``;
 
-                    if (res.customer_hours){
+                    if (res.customer_hours) {
                         formSectionHours.find('#txt-customer-notes-hours-open').val(res.customer_hours.hours_open);
                         formSectionHours.find('#txt-customer-notes-hours-close').val(res.customer_hours.hours_close);
                         formSectionHours.find('#txt-customer-notes-delivery-hours-open').val(res.customer_hours.delivery_hours_open);
                         formSectionHours.find('#txt-customer-notes-delivery-hours-close').val(res.customer_hours.delivery_hours_close);
                     }
 
-                    if (res.automatic_emails){
+                    if (res.automatic_emails) {
                         let ae = res.automatic_emails;
-                        let inputBoxContainerTo = automaticEmailsSection.find('#txt-automatic-emails-email-to');
-                        let inputBoxContainerCc = automaticEmailsSection.find('#txt-automatic-emails-email-cc');
-                        let inputBoxContainerBcc = automaticEmailsSection.find('#txt-automatic-emails-email-bcc');
-    
+                        let inputBoxContainerTo = automaticEmailsSection.find('#ibc-automatic-emails-email-to');
+                        inputBoxContainerTo.find('input').val('');
+                        let inputBoxContainerCc = automaticEmailsSection.find('#ibc-automatic-emails-email-cc');
+                        inputBoxContainerCc.find('input').val('');
+                        let inputBoxContainerBcc = automaticEmailsSection.find('#ibc-automatic-emails-email-bcc');
+                        inputBoxContainerBcc.find('input').val('');
+
                         if (ae.automatic_emails_to !== '') {
+                            let input = inputBoxContainerTo.find('input');
+
                             let arrEmailsTo = ae.automatic_emails_to.split(' ');
                             inputBoxContainerTo.find('.inputted-email').remove();
-    
+
                             for (let i = 0; i < arrEmailsTo.length; i++) {
-                                inputBoxContainerTo.append(`
+                                input.before(`
                                     <div class="inputted-email">
                                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
                                         <span class="inputted-email-address" role="textbox">${arrEmailsTo[i]}</span>
                                     </div>
                                 `);
                             }
-    
+
                             inputBoxContainerTo.addClass('focusin');
                         }
-    
+
                         if (ae.automatic_emails_cc !== '') {
+                            let input = inputBoxContainerTo.find('input');
+
                             let arrEmailsCc = ae.automatic_emails_cc.split(' ');
                             inputBoxContainerCc.find('.inputted-email').remove();
-    
+
                             for (let i = 0; i < arrEmailsCc.length; i++) {
-                                inputBoxContainerCc.append(`
+                                input.before(`
                                     <div class="inputted-email">
                                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
                                         <span class="inputted-email-address" role="textbox">${arrEmailsCc[i]}</span>
                                     </div>
                                 `);
                             }
-    
+
                             inputBoxContainerCc.addClass('focusin');
                         }
-    
+
                         if (ae.automatic_emails_bcc !== '') {
+                            let input = inputBoxContainerTo.find('input');
+
                             let arrEmailsBcc = ae.automatic_emails_bcc.split(' ');
                             inputBoxContainerBcc.find('.inputted-email').remove();
-    
+
                             for (let i = 0; i < arrEmailsBcc.length; i++) {
-                                inputBoxContainerBcc.append(`
+                                input.before(`
                                     <div class="inputted-email">
                                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
                                         <span class="inputted-email-address" role="textbox">${arrEmailsBcc[i]}</span>
                                     </div>
                                 `);
                             }
-    
+
                             inputBoxContainerBcc.addClass('focusin');
                         }
-    
+
                         automaticEmailsSection.find('#cbox-automatic-emails-booked-load').prop('checked', ae.automatic_emails_booked_load === 1);
                         automaticEmailsSection.find('#cbox-automatic-emails-check-calls').prop('checked', ae.automatic_emails_check_calls === 1);
                         automaticEmailsSection.find('#cbox-automatic-emails-carrier-arrival-shipper').prop('checked', ae.automatic_emails_carrier_arrival_shipper === 1);
                         automaticEmailsSection.find('#cbox-automatic-emails-carrier-arrival-consignee').prop('checked', ae.automatic_emails_carrier_arrival_consignee === 1);
                         automaticEmailsSection.find('#cbox-automatic-emails-loaded').prop('checked', ae.automatic_emails_loaded === 1);
                         automaticEmailsSection.find('#cbox-automatic-emails-empty').prop('checked', ae.automatic_emails_empty === 1);
-                    }                    
+                    }
 
                     for (let i = 0; i < res.contacts.length; i++) {
                         let contact = res.contacts[i];
@@ -2349,6 +2358,7 @@ function eventListeners() {
         }
 
         let formSection = $(this).closest('.form-section');
+        formSection.find('.customer-contact-list-section input').attr('tabindex', '0');
 
         formSection.attr('class', 'form-section searching');
     });
@@ -2357,6 +2367,7 @@ function eventListeners() {
         let formSection = $(this).closest('.form-section');
         formSection.find('input').val('');
         formSection.attr('class', 'form-section');
+        formSection.find('.customer-contact-list-section input').attr('tabindex', '-1');
     });
 
     $(document).on('click', '#customer-contacts-list-send-btn', function (e) {
@@ -2505,7 +2516,7 @@ function eventListeners() {
 
     $(document).on('click', '#customer-notes-print-notes-btn', function (e) {
         let formSection = $(this).closest('.form-section');
-        let notesWrapper = formSection.find('.notes-portal-section-wrapper');
+        let notesWrapper = formSection.find('.notes-portal-section-wrapper').clone();
 
         let len = notesWrapper.find('.customer-notes-list-item').length;
 
@@ -2525,7 +2536,7 @@ function eventListeners() {
 
     $(document).on('click', '#customer-print-directions-btn', function (e) {
         let formSection = $(this).closest('.form-section');
-        let directionsWrapper = formSection.find('.directions-portal-section-wrapper');
+        let directionsWrapper = formSection.find('.directions-portal-section-wrapper').clone();
 
         let len = directionsWrapper.find('.customer-directions-list-item').length;
 
@@ -2602,29 +2613,37 @@ function eventListeners() {
         validateAutomaticEmailsForSaving();
     })
 
-    $(document).on('keydown', '.inputted-email.editing span.inputted-email-address', function (e) {
+    $(document).on('keydown', 'input.inputted-email-address', function (e) {
         let keycode = e.keyCode || e.which;
-        let inputBoxContainer = $(this).closest('.input-box-container');
-        let inputtedEmail = $(this).closest('.inputted-email');
+        let input = $(this);
+        let inputBoxContainer = input.closest('.input-box-container');
 
-        if (keycode === 9) {
-            if (ValidateEmail($(this).text().trim())) {
+        if (keycode === 9) { //TAB
+            console.log('tab pressed');
+            if (ValidateEmail(input.val().trim())) {
 
-                inputtedEmail.removeClass('editing');
-                $(this).prop('contenteditable', false);
-
-                inputBoxContainer.append(`
-                    <div class="inputted-email editing">
+                let inputtedEmail = `
+                    <div class="inputted-email">
                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
-                        <span class="inputted-email-address" contenteditable role="textbox"></span>
+                        <span class="inputted-email-address" role="textbox">${input.val().trim()}</span>
                     </div>
-                `);
+                `;
+
+                input.before(inputtedEmail);
+
+                input.val('');
+
+                if (!inputBoxContainer.hasClass('focusin')) {
+                    inputBoxContainer.addClass('focusin');
+                }
 
                 validateAutomaticEmailsForSaving();
 
                 setTimeout(function () {
-                    inputBoxContainer.find('.inputted-email.editing span.inputted-email-address').focus();
+                    input.focus();
                 }, 50);
+            } else {
+                e.preventDefault();
             }
         } else if (keycode === 27) {
             inputBoxContainer.removeClass('adding');
@@ -2636,100 +2655,127 @@ function eventListeners() {
         }
     })
 
-    $(document).on('input', '.inputted-email.editing span.inputted-email-address', function (e) {
+    $(document).on('input', 'input.inputted-email-address', function (e) {
         let input = $(this);
         let inputBoxContainer = $(this).closest('.input-box-container');
         let popupContainer = input.closest('.customer-wrapper').find('.mochi-contextual-container');
         let popup = popupContainer.find('.mochi-contextual-popup');
 
-        if (input.text().trim() === '') {
+        if (input.val().trim() === '') {
             popup.html('');
             popupContainer.fadeOut('fast');
             return;
         }
 
-        $.post(serverURL + '/getContactsByEmail', { email: input.text().trim() })
-            .then(res => {
+        clearTimeout(delayTimer);
+        delayTimer = setTimeout(function () {
+            $.post(serverURL + '/getContactsByEmailOrName', { email: input.val().trim() })
+                .then(res => {
 
-                if (res.contacts.length > 0) {
-                    let html = `<div class="mochi-contextual-popup-content">
+                    if (res.contacts.length > 0) {
+                        let html = `<div class="mochi-contextual-popup-content">
                     <div class="mochi-contextual-popup-wrapper">`;
 
-                    for (let i = 0; i < res.contacts.length; i++) {
-                        let emailWork = res.contacts[i].email_work;
-                        let emailPersonal = res.contacts[i].email_personal;
-                        let emailOther = res.contacts[i].email_other;
+                        for (let i = 0; i < res.contacts.length; i++) {
+                            let emailWork = res.contacts[i].email_work;
+                            let emailPersonal = res.contacts[i].email_personal;
+                            let emailOther = res.contacts[i].email_other;
+                            let firstName = res.contacts[i].first_name;
+                            let lastName = res.contacts[i].last_name;
 
-                        let email = emailWork.indexOf(input.text().trim()) > -1 ? emailWork :
-                            emailPersonal.indexOf(input.text().trim()) ? emailPersonal : emailOther
+                            let name = firstName + ' ' + lastName;
+                            let email = emailWork.indexOf(input.val().trim()) > -1 ? emailWork :
+                                emailPersonal.indexOf(input.val().trim()) ? emailPersonal : emailOther
 
-                        html += `
-                            <p class="mochi-contextual-popup-item">${email}</p>
-                        `;
-                    }
+                            if (email.trim() !== '') {
+                                html += `
+                                <p class="mochi-contextual-popup-item" data-email="${email}">${name} <b>(${email})</b></p>
+                            `;
+                            }
+                        }
 
-                    html += ` </div>
+                        html += ` </div>
                          </div>`;
 
-                    popup.html(html);
+                        popup.html(html);
 
-                    let pos = getPopupPosition(input, popupContainer);
+                        let pos = getPopupPosition(input, popupContainer);
 
-                    popup.attr('data-ctrl-id', inputBoxContainer.attr('id'));
+                        popup.attr('data-ctrl-id', inputBoxContainer.attr('id'));
 
-                    popup.attr('class',
-                        'mochi-contextual-popup is-dropdown ' +
-                        pos.isAboveBelow +
-                        pos.isCorner +
-                        pos.isLeftRight +
-                        pos.isVerticalHorizontal +
-                        pos.isLowHigh);
+                        popup.attr('class',
+                            'mochi-contextual-popup is-dropdown ' +
+                            pos.isAboveBelow +
+                            pos.isCorner +
+                            pos.isLeftRight +
+                            pos.isVerticalHorizontal +
+                            pos.isLowHigh);
 
-                    popup.find('.mochi-contextual-popup-item').eq(input.attr('data-selected-index')).css('background-color', 'rgba(0,0,0,0.1)');
+                        popup.find('.mochi-contextual-popup-item').eq(input.attr('data-selected-index')).css('background-color', 'rgba(0,0,0,0.1)');
 
-                    popupContainer.fadeIn('fast');
-                } else {
-                    popup.html('');
-                    popupContainer.fadeOut('fast');
-                }
-            })
-    })
+                        popupContainer.fadeIn('fast');
+                    } else {
+                        popup.html('');
+                        popupContainer.fadeOut('fast');
+                    }
+                })
+        }, 500);
+    });
 
     $(document).on('click', '.mochi-contextual-popup-item', function () {
         let item = $(this);
         let popup = item.closest('.mochi-contextual-popup');
 
         if (popup.hasClass('is-dropdown')) {
-            let input = $(document).find('#' + popup.attr('data-ctrl-id')).find('.inputted-email.editing span.inputted-email-address');
-            input.text(item.text());
-            input.attr('data-selected-index', item.index());
-
             let inputBoxContainer = $(document).find('#' + popup.attr('data-ctrl-id'));
-            let inputtedEmail = inputBoxContainer.find('.inputted-email.editing');
-            let inputtedEmailAddress = inputtedEmail.find('.inputted-email-address');
+            let input = inputBoxContainer.find('input');
 
-            inputtedEmail.removeClass('editing');
-            inputtedEmailAddress.prop('contenteditable', false);
-
-            inputBoxContainer.append(`
-                    <div class="inputted-email editing">
+            let inputtedEmail = `
+                    <div class="inputted-email">
                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
-                        <span class="inputted-email-address" contenteditable role="textbox"></span>
+                        <span class="inputted-email-address" role="textbox">${item.attr('data-email')}</span>
                     </div>
-                `);
+                `;
+
+            input.before(inputtedEmail);
+
+            input.val('');
+
+            if (!inputBoxContainer.hasClass('focusin')) {
+                inputBoxContainer.addClass('focusin');
+            }
 
             validateAutomaticEmailsForSaving();
 
             setTimeout(function () {
-                inputBoxContainer.find('.inputted-email.editing span.inputted-email-address').focus();
+                input.focus();
             }, 50);
 
             popup.closest('.mochi-contextual-container').hide();
         }
     });
 
+    $(document).on('focusin', '.automatic-emails-section input', function (e) {
+        let inputBoxContainer = $(this).closest('.input-box-container');
+        if (!inputBoxContainer.hasClass('focusin')) {
+            inputBoxContainer.addClass('focusin');
+        }
+    });
+
+    $(document).on('focusout', '.automatic-emails-section input', function (e) {
+        let inputBoxContainer = $(this).closest('.input-box-container');
+
+        if (inputBoxContainer.find('.inputted-email:not(.editing)').length === 0) {
+            inputBoxContainer.removeClass('focusin');
+        }
+    });
+
     setMaskedInput();
+
+    var delayTimer;
 }
+
+
 
 function ValidateEmail(inputText) {
     var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -2837,12 +2883,12 @@ function validateAutomaticEmailsForSaving() {
     let automaticEmailsLoaded = automaticEmailsSection.find('input#cbox-automatic-emails-loaded').is(':checked') ? 1 : 0;
     let automaticEmailsEmpty = automaticEmailsSection.find('input#cbox-automatic-emails-empty').is(':checked') ? 1 : 0;
 
-    console.log(customerId.val());
+    console.log(customerId.val().trim());
 
     if (customerId.val().trim() !== '') {
-        let emailsToContainer = automaticEmailsSection.find('#txt-automatic-emails-email-to');
-        let emailsCcContainer = automaticEmailsSection.find('#txt-automatic-emails-email-cc');
-        let emailsBccContainer = automaticEmailsSection.find('#txt-automatic-emails-email-bcc');
+        let emailsToContainer = automaticEmailsSection.find('#ibc-automatic-emails-email-to');
+        let emailsCcContainer = automaticEmailsSection.find('#ibc-automatic-emails-email-cc');
+        let emailsBccContainer = automaticEmailsSection.find('#ibc-automatic-emails-email-bcc');
 
         for (let i = 0; i < emailsToContainer.find('.inputted-email:not(.editing)').length; i++) {
             automaticEmailsEmailTo += emailsToContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').text().trim() + ' ';
@@ -2924,7 +2970,7 @@ function validateContactforSaving() {
         return;
     }
 
-    if (address1.val().trim() === '' && address2.val().trim() === ''){
+    if (address1.val().trim() === '' && address2.val().trim() === '') {
         address1.val(customerSection.find('#txt-customer-customer-address-1').val().trim());
         address2.val(customerSection.find('#txt-customer-customer-address-2').val().trim());
         city.val(customerSection.find('#txt-customer-customer-city').val().trim());

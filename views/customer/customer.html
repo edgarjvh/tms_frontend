@@ -502,7 +502,7 @@
                                             <div class="customer-contact-search-container">
                                                 <div class="row-section">
                                                     <div class="input-box-container name-box">
-                                                        <input required type="text"
+                                                        <input tabindex="-1" required type="text"
                                                             id="txt-customer-contacts-search-first-name"
                                                             name="txt-customer-contacts-search-first-name"
                                                             title="Contact First Name">
@@ -511,7 +511,7 @@
                                                     </div>
                                                     <div class="hsep"></div>
                                                     <div class="input-box-container name-box">
-                                                        <input required type="text"
+                                                        <input tabindex="-1" required type="text"
                                                             id="txt-customer-contacts-search-last-name"
                                                             name="txt-customer-contacts-search-last-name"
                                                             title="Contact Last Name">
@@ -522,7 +522,7 @@
                                                 <div class="vsep"></div>
                                                 <div class="row-section">
                                                     <div class="input-box-container">
-                                                        <input required type="text"
+                                                        <input tabindex="-1" required type="text"
                                                             id="txt-customer-contacts-search-address1"
                                                             name="txt-customer-contacts-search-address1"
                                                             title="Address 1">
@@ -533,7 +533,7 @@
                                                 <div class="vsep"></div>
                                                 <div class="row-section">
                                                     <div class="input-box-container">
-                                                        <input required type="text"
+                                                        <input tabindex="-1" required type="text"
                                                             id="txt-customer-contacts-search-address2"
                                                             name="txt-customer-contacts-search-address2"
                                                             title="Address 2">
@@ -544,14 +544,14 @@
                                                 <div class="vsep"></div>
                                                 <div class="row-section">
                                                     <div class="input-box-container">
-                                                        <input required type="text"
+                                                        <input tabindex="-1" required type="text"
                                                             id="txt-customer-contacts-search-city"
                                                             name="txt-customer-contacts-search-city" title="City">
                                                         <label for="txt-customer-contacts-search-city">City</label>
                                                     </div>
                                                     <div class="hsep"></div>
                                                     <div class="input-box-container state">
-                                                        <input required type="text"
+                                                        <input tabindex="-1" required type="text"
                                                             id="txt-customer-contacts-search-state"
                                                             name="txt-customer-contacts-search-state" title="State"
                                                             maxlength="2">
@@ -559,7 +559,7 @@
                                                     </div>
                                                     <div class="hsep"></div>
                                                     <div class="input-box-container">
-                                                        <input class="contact-phone" required type="text"
+                                                        <input tabindex="-1" class="contact-phone" required type="text"
                                                             id="txt-customer-contacts-search-phone"
                                                             name="txt-customer-contacts-search-phone"
                                                             title="Phone (Work-Mobile-Fax)">
@@ -570,7 +570,7 @@
                                                 <div class="vsep"></div>
                                                 <div class="row-section">
                                                     <div class="input-box-container">
-                                                        <input required type="text"
+                                                        <input tabindex="-1" required type="text"
                                                             id="txt-customer-contacts-search-email"
                                                             name="txt-customer-contacts-search-email"
                                                             title="Contact E-mail">
@@ -593,10 +593,9 @@
                                         <div class="right-border"></div>
                                     </div>
                                     <div class="row-section">
-                                        <div class="input-box-container" id="txt-automatic-emails-email-to">
-                                            <span class="fas fa-plus btn-add-inputted-email-address"></span>
-                                            <span class="fas fa-times btn-cancel-inputted-email-address"></span>
-                                            <label for="txt-automatic-emails-email-to">E-Mail To</label>
+                                        <div class="input-box-container" id="ibc-automatic-emails-email-to">
+                                            <label for="txt-automatic-emails-email-to">E-Mail To</label>                                            
+                                            <input required class="inputted-email-address" type="text" id="txt-automatic-emails-email-to" name="txt-automatic-emails-email-to" autocomplete="off" />
                                         </div>
                                         <div class="hsep"></div>
                                         <div class="input-toggle-container">
@@ -621,10 +620,9 @@
                                     </div>
                                     <div class="vsep"></div>
                                     <div class="row-section">
-                                        <div class="input-box-container" id="txt-automatic-emails-email-cc">
-                                            <span class="fas fa-plus btn-add-inputted-email-address"></span>
-                                            <span class="fas fa-times btn-cancel-inputted-email-address"></span>
+                                        <div class="input-box-container" id="ibc-automatic-emails-email-cc">                                            
                                             <label for="txt-automatic-emails-email-cc">E-Mail Cc</label>
+                                            <input required class="inputted-email-address" type="text" id="txt-automatic-emails-email-cc" name="txt-automatic-emails-email-cc" autocomplete="off" />
                                         </div>
                                         <div class="hsep"></div>
                                         <div class="input-toggle-container">
@@ -651,10 +649,9 @@
                                     </div>
                                     <div class="vsep"></div>
                                     <div class="row-section">
-                                        <div class="input-box-container" id="txt-automatic-emails-email-bcc">
-                                            <span class="fas fa-plus btn-add-inputted-email-address"></span>
-                                            <span class="fas fa-times btn-cancel-inputted-email-address"></span>
+                                        <div class="input-box-container" id="ibc-automatic-emails-email-bcc">
                                             <label for="txt-automatic-emails-email-bcc">E-Mail Bcc</label>
+                                            <input required class="inputted-email-address" type="text" id="txt-automatic-emails-email-bcc" name="txt-automatic-emails-email-bcc" autocomplete="off" />
                                         </div>
                                         <div class="hsep"></div>
                                         <div class="input-toggle-container">

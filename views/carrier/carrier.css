@@ -24,7 +24,7 @@
   background-color: lightgreen;
 }
 .carrier-container .carrier-content .insurance.warning {
-  background-color: lightyellow;
+  background-color: yellow;
 }
 .carrier-container .carrier-content .carrier-wrapper {
   width: 100%;
@@ -267,6 +267,53 @@
   min-width: calc(50% + 46px);
   max-width: calc(50% + 46px);
 }
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section .form-section-insurances-portal {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section .form-section-insurances-portal .portal-section {
+  position: relative;
+  width: 100%;
+  min-height: unset !important;
+  flex-grow: 1;
+  margin-top: 5px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section .form-section-insurances-portal .portal-section .insurances-list-content {
+  height: 100%;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section .form-section-insurances-portal .portal-section .insurances-list-content .insurances-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding: 5px;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section .form-section-insurances-portal .portal-section .insurances-list-content .insurances-list-wrapper .insurances-list-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: ease 0.3s;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section .form-section-insurances-portal .portal-section .insurances-list-content .insurances-list-wrapper .insurances-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-2 .insurances-section .form-section-insurances-portal .portal-section .insurances-list-content .insurances-list-wrapper .insurances-list-item > div {
+  margin-right: 5px;
+}
 .carrier-container .carrier-content .carrier-wrapper .cell-2 .notes-section {
   flex-grow: 1;
   position: relative;
@@ -490,4 +537,7 @@
 }
 .carrier-container .carrier-content .modal-carrier-notes.adding #carrier-carrier-notes-save-btn {
   display: block;
+}
+.carrier-container .carrier-content .mochi-contextual-popup-item.selected {
+  background-color: 'rgba(0,0,0,0.1)';
 }
