@@ -189,6 +189,12 @@
 .customer-container .customer-content .customer-wrapper .forms-section-container .mailing-address-section .form-section-extra .input-box-container {
   margin: 0;
 }
+.customer-container .customer-content .customer-wrapper .forms-section-container .mailing-address-section .form-section-extra .input-box-container label {
+  pointer-events: none;
+}
+.customer-container .customer-content .customer-wrapper .forms-section-container .mailing-address-section .form-section-extra .input-box-container input {
+  pointer-events: none;
+}
 .customer-container .customer-content .customer-wrapper .forms-section-container .credit-section {
   padding: 5px;
   position: relative;
@@ -274,8 +280,8 @@
   text-transform: lowercase;
 }
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container {
-  align-items: flex-end !important;
-  padding: 0 20px 0 5px !important;
+  align-items: center !important;
+  padding: 0 10px !important;
   flex-wrap: nowrap;
 }
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container label {
@@ -290,9 +296,7 @@
   padding-right: 0;
 }
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container.focusin label {
-  top: 4px;
-  color: darkred;
-  font-size: 0.65rem;
+  display: none;
 }
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .input-box-container.adding span.btn-add-inputted-email-address {
   display: none;
@@ -309,9 +313,11 @@
   border-radius: 10px;
   margin-right: 3px;
   margin-bottom: 1px;
+  cursor: default;
 }
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email span {
   font-size: 0.6rem;
+  cursor: default;
 }
 .customer-container .customer-content .customer-wrapper .forms-section-container .automatic-emails-section .form-section .inputted-email span.btn-delete-inputted-email-address {
   margin-right: 5px;

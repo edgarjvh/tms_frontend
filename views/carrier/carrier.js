@@ -2,9 +2,10 @@ let location = window.location.href;
 // let serverURL = 'http://server.anchortms.com';
 let serverURL = "http://localhost:8000";
 
+
+
 export class CarrierContainer {
     create(callback) {
-        console.log('creating carrier');
         let container = $(document).find('#main-container .swiper-wrapper');
 
         if ($(document).find('.swiper-slide #carrier-container').length === 0) {
@@ -13,8 +14,9 @@ export class CarrierContainer {
             loader.fadeIn(300);
 
             $.get(location + 'views/carrier/carrier.html', async function (content) {
-                $.post(serverURL + '/getInsuranceTypes').then(async res => {
+                $.post(serverURL + '/getCarrierDropdownItems').then(async res => {
                     let insuranceTypes = '';
+                    let equipments = '';
 
                     if (res.result === 'OK') {
                         for (let i = 0; i < res.types.length; i++) {
@@ -27,6 +29,18 @@ export class CarrierContainer {
                             insuranceTypes = insuranceTypes.slice(0, -1);
                         }
 
+                        for (let i = 0; i < res.equipments.length; i++) {
+                            let e = res.equipments[i];
+
+                            equipments += e.id + ';' + e.name + '|';
+                        }
+
+                        if (equipments !== '') {
+                            equipments = equipments.slice(0, -1);
+                        }
+
+                        content = content.replace("[INSURANCES-ARRAY]", JSON.stringify(res.companies));
+                        content = content.replace("[EQUIPMENTS]", equipments);
                         content = content.replace("[INSURANCE-TYPES]", insuranceTypes);
                     }
 
@@ -85,7 +99,7 @@ function eventListeners() {
         panel.animate({
             left: '100%'
         }, 100, function () {
-            $(this).remove();
+            panel.remove();
             if (panelContainer.find('.panel').length === 0) {
                 mainPanelContainer.css('left', '100%');
             } else {
@@ -397,30 +411,392 @@ function eventListeners() {
         rateSelected = true;
     });
 
-    $(document).on('click', '.input-box-container.drop-down input', function (e) {
+    $(document).on('click', '.input-box-container.drop-down span', function (e) {
         e.stopPropagation();
-        let input = $(this);
-        let inputOptions = input.attr('data-options');
-        let inputOptionsArray = inputOptions.split("|");
+        let input = $(this).closest('.input-box-container').find('input');
+        input.click();
+    });
 
+    $(document).on('keyup', '.input-box-container.drop-down input', function (e) {
+        let key = e.keyCode || e.which;
+
+        if (key === 46 || key === 8) {
+            e.preventDefault();
+            return;
+        }
+    });
+
+    $(document).on('keydown', '.input-box-container.drop-down input', function (e) {
+        let key = e.keyCode || e.which;
+
+        if (key === 46 || key === 8) {
+            e.preventDefault();
+            return;
+        }
+
+        let input = $(this);
+        let popup = $(document).find('.mochi-contextual-container');
+
+        if (key === 27) {
+            e.preventDefault();
+
+            input.val('');
+            input.attr('data-selected-id', '0');
+            popup.fadeOut('fast');
+            return;
+        }
+
+        let tabindex = Number(input.attr('tabindex'));
+
+        let data = input.attr('data-options').split('|');
+        let selectedId = Number(input.attr('data-selected-id'));
+        let options = [];
+
+        let typeId = 0;
+        let typeName = '';
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i].split(';');
+
+            options.push({
+                id: Number(item[0]),
+                type: item[1]
+            });
+        }
+
+        if (key === 9 || key === 13) {
+            setTimeout(function () {
+                popup.fadeOut();
+                $('[tabindex=' + (tabindex + 1) + ']').focus();
+                validateInsuranceForSaving();
+                validateDriverForSaving();
+            }, 100);
+        } else if (key === 37 || key === 38) { // upstairs
+            let itemPos = options.map(e => { return e.id }).indexOf(selectedId);
+
+            if (itemPos === -1) {
+                typeId = options[0].id;
+                typeName = options[0].type;
+            } else {
+                let optionItem = options[itemPos]
+
+                if (itemPos === 0) {
+                    typeId = options[options.length - 1].id;
+                    typeName = options[options.length - 1].type;
+                } else {
+                    typeId = options[itemPos - 1].id;
+                    typeName = options[itemPos - 1].type;
+                }
+            }
+
+            input.val(typeName);
+            input.attr('data-selected-id', typeId);
+        } else if (key === 39 || key === 40) { // downstairs
+            let itemPos = options.map(e => { return e.id }).indexOf(selectedId);
+
+            if (itemPos === -1) {
+                typeId = options[0].id;
+                typeName = options[0].type;
+            } else {
+
+
+                if (itemPos === (options.length - 1)) {
+                    typeId = options[0].id;
+                    typeName = options[0].type;
+                } else {
+                    typeId = options[itemPos + 1].id;
+                    typeName = options[itemPos + 1].type;
+                }
+            }
+
+            input.val(typeName);
+            input.attr('data-selected-id', typeId);
+        }
+
+        if (popup.is(':visible')) {
+            popup.find('.mochi-contextual-popup-item').removeClass('selected');
+
+            for (let x = 0; x < popup.find('.mochi-contextual-popup-item').length; x++) {
+                let item = popup.find('.mochi-contextual-popup-item').eq(x);
+                let itemId = Number(item.attr('data-id'));
+
+                if (itemId === typeId) {
+                    item.addClass('selected');
+                    let popupItem = input.attr('id') + '-' + typeId;
+                    document.getElementById(popupItem).scrollIntoView(true);
+                    break;
+                }
+            }
+        }
+    });
+
+    $(document).on('keypress', '.input-box-container.drop-down input', function (e) {
+        e.preventDefault();
+        let input = $(this);
+        let data = input.attr('data-options').split('|');
+        let selectedId = Number(input.attr('data-selected-id'));
+        let options = [];
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i].split(';');
+
+            options.push({
+                id: Number(item[0]),
+                type: item[1]
+            });
+        }
+
+        let letter = String.fromCharCode(e.keyCode || e.which).toLowerCase();
+        let typeId = 0;
+        let typeName = '';
+
+
+        if (input.val() === '') {
+            for (let i = 0; i < options.length; i++) {
+                let initial = options[i].type.substring(0, 1).toLowerCase();
+
+                if (letter === initial) {
+                    typeId = options[i].id;
+                    typeName = options[i].type;
+
+                    let popup = $(document).find('.mochi-contextual-container');
+
+                    if (popup.is(':visible')) {
+                        popup.find('.mochi-contextual-popup-item').removeClass('selected');
+
+                        for (let x = 0; x < popup.find('.mochi-contextual-popup-item').length; x++) {
+                            let item = popup.find('.mochi-contextual-popup-item').eq(x);
+                            let itemId = Number(item.attr('data-id'));
+
+                            if (itemId === options[i].id) {
+                                item.addClass('selected');
+                                break;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            input.val(typeName);
+            input.attr('data-selected-id', typeId);
+        } else {
+            let curInitial = input.val().substring(0, 1).toLowerCase();
+
+            if (letter === curInitial) {
+                for (let i = 0; i < options.length; i++) {
+                    let initial = options[i].type.substring(0, 1).toLowerCase();
+
+                    if (letter === initial) {
+                        if (typeId === 0) {
+                            typeId = options[i].id;
+                            typeName = options[i].type;
+                        }
+
+                        if (selectedId < options[i].id) {
+                            typeId = options[i].id;
+                            typeName = options[i].type;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for (let i = 0; i < options.length; i++) {
+                    let initial = options[i].type.substring(0, 1).toLowerCase();
+
+                    if (letter === initial) {
+                        typeId = options[i].id;
+                        typeName = options[i].type;
+
+                        break;
+                    }
+                }
+            }
+
+            let popup = $(document).find('.mochi-contextual-container');
+
+            if (popup.is(':visible')) {
+                popup.find('.mochi-contextual-popup-item').removeClass('selected');
+
+                for (let x = 0; x < popup.find('.mochi-contextual-popup-item').length; x++) {
+                    let item = popup.find('.mochi-contextual-popup-item').eq(x);
+                    let itemId = Number(item.attr('data-id'));
+
+                    if (itemId === typeId) {
+                        item.addClass('selected');
+                        break;
+                    }
+                }
+            }
+
+            input.val(typeName);
+            input.attr('data-selected-id', typeId);
+        }
+    });
+
+    // $(document).on('keyup', '#cbo-carrier-driver-info-equipment', function (e) {
+    //     e.preventDefault();
+    //     let input = $(this);
+    //     let key = e.keyCode || e.which;
+    //     let popupContainer = input.closest('.carrier-wrapper').find('.mochi-contextual-container');
+    //     let popup = popupContainer.find('.mochi-contextual-popup');
+    //     let value = input.val().trim();
+    //     let equipments = JSON.parse($('#txt-equipments-array').val());
+
+    //     if (key >= 37 && key <= 40) {
+    //         return;
+    //     } else if (key === 9) {
+    //         popupContainer.fadeOut('fast');
+    //         return;
+    //     } else {
+    //         let matches = equipments.filter(item => {
+    //             const regex = new RegExp(value, 'gi');
+    //             return item.name.match(regex);
+    //         })
+
+    //         if (value === '') {
+    //             popupContainer.fadeOut('fast');
+    //             return;
+    //         }
+
+    //         if (matches.length > 0) {
+    //             let html = `<div class="mochi-contextual-popup-content">
+    //                 <div class="mochi-contextual-popup-wrapper">`;
+
+    //             for (let i = 0; i < matches.length; i++) {
+    //                 let equipment = matches[i];
+    //                 let searchValue = new RegExp(value, 'gi');
+    //                 let equipmentName = equipment.name.replace(searchValue, `<span class="hl">$&</span>`);
+
+    //                 html += `
+    //                     <p id="driver-equipment-id-${equipment.id}" class="mochi-contextual-popup-item" data-equipment="${equipment.name}" data-id="${equipment.id}">${equipmentName}</p> 
+    //                     `;
+    //             }
+
+    //             html += `</div>
+    //                         </div>`;
+
+    //             let pos = getPopupPosition(input, popupContainer);
+
+    //             popup.attr('data-ctrl-id', input.attr('id'));
+
+    //             popup.attr('class',
+    //                 'mochi-contextual-popup is-dropdown ' +
+    //                 pos.isAboveBelow +
+    //                 pos.isCorner +
+    //                 pos.isLeftRight +
+    //                 pos.isVerticalHorizontal +
+    //                 pos.isLowHigh);
+
+    //             popup.html(html);
+
+    //             popupContainer.fadeIn('fast');
+    //         } else {
+    //             popupContainer.fadeOut('fast');
+    //         }
+    //     }
+    // });
+
+    // $(document).on('keydown', '#cbo-carrier-driver-info-equipment', function (e) {
+    //     let input = $(this);
+    //     let key = e.keyCode || e.which;
+    //     let popupContainer = input.closest('.carrier-wrapper').find('.mochi-contextual-container');
+    //     let popup = popupContainer.find('.mochi-contextual-popup');
+
+    //     if (popupContainer.is(':visible')) {
+    //         let curItem = popup.find('.mochi-contextual-popup-item');
+    //         let selItem = popup.find('.mochi-contextual-popup-item.selected');
+
+    //         curItem.removeClass('selected');
+
+    //         if (key === 37 || key === 38) {
+    //             e.preventDefault();
+    //             if (selItem.length > 0) {
+    //                 let index = selItem.index();
+
+    //                 if (index === 0) {
+    //                     curItem.eq(curItem.length - 1).addClass('selected');
+    //                 } else {
+    //                     curItem.eq(index - 1).addClass('selected');
+    //                 }
+    //             } else {
+    //                 curItem.eq(0).addClass('selected');
+    //             }
+
+    //             if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
+    //                 document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
+    //             }
+
+    //         } else if (key === 39 || key === 40) {
+    //             e.preventDefault();
+    //             if (selItem.length > 0) {
+    //                 let index = selItem.index();
+
+    //                 if (index === curItem.length - 1) {
+    //                     curItem.eq(0).addClass('selected');
+    //                 } else {
+    //                     curItem.eq(index + 1).addClass('selected');
+    //                 }
+    //             } else {
+    //                 curItem.eq(0).addClass('selected');
+    //             }
+
+    //             if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
+    //                 document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
+    //             }
+    //         } else if (key === 9) {
+    //             if (selItem.length > 0) {
+    //                 input.val(selItem.attr('data-equipment'));
+    //                 popupContainer.fadeOut('fast');
+    //             }
+    //         }
+    //     } else {
+
+    //     }
+    // });
+
+    $(document).on('keyup', '#txt-carrier-insurance-company', function (e) {
+        e.preventDefault();
+        let input = $(this);
+        let key = e.keyCode || e.which;
         let popupContainer = input.closest('.carrier-wrapper').find('.mochi-contextual-container');
         let popup = popupContainer.find('.mochi-contextual-popup');
+        let value = input.val().trim();
+        let companies = JSON.parse($('#txt-insurances-array').val());
 
-        switch (input.attr('id')) {
-            case 'cbo-carrier-insurance-type':
+        if (key >= 37 && key <= 40) {
+            return;
+        } else if (key === 9) {
+            popupContainer.fadeOut('fast');
+            return;
+        } else {
+            let matches = companies.filter(item => {
+                const regex = new RegExp(value, 'gi');
+                return item.company.match(regex);
+            })
+
+            if (value === '') {
+                popupContainer.fadeOut('fast');
+                return;
+            }
+
+            if (matches.length > 0) {
                 let html = `<div class="mochi-contextual-popup-content">
-                                <div class="mochi-contextual-popup-wrapper">`;
+                    <div class="mochi-contextual-popup-wrapper">`;
 
-                for (let i = 0; i < inputOptionsArray.length; i++) {
-                    let optionItemArray = inputOptionsArray[i].split(";");
+                for (let i = 0; i < matches.length; i++) {
+                    let company = matches[i];
+                    let searchValue = new RegExp(value, 'gi');
+                    let companyName = company.company.replace(searchValue, `<span class="hl">$&</span>`);
 
-                    html += `                        
-                            <p class="mochi-contextual-popup-item ${input.attr('data-selected-id') === optionItemArray[0] ? 'selected' : ''}" data-id="${optionItemArray[0]}">${optionItemArray[1]}</p>                    
+                    html += `
+                        <p id="insurance-company-id-${company.id}" class="mochi-contextual-popup-item" data-company="${company.company}" data-id="${company.id}">${companyName}</p> 
                         `;
                 }
 
                 html += `</div>
-                        </div>`;
+                            </div>`;
 
                 let pos = getPopupPosition(input, popupContainer);
 
@@ -434,23 +810,199 @@ function eventListeners() {
                     pos.isVerticalHorizontal +
                     pos.isLowHigh);
 
-                // popup.find('.mochi-contextual-popup-item').eq(input.attr('data-selected-index')).css('background-color', 'rgba(0,0,0,0.1)');
                 popup.html(html);
 
                 popupContainer.fadeIn('fast');
+            } else {
+                popupContainer.fadeOut('fast');
+            }
+        }
+    });
+
+    $(document).on('keydown', '#txt-carrier-insurance-company', function (e) {
+        let input = $(this);
+        let key = e.keyCode || e.which;
+        let popupContainer = input.closest('.carrier-wrapper').find('.mochi-contextual-container');
+        let popup = popupContainer.find('.mochi-contextual-popup');
+
+        if (popupContainer.is(':visible')) {
+            let curItem = popup.find('.mochi-contextual-popup-item');
+            let selItem = popup.find('.mochi-contextual-popup-item.selected');
+
+            curItem.removeClass('selected');
+
+            if (key === 37 || key === 38) {
+                e.preventDefault();
+                if (selItem.length > 0) {
+                    let index = selItem.index();
+
+                    if (index === 0) {
+                        curItem.eq(curItem.length - 1).addClass('selected');
+                    } else {
+                        curItem.eq(index - 1).addClass('selected');
+                    }
+                } else {
+                    curItem.eq(0).addClass('selected');
+                }
+
+                if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
+                    document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
+                }
+
+            } else if (key === 39 || key === 40) {
+                e.preventDefault();
+                if (selItem.length > 0) {
+                    let index = selItem.index();
+
+                    if (index === curItem.length - 1) {
+                        curItem.eq(0).addClass('selected');
+                    } else {
+                        curItem.eq(index + 1).addClass('selected');
+                    }
+                } else {
+                    curItem.eq(0).addClass('selected');
+                }
+
+                if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
+                    document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
+                }
+            } else if (key === 9) {
+                if (selItem.length > 0) {
+                    input.val(selItem.attr('data-company'));
+                    popupContainer.fadeOut('fast');
+                }
+            }
+        } else {
+
+        }
+    });
+
+    $(document).on('keydown', '#txt-carrier-insurance-notes', function (e) {
+        e.preventDefault();
+        let input = $(this);
+        let tabindex = Number(input.attr('tabindex'));
+        let key = e.keyCode || e.which;
+
+        if (key === 9) {
+            if (input.closest('.form-section').find('#cbo-carrier-insurance-type').val() === '' &&
+                input.closest('.form-section').find('#txt-carrier-insurance-company').val() === '' &&
+                input.closest('.form-section').find('#txt-carrier-insurance-expiration-date').val() === '' &&
+                input.closest('.form-section').find('#txt-carrier-insurance-amount').val() === '') {
+                $('[tabindex=' + (tabindex + 1) + ']').focus();
+            } else {
+                $('#carrier-insurance-clear-btn').click();
+
+                setTimeout(function () {
+                    $(document).find('#txt-carrier-insurance-id').val('');
+                    $(document).find('#cbo-carrier-insurance-type').focus();
+                }, 100);
+            }
+        }
+    })
+
+    
+
+    $(document).on('keydown', '#txt-carrier-driver-info-notes', function (e) {
+        e.preventDefault();
+        let input = $(this);
+        let key = e.keyCode || e.which;
+
+        if (key === 9) {
+            if (input.closest('.inputs-container').find('#txt-carrier-driver-info-first-name').val().trim() === '') {
+                $('[tabindex=1]').focus();
+            } else {
+                $('#carrier-drivers-info-clear-btn').click();
+
+                setTimeout(function () {
+                    $(document).find('#txt-carrier-driver-info-first-name').focus();
+                }, 100);
+            }
+        }
+    })
+
+    $(document).on('click', '.input-box-container.drop-down input', function (e) {
+        e.stopPropagation();
+        let input = $(this);
+        let inputOptions = input.attr('data-options');
+        let inputOptionsArray = inputOptions.split("|");
+
+        let popupContainer = input.closest('.carrier-wrapper').find('.mochi-contextual-container');
+        let popup = popupContainer.find('.mochi-contextual-popup');
+        let html = `<div class="mochi-contextual-popup-content">
+            <div class="mochi-contextual-popup-wrapper">`;
+        let pos = getPopupPosition(input, popupContainer);
+
+        switch (input.attr('id')) {
+            case 'cbo-carrier-insurance-type':
+
+
+                for (let i = 0; i < inputOptionsArray.length; i++) {
+                    let optionItemArray = inputOptionsArray[i].split(";");
+
+                    html += `                        
+                            <p id="${input.attr('id') + '-' + optionItemArray[0]}" class="mochi-contextual-popup-item ${input.attr('data-selected-id') === optionItemArray[0] ? 'selected' : ''}" data-id="${optionItemArray[0]}">${optionItemArray[1]}</p>                    
+                        `;
+                }
+
+                html += `</div>
+                        </div>`;
+
+
+
+                popup.attr('data-ctrl-id', input.attr('id'));
+
+                popup.attr('class',
+                    'mochi-contextual-popup is-dropdown ' +
+                    pos.isAboveBelow +
+                    pos.isCorner +
+                    pos.isLeftRight +
+                    pos.isVerticalHorizontal +
+                    pos.isLowHigh);
+
+                popup.html(html);
+
+                popupContainer.fadeIn('fast');
+
+                if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
+                    document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
+                }
+                break;
+
+            case 'cbo-carrier-driver-info-equipment':
+
+                for (let i = 0; i < inputOptionsArray.length; i++) {
+                    let optionItemArray = inputOptionsArray[i].split(";");
+
+                    html += `                        
+                        <p id="${input.attr('id') + '-' + optionItemArray[0]}" class="mochi-contextual-popup-item ${input.attr('data-selected-id') === optionItemArray[0] ? 'selected' : ''}" data-id="${optionItemArray[0]}">${optionItemArray[1]}</p>                    
+                    `;
+                }
+
+                html += `</div>
+                    </div>`;
+
+                popup.attr('data-ctrl-id', input.attr('id'));
+
+                popup.attr('class',
+                    'mochi-contextual-popup is-dropdown ' +
+                    pos.isAboveBelow +
+                    pos.isCorner +
+                    pos.isLeftRight +
+                    pos.isVerticalHorizontal +
+                    pos.isLowHigh);
+
+                popup.html(html);
+
+                popupContainer.fadeIn('fast');
+
+                if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
+                    document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
+                }
                 break;
 
             default:
                 break;
         }
-    });
-
-    $(document).on('focusin', '.input-box-container.drop-down input', function (e) {
-        $(this).prop('readonly', true);
-    });
-
-    $(document).on('focusout', '.input-box-container.drop-down input', function (e) {
-        $(this).prop('readonly', false);
     });
 
     $(document).on('click', '.mochi-contextual-popup-item', function () {
@@ -468,6 +1020,13 @@ function eventListeners() {
     });
 
     $(document).on('click', '#carriers-factoring-company-more-btn', function (e) {
+        let factoringCompanyId = $(this).closest('.factoring-company-section').find('#txt-carrier-factoring-company-id').val();
+
+        if (factoringCompanyId === '') {
+            alert('You must select a factoring company first!');
+            return;
+        }
+
         let btn = $(this);
         let mainContainer = btn.closest('.swiper-slide').find('.main-panel-container');
         let panelContainer = mainContainer.find('.panel-container');
@@ -584,50 +1143,68 @@ function eventListeners() {
                     for (let i = 0; i < res.contacts.length; i++) {
                         let row = res.contacts[i];
 
+                        let factoringCode = row.carrier.factoring_company ? row.carrier.factoring_company.code + (row.carrier.factoring_company.code_number === 0 ? "" : row.carrier.factoring_company.code_number) : "";
+                        let factoringName = row.carrier.factoring_company ? row.carrier.factoring_company.name : "";
+                        let factoringAddress1 = row.carrier.factoring_company ? row.carrier.factoring_company.address1 : "";
+                        let factoringAddress2 = row.carrier.factoring_company ? row.carrier.factoring_company.address2 : "";
+                        let factoringCity = row.carrier.factoring_company ? row.carrier.factoring_company.city : "";
+                        let factoringState = row.carrier.factoring_company ? row.carrier.factoring_company.state : "";
+                        let factoringZip = row.carrier.factoring_company ? row.carrier.factoring_company.zip : "";
+                        let factoringContactName = row.carrier.factoring_company ? row.carrier.factoring_company.contact_name : "";
+                        let factoringContactPhone = row.carrier.factoring_company ? row.carrier.factoring_company.contact_phone : "";
+                        let factoringContactPhoneExt = row.carrier.factoring_company ? row.carrier.factoring_company.ext : "";
+                        let factoringEmail = row.carrier.factoring_company ? row.carrier.factoring_company.email : "";
+
                         rows +=
                             `
-                    <div class="trow">
-                        <div class="tcol contact-id hidden">` + row.id + `</div>
-                        <div class="tcol contact-first-name">` + row.first_name + `</div>
-                        <div class="tcol contact-last-name">` + row.last_name + `</div>
-                        <div class="tcol contact-address1">` + row.address1 + `</div>
-                        <div class="tcol contact-address2">` + row.address2 + `</div>
-                        <div class="tcol contact-city">` + row.city + `</div>
-                        <div class="tcol contact-state">` + row.state + `</div>
-                        <div class="tcol contact-phone-work">` + row.phone_work + `</div>
-                        <div class="tcol contact-email-work">` + row.email_work + `</div>
+                        <div class="trow">
+                            <div class="tcol contact-id hidden">` + row.id + `</div>
+                            <div class="tcol contact-first-name">` + row.first_name + `</div>
+                            <div class="tcol contact-last-name">` + row.last_name + `</div>
+                            <div class="tcol contact-address1">` + row.address1 + `</div>
+                            <div class="tcol contact-address2">` + row.address2 + `</div>
+                            <div class="tcol contact-city">` + row.city + `</div>
+                            <div class="tcol contact-state">` + row.state + `</div>
+                            <div class="tcol contact-phone-work">` + row.phone_work + `</div>
+                            <div class="tcol contact-email-work">` + row.email_work + `</div>
 
-                        <div class="tcol carrier-id hidden">` + row.carrier.id + `</div>
-                        <div class="tcol code hidden">` + row.carrier.code + (row.carrier.code_number === 0 ? "" : row.carrier.code_number) + `</div>
-                        <div class="tcol name hidden">` + row.carrier.name + `</div>
-                        <div class="tcol address1 hidden">` + row.carrier.address1 + `</div>
-                        <div class="tcol address2 hidden">` + row.carrier.address2 + `</div>
-                        <div class="tcol city hidden">` + row.carrier.city + `</div>
-                        <div class="tcol state hidden">` + row.carrier.state + `</div>
-                        <div class="tcol zip hidden">` + row.carrier.zip + `</div>
-                        <div class="tcol contact-name hidden">` + row.carrier.contact_name + `</div>
-                        <div class="tcol contact-phone hidden">` + row.carrier.contact_phone + `</div>
-                        <div class="tcol ext hidden">` + row.carrier.ext + `</div>
-                        <div class="tcol hidden email">` + row.carrier.email + `</div>
+                            <div class="tcol carrier-id hidden">` + row.carrier.id + `</div>
+                            <div class="tcol code hidden">` + row.carrier.code + (row.carrier.code_number === 0 ? "" : row.carrier.code_number) + `</div>
+                            <div class="tcol name hidden">` + row.carrier.name + `</div>
+                            <div class="tcol address1 hidden">` + row.carrier.address1 + `</div>
+                            <div class="tcol address2 hidden">` + row.carrier.address2 + `</div>
+                            <div class="tcol city hidden">` + row.carrier.city + `</div>
+                            <div class="tcol state hidden">` + row.carrier.state + `</div>
+                            <div class="tcol zip hidden">` + row.carrier.zip + `</div>
+                            <div class="tcol contact-name hidden">` + row.carrier.contact_name + `</div>
+                            <div class="tcol contact-phone hidden">` + row.carrier.contact_phone + `</div>
+                            <div class="tcol ext hidden">` + row.carrier.ext + `</div>
+                            <div class="tcol hidden email">` + row.carrier.email + `</div>
 
-                        <div class="tcol hidden mailing-code">` + row.carrier.mailing_code + (row.carrier.mailing_code_number === 0 ? "" : row.carrier.mailing_code_number) + `</div>
-                        <div class="tcol hidden mailing-name">` + row.carrier.mailing_name + `</div>
-                        <div class="tcol hidden mailing-address1">` + row.carrier.mailing_address1 + `</div>
-                        <div class="tcol hidden mailing-address2">` + row.carrier.mailing_address2 + `</div>
-                        <div class="tcol hidden mailing-city">` + row.carrier.mailing_city + `</div>
-                        <div class="tcol hidden mailing-state">` + row.carrier.mailing_state + `</div>
-                        <div class="tcol hidden mailing-zip">` + row.carrier.mailing_zip + `</div>
-                        <div class="tcol hidden mailing-contact-name">` + row.carrier.mailing_contact_name + `</div>
-                        <div class="tcol hidden mailing-contact-phone">` + row.carrier.mailing_contact_phone + `</div>
-                        <div class="tcol hidden mailing-ext">` + row.carrier.mailing_ext + `</div>
-                        <div class="tcol hidden mailing-email">` + row.carrier.mailing_email + `</div>
+                            <div class="tcol hidden mailing-code">` + row.carrier.mailing_code + (row.carrier.mailing_code_number === 0 ? "" : row.carrier.mailing_code_number) + `</div>
+                            <div class="tcol hidden mailing-name">` + row.carrier.mailing_name + `</div>
+                            <div class="tcol hidden mailing-address1">` + row.carrier.mailing_address1 + `</div>
+                            <div class="tcol hidden mailing-address2">` + row.carrier.mailing_address2 + `</div>
+                            <div class="tcol hidden mailing-city">` + row.carrier.mailing_city + `</div>
+                            <div class="tcol hidden mailing-state">` + row.carrier.mailing_state + `</div>
+                            <div class="tcol hidden mailing-zip">` + row.carrier.mailing_zip + `</div>
+                            <div class="tcol hidden mailing-contact-name">` + row.carrier.mailing_contact_name + `</div>
+                            <div class="tcol hidden mailing-contact-phone">` + row.carrier.mailing_contact_phone + `</div>
+                            <div class="tcol hidden mailing-ext">` + row.carrier.mailing_ext + `</div>
+                            <div class="tcol hidden mailing-email">` + row.carrier.mailing_email + `</div>
 
-                        <div class="tcol hidden mailing-bill-to">` + row.carrier.mailing_bill_to + `</div>
-                        <div class="tcol hidden mailing-division">` + row.carrier.mailing_division + `</div>
-                        <div class="tcol hidden mailing-agent-code">` + row.carrier.mailing_agent_code + `</div>
-                        <div class="tcol hidden mailing-salesman">` + row.carrier.mailing_salesman + `</div>
-                        <div class="tcol hidden mailing-fid">` + row.carrier.mailing_fid + `</div>
-                    </div>
+                            <div class="tcol factoring-code hidden">` + factoringCode + `</div>
+                            <div class="tcol factoring-name hidden">` + factoringName + `</div>
+                            <div class="tcol factoring-address1 hidden">` + factoringAddress1 + `</div>
+                            <div class="tcol factoring-address2 hidden">` + factoringAddress2 + `</div>
+                            <div class="tcol factoring-city hidden">` + factoringCity + `</div>
+                            <div class="tcol factoring-state hidden">` + factoringState + `</div>
+                            <div class="tcol factoring-zip hidden">` + factoringZip + `</div>
+                            <div class="tcol factoring-contact-name hidden">` + factoringContactName + `</div>
+                            <div class="tcol factoring-contact-phone hidden">` + factoringContactPhone + `</div>
+                            <div class="tcol factoring-ext hidden">` + factoringContactPhoneExt + `</div>
+                            <div class="tcol hidden factoring-email">` + factoringEmail + `</div>
+                        </div>
                     `;
                     }
 
@@ -725,49 +1302,70 @@ function eventListeners() {
 
                         rows +=
                             `
-                    <div class="trow">
-                        <div class="tcol carrier-id hidden">` + row.id + `</div>
-                        <div class="tcol code">` + row.code + (row.code_number === 0 ? "" : row.code_number) + `</div>
-                        <div class="tcol name">` + row.name + `</div>
-                        <div class="tcol address1">` + row.address1 + `</div>
-                        <div class="tcol address2">` + row.address2 + `</div>
-                        <div class="tcol city">` + row.city + `</div>
-                        <div class="tcol state">` + row.state + `</div>
-                        <div class="tcol zip">` + row.zip + `</div>
-                        <div class="tcol hidden contact-name">` + row.contact_name + `</div>
-                        <div class="tcol hidden contact-phone">` + row.contact_phone + `</div>
-                        <div class="tcol hidden ext">` + row.ext + `</div>
-                        <div class="tcol email">` + row.email + `</div>
-                        <div class="tcol hidden mc-number">` + row.mc_number + `</div>
-                        <div class="tcol hidden dot-number">` + row.dot_number + `</div>
-                        <div class="tcol hidden scac">` + row.scac + `</div>
-                        <div class="tcol hidden fid">` + row.fid + `</div>
+                        <div class="trow">
+                            <div class="tcol carrier-id hidden">` + row.id + `</div>
+                            <div class="tcol code">` + row.code + (row.code_number === 0 ? "" : row.code_number) + `</div>
+                            <div class="tcol name">` + row.name + `</div>
+                            <div class="tcol address1">` + row.address1 + `</div>
+                            <div class="tcol address2">` + row.address2 + `</div>
+                            <div class="tcol city">` + row.city + `</div>
+                            <div class="tcol state">` + row.state + `</div>
+                            <div class="tcol zip">` + row.zip + `</div>
+                            <div class="tcol hidden contact-name">` + row.contact_name + `</div>
+                            <div class="tcol hidden contact-phone">` + row.contact_phone + `</div>
+                            <div class="tcol hidden ext">` + row.ext + `</div>
+                            <div class="tcol email">` + row.email + `</div>
+                            <div class="tcol hidden mc-number">` + row.mc_number + `</div>
+                            <div class="tcol hidden dot-number">` + row.dot_number + `</div>
+                            <div class="tcol hidden scac">` + row.scac + `</div>
+                            <div class="tcol hidden fid">` + row.fid + `</div>
 
-                        <div class="tcol hidden mailing-code">` + row.mailing_code + (row.mailing_code_number === 0 ? "" : row.mailing_code_number) + `</div>
-                        <div class="tcol hidden mailing-name">` + row.mailing_name + `</div>
-                        <div class="tcol hidden mailing-address1">` + row.mailing_address1 + `</div>
-                        <div class="tcol hidden mailing-address2">` + row.mailing_address2 + `</div>
-                        <div class="tcol hidden mailing-city">` + row.mailing_city + `</div>
-                        <div class="tcol hidden mailing-state">` + row.mailing_state + `</div>
-                        <div class="tcol hidden mailing-zip">` + row.mailing_zip + `</div>
-                        <div class="tcol hidden mailing-contact-name">` + row.mailing_contact_name + `</div>
-                        <div class="tcol hidden mailing-contact-phone">` + row.mailing_contact_phone + `</div>
-                        <div class="tcol hidden mailing-ext">` + row.mailing_ext + `</div>
-                        <div class="tcol hidden mailing-email">` + row.mailing_email + `</div>
+                            <div class="tcol hidden mailing-code">` + row.mailing_code + (row.mailing_code_number === 0 ? "" : row.mailing_code_number) + `</div>
+                            <div class="tcol hidden mailing-name">` + row.mailing_name + `</div>
+                            <div class="tcol hidden mailing-address1">` + row.mailing_address1 + `</div>
+                            <div class="tcol hidden mailing-address2">` + row.mailing_address2 + `</div>
+                            <div class="tcol hidden mailing-city">` + row.mailing_city + `</div>
+                            <div class="tcol hidden mailing-state">` + row.mailing_state + `</div>
+                            <div class="tcol hidden mailing-zip">` + row.mailing_zip + `</div>
+                            <div class="tcol hidden mailing-contact-name">` + row.mailing_contact_name + `</div>
+                            <div class="tcol hidden mailing-contact-phone">` + row.mailing_contact_phone + `</div>
+                            <div class="tcol hidden mailing-ext">` + row.mailing_ext + `</div>
+                            <div class="tcol hidden mailing-email">` + row.mailing_email + `</div>     
+                            `;
 
-                        <div class="tcol hidden factoring-code">` + row.factoring_code + (row.factoring_code_number === 0 ? "" : row.factoring_code_number) + `</div>
-                        <div class="tcol hidden factoring-name">` + row.factoring_name + `</div>
-                        <div class="tcol hidden factoring-address1">` + row.factoring_address1 + `</div>
-                        <div class="tcol hidden factoring-address2">` + row.factoring_address2 + `</div>
-                        <div class="tcol hidden factoring-city">` + row.factoring_city + `</div>
-                        <div class="tcol hidden factoring-state">` + row.factoring_state + `</div>
-                        <div class="tcol hidden factoring-zip">` + row.factoring_zip + `</div>
-                        <div class="tcol hidden factoring-contact-name">` + row.factoring_contact_name + `</div>
-                        <div class="tcol hidden factoring-contact-phone">` + row.factoring_contact_phone + `</div>
-                        <div class="tcol hidden factoring-ext">` + row.factoring_ext + `</div>
-                        <div class="tcol hidden factoring-email">` + row.factoring_email + `</div>
-                    </div>
-                    `;
+                        if (row.factoring_company) {
+                            rows += `
+                            <div class="tcol hidden factoring-id">` + row.factoring_company.code + (row.factoring_company.code_number === 0 ? "" : row.factoring_company.code_number) + `</div>
+                            <div class="tcol hidden factoring-code">` + row.factoring_company.code + (row.factoring_company.code_number === 0 ? "" : row.factoring_company.code_number) + `</div>
+                            <div class="tcol hidden factoring-name">` + row.factoring_company.name + `</div>
+                            <div class="tcol hidden factoring-address1">` + row.factoring_company.address1 + `</div>
+                            <div class="tcol hidden factoring-address2">` + row.factoring_company.address2 + `</div>
+                            <div class="tcol hidden factoring-city">` + row.factoring_company.city + `</div>
+                            <div class="tcol hidden factoring-state">` + row.factoring_company.state + `</div>
+                            <div class="tcol hidden factoring-zip">` + row.factoring_company.zip + `</div>
+                            <div class="tcol hidden factoring-contact-name">` + row.factoring_company.contact_name + `</div>
+                            <div class="tcol hidden factoring-contact-phone">` + row.factoring_company.contact_phone + `</div>
+                            <div class="tcol hidden factoring-ext">` + row.factoring_company.ext + `</div>
+                            <div class="tcol hidden factoring-email">` + row.factoring_company.email + `</div>
+                            `;
+                        } else {
+                            rows += `
+                            <div class="tcol hidden factoring-id"></div>
+                            <div class="tcol hidden factoring-code"></div>
+                            <div class="tcol hidden factoring-name"></div>
+                            <div class="tcol hidden factoring-address1"></div>
+                            <div class="tcol hidden factoring-address2"></div>
+                            <div class="tcol hidden factoring-city"></div>
+                            <div class="tcol hidden factoring-state"></div>
+                            <div class="tcol hidden factoring-zip"></div>
+                            <div class="tcol hidden factoring-contact-name"></div>
+                            <div class="tcol hidden factoring-contact-phone"></div>
+                            <div class="tcol hidden factoring-ext"></div>
+                            <div class="tcol hidden factoring-email"></div>
+                            `;
+                        }
+
+                        rows += `</div>`;
                     }
 
                     content = content.replace("[RESULTS]", rows);
@@ -804,6 +1402,207 @@ function eventListeners() {
             });
     });
 
+    $(document).on("click", "#carrier-factoring-company-search-btn", function (e) {
+        e.preventDefault();
+        let carrierId = $(this).closest('.carrier-content').find('#txt-carrier-carrier-id').val();
+
+        if (carrierId === '') {
+            alert('You must select a carrier first!');
+            return;
+        }
+
+        let form = $(e.target).closest(".form-section");
+        let mainContainer = form.closest(".swiper-slide").find(".main-panel-container");
+        let panelContainer = mainContainer.find(".panel-container");
+
+        let code = form.find("input#txt-carrier-factoring-company-code").val();
+        let name = form.find("input#txt-carrier-factoring-company-name").val();
+        let address1 = form.find("input#txt-carrier-factoring-company-address1").val();
+        let address2 = form.find("input#txt-carrier-factoring-company-address2").val();
+        let city = form.find("input#txt-carrier-factoring-company-city").val();
+        let state = form.find("input#txt-carrier-factoring-company-state").val();
+        let zip = form.find("input#txt-carrier-factoring-company-zip-code").val();
+
+        let data = {
+            code: code.toLowerCase(),
+            name: name.toLowerCase(),
+            city: city.toLowerCase(),
+            state: state.toLowerCase(),
+            zip: zip,
+            address1: address1.toLowerCase(),
+            address2: address2.toLowerCase()
+        };
+
+        $.post(serverURL + "/getFactoringCompanies", data)
+            .then((res) => {
+                $.get(location + "views/panels/search-results/carriers/factoring-company/factoring-company-search.html", async function (content) {
+                    let filter = "";
+
+                    if (code.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Code:</div> <div class="value">' + code.trim() + "</div> </div>";
+                    }
+                    if (name.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Name:</div> <div class="value">' + name.trim() + "</div> </div>";
+                    }
+                    if (city.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">City:</div> <div class="value">' + city.trim() + "</div> </div>";
+                    }
+                    if (state.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">State:</div> <div class="value">' + state.trim() + "</div> </div>";
+                    }
+                    if (zip.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Postal Code:</div> <div class="value">' + zip.trim() + "</div> </div>";
+                    }
+                    if (address1.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Address 1:</div> <div class="value">' + address1.trim() + "</div> </div>";
+                    }
+                    if (address2.trim() !== "") {
+                        filter += '<div class="filter"> <div class="field">Address 2:</div> <div class="value">' + address2.trim() + "</div> </div>";
+                    }
+
+                    content = content.replace("[FILTER]", filter);
+
+                    let rows = ``;
+
+                    for (let i = 0; i < res.factoring_companies.length; i++) {
+                        let row = res.factoring_companies[i];
+
+                        rows +=
+                            `
+                        <div class="trow">
+                            <div class="tcol factoring-id hidden">` + row.id + `</div>
+                            <div class="tcol code">` + row.code + (row.code_number === 0 ? "" : row.code_number) + `</div>
+                            <div class="tcol name">` + row.name + `</div>
+                            <div class="tcol address1">` + row.address1 + `</div>
+                            <div class="tcol address2">` + row.address2 + `</div>
+                            <div class="tcol city">` + row.city + `</div>
+                            <div class="tcol state">` + row.state + `</div>
+                            <div class="tcol zip">` + row.zip + `</div>
+                            <div class="tcol hidden contact-name">` + row.contact_name + `</div>
+                            <div class="tcol hidden contact-phone">` + row.contact_phone + `</div>
+                            <div class="tcol hidden ext">` + row.ext + `</div>
+                            <div class="tcol hidden email">` + row.email + `</div>                            
+                        </div>`;
+                    }
+
+                    content = content.replace("[RESULTS]", rows);
+
+                    if (panelContainer.find(".panel").length === 0) {
+                        mainContainer.css("left", $(window).width() - mainContainer.width() + "px");
+                        panelContainer.append(content);
+                        reorderCarrierPanels();
+                    } else {
+                        let exist = false;
+
+                        for (let i = 0; i < panelContainer.find(".panel").length; i++) {
+                            let panel = panelContainer.find(".panel").eq(i);
+
+                            if (panel.attr("id") === "panel-carriers-factoring-company-search-result") {
+                                panel.appendTo(panelContainer);
+                                reorderCarrierPanels();
+                                exist = true;
+                                break;
+                            }
+                        }
+
+                        if (!exist) {
+                            panelContainer.append(content);
+                            reorderCarrierPanels();
+                        }
+                    }
+                },
+                    "html"
+                );
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    });
+
+    $(document).on("dblclick", "#tbl-carriers-contact-search-results .wrapper .trow", function (e) {
+        let row = $(this);
+
+        let id = row.find(".carrier-id").text();
+        let code = row.find(".code").text();
+        let name = row.find(".name").text();
+        let address1 = row.find(".address1").text();
+        let address2 = row.find(".address2").text();
+        let city = row.find(".city").text();
+        let state = row.find(".state").text();
+        let zip = row.find(".zip").text();
+        let contact_name = row.find(".contact-name").text();
+        let contact_phone = row.find(".contact-phone").text();
+        let ext = row.find(".ext").text();
+        let email = row.find(".email").text();
+
+        let mailing_code = row.find(".mailing-code").text();
+        let mailing_name = row.find(".mailing-name").text();
+        let mailing_address1 = row.find(".mailing-address1").text();
+        let mailing_address2 = row.find(".mailing-address2").text();
+        let mailing_city = row.find(".mailing-city").text();
+        let mailing_state = row.find(".mailing-state").text();
+        let mailing_zip = row.find(".mailing-zip").text();
+        let mailing_contact_name = row.find(".mailing-contact-name").text();
+        let mailing_contact_phone = row.find(".mailing-contact-phone").text();
+        let mailing_ext = row.find(".mailing-ext").text();
+        let mailing_email = row.find(".mailing-email").text();
+
+        let factoring_code = row.find(".factoring-code").text();
+        let factoring_name = row.find(".factoring-name").text();
+        let factoring_address1 = row.find(".factoring-address1").text();
+        let factoring_address2 = row.find(".factoring-address2").text();
+        let factoring_city = row.find(".factoring-city").text();
+        let factoring_state = row.find(".factoring-state").text();
+        let factoring_zip = row.find(".factoring-zip").text();
+        let factoring_contact_name = row.find(".factoring-contact-name").text();
+        let factoring_contact_phone = row.find(".factoring-contact-phone").text();
+        let factoring_ext = row.find(".factoring-ext").text();
+        let factoring_email = row.find(".factoring-email").text();
+
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-id").val(id);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-code").val(code);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-name").val(name);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-address1").val(address1);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-address2").val(address2);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-city").val(city);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-state").val(state);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-zip-code").val(zip);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-contact-name").val(contact_name);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-contact-phone").val(contact_phone);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-contact-phone-ext").val(ext);
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-email").val(email);
+
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-code").val(mailing_code);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-name").val(mailing_name);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-address1").val(mailing_address1);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-address2").val(mailing_address2);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-city").val(mailing_city);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-state").val(mailing_state);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-zip-code").val(mailing_zip);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-contact-name").val(mailing_contact_name);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-contact-phone").val(mailing_contact_phone);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-contact-phone-ext").val(mailing_ext);
+        $("#carrier-container .mailing-address-section input#txt-carrier-mailing-address-email").val(mailing_email);
+
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-code").val(factoring_code);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-name").val(factoring_name);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-address1").val(factoring_address1);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-address2").val(factoring_address2);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-city").val(factoring_city);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-state").val(factoring_state);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-zip-code").val(factoring_zip);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-contact-name").val(factoring_contact_name);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-contact-phone").val(factoring_contact_phone);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-contact-phone-ext").val(factoring_ext);
+        $("#carrier-container .factoring-company-section input#txt-carrier-factoring-company-email").val(factoring_email);
+
+        let panel = row.closest(".panel");
+
+        $("#carrier-container .carrier-section input#txt-carrier-carrier-id").change();
+
+        panel.find(".panel-close-btn").click();
+    });
+
     $(document).on("dblclick", "#tbl-carriers-carrier-search-results .wrapper .trow", function (e) {
         let row = $(this);
 
@@ -815,6 +1614,9 @@ function eventListeners() {
         let city = row.find(".city").text();
         let state = row.find(".state").text();
         let zip = row.find(".zip").text();
+        let contact_name = row.find(".contact-name").text();
+        let contact_phone = row.find(".contact-phone").text();
+        let ext = row.find(".ext").text();
         let email = row.find(".email").text();
         let mc_number = row.find(".mc-number").text();
         let dot_number = row.find(".dot-number").text();
@@ -828,8 +1630,12 @@ function eventListeners() {
         let mailing_city = row.find(".mailing-city").text();
         let mailing_state = row.find(".mailing-state").text();
         let mailing_zip = row.find(".mailing-zip").text();
+        let mailing_contact_name = row.find(".mailing-contact-name").text();
+        let mailing_contact_phone = row.find(".mailing-contact-phone").text();
+        let mailing_ext = row.find(".mailing-ext").text();
         let mailing_email = row.find(".mailing-email").text();
 
+        let factoring_id = row.find(".factoring-id").text();
         let factoring_code = row.find(".factoring-code").text();
         let factoring_name = row.find(".factoring-name").text();
         let factoring_address1 = row.find(".factoring-address1").text();
@@ -837,6 +1643,9 @@ function eventListeners() {
         let factoring_city = row.find(".factoring-city").text();
         let factoring_state = row.find(".factoring-state").text();
         let factoring_zip = row.find(".factoring-zip").text();
+        let factoring_contact_name = row.find(".factoring-contact-name").text();
+        let factoring_contact_phone = row.find(".factoring-contact-phone").text();
+        let factoring_ext = row.find(".factoring-ext").text();
         let factoring_email = row.find(".factoring-email").text();
 
         $("#carrier-container .cell-1 input#txt-carrier-carrier-id").val(id);
@@ -847,6 +1656,9 @@ function eventListeners() {
         $("#carrier-container .cell-1 input#txt-carrier-carrier-city").val(city);
         $("#carrier-container .cell-1 input#txt-carrier-carrier-state").val(state);
         $("#carrier-container .cell-1 input#txt-carrier-carrier-zip-code").val(zip);
+        $("#carrier-container .cell-1 input#txt-carrier-carrier-contact-name").val(contact_name);
+        $("#carrier-container .cell-1 input#txt-carrier-carrier-contact-phone").val(contact_phone);
+        $("#carrier-container .cell-1 input#txt-carrier-carrier-contact-phone-ext").val(ext);
         $("#carrier-container .cell-1 input#txt-carrier-carrier-email").val(email);
         $("#carrier-container .cell-1 input#txt-carrier-carrier-mc-number").val(mc_number);
         $("#carrier-container .cell-1 input#txt-carrier-carrier-dot-number").val(dot_number);
@@ -860,8 +1672,12 @@ function eventListeners() {
         $("#carrier-container .cell-1 input#txt-carrier-mailing-address-city").val(mailing_city);
         $("#carrier-container .cell-1 input#txt-carrier-mailing-address-state").val(mailing_state);
         $("#carrier-container .cell-1 input#txt-carrier-mailing-address-zip-code").val(mailing_zip);
+        $("#carrier-container .cell-1 input#txt-carrier-mailing-address-contact-name").val(mailing_contact_name);
+        $("#carrier-container .cell-1 input#txt-carrier-mailing-address-contact-phone").val(mailing_contact_phone);
+        $("#carrier-container .cell-1 input#txt-carrier-mailing-address-contact-phone-ext").val(mailing_ext);
         $("#carrier-container .cell-1 input#txt-carrier-mailing-address-email").val(mailing_email);
 
+        $("#carrier-container .cell-1 input#txt-carrier-factoring-company-id").val(factoring_id);
         $("#carrier-container .cell-1 input#txt-carrier-factoring-company-code").val(factoring_code);
         $("#carrier-container .cell-1 input#txt-carrier-factoring-company-name").val(factoring_name);
         $("#carrier-container .cell-1 input#txt-carrier-factoring-company-address1").val(factoring_address1);
@@ -869,6 +1685,9 @@ function eventListeners() {
         $("#carrier-container .cell-1 input#txt-carrier-factoring-company-city").val(factoring_city);
         $("#carrier-container .cell-1 input#txt-carrier-factoring-company-state").val(factoring_state);
         $("#carrier-container .cell-1 input#txt-carrier-factoring-company-zip-code").val(factoring_zip);
+        $("#carrier-container .cell-1 input#txt-carrier-factoring-company-contact-name").val(factoring_contact_name);
+        $("#carrier-container .cell-1 input#txt-carrier-factoring-company-contact-phone").val(factoring_contact_phone);
+        $("#carrier-container .cell-1 input#txt-carrier-factoring-company-contact-phone-ext").val(factoring_ext);
         $("#carrier-container .cell-1 input#txt-carrier-factoring-company-email").val(factoring_email);
 
         let panel = row.closest(".panel");
@@ -876,6 +1695,10 @@ function eventListeners() {
         $("#carrier-container .carrier-section input#txt-carrier-carrier-id").change();
 
         panel.find(".panel-close-btn").click();
+    });
+
+    $(document).on("click", "#tbl-carriers-factoring-company-search-results .wrapper .trow", function (e) {
+        factoringCompanyClicks($(this));
     });
 
     $(document).on("click", "#carrier-carrier-clear-btn", function (e) {
@@ -918,6 +1741,9 @@ function eventListeners() {
         mailingAddressSection.find('input#txt-carrier-mailing-address-city').val(carrierSection.find('#txt-carrier-carrier-city').val());
         mailingAddressSection.find('input#txt-carrier-mailing-address-state').val(carrierSection.find('#txt-carrier-carrier-state').val());
         mailingAddressSection.find('input#txt-carrier-mailing-address-zip-code').val(carrierSection.find('#txt-carrier-carrier-zip-code').val());
+        mailingAddressSection.find('input#txt-carrier-mailing-address-contact-name').val(carrierSection.find('#txt-carrier-carrier-contact-name').val());
+        mailingAddressSection.find('input#txt-carrier-mailing-address-contact-phone').val(carrierSection.find('#txt-carrier-carrier-contact-phone').val());
+        mailingAddressSection.find('input#txt-carrier-mailing-address-contact-phone-ext').val(carrierSection.find('#txt-carrier-carrier-contact-phone-ext').val());
         mailingAddressSection.find('input#txt-carrier-mailing-address-email').val(carrierSection.find('#txt-carrier-carrier-email').val());
 
         validateCarrierForSaving();
@@ -930,7 +1756,7 @@ function eventListeners() {
 
         let carrierId = carrierSection.find('#txt-carrier-carrier-id').val();
 
-        if (carrierId === '') {            
+        if (carrierId === '') {
             return;
         }
 
@@ -953,10 +1779,11 @@ function eventListeners() {
 
         let carrierId = carrierSection.find('#txt-carrier-carrier-id').val();
 
-        if (carrierId === '') {            
+        if (carrierId === '') {
             return;
         }
 
+        factoringCompanySection.find('input#txt-carrier-factoring-company-id').val('');
         factoringCompanySection.find('input#txt-carrier-factoring-company-code').val('');
         factoringCompanySection.find('input#txt-carrier-factoring-company-name').val('');
         factoringCompanySection.find('input#txt-carrier-factoring-company-address1').val('');
@@ -983,6 +1810,7 @@ function eventListeners() {
         let driverFormSection = carrierContainer.find('.driver-information-section .form-section');
         let insuranceListWrapper = carrierContainer.find('.insurances-list-wrapper');
         let insuranceFormSection = carrierContainer.find('.insurances-section .form-section');
+        let insuranceIndicator = carrierContainer.find('.input-box-container.insurance');
 
         if (carrier_id === "") {
             contactListWrapper.html("");
@@ -996,8 +1824,9 @@ function eventListeners() {
             driverFormSection.find("input").val("");
             insuranceFormSection.find('input').val("");
             insuranceFormSection.find('#cbo-carrier-insurance-type').attr('data-selected-id', 0);
+            insuranceIndicator.attr('class', 'input-box-container insurance not-printable no-carrier');
         } else {
-            contactListFormSection.attr('class', 'form-section');            
+            contactListFormSection.attr('class', 'form-section');
 
             $.post(serverURL + "/getCarrierPayload", {
                 carrier_id: carrier_id,
@@ -1096,6 +1925,13 @@ function eventListeners() {
                                 `;
                     }
 
+
+                    let curDate = moment().startOf('day');
+                    let curDate2 = moment();
+                    let futureMonth = curDate2.add(1, 'M');
+
+                    insuranceIndicator.attr('class', 'input-box-container insurance not-printable no-carrier');
+
                     for (let i = 0; i < res.insurances.length; i++) {
                         let insurance = res.insurances[i];
 
@@ -1118,6 +1954,20 @@ function eventListeners() {
                                             <div class="item-deductible">${insurance.deductible}</div>
                                     </div>
                                     `;
+
+                        let expDate = moment(insurance.expiration_date, 'MM/DD/YYYY');
+
+                        if (expDate < curDate) {
+                            insuranceIndicator.attr('class', 'input-box-container insurance not-printable expired');
+                        } else if (expDate >= curDate && expDate <= futureMonth) {
+                            if (!insuranceIndicator.hasClass('expired')) {
+                                insuranceIndicator.attr('class', 'input-box-container insurance not-printable warning');
+                            }
+                        } else {
+                            if (!insuranceIndicator.hasClass('expired') && !insuranceIndicator.hasClass('warning')) {
+                                insuranceIndicator.attr('class', 'input-box-container insurance not-printable active');
+                            }
+                        }
                     }
 
                     contactListWrapper.html(contactItems);
@@ -1152,6 +2002,7 @@ function eventListeners() {
         let modal = carrierContent.find(".modal-carrier-notes");
         modal.attr("class", "modal-carrier-notes adding");
         modal.find("textarea").val("");
+        modal.find("textarea").prop('readonly', false);
         modal.fadeIn();
         modal.find("textarea").focus();
     });
@@ -1223,23 +2074,41 @@ function eventListeners() {
         modal.attr("class", "modal-carrier-notes showing");
 
         textarea.val(noteUser + ":" + noteDateTime + " " + noteText);
+        textarea.attr('data-content', noteText);
+        textarea.attr('data-user', noteUser + ":" + noteDateTime);
+        textarea.prop('readonly', true);
         modal.fadeIn();
     });
 
+    $(document).on('click', '#carrier-carrier-notes-print-btn', function () {
+        let textarea = $(this).closest('.modal-carrier-notes-content').find('textarea');
+        let dataUser = textarea.attr('data-user');
+        let dataContent = textarea.attr('data-content');
+
+        if (dataContent === '') {
+            alert('There is nothing to print');
+            return;
+        }
+
+        let item = `<div style="margin-bottom: 10px"><span style="font-weight: bold">${dataUser}</span> ${dataContent} </div>`;
+
+        Popup(item);
+    })
+
     $(document).on('blur', '.carrier-content .mailing-address-section input', function (e) {
-        validateCarrierForSaving()
+        validateCarrierForSaving();
     });
 
     $(document).on('blur', '.carrier-content .factoring-company-section input', function (e) {
-        validateCarrierForSaving()
+        validateFactoringCompanyForSaving();
     });
 
     $(document).on('blur', '.carrier-content .contacts-section .form-section:first-child input', function (e) {
-        validateContactForSaving()
+        validateContactForSaving();
     });
 
     $(document).on('change', '#cbox-carrier-contacts-phone-primary', function () {
-        validateContactforSaving();
+        validateContactForSaving();
     })
 
     $(document).on("click", "#carriers-contacts-clear-btn", function (e) {
@@ -2068,41 +2937,6 @@ function eventListeners() {
         validateContactforSaving();
     });
 
-    $(document).on('blur', '#txt-carrier-insurance-expiration-date', function () {
-        let input = $(this);
-        let carrierSection = input.closest('.carrier-content').find('.carrier-section');
-        let carrierId = carrierSection.find('#txt-carrier-carrier-id');
-        let insurance = input.closest('.carrier-content').find('.carrier-section .input-box-container.insurance');
-        let expDate = moment(input.val().trim(), 'MM/DD/YYYY');
-        let curDate = moment().startOf('day');
-        let curDate2 = moment();
-        let futureMonth = curDate2.add(1, 'M');
-
-        if (carrierId.val() === ''){
-            insurance.attr('class', 'input-box-container insurance expired');
-            return;
-        }
-
-        if (input.val().trim() !== '') {
-            if (moment(input.val().trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') !== input.val().trim()) {
-                alert('invalid date format');
-                input.focus();
-                return;
-            }
-        } else {
-            insurance.attr('class', 'input-box-container insurance expired');
-            return;
-        }
-
-        if (expDate < curDate) {
-            insurance.attr('class', 'input-box-container insurance expired');
-        } else if (expDate >= curDate && expDate <= futureMonth) {
-            insurance.attr('class', 'input-box-container insurance warning');
-        } else {
-            insurance.attr('class', 'input-box-container insurance active');
-        }
-    });
-
     $(document).on('click', '#carrier-past-orders-search-btn', function () {
         let btn = $(this);
         let mainContainer = btn.closest('.swiper-slide').find('.main-panel-container');
@@ -2137,6 +2971,17 @@ function eventListeners() {
         }, 'html');
     })
 
+    $(document).on('change', '#txt-carrier-driver-info-id', function (e) {
+        let deleteBtn = $(this).closest('.form-section').find('#carrier-drivers-info-delete-btn');
+        let driverId = $(this).val();
+
+        if (driverId === '') {
+            deleteBtn.addClass('disabled');
+        } else {
+            deleteBtn.removeClass('disabled');
+        }
+    })
+
     $(document).on('click', '.carrier-drivers-list-item', function () {
         let id = $(this).attr("data-id");
         let firstName = $(this).attr("data-first-name");
@@ -2151,14 +2996,17 @@ function eventListeners() {
         let driverInformationSection = $(this).closest(".carrier-content").find('.driver-information-section');
 
         driverInformationSection.find("input#txt-carrier-driver-info-id").val(id);
+        driverInformationSection.find("input#txt-carrier-driver-info-id").attr('data-id', id);
         driverInformationSection.find("input#txt-carrier-driver-info-first-name").val(firstName);
         driverInformationSection.find("input#txt-carrier-driver-info-last-name").val(lastName);
         driverInformationSection.find("input#txt-carrier-driver-info-phone-number").val(phone);
         driverInformationSection.find("input#txt-carrier-driver-info-email").val(email);
-        driverInformationSection.find("input#txt-carrier-driver-info-equipment").val(equipment);
+        driverInformationSection.find("input#cbo-carrier-driver-info-equipment").val(equipment);
         driverInformationSection.find("input#txt-carrier-driver-info-truck").val(truck);
         driverInformationSection.find("input#txt-carrier-driver-info-trailer").val(trailer);
         driverInformationSection.find("input#txt-carrier-driver-info-notes").val(notes);
+
+        $('#txt-carrier-driver-info-id').change();
     })
 
     $(document).on('click', '.insurances-list-item', function () {
@@ -2196,12 +3044,16 @@ function eventListeners() {
     $(document).on('click', '#carrier-drivers-info-clear-btn', function () {
         let formSection = $(this).closest('.form-section');
         formSection.find('input').val('');
+        $('#txt-carrier-driver-info-id').change();
     })
 
     $(document).on('click', '#carrier-insurance-clear-btn', function () {
         let formSection = $(this).closest('.form-section');
         formSection.find('input#cbo-carrier-insurance-type').attr('data-selected-id', '0');
-        formSection.find('input').val('');
+        setTimeout(function () {
+            formSection.find('input').val('');
+        }, 100)
+
         formSection.find('#txt-carrier-insurance-expiration-date').blur();
     })
 
@@ -2214,6 +3066,7 @@ function eventListeners() {
             let mailingAddressSection = code.closest('.mailing-address-content');
 
             $.post(serverURL + '/carriers', { code: code.val().toLowerCase() }).then(res => {
+                console.log(res);
                 if (res.carriers.length > 0) {
                     let carrier = res.carriers[0];
 
@@ -2225,6 +3078,9 @@ function eventListeners() {
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-city").val(carrier.city);
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-state").val(carrier.state);
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-zip-code").val(carrier.zip);
+                    carrierContent.find(".carrier-section input#txt-carrier-carrier-contact-name").val(carrier.contact_name);
+                    carrierContent.find(".carrier-section input#txt-carrier-carrier-contact-phone").val(carrier.contact_phone);
+                    carrierContent.find(".carrier-section input#txt-carrier-carrier-contact-phone-ext").val(carrier.ext);
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-email").val(carrier.email);
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-mc-number").val(carrier.mc_number);
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-dot-number").val(carrier.dot_number);
@@ -2238,16 +3094,38 @@ function eventListeners() {
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-city").val(carrier.mailing_city);
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-state").val(carrier.mailing_state);
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-zip-code").val(carrier.mailing_zip);
+                    carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-contact-name").val(carrier.mailing_contact_name);
+                    carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-contact-phone").val(carrier.mailing_contact_phone);
+                    carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-contact-phone-ext").val(carrier.mailing_ext);
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-email").val(carrier.mailing_email);
 
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-code").val(carrier.factoring_code + (carrier.factoring_code_number === 0 ? '' : carrier.factoring_code_number));
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-name").val(carrier.factoring_name);
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-address1").val(carrier.factoring_address1);
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-address2").val(carrier.factoring_address2);
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-city").val(carrier.factoring_city);
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-state").val(carrier.factoring_state);
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-zip-code").val(carrier.factoring_zip);
-                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-email").val(carrier.factoring_email);
+                    if (carrier.factoring_company) {
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-id").val(carrier.factoring_company.id);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-code").val(carrier.factoring_company.code + (carrier.factoring_company.code_number === 0 ? '' : carrier.factoring_company.code_number));
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-name").val(carrier.factoring_company.name);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-address1").val(carrier.factoring_company.address1);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-address2").val(carrier.factoring_company.address2);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-city").val(carrier.factoring_company.city);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-state").val(carrier.factoring_company.state);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-zip-code").val(carrier.factoring_company.zip);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-name").val(carrier.factoring_company.contact_name);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-phone").val(carrier.factoring_company.contact_phone);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-phone-ext").val(carrier.factoring_company.ext);
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-email").val(carrier.factoring_company.email);
+                    } else {
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-id").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-code").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-name").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-address1").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-address2").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-city").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-state").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-zip-code").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-name").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-phone").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-phone-ext").val('');
+                        carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-email").val('');
+                    }
 
                     $("#carrier-container .carrier-section input#txt-carrier-carrier-id").change();
                 } else {
@@ -2258,6 +3136,9 @@ function eventListeners() {
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-city").val('');
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-state").val('');
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-zip-code").val('');
+                    carrierContent.find(".carrier-section input#txt-carrier-carrier-contact-name").val('');
+                    carrierContent.find(".carrier-section input#txt-carrier-carrier-contact-phone").val('');
+                    carrierContent.find(".carrier-section input#txt-carrier-carrier-contact-phone-ext").val('');
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-email").val('');
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-mc-number").val('');
                     carrierContent.find(".carrier-section input#txt-carrier-carrier-dot-number").val('');
@@ -2271,8 +3152,12 @@ function eventListeners() {
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-city").val('');
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-state").val('');
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-zip-code").val('');
+                    carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-contact-name").val('');
+                    carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-contact-phone").val('');
+                    carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-contact-phone-ext").val('');
                     carrierContent.find(".mailing-address-section input#txt-carrier-mailing-address-email").val('');
 
+                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-id").val('');
                     carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-code").val('');
                     carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-name").val('');
                     carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-address1").val('');
@@ -2280,6 +3165,9 @@ function eventListeners() {
                     carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-city").val('');
                     carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-state").val('');
                     carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-zip-code").val('');
+                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-name").val('');
+                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-phone").val('');
+                    carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-contact-phone-ext").val('');
                     carrierContent.find(".factoring-company-section input#txt-carrier-factoring-company-email").val('');
 
                     $("#carrier-container .carrier-section input#txt-carrier-carrier-id").change();
@@ -2352,9 +3240,166 @@ function eventListeners() {
         }
 
         Popup(html);
-    })
+    });
+
+    $(document).on('click', '#carrier-drivers-info-delete-btn', function (e) {
+        if (confirm('Are you sure to delete this driver?')) {
+            let swiperSlideCarrier = $(document).find("#swiper-slide-carrier");
+            let carrierSection = swiperSlideCarrier.find(".carrier-section");
+            let driverSection = swiperSlideCarrier.find(".driver-information-section");
+            let carrierId = carrierSection.find("input#txt-carrier-carrier-id");
+            let driverId = driverSection.find("input#txt-carrier-driver-info-id");
+
+            let driverListWrapper = swiperSlideCarrier.find('.carrier-drivers-list-wrapper');
+
+            if (carrierId.val().trim() === "") {
+                return;
+            }
+
+            let data = {
+                driver_id: driverId.val().trim(),
+                carrier_id: carrierId.val().trim()
+            }
+
+            $.post(serverURL + '/deleteCarrierDriver', data).then(res => {
+                if (res.result === 'OK') {
+                    let driverItems = ``;
+
+                    for (let i = 0; i < res.drivers.length; i++) {
+                        let driver = res.drivers[i];
+
+                        driverItems += `
+                            <div class="carrier-drivers-list-item" 
+                                data-id="${driver.id}" 
+                                data-carrier-id="${driver.carrier_id}"                         
+                                data-first-name="${driver.first_name || ''}"                        
+                                data-last-name="${driver.last_name || ''}"
+                                data-phone="${driver.phone || ''}"
+                                data-email="${driver.email || ''}"
+                                data-equipment="${driver.equipment || ''}"
+                                data-truck="${driver.truck || ''}"
+                                data-trailer="${driver.trailer || ''}"
+                                data-notes="${driver.notes || ''}">      
+        
+                                    <div class="item-name">${(driver.first_name || '') + " " + (driver.last_name || '')}</div>
+                                    <div class="item-phone">${driver.phone || ''}</div>
+                                    <div class="item-email">${driver.email || ''}</div>
+                            </div>           
+                        `;
+                    }
+
+                    $('#carrier-drivers-info-clear-btn').click();
+
+                    driverListWrapper.html(driverItems);
+                } else {
+                    driverListWrapper.html("");
+                }
+            });
+        }
+    });
+
+    $(document).on('click', '#carriers-carrier-print-info-btn', function (e) {
+        let carrierContent = $(this).closest('.carrier-content');
+        let carrierSection = carrierContent.find('.carrier-section');
+
+        let carrierId = carrierSection.find('#txt-carrier-carrier-id').val();
+
+        if (carrierId === '') {
+            alert('You must select a carrier first!');
+            return;
+        }
+
+        let html = ``;
+
+        for (let i = 0; i < carrierSection.find('.input-box-container:not(.not-printable)').length; i++) {
+            let item = carrierSection.find('.input-box-container:not(.not-printable)').eq(i);
+
+            if (!item.hasClass('hidden')) {
+                html += `<div style="margin-bottom:10px;"><span style="font-weight: bold;">${item.find('label').text()}</span>: ${item.find('input').val()}</div>`
+            }
+        }
+
+        Popup(html);
+    });
 
     setMaskedInput()
+}
+
+var clickCount = 0;
+var timeout = 300;
+
+function factoringCompanyClicks(row) {
+    clickCount++;
+    if (clickCount == 1) {
+        setTimeout(function () {
+            if (clickCount == 1) {
+                let mainContainer = row.closest('.swiper-slide').find('.main-panel-container');
+                let panelContainer = mainContainer.find('.panel-container');
+
+                $.get(location + 'views/panels/factoring-company/factoring-company.html', async function (content) {
+                    if (panelContainer.find('.panel').length === 0) {
+
+                        mainContainer.css('left', ($(window).width() - mainContainer.width()) + 'px');
+                        panelContainer.append(content);
+                        reorderCarrierPanels();
+                    } else {
+                        let exist = false;
+
+                        for (let i = 0; i < panelContainer.find('.panel').length; i++) {
+                            let panel = panelContainer.find('.panel').eq(i);
+
+                            if (panel.attr('id') === 'panel-carrier-factoring-company') {
+                                panel.appendTo(panelContainer);
+                                reorderCarrierPanels();
+                                exist = true;
+                                break;
+                            }
+                        }
+
+                        if (!exist) {
+                            panelContainer.append(content);
+                            reorderCarrierPanels();
+                        }
+                    }
+
+                }, 'html');
+            } else {
+                let id = row.find(".factoring-id").text();
+                let code = row.find(".code").text();
+                let name = row.find(".name").text();
+                let address1 = row.find(".address1").text();
+                let address2 = row.find(".address2").text();
+                let city = row.find(".city").text();
+                let state = row.find(".state").text();
+                let zip = row.find(".zip").text();
+                let contact_name = row.find(".contact-name").text();
+                let contact_phone = row.find(".contact-phone").text();
+                let ext = row.find(".ext").text();
+                let email = row.find(".email").text();
+
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-id").val(id);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-code").val(code);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-name").val(name);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-address1").val(address1);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-address2").val(address2);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-city").val(city);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-state").val(state);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-zip-code").val(zip);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-contact-name").val(contact_name);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-contact-phone").val(contact_phone);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-contact-phone-ext").val(ext);
+                $("#carrier-container .cell-1 input#txt-carrier-factoring-company-email").val(email);
+
+                let panel = row.closest(".panel");
+
+                // $("#carrier-container .carrier-section input#txt-carrier-carrier-id").change();
+                validateCarrierForSaving();
+
+                panel.find(".panel-close-btn").click();
+            }
+            clickCount = 0;
+        }, timeout || 300);
+    }
 }
 
 function Popup(data) {
@@ -2389,79 +3434,116 @@ function getInitials(length) {
     return result;
 }
 
+var insuranceTimer;
+
 function validateInsuranceForSaving() {
-    let swiperSlideCarrier = $(document).find("#swiper-slide-carrier");
-    let carrierSection = swiperSlideCarrier.find(".carrier-section");
-    let insurancesSection = swiperSlideCarrier.find(".insurances-section");
-    let carrierId = carrierSection.find("input#txt-carrier-carrier-id");
-    let insuranceId = insurancesSection.find("input#txt-carrier-insurance-id");
-    let insuranceType = insurancesSection.find("input#cbo-carrier-insurance-type");
-    let insuranceCompany = insurancesSection.find("input#txt-carrier-insurance-company");
-    let insuranceExpirationDate = insurancesSection.find("input#txt-carrier-insurance-expiration-date");
-    let insuranceAmount = insurancesSection.find("input#txt-carrier-insurance-amount");
-    let insuranceDeductible = insurancesSection.find("input#txt-carrier-insurance-deductible");
-    let insuranceNotes = insurancesSection.find("input#txt-carrier-insurance-notes");
+    clearTimeout(insuranceTimer);
 
-    let insuranceListWrapper = swiperSlideCarrier.find('.insurances-list-wrapper');
+    insuranceTimer = setTimeout(function () {
+        let swiperSlideCarrier = $(document).find("#swiper-slide-carrier");
+        let carrierSection = swiperSlideCarrier.find(".carrier-section");
+        let insurancesSection = swiperSlideCarrier.find(".insurances-section");
+        let carrierId = carrierSection.find("input#txt-carrier-carrier-id");
+        let insuranceId = insurancesSection.find("input#txt-carrier-insurance-id");
+        let insuranceType = insurancesSection.find("input#cbo-carrier-insurance-type");
+        let insuranceCompany = insurancesSection.find("input#txt-carrier-insurance-company");
+        let insuranceExpirationDate = insurancesSection.find("input#txt-carrier-insurance-expiration-date");
+        let insuranceAmount = insurancesSection.find("input#txt-carrier-insurance-amount");
+        let insuranceDeductible = insurancesSection.find("input#txt-carrier-insurance-deductible");
+        let insuranceNotes = insurancesSection.find("input#txt-carrier-insurance-notes");
+        let insuranceIndicator = $(document).find('.input-box-container.insurance');
+        let insuranceListWrapper = swiperSlideCarrier.find('.insurances-list-wrapper');
 
-    if (carrierId.val().trim() === "") {
-        return;
-    }
+        console.log(insuranceId.val());
 
-    if (insuranceType.attr('data-selected-id') === "0" ||
-        insuranceCompany.val().trim() === "" ||
-        insuranceExpirationDate.val().trim() === "" ||
-        insuranceAmount.val().trim() === "" ||
-        insuranceDeductible.val().trim() === "") {
-        return;
-    }
-
-    let data = {
-        insurance_id: insuranceId.val().trim(),
-        carrier_id: carrierId.val().trim(),
-        insurance_type_id: insuranceType.attr('data-selected-id'),
-        company: insuranceCompany.val().trim(),
-        expiration_date: insuranceExpirationDate.val().trim(),
-        amount: insuranceAmount.val().trim(),
-        deductible: insuranceDeductible.val().trim(),
-        notes: insuranceNotes.val().trim()
-    }
-
-    $.post(serverURL + '/saveInsurance', data).then(res => {
-        if (res.result === 'OK') {
-            insuranceId.val(res.insurance.id);
-
-            let insuranceItems = ``;
-
-            for (let i = 0; i < res.insurances.length; i++) {
-                let insurance = res.insurances[i];
-
-                insuranceItems += `
-                        <div class="insurances-list-item" 
-                            data-id="${insurance.id}" 
-                            data-carrier-id="${insurance.carrier_id}" 
-                            data-type-id="${insurance.insurance_type.id}" 
-                            data-type-name="${insurance.insurance_type.name}" 
-                            data-company="${insurance.company}" 
-                            data-expiration-date="${insurance.expiration_date}" 
-                            data-amount="${insurance.amount}" 
-                            data-deductible="${insurance.deductible}" 
-                            data-notes="${insurance.notes}">
-
-                                <div class="item-type">${insurance.insurance_type.name}</div>
-                                <div class="item-company">${insurance.company}</div>
-                                <div class="item-expiration-date">${insurance.expiration_date}</div>
-                                <div class="item-amount">${insurance.amount}</div>
-                                <div class="item-deductible">${insurance.deductible}</div>
-                        </div>
-                `;
-            }
-
-            insuranceListWrapper.html(insuranceItems);
-        } else {
-            insuranceListWrapper.html("");
+        if (carrierId.val().trim() === "") {
+            return;
         }
-    });
+
+        if (insuranceType.attr('data-selected-id') === "0" ||
+            insuranceCompany.val().trim() === "" ||
+            insuranceExpirationDate.val().trim() === "" ||
+            insuranceAmount.val().trim() === "") {
+            return;
+        }
+
+        let data = {
+            insurance_id: insuranceId.val().trim(),
+            carrier_id: carrierId.val().trim(),
+            insurance_type_id: insuranceType.attr('data-selected-id'),
+            company: insuranceCompany.val().trim(),
+            expiration_date: insuranceExpirationDate.val().trim(),
+            amount: insuranceAmount.val().trim(),
+            deductible: insuranceDeductible.val().trim(),
+            notes: insuranceNotes.val().trim()
+        }
+
+        $.post(serverURL + '/saveInsurance', data).then(res => {
+            if (res.result === 'OK') {
+                if (insuranceType.val().trim() !== '' &&
+                    insuranceCompany.val().trim() !== '' &&
+                    insuranceExpirationDate.val().trim() !== '' &&
+                    insuranceAmount.val().trim() !== '') {
+                    insuranceId.val(res.insurance.id);
+                }
+
+                let insuranceItems = ``;
+                let curDate = moment().startOf('day');
+                let curDate2 = moment();
+                let futureMonth = curDate2.add(1, 'M');
+
+                insuranceIndicator.attr('class', 'input-box-container insurance not-printable no-carrier');
+
+                console.log(res.insurances);
+
+                for (let i = 0; i < res.insurances.length; i++) {
+                    let insurance = res.insurances[i];
+
+
+                    insuranceItems += `
+                            <div class="insurances-list-item" 
+                                data-id="${insurance.id}" 
+                                data-carrier-id="${insurance.carrier_id}" 
+                                data-type-id="${insurance.insurance_type.id}" 
+                                data-type-name="${insurance.insurance_type.name}" 
+                                data-company="${insurance.company}" 
+                                data-expiration-date="${insurance.expiration_date}" 
+                                data-amount="${insurance.amount}" 
+                                data-deductible="${insurance.deductible}" 
+                                data-notes="${insurance.notes}">
+    
+                                    <div class="item-type">${insurance.insurance_type.name}</div>
+                                    <div class="item-company">${insurance.company}</div>
+                                    <div class="item-expiration-date">${insurance.expiration_date}</div>
+                                    <div class="item-amount">${insurance.amount}</div>
+                                    <div class="item-deductible">${insurance.deductible}</div>
+                            </div>
+                    `;
+
+                    let expDate = moment(insurance.expiration_date, 'MM/DD/YYYY');
+
+                    if (expDate < curDate) {
+                        insuranceIndicator.attr('class', 'input-box-container insurance not-printable expired');
+                    } else if (expDate >= curDate && expDate <= futureMonth) {
+                        if (!insuranceIndicator.hasClass('expired')) {
+                            insuranceIndicator.attr('class', 'input-box-container insurance not-printable warning');
+                        }
+                    } else {
+                        if (!insuranceIndicator.hasClass('expired') && !insuranceIndicator.hasClass('warning')) {
+                            insuranceIndicator.attr('class', 'input-box-container insurance not-printable active');
+                        }
+                    }
+                }
+
+                insuranceListWrapper.html(insuranceItems);
+
+                $(document).find('#txt-insurances-array').val(JSON.stringify(res.companies));
+
+            } else {
+                insuranceListWrapper.html("");
+            }
+        });
+    }, 100);
 }
 
 function validateDriverForSaving() {
@@ -2476,7 +3558,7 @@ function validateDriverForSaving() {
     let lastName = driverSection.find("input#txt-carrier-driver-info-last-name");
     let phone = driverSection.find("input#txt-carrier-driver-info-phone-number");
     let email = driverSection.find("input#txt-carrier-driver-info-email");
-    let equipment = driverSection.find("input#txt-carrier-driver-info-equipment");
+    let equipment = driverSection.find("input#cbo-carrier-driver-info-equipment");
     let truck = driverSection.find("input#txt-carrier-driver-info-truck");
     let trailer = driverSection.find("input#txt-carrier-driver-info-trailer");
     let notes = driverSection.find("input#txt-carrier-driver-info-notes");
@@ -2487,13 +3569,7 @@ function validateDriverForSaving() {
         return;
     }
 
-    if (firstName.val().trim() === "" ||
-        lastName.val().trim() === "" ||
-        phone.val().trim() === "" ||
-        email.val().trim() === "" ||
-        equipment.val().trim() === "" ||
-        truck.val().trim() === "" ||
-        trailer.val().trim() === "") {
+    if (firstName.val().trim() === "") {
         return;
     }
 
@@ -2538,6 +3614,8 @@ function validateDriverForSaving() {
                     </div>           
                 `;
             }
+
+            $('#txt-carrier-driver-info-id').change();
 
             driverListWrapper.html(driverItems);
         } else {
@@ -2703,8 +3781,80 @@ function validateContactForSaving() {
             contactListWrapper.html("");
         }
     });
+}
 
+function validateFactoringCompanyForSaving() {
+    let swiperSlideCarrier = $(document).find("#swiper-slide-carrier");
+    let carrierSection = swiperSlideCarrier.find(".carrier-section");
+    let factoringCompanySection = swiperSlideCarrier.find(".factoring-company-section");
+    let carrier_id = carrierSection.find("input#txt-carrier-carrier-id");
+    let id = factoringCompanySection.find("input#txt-carrier-factoring-company-id");
+    let code = factoringCompanySection.find("input#txt-carrier-factoring-company-code");
+    let name = factoringCompanySection.find("input#txt-carrier-factoring-company-name");
+    let address1 = factoringCompanySection.find("input#txt-carrier-factoring-company-address1");
+    let address2 = factoringCompanySection.find("input#txt-carrier-factoring-company-address2");
+    let city = factoringCompanySection.find("input#txt-carrier-factoring-company-city");
+    let state = factoringCompanySection.find("input#txt-carrier-factoring-company-state");
+    let zip = factoringCompanySection.find("input#txt-carrier-factoring-company-zip-code");
+    let contact_name = factoringCompanySection.find("input#txt-carrier-factoring-company-contact-name");
+    let contact_phone = factoringCompanySection.find("input#txt-carrier-factoring-company-contact-phone");
+    let ext = factoringCompanySection.find("input#txt-carrier-factoring-company-contact-phone-ext");
+    let email = factoringCompanySection.find("input#txt-carrier-factoring-company-email");
+    let oldCode = code.val().trim();
 
+    if (carrier_id === '') {
+        return;
+    }
+
+    if (
+        name.val().trim().replace(/\s/g, "").replace("&", "A") !== "" &&
+        city.val().trim().replace(/\s/g, "") !== "" &&
+        state.val().trim().replace(/\s/g, "") !== "" &&
+        address1.val().trim() !== "" &&
+        zip.val().trim() !== ""
+    ) {
+        let parseCity = city.val().trim().replace(/\s/g, "").substring(0, 3);
+
+        if (parseCity.toLowerCase() === "ft.") {
+            parseCity = "FO";
+        }
+        if (parseCity.toLowerCase() === "mt.") {
+            parseCity = "MO";
+        }
+        if (parseCity.toLowerCase() === "st.") {
+            parseCity = "SA";
+        }
+
+        let newCode = name.val().trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + state.val().trim().replace(/\s/g, "").substring(0, 2);
+
+        let data = {
+            id: id.val() === "" ? 0 : id.val(),
+            code: newCode.toUpperCase(),
+            old_code: oldCode,
+            name: name.val().trim(),
+            address1: address1.val().trim(),
+            address2: address2.val().trim(),
+            city: city.val().trim(),
+            state: state.val().trim().toUpperCase(),
+            zip: zip.val().trim(),
+            contact_name: contact_name.val().trim(),
+            contact_phone: contact_phone.val().trim(),
+            ext: ext.val().trim(),
+            email: email.val().trim()
+        }
+
+        $.post(serverURL + "/saveFactoringCompany", data).then((res) => {
+            let f = res.factoring_company;
+            id.val(f.id);
+            code.val(f.code + (f.code_number !== 0 ? f.code_number : ""));
+
+            validateCarrierForSaving();
+        });
+    } else {
+        if (id.val() !== "") {
+            code.val(oldCode);
+        }
+    }
 }
 
 function validateCarrierForSaving() {
@@ -2720,6 +3870,9 @@ function validateCarrierForSaving() {
     let city = carrierSection.find("input#txt-carrier-carrier-city");
     let state = carrierSection.find("input#txt-carrier-carrier-state");
     let zip = carrierSection.find("input#txt-carrier-carrier-zip-code");
+    let contact_name = carrierSection.find("input#txt-carrier-carrier-contact-name");
+    let contact_phone = carrierSection.find("input#txt-carrier-carrier-contact-phone");
+    let ext = carrierSection.find("input#txt-carrier-carrier-contact-phone-ext");
     let email = carrierSection.find("input#txt-carrier-carrier-email");
     let mcNumber = carrierSection.find("input#txt-carrier-carrier-mc-number");
     let dotNumber = carrierSection.find("input#txt-carrier-carrier-dot-number");
@@ -2733,20 +3886,17 @@ function validateCarrierForSaving() {
     let mailing_city = mailingAddressSection.find("input#txt-carrier-mailing-address-city");
     let mailing_state = mailingAddressSection.find("input#txt-carrier-mailing-address-state");
     let mailing_zip = mailingAddressSection.find("input#txt-carrier-mailing-address-zip-code");
+    let mailing_contact_name = mailingAddressSection.find("input#txt-carrier-mailing-address-contact-name");
+    let mailing_contact_phone = mailingAddressSection.find("input#txt-carrier-mailing-address-contact-phone");
+    let mailing_ext = mailingAddressSection.find("input#txt-carrier-mailing-address-contact-phone-ext");
     let mailing_email = mailingAddressSection.find("input#txt-carrier-mailing-address-email");
 
-    let factoring_code = factoringCompanySection.find("input#txt-carrier-factoring-company-code");
-    let factoring_name = factoringCompanySection.find("input#txt-carrier-factoring-company-name");
-    let factoring_address1 = factoringCompanySection.find("input#txt-carrier-factoring-company-address1");
-    let factoring_address2 = factoringCompanySection.find("input#txt-carrier-factoring-company-address2");
-    let factoring_city = factoringCompanySection.find("input#txt-carrier-factoring-company-city");
-    let factoring_state = factoringCompanySection.find("input#txt-carrier-factoring-company-state");
-    let factoring_zip = factoringCompanySection.find("input#txt-carrier-factoring-company-zip-code");
-    let factoring_email = factoringCompanySection.find("input#txt-carrier-factoring-company-email");
+    let factoring_company_id = factoringCompanySection.find("input#txt-carrier-factoring-company-id");
+
+    console.log(factoring_company_id.val());
 
     let oldCode = code.val().trim();
     let mailingOldCode = mailing_code.val().trim();
-    let factoringOldCode = factoring_code.val().trim();
 
     if (
         name.val().trim().replace(/\s/g, "").replace("&", "A") !== "" &&
@@ -2779,21 +3929,8 @@ function validateCarrierForSaving() {
             mailingParseCity = "SA";
         }
 
-        let factoringParseCity = factoring_city.val().trim().replace(/\s/g, "").substring(0, 3);
-
-        if (factoringParseCity.toLowerCase() === "ft.") {
-            factoringParseCity = "FO";
-        }
-        if (factoringParseCity.toLowerCase() === "mt.") {
-            factoringParseCity = "MO";
-        }
-        if (factoringParseCity.toLowerCase() === "st.") {
-            factoringParseCity = "SA";
-        }
-
         let newCode = name.val().trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + state.val().trim().replace(/\s/g, "").substring(0, 2);
         let mailingNewCode = mailing_name.val().trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + mailingParseCity.substring(0, 2) + mailing_state.val().trim().replace(/\s/g, "").substring(0, 2);
-        let factoringNewCode = factoring_name.val().trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + factoringParseCity.substring(0, 2) + factoring_state.val().trim().replace(/\s/g, "").substring(0, 2);
 
         $.post(serverURL + "/saveCarrier", {
             id: id.val() === "" ? 0 : id.val(),
@@ -2805,6 +3942,9 @@ function validateCarrierForSaving() {
             city: city.val().trim(),
             state: state.val().trim().toUpperCase(),
             zip: zip.val().trim(),
+            contact_name: contact_name.val().trim(),
+            contact_phone: contact_phone.val().trim(),
+            ext: ext.val().trim(),
             email: email.val().trim(),
             mc_number: mcNumber.val().trim(),
             dot_number: dotNumber.val().trim(),
@@ -2817,21 +3957,16 @@ function validateCarrierForSaving() {
             mailing_city: mailing_city.val().trim(),
             mailing_state: mailing_state.val().trim().toUpperCase(),
             mailing_zip: mailing_zip.val().trim(),
+            mailing_contact_name: mailing_contact_name.val().trim(),
+            mailing_contact_phone: mailing_contact_phone.val().trim(),
+            mailing_ext: mailing_ext.val().trim(),
             mailing_email: mailing_email.val().trim(),
-            factoring_code: factoringNewCode.toUpperCase(),
-            factoring_name: factoring_name.val().trim(),
-            factoring_address1: factoring_address1.val().trim(),
-            factoring_address2: factoring_address2.val().trim(),
-            factoring_city: factoring_city.val().trim(),
-            factoring_state: factoring_state.val().trim().toUpperCase(),
-            factoring_zip: factoring_zip.val().trim(),
-            factoring_email: factoring_email.val().trim()
+            factoring_company_id: factoring_company_id.val() === '' ? 0 : factoring_company_id.val()
         }).then((res) => {
             let c = res.carrier;
             id.val(c.id);
             code.val(c.code + (c.code_number !== 0 ? c.code_number : ""));
             mailing_code.val(c.mailing_code + (c.mailing_code_number !== 0 ? c.mailing_code_number : ""));
-            factoring_code.val(c.factoring_code + (c.factoring_code_number !== 0 ? c.factoring_code_number : ""));
 
             $("#carrier-container .carrier-section input#txt-carrier-carrier-id").change();
         });
@@ -2839,7 +3974,6 @@ function validateCarrierForSaving() {
         if (id.val() !== "") {
             code.val(oldCode);
             mailing_code.val(mailingOldCode);
-            factoring_code.val(factoringOldCode);
         }
     }
 }
@@ -2919,9 +4053,19 @@ function reorderCarrierPanels() {
         let offset = i * 10;
 
         panel.css('padding-right', offset + 'px');
-        panel.animate({
-            left: offset + 'px'
-        }, 100);
+
+        if (panel.attr('id') === 'panel-carrier-factoring-company') {
+            let panelCss = 'calc(' + offset + 'px + 40%)';
+
+            panel.css('left', panelCss);
+            // panel.animate({
+            //     left: 'calc('+ offset + 'px + 40%)'
+            // }, 100);
+        } else {
+            panel.animate({
+                left: offset + 'px'
+            }, 100);
+        }
 
         if (i === (panelCount - 1)) {
             panel.find('.panel-not-focused').fadeOut(100);

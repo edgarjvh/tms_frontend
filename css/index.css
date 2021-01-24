@@ -74,9 +74,7 @@ body .admin-layer {
   padding: 10px 10px 0 10px ;
 }
 .input-box-container.search-filter label {
-  top: 4px;
-  color: darkred;
-  font-size: 0.65rem;
+  display: none;
 }
 .input-box-container.search-filter .filter-words {
   width: 100%;
@@ -128,9 +126,7 @@ body .admin-layer {
 .select-box-container input:valid + label,
 .input-box-container input:focus + label,
 .select-box-container input:focus + label {
-  top: 4px;
-  color: darkred;
-  font-size: 0.65rem;
+  display: none;
 }
 .input-box-container input,
 .select-box-container input {
@@ -139,9 +135,9 @@ body .admin-layer {
   width: 100%;
   padding-left: 10px;
   padding-right: 10px;
-  padding-top: 10px;
   text-align: left;
   font-size: 0.7rem;
+  box-shadow: none !important;
 }
 .input-box-container select,
 .select-box-container select {
@@ -150,7 +146,6 @@ body .admin-layer {
   width: calc(100% - 2px);
   padding-left: 10px;
   padding-right: 10px;
-  padding-top: 10px;
   text-align: center;
   font-size: 0.7rem;
 }
@@ -158,9 +153,7 @@ body .admin-layer {
 .select-box-container select:valid + label,
 .input-box-container select:focus + label,
 .select-box-container select:focus + label {
-  top: 4px;
-  font-size: 0.65rem;
-  color: darkred;
+  display: none;
 }
 .input-box-container.code {
   max-width: 7.5rem !important;
@@ -196,9 +189,7 @@ body .admin-layer {
 }
 .input-box-container.drop-down input:valid + label,
 .input-box-container.drop-down input:focus + label {
-  top: 4px;
-  color: darkred;
-  font-size: 0.65rem;
+  display: none;
 }
 .input-box-container.drop-down input:hover ~ span {
   color: rgba(0, 0, 0, 0.5);
@@ -561,6 +552,10 @@ body .admin-layer {
   z-index: 100;
   border-radius: inherit;
   cursor: pointer;
+}
+.main-panel-container .panel-container .panel#panel-carrier-factoring-company {
+  max-width: 60%;
+  align-self: flex-end;
 }
 .main-panel-container .panel-container .panel {
   box-shadow: -1px 0 5px #4b4b4b;
@@ -3368,6 +3363,14 @@ body .admin-layer {
   max-width: 160px;
   min-width: 160px;
 }
+.main-panel-container .panel-container .search-container .tbl-customers-contact-search-results .btn {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+.main-panel-container .panel-container .search-container .tbl-customers-contact-search-results .btn span {
+  text-decoration: none !important;
+}
 .main-panel-container .panel-container .search-container {
   flex-grow: 1;
   padding: 10px;
@@ -3548,6 +3551,116 @@ body .admin-layer {
 .main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .tcol.contact-email-work {
   max-width: 160px;
   min-width: 160px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .btn {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-contact-search-results .btn span {
+  text-decoration: none !important;
+}
+.main-panel-container .panel-container .search-container {
+  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .thead,
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody {
+  display: flex;
+  flex-direction: column;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .thead .trow,
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody .trow {
+  display: flex;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .thead .trow .tcol,
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody .trow .tcol {
+  padding: 10px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .thead {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .thead .tcol {
+  font-weight: bold;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody {
+  flex-grow: 1;
+  position: relative;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper .trow {
+  align-items: center;
+  cursor: default;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper .trow .tcol span {
+  text-decoration: underline;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper .trow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.hidden {
+  display: none;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.code {
+  max-width: 90px;
+  min-width: 90px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.name {
+  max-width: 160px;
+  min-width: 160px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.address1 {
+  max-width: 190px;
+  min-width: 190px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.address2 {
+  max-width: 190px;
+  min-width: 190px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.city {
+  max-width: 120px;
+  min-width: 120px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.state {
+  max-width: 60px;
+  min-width: 60px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.zip {
+  max-width: 100px;
+  min-width: 100px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.contact-name {
+  max-width: 160px;
+  min-width: 160px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.contact-phone {
+  max-width: 120px;
+  min-width: 120px;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .tcol.ext {
+  flex-grow: 1;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .btn {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+.main-panel-container .panel-container .search-container .tbl-carriers-factoring-company-search-results .btn span {
+  text-decoration: none !important;
 }
 .main-panel-container .panel-container .search-container {
   flex-grow: 1;

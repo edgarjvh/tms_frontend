@@ -1,0 +1,102 @@
+.search-container {
+  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.search-container .tbl-carriers-factoring-company-search-results {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .thead,
+.search-container .tbl-carriers-factoring-company-search-results .tbody {
+  display: flex;
+  flex-direction: column;
+}
+.search-container .tbl-carriers-factoring-company-search-results .thead .trow,
+.search-container .tbl-carriers-factoring-company-search-results .tbody .trow {
+  display: flex;
+}
+.search-container .tbl-carriers-factoring-company-search-results .thead .trow .tcol,
+.search-container .tbl-carriers-factoring-company-search-results .tbody .trow .tcol {
+  padding: 10px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .thead {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.search-container .tbl-carriers-factoring-company-search-results .thead .tcol {
+  font-weight: bold;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tbody {
+  flex-grow: 1;
+  position: relative;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper .trow {
+  align-items: center;
+  cursor: default;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper .trow .tcol span {
+  text-decoration: underline;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tbody .wrapper .trow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.hidden {
+  display: none;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.code {
+  max-width: 90px;
+  min-width: 90px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.name {
+  max-width: 160px;
+  min-width: 160px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.address1 {
+  max-width: 190px;
+  min-width: 190px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.address2 {
+  max-width: 190px;
+  min-width: 190px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.city {
+  max-width: 120px;
+  min-width: 120px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.state {
+  max-width: 60px;
+  min-width: 60px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.zip {
+  max-width: 100px;
+  min-width: 100px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.contact-name {
+  max-width: 160px;
+  min-width: 160px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.contact-phone {
+  max-width: 120px;
+  min-width: 120px;
+}
+.search-container .tbl-carriers-factoring-company-search-results .tcol.ext {
+  flex-grow: 1;
+}
+.search-container .tbl-carriers-factoring-company-search-results .btn {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+.search-container .tbl-carriers-factoring-company-search-results .btn span {
+  text-decoration: none !important;
+}

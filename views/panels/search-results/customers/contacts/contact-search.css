@@ -85,3 +85,11 @@
   max-width: 160px;
   min-width: 160px;
 }
+.search-container .tbl-customers-contact-search-results .btn {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+.search-container .tbl-customers-contact-search-results .btn span {
+  text-decoration: none !important;
+}

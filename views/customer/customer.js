@@ -20,74 +20,6 @@ export class CustomerContainer {
                     await eventListeners();
                     await callback();
                     loader.fadeOut(300);
-
-                    // $.post(serverURL + "/notes")
-                    //     .then(async (res) => {
-                    //         let notesList = ``;
-
-                    //         for (let i = 0; i < res.notes.length; i++) {
-                    //             notesList += `
-                    //                         <div 
-                    //                             class="customer-notes-list-item" 
-                    //                             data-id="${res.notes[i].id}" 
-                    //                             data-user="${res.notes[i].user}" 
-                    //                             data-note="${res.notes[i].note}" 
-                    //                             data-datetime="${moment(
-                    //                 res.notes[i].date_time,
-                    //                 "YYYY-MM-DD HH:mm:ss"
-                    //             ).format("MM/DD/YYYY:HHmm")}">
-                    //                                 ${res.notes[i].note}
-                    //                         </div>
-                    //                         `;
-                    //         }
-
-                    //         $.post(serverURL + "/directions")
-                    //             .then(async (res) => {
-                    //                 let directionsList = ``;
-
-                    //                 for (let i = 0; i < res.directions.length; i++) {
-                    //                     directionsList += `
-                    //                                     <div 
-                    //                                         class="customer-directions-list-item" 
-                    //                                         data-id="${res.directions[i].id}" 
-                    //                                         data-user="${res.directions[i].user}" 
-                    //                                         data-note="${res.directions[i].direction}" 
-                    //                                         data-datetime="${moment(
-                    //                         res.directions[i].date_time,
-                    //                         "YYYY-MM-DD HH:mm:ss"
-                    //                     ).format("MM/DD/YYYY:HHmm")}">
-                    //                                             ${res.directions[i].direction}
-                    //                                     </div>
-                    //                                     `;
-                    //                 }
-
-                    //                 content = content.replace("[NOTES-LIST]", notesList);
-                    //                 content = content.replace("[DIRECTIONS-LIST]", directionsList);
-
-                    //                 $(container).append(content);
-                    //                 await eventListeners();
-                    //                 await callback();
-                    //                 loader.fadeOut(300);
-                    //             })
-                    //             .catch(async (e) => {
-                    //                 content = content.replace("[NOTES-LIST]", "");
-                    //                 content = content.replace("[DIRECTIONS-LIST]", "");
-                    //                 $(container).append(content);
-                    //                 await eventListeners();
-                    //                 await callback();
-                    //                 loader.fadeOut(300);
-                    //             });
-
-
-                    //     })
-                    //     .catch(async (e) => {
-                    //         content = content.replace("[NOTES-LIST]", "");
-                    //         content = content.replace("[DIRECTIONS-LIST]", "");
-                    //         $(container).append(content);
-                    //         await eventListeners();
-                    //         await callback();
-                    //         loader.fadeOut(300);
-                    //     });
                 },
                 "html"
             );
@@ -106,6 +38,14 @@ function eventListeners() {
         maxWidth: containerWidth * 0.9,
         minWidth: containerWidth * 0.01,
     });
+
+    $(document).on('keydown', '.mailing-address-section .form-section-extra input', function (e) {
+        let key = e.keyCode || e.which;
+
+        if (key !== 9) {
+            e.preventDefault();
+        }
+    })
 
     $(document).on("click", ".gutter", function () {
         let panelContainer = $(this).closest(".panel-container");
@@ -976,76 +916,8 @@ function eventListeners() {
         panel.find(".panel-close-btn").click();
     });
 
-    $(document).on("dblclick", "#tbl-customers-contact-search-results .wrapper .trow", function (e) {
-        let row = $(this);
-
-        let id = row.find(".customer-id").text();
-        let code = row.find(".code").text();
-        let name = row.find(".name").text();
-        let address1 = row.find(".address1").text();
-        let address2 = row.find(".address2").text();
-        let city = row.find(".city").text();
-        let state = row.find(".state").text();
-        let zip = row.find(".zip").text();
-        let contact_name = row.find(".contact-name").text();
-        let contact_phone = row.find(".contact-phone").text();
-        let ext = row.find(".ext").text();
-        let email = row.find(".email").text();
-
-        let mailing_code = row.find(".mailing-code").text();
-        let mailing_name = row.find(".mailing-name").text();
-        let mailing_address1 = row.find(".mailing-address1").text();
-        let mailing_address2 = row.find(".mailing-address2").text();
-        let mailing_city = row.find(".mailing-city").text();
-        let mailing_state = row.find(".mailing-state").text();
-        let mailing_zip = row.find(".mailing-zip").text();
-        let mailing_contact_name = row.find(".mailing-contact-name").text();
-        let mailing_contact_phone = row.find(".mailing-contact-phone").text();
-        let mailing_ext = row.find(".mailing-ext").text();
-        let mailing_email = row.find(".mailing-email").text();
-
-        let mailing_bill_to = row.find(".mailing-bill-to").text();
-        let mailing_division = row.find(".mailing-division").text();
-        let mailing_agent_code = row.find(".mailing-agent-code").text();
-        let mailing_salesman = row.find(".mailing-salesman").text();
-        let mailing_fid = row.find(".mailing-fid").text();
-
-        $("#customer-container .customer-section input#txt-customer-customer-id").val(id);
-        $("#customer-container .customer-section input#txt-customer-customer-code").val(code);
-        $("#customer-container .customer-section input#txt-customer-customer-name").val(name);
-        $("#customer-container .customer-section input#txt-customer-customer-address-1").val(address1);
-        $("#customer-container .customer-section input#txt-customer-customer-address-2").val(address2);
-        $("#customer-container .customer-section input#txt-customer-customer-city").val(city);
-        $("#customer-container .customer-section input#txt-customer-customer-state").val(state);
-        $("#customer-container .customer-section input#txt-customer-customer-zip-code").val(zip);
-        $("#customer-container .customer-section input#txt-customer-customer-contact-name").val(contact_name);
-        $("#customer-container .customer-section input#txt-customer-customer-contact-phone").val(contact_phone);
-        $("#customer-container .customer-section input#txt-customer-customer-contact-phone-ext").val(ext);
-        $("#customer-container .customer-section input#txt-customer-customer-email").val(email);
-
-        $("#customer-container .mailing-address-section input#txt-mailing-address-code").val(mailing_code);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-name").val(mailing_name);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-address-1").val(mailing_address1);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-address-2").val(mailing_address2);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-city").val(mailing_city);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-state").val(mailing_state);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-zip-code").val(mailing_zip);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-contact-name").val(mailing_contact_name);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-contact-phone").val(mailing_contact_phone);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-contact-phone-ext").val(mailing_ext);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-email").val(mailing_email);
-
-        $("#customer-container .mailing-address-section input#txt-mailing-address-bill-to").val(mailing_bill_to === "" ? mailing_bill_to : mailing_code);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-division").val(mailing_division);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-agent-code").val(mailing_agent_code);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-salesman").val(mailing_salesman);
-        $("#customer-container .mailing-address-section input#txt-mailing-address-fid").val(mailing_fid);
-
-        let panel = row.closest(".panel");
-
-        $("#customer-container .customer-section input#txt-customer-customer-id").change();
-
-        panel.find(".panel-close-btn").click();
+    $(document).on("click", "#tbl-customers-contact-search-results .wrapper .trow", function (e) {
+        customerContactClicks($(this));
     });
 
     $(document).on("click", "#customer-customer-clear-btn", function (e) {
@@ -1058,6 +930,7 @@ function eventListeners() {
         let mailingAddressSection = $(this).closest(".mailing-address-section");
         mailingAddressSection.find("input").val("");
         // $("#customer-container .customer-section input#txt-customer-customer-id").change();
+        validateCustomerForSaving();
     });
 
     $(document).on("click", "#customer-contacts-clear-btn", function (e) {
@@ -1075,6 +948,7 @@ function eventListeners() {
         let automaticEmailsSection = customerContainer.find(".automatic-emails-section");
         let contactListWrapper = customerContainer.find(".customer-contact-list-wrapper");
         let contactListFormSection = contactListWrapper.closest(".form-section");
+        let contactsSection = contactListWrapper.closest(".contacts-section");
         let notesListWrapper = customerContainer.find(".notes-portal-section-wrapper");
         let directionsListWrapper = customerContainer.find(".directions-portal-section-wrapper");
         let formSectionHours = customerContainer.find(".form-section-hours");
@@ -1091,25 +965,7 @@ function eventListeners() {
             automaticEmailsSection.find("input[type=checkbox]").prop("checked", false);
             formSectionHours.find('input').val('');
         } else {
-            contactListFormSection.attr('class', 'form-section');
-
-            // contactListWrapper.html(`
-            //             <div class="loader">
-            //                 <span class="fas fa-spin fa-spinner"></span>
-            //             </div>
-            //         `);
-
-            // notesListWrapper.html(`
-            //             <div class="loader">
-            //                 <span class="fas fa-spin fa-spinner"></span>
-            //             </div>
-            //         `);
-
-            // directionsListWrapper.html(`
-            //             <div class="loader">
-            //                 <span class="fas fa-spin fa-spinner"></span>
-            //             </div>
-            //         `);
+            contactListFormSection.attr('class', 'form-section');            
 
             $.post(serverURL + "/getCustomerPayload", {
                 customer_id: customer_id,
@@ -1131,6 +987,8 @@ function eventListeners() {
 
                     if (res.automatic_emails) {
                         let ae = res.automatic_emails;
+
+                        
                         let inputBoxContainerTo = automaticEmailsSection.find('#ibc-automatic-emails-email-to');
                         inputBoxContainerTo.find('input').val('');
                         let inputBoxContainerCc = automaticEmailsSection.find('#ibc-automatic-emails-email-cc');
@@ -1145,10 +1003,24 @@ function eventListeners() {
                             inputBoxContainerTo.find('.inputted-email').remove();
 
                             for (let i = 0; i < arrEmailsTo.length; i++) {
+                                let curText = arrEmailsTo[i];
+                                let curEmail = arrEmailsTo[i];
+                                
+                                for (let x = 0; x < res.contacts.length; x++){
+                                    let curContact = res.contacts[x];
+
+                                    if (curText === curContact.email_work || 
+                                        curText === curContact.email_personal || 
+                                        curText === curContact.email_other){
+                                            curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
+                                            break;
+                                        }
+                                }
+
                                 input.before(`
-                                    <div class="inputted-email">
+                                    <div class="inputted-email" title="${curEmail}">
                                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
-                                        <span class="inputted-email-address" role="textbox">${arrEmailsTo[i]}</span>
+                                        <span style="white-space:nowrap" class="inputted-email-address" role="textbox" data-email="${curEmail}">${curText}</span>
                                     </div>
                                 `);
                             }
@@ -1163,10 +1035,24 @@ function eventListeners() {
                             inputBoxContainerCc.find('.inputted-email').remove();
 
                             for (let i = 0; i < arrEmailsCc.length; i++) {
+                                let curText = arrEmailsCc[i];
+                                let curEmail = arrEmailsCc[i];
+                                
+                                for (let x = 0; x < res.contacts.length; x++){
+                                    let curContact = res.contacts[x];
+
+                                    if (curText === curContact.email_work || 
+                                        curText === curContact.email_personal || 
+                                        curText === curContact.email_other){
+                                            curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
+                                            break;
+                                        }
+                                }
+
                                 input.before(`
-                                    <div class="inputted-email">
+                                    <div class="inputted-email" title="${curEmail}">
                                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
-                                        <span class="inputted-email-address" role="textbox">${arrEmailsCc[i]}</span>
+                                        <span style="white-space:nowrap" class="inputted-email-address" role="textbox" data-email="${curEmail}">${curText}</span>
                                     </div>
                                 `);
                             }
@@ -1181,10 +1067,24 @@ function eventListeners() {
                             inputBoxContainerBcc.find('.inputted-email').remove();
 
                             for (let i = 0; i < arrEmailsBcc.length; i++) {
+                                let curText = arrEmailsBcc[i];
+                                let curEmail = arrEmailsBcc[i];
+                                
+                                for (let x = 0; x < res.contacts.length; x++){
+                                    let curContact = res.contacts[x];
+
+                                    if (curText === curContact.email_work || 
+                                        curText === curContact.email_personal || 
+                                        curText === curContact.email_other){
+                                            curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
+                                            break;
+                                        }
+                                }
+
                                 input.before(`
-                                    <div class="inputted-email">
+                                    <div class="inputted-email" title="${curEmail}">
                                         <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
-                                        <span class="inputted-email-address" role="textbox">${arrEmailsBcc[i]}</span>
+                                        <span style="white-space:nowrap" class="inputted-email-address" role="textbox" data-email="${curEmail}">${curText}</span>
                                     </div>
                                 `);
                             }
@@ -1249,6 +1149,72 @@ function eventListeners() {
                                         <div class="item-email">${contact.email_work || ''}</div>
                                 </div>           
                         `;
+
+                        if (contact.is_primary === 1) {
+                            contactsSection.find('#txt-customer-contacts-id').val(contact.id);
+                            contactsSection.find('#txt-customer-contacts-first-name').val(contact.first_name);
+                            contactsSection.find('#txt-customer-contacts-last-name').val(contact.last_name);
+                            contactsSection.find('#txt-customer-contacts-phone-number').val(contact.id);
+
+                            if (contact.phone_work !== "") {
+                                contactsSection.find("#txt-customer-contacts-phone-number").val(contact.phone_work);
+                            } else if (contact.phone_work_fax !== "") {
+                                contactsSection.find("#txt-customer-contacts-phone-number").val(contact.phone_work_fax);
+                            } else if (contact.phone_mobile !== "") {
+                                contactsSection.find("#txt-customer-contacts-phone-number").val(contact.phone_mobile);
+                            } else if (contact.phone_direct !== "") {
+                                contactsSection.find("#txt-customer-contacts-phone-number").val(contact.phone_direct);
+                            } else if (contact.phone_other !== "") {
+                                contactsSection.find("#txt-customer-contacts-phone-number").val(contact.phone_other);
+                            } else {
+                                contactsSection.find("#txt-customer-contacts-phone-number").val("");
+                            }
+
+                            contactsSection.find('#txt-customer-contacts-phone-ext').val(contact.phone_ext);
+                            contactsSection.find('#cbox-customer-contacts-phone-primary').prop('checked', true);
+
+                            if (contact.email_work !== "") {
+                                contactsSection.find('#txt-customer-contacts-email').val(contact.email_work);
+                            } else if (contact.email_personal !== "") {
+                                contactsSection.find('#txt-customer-contacts-email').val(contact.email_personal);
+                            } else if (contact.email_other !== "") {
+                                contactsSection.find('#txt-customer-contacts-email').val(contact.email_other);
+                            } else {
+                                contactsSection.find('#txt-customer-contacts-email').val("");
+                            }
+
+                            contactsSection.find('#txt-customer-contacts-notes').val(contact.notes);
+                            contactsSection.find('#txt-customer-contacts-prefix').val(contact.prefix);
+                            contactsSection.find('#txt-customer-contacts-middle-name').val(contact.middle_name);
+                            contactsSection.find('#txt-customer-contacts-suffix').val(contact.suffix);
+                            contactsSection.find('#txt-customer-contacts-department').val(contact.department);
+                            contactsSection.find('#txt-customer-contacts-title').val(contact.title);
+                            contactsSection.find('#txt-customer-contacts-email-personal').val(contact.email_personal);
+                            contactsSection.find('#txt-customer-contacts-email-other').val(contact.email_other);
+                            contactsSection.find('#txt-customer-contacts-phone-work-fax').val(contact.phone_work_fax);
+                            contactsSection.find('#txt-customer-contacts-phone-mobile').val(contact.phone_mobile);
+                            contactsSection.find('#txt-customer-contacts-phone-direct').val(contact.phone_direct);
+                            contactsSection.find('#txt-customer-contacts-phone-other').val(contact.phone_other);
+                            contactsSection.find('#txt-customer-contacts-phone-ext').val(contact.phone_ext);
+                            contactsSection.find('#txt-customer-contacts-country').val(contact.country);
+                            contactsSection.find('#txt-customer-contacts-address1').val(contact.address1);
+                            contactsSection.find('#txt-customer-contacts-address2').val(contact.address2);
+                            contactsSection.find('#txt-customer-contacts-city').val(contact.city);
+                            contactsSection.find('#txt-customer-contacts-state').val(contact.state);
+                            contactsSection.find('#txt-customer-contacts-zip-code').val(contact.zip_code);
+                            contactsSection.find('#txt-customer-contacts-birthday').val(contact.birthday);
+                            contactsSection.find('#txt-customer-contacts-website').val(contact.website);
+                            contactsSection.find('#txt-customer-contacts-is-online').val(contact.is_online);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-to').val(contact.automatic_emails_to);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-cc').val(contact.automatic_emails_cc);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-bcc').val(contact.automatic_emails_bcc);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-booked-load').val(contact.automatic_emails_booked_load);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-check-calls').val(contact.automatic_emails_check_calls);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-carrier-arrival-shipper').val(contact.automatic_emails_carrier_arrival_shipper);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-carrier-arrival-consignee').val(contact.automatic_emails_carrier_arrival_consignee);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-loaded').val(contact.automatic_emails_loaded);
+                            contactsSection.find('#txt-customer-contacts-automatic-emails-empty').val(contact.automatic_emails_empty);
+                        }
                     }
 
                     for (let i = 0; i < res.notes.length; i++) {
@@ -2253,7 +2219,11 @@ function eventListeners() {
             return;
         }
 
-        mailingAddressSection.find('#txt-mailing-address-bill-to').val(mailingAddressSection.find('#txt-mailing-address-code').val());
+        if (mailingAddressSection.find('#txt-mailing-address-bill-to').val() === '') {
+            mailingAddressSection.find('#txt-mailing-address-bill-to').val(mailingAddressSection.find('#txt-mailing-address-code').val());
+        } else {
+            mailingAddressSection.find('#txt-mailing-address-bill-to').val('');
+        }
 
         validateCustomerForSaving(true);
     })
@@ -2551,6 +2521,12 @@ function eventListeners() {
     $(document).on('click', '#customer-print-information-btn', function (e) {
         let customerContent = $(this).closest('.customer-content');
         let customerSection = customerContent.find('.customer-section');
+        let customerId = customerSection.find('#txt-customer-customer-id').val();
+
+        if (customerId === '') {
+            alert('You must select a customer first!');
+            return;
+        }
 
         let html = ``;
 
@@ -2613,37 +2589,176 @@ function eventListeners() {
         validateAutomaticEmailsForSaving();
     })
 
+    $(document).on('keydown', '#txt-customer-notes-delivery-hours-close', function (e) {
+        let keycode = e.keyCode || e.which;
+
+        if (keycode === 9) {
+            e.preventDefault();
+            $('[tabindex=1]').focus();
+        }
+    });
+
     $(document).on('keydown', 'input.inputted-email-address', function (e) {
         let keycode = e.keyCode || e.which;
         let input = $(this);
+        let customerContainer = input.closest('.customer-container');
+        let contactListWrapper = customerContainer.find('.customer-contact-list-wrapper');
         let inputBoxContainer = input.closest('.input-box-container');
+        let tabindex = Number(input.attr('tabindex'));
+        let popup = $(document).find('.mochi-contextual-container');
 
-        if (keycode === 9) { //TAB
-            console.log('tab pressed');
-            if (ValidateEmail(input.val().trim())) {
+        if (keycode === 9 || keycode === 13) { //TAB
 
-                let inputtedEmail = `
-                    <div class="inputted-email">
-                        <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
-                        <span class="inputted-email-address" role="textbox">${input.val().trim()}</span>
-                    </div>
-                `;
+            if (input.val().trim() === '') {
+                setTimeout(function () {
+                    $('[tabindex=' + (tabindex) + ']').focus();
+                }, 50);
+                
+                popup.fadeOut('fast');
+            } else {
+                if (popup.is(':visible')) {
+                    let selectedindex = popup.find('.mochi-contextual-popup-item.selected').index();
+                    if (selectedindex > -1) {
+                        let itemEmail = popup.find('.mochi-contextual-popup-item.selected').attr('data-email');
 
-                input.before(inputtedEmail);
 
-                input.val('');
+                        for (let i = 0; i < contactListWrapper.find('.customer-contact-list-item').length; i++) {
+                            let contactItem = contactListWrapper.find('.customer-contact-list-item').eq(i);
 
-                if (!inputBoxContainer.hasClass('focusin')) {
-                    inputBoxContainer.addClass('focusin');
+                            if (itemEmail === contactItem.attr('data-email-work') ||
+                                itemEmail === contactItem.attr('data-email-personal') ||
+                                itemEmail === contactItem.attr('data-email-other')) {
+                                let itemName = contactItem.attr('data-first-name') + (contactItem.attr('data-middle-name') === '' ? '' : ' ' + contactItem.attr('data-middle-name')) + (contactItem.attr('data-last-name') === '' ? '' : ' ' + contactItem.attr('data-last-name'));
+
+                                let inputtedEmail = `
+                                    <div class="inputted-email" title="${itemEmail}">
+                                        <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                                        <span style="white-space:nowrap" class="inputted-email-address" role="textbox" data-email="${itemEmail}">${itemName}</span>
+                                    </div>
+                                `;
+
+                                input.before(inputtedEmail);
+
+                                input.val('');
+
+                                if (!inputBoxContainer.hasClass('focusin')) {
+                                    inputBoxContainer.addClass('focusin');
+                                }
+
+                                validateAutomaticEmailsForSaving();
+
+                                setTimeout(function () {
+                                    input.focus();
+                                }, 50);
+
+                                popup.fadeOut('fast');
+
+                                return;
+                            }
+                        }
+                    }
                 }
 
-                validateAutomaticEmailsForSaving();
+                if (ValidateEmail(input.val().trim())) {
 
-                setTimeout(function () {
-                    input.focus();
-                }, 50);
-            } else {
-                e.preventDefault();
+                    for (let i = 0; i < contactListWrapper.find('.customer-contact-list-item').length; i++) {
+                        let contactItem = contactListWrapper.find('.customer-contact-list-item').eq(i);
+
+                        if (input.val().trim() === contactItem.attr('data-email-work') ||
+                            input.val().trim() === contactItem.attr('data-email-personal') ||
+                            input.val().trim() === contactItem.attr('data-email-other')) {
+                            let itemName = contactItem.attr('data-first-name') + (contactItem.attr('data-middle-name') === '' ? '' : ' ' + contactItem.attr('data-middle-name')) + (contactItem.attr('data-last-name') === '' ? '' : ' ' + contactItem.attr('data-last-name'));
+
+                            let inputtedEmail = `
+                                <div class="inputted-email" title="${input.val().trim()}">
+                                    <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                                    <span style="white-space:nowrap" class="inputted-email-address" role="textbox" data-email="${input.val().trim()}">${itemName}</span>
+                                </div>
+                            `;
+
+                            input.before(inputtedEmail);
+
+                            input.val('');
+
+                            if (!inputBoxContainer.hasClass('focusin')) {
+                                inputBoxContainer.addClass('focusin');
+                            }
+
+                            validateAutomaticEmailsForSaving();
+
+                            setTimeout(function () {
+                                input.focus();
+                            }, 50);
+
+                            popup.fadeOut('fast');
+
+                            return;
+                        }
+                    }
+
+                    let inputtedEmail = `
+                        <div class="inputted-email" title="${input.val().trim()}">
+                            <span class="fas fa-trash-alt btn-delete-inputted-email-address"></span>
+                            <span style="white-space:nowrap" class="inputted-email-address" role="textbox" data-email="${input.val().trim()}">${input.val().trim()}</span>
+                        </div>
+                     `;
+
+                    input.before(inputtedEmail);
+
+                    input.val('');
+
+                    if (!inputBoxContainer.hasClass('focusin')) {
+                        inputBoxContainer.addClass('focusin');
+                    }
+
+                    validateAutomaticEmailsForSaving();
+
+                    setTimeout(function () {
+                        input.focus();
+                    }, 50);
+
+                    popup.fadeOut('fast');
+                } else {
+                    e.preventDefault();
+                }
+            }
+        } else if (keycode === 37 || keycode === 38) { // upstairs
+            if (popup.is(':visible')) {
+                let itemCount = popup.find('.mochi-contextual-popup-item').length;
+                let selectedIndex = popup.find('.mochi-contextual-popup-item.selected').index();
+
+                popup.find('.mochi-contextual-popup-item').removeClass('selected');
+
+                if (selectedIndex === -1) {
+                    popup.find('.mochi-contextual-popup-item').eq(0).addClass('selected');
+                } else {
+                    if (selectedIndex === 0) {
+                        popup.find('.mochi-contextual-popup-item').eq(itemCount - 1).addClass('selected');
+                    } else {
+                        popup.find('.mochi-contextual-popup-item').eq(selectedIndex - 1).addClass('selected');
+                    }
+                }
+
+                document.querySelector('.mochi-contextual-popup-item.selected').scrollIntoView();
+            }
+        } else if (keycode === 39 || keycode === 40) { // downstairs
+            if (popup.is(':visible')) {
+                let itemCount = popup.find('.mochi-contextual-popup-item').length;
+                let selectedIndex = popup.find('.mochi-contextual-popup-item.selected').index();
+
+                popup.find('.mochi-contextual-popup-item').removeClass('selected');
+
+                if (selectedIndex === -1) {
+                    popup.find('.mochi-contextual-popup-item').eq(0).addClass('selected');
+                } else {
+                    if (selectedIndex === (itemCount - 1)) {
+                        popup.find('.mochi-contextual-popup-item').eq(0).addClass('selected');
+                    } else {
+                        popup.find('.mochi-contextual-popup-item').eq(selectedIndex + 1).addClass('selected');
+                    }
+                }
+
+                document.querySelector('.mochi-contextual-popup-item.selected').scrollIntoView();
             }
         } else if (keycode === 27) {
             inputBoxContainer.removeClass('adding');
@@ -2652,29 +2767,38 @@ function eventListeners() {
             if (inputBoxContainer.find('.inputted-email').length === 0) {
                 inputBoxContainer.removeClass('focusin');
             }
+
+            popup.fadeOut('fast');
         }
     })
 
     $(document).on('input', 'input.inputted-email-address', function (e) {
         let input = $(this);
+        let customer_id = input.closest('.customer-container').find('#txt-customer-customer-id').val();
+        let inputText = input.val().trim();
+
         let inputBoxContainer = $(this).closest('.input-box-container');
         let popupContainer = input.closest('.customer-wrapper').find('.mochi-contextual-container');
         let popup = popupContainer.find('.mochi-contextual-popup');
 
-        if (input.val().trim() === '') {
+        clearTimeout(delayTimer);
+
+        if (inputText === '') {
             popup.html('');
             popupContainer.fadeOut('fast');
             return;
         }
 
-        clearTimeout(delayTimer);
         delayTimer = setTimeout(function () {
-            $.post(serverURL + '/getContactsByEmailOrName', { email: input.val().trim() })
+            $.post(serverURL + '/getContactsByEmailOrName', {
+                email: inputText,
+                customer_id: customer_id
+            })
                 .then(res => {
 
                     if (res.contacts.length > 0) {
                         let html = `<div class="mochi-contextual-popup-content">
-                    <div class="mochi-contextual-popup-wrapper">`;
+                                        <div class="mochi-contextual-popup-wrapper">`;
 
                         for (let i = 0; i < res.contacts.length; i++) {
                             let emailWork = res.contacts[i].email_work;
@@ -2684,13 +2808,18 @@ function eventListeners() {
                             let lastName = res.contacts[i].last_name;
 
                             let name = firstName + ' ' + lastName;
-                            let email = emailWork.indexOf(input.val().trim()) > -1 ? emailWork :
-                                emailPersonal.indexOf(input.val().trim()) ? emailPersonal : emailOther
+                            let email = emailWork.indexOf(inputText) > -1 ? emailWork :
+                                emailPersonal.indexOf(inputText) ? emailPersonal : emailOther
 
-                            if (email.trim() !== '') {
+                            if (email === '') {
+                                email = emailWork !== '' ? emailWork :
+                                    emailPersonal !== '' ? emailPersonal : emailOther;
+                            }
+
+                            if (emailWork.trim() !== '' || emailPersonal.trim() !== '' || emailOther !== '') {
                                 html += `
-                                <p class="mochi-contextual-popup-item" data-email="${email}">${name} <b>(${email})</b></p>
-                            `;
+                                    <p  class="mochi-contextual-popup-item" data-email="${email}" data-name="${name}">${name} <b>(${email})</b></p>
+                                `;
                             }
                         }
 
@@ -2770,7 +2899,20 @@ function eventListeners() {
         }
     });
 
+    $(document).on('click', '#slide-carrier-docs-upload-documents-btn', function(e) {
+        let btn = $(this);
+        let panel = btn.closest('.panel');
+
+        let buttonsSection = btn.closest(".buttons-section");
+        let form = buttonsSection.find("form#frm-document-upload-btn");
+        let inputFile = form.find("input");
+
+        inputFile.trigger("click");
+    });
+
     setMaskedInput();
+
+
 
     var delayTimer;
 }
@@ -2891,15 +3033,15 @@ function validateAutomaticEmailsForSaving() {
         let emailsBccContainer = automaticEmailsSection.find('#ibc-automatic-emails-email-bcc');
 
         for (let i = 0; i < emailsToContainer.find('.inputted-email:not(.editing)').length; i++) {
-            automaticEmailsEmailTo += emailsToContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').text().trim() + ' ';
+            automaticEmailsEmailTo += emailsToContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').attr('data-email').trim() + ' ';
         }
 
         for (let i = 0; i < emailsCcContainer.find('.inputted-email:not(.editing)').length; i++) {
-            automaticEmailsEmailCc += emailsCcContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').text().trim() + ' ';
+            automaticEmailsEmailCc += emailsCcContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').attr('data-email').trim() + ' ';
         }
 
         for (let i = 0; i < emailsBccContainer.find('.inputted-email:not(.editing)').length; i++) {
-            automaticEmailsEmailBcc += emailsBccContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').text().trim() + ' ';
+            automaticEmailsEmailBcc += emailsBccContainer.find('.inputted-email:not(.editing)').eq(i).find('span.inputted-email-address').attr('data-email').trim() + ' ';
         }
 
         automaticEmailsEmailTo = automaticEmailsEmailTo.trim();
@@ -3179,8 +3321,8 @@ function validateCustomerForSaving(bill_to = false) {
             code.val(c.code + (c.code_number !== 0 ? c.code_number : ""));
             mailing_code.val(c.mailing_code + (c.mailing_code_number !== 0 ? c.mailing_code_number : ""));
 
-            if (bill_to) {
-                mailing_bill_to.val(c.mailing_code + (c.mailing_code_number !== 0 ? c.mailing_code_number : ""));
+            if (c.mailing_bill_to !== '') {
+                mailing_bill_to.val(c.mailing_bill_to + (c.mailing_code_number !== 0 ? c.mailing_code_number : ""));
             }
 
             $("#customer-container .customer-section input#txt-customer-customer-id").change();
@@ -3357,4 +3499,225 @@ function reorderCustomerPanels() {
     }
 
     setPanelDraggable();
+}
+
+var clickCount = 0;
+var timeout = 300;
+
+function customerContactClicks(row) {
+    clickCount++;
+    if (clickCount == 1) {
+        setTimeout(function () {
+            if (clickCount == 1) {
+                let customerContainer = row.closest(".customer-container");
+                let contactId = row.find('.contact-id').text();
+                let customerId = row.find('.customer-id').text();
+
+                if (contactId === "") {
+                    alert("You must select a contact first");
+                    return;
+                } else {
+                    let mainContainer = row.closest(".swiper-slide").find(".main-panel-container");
+                    let panelContainer = mainContainer.find(".panel-container");
+
+                    $.get(
+                        location + "views/panels/contacts/contacts.html",
+                        async function (content) {
+                            $.post(serverURL + "/getContactById", {
+                                customer_id: customerId,
+                                contact_id: contactId,
+                            }).then((res) => {
+                                console.log(res);
+                                let list = ``;
+                                let lastLetter = "";
+
+                                for (let i = 0; i < res.contacts.length; i++) {
+                                    let contact = res.contacts[i];
+                                    let currentLetter = contact.last_name.substring(0, 1).toUpperCase();
+
+                                    if (lastLetter === "") {
+                                        lastLetter = currentLetter;
+
+                                        list += `
+                                            <div class="contact-header-item">${lastLetter}</div>
+                                        `;
+                                    } else {
+                                        if (lastLetter !== currentLetter) {
+                                            lastLetter = currentLetter;
+
+                                            list += `
+                                                <div class="contact-header-item">${lastLetter}</div>
+                                            `;
+                                        }
+                                    }
+
+                                    list += `
+                                        <div class="contact-info-item" data-contact-id="${contact.id}">
+                                            <div class="contact-image-item">
+                                                <img src="${contact.avatar ? serverURL + "/avatars/" + contact.avatar : "../../../img/avatar-user-default.png"}" data-default="../../../img/avatar-user-default.png" alt="">
+                                            </div>
+                                            
+                                            <div class="contact-data">
+                                                <div class="contact-name-item">
+                                                    ${(contact.prefix || '') + " " + contact.first_name + " " + (contact.middle_name || '') + " " + contact.last_name}
+                                                </div>                                    
+                                                <div class="contact-status-item ${contact.is_online === 1 ? "online" : "offline"}"></div>
+                                                <div class="hidden contact-occupation-item">${contact.title || ''}</div>
+                                                <div class="hidden contact-is-primary-item">${contact.is_primary}</div>
+                                            </div>
+                                        </div>
+                                        `;
+                                }
+
+                                content = content.replace("[CUSTOMER-ID]", customerId);
+                                content = content.replace("[CONTACT-LIST]", list);
+                                content = content.replace("[ACTION-CLASS]", "showing");
+
+                                let con = res.contact;
+
+                                content = content.replace("[CONTACT-AVATAR]", (con.avatar ? serverURL + "/avatars/" + con.avatar : "../../../img/avatar-user-default.png"));
+                                content = content.replace("[DISPLAY-UPLOAD-AVATAR]", "block");
+                                content = content.replace("[DISPLAY-REMOVE-AVATAR]", con.avatar ? "block" : "none");
+                                content = content.replace("[CONTACT-NAME]", con.first_name + " " + (con.middle_name || '') + " " + con.last_name);
+                                content = content.replace("[CONTACT-OCCUPATION]", `<span>${con.customer.name}</span> ${con.title ? `<span>${con.title}</span>` : ``} ${con.department ? `<span>${con.department}</span>` : ``}`);
+                                content = content.replace("[IS-PRIMARY]", con.is_primary === 1 ? "checked" : "");
+                                content = content.replace("[CONTACT-ID]", con.id);
+                                content = content.replace("[CONTACT-PREFIX]", con.prefix || '');
+                                content = content.replace("[CONTACT-FIRST-NAME]", con.first_name || '');
+                                content = content.replace("[CONTACT-MIDDLE-NAME]", con.middle_name || '');
+                                content = content.replace("[CONTACT-LAST-NAME]", con.last_name || '');
+                                content = content.replace("[CONTACT-SUFFIX]", con.suffix || '');
+                                content = content.replace("[CONTACT-COMPANY]", con.customer.name || '');
+                                content = content.replace("[CONTACT-OCCUPATION2]", con.title || '');
+                                content = content.replace("[CONTACT-DEPARTMENT]", con.department || '');
+                                content = content.replace("[CONTACT-EMAIL-WORK]", con.email_work || '');
+                                content = content.replace("[CONTACT-EMAIL-PERSONAL]", con.email_personal || '');
+                                content = content.replace("[CONTACT-EMAIL-OTHER]", con.email_other || '');
+                                content = content.replace("[CONTACT-PHONE-WORK]", con.phone_work || '');
+                                content = content.replace("[CONTACT-PHONE-EXT]", con.phone_ext || '');
+                                content = content.replace("[CONTACT-PHONE-WORK-FAX]", con.phone_work_fax || '');
+                                content = content.replace("[CONTACT-PHONE-MOBILE]", con.phone_mobile || '');
+                                content = content.replace("[CONTACT-PHONE-DIRECT]", con.phone_direct || '');
+                                content = content.replace("[CONTACT-PHONE-OTHER]", con.phone_other || '');
+                                content = content.replace("[CONTACT-COUNTRY]", con.country || '');
+                                content = content.replace("[CONTACT-ADDRESS1]", con.address1 || '');
+                                content = content.replace("[CONTACT-ADDRESS2]", con.address2 || '');
+                                content = content.replace("[CONTACT-CITY]", con.city || '');
+                                content = content.replace("[CONTACT-STATE]", con.state || '');
+                                content = content.replace("[CONTACT-ZIP-CODE]", con.zip_code || '');
+                                content = content.replace("[CONTACT-BIRTHDAY]", con.birthday || '');
+                                content = content.replace("[CONTACT-WEBSITE]", con.website || '');
+                                content = content.replace("[CONTACT-NOTES]", con.notes || '');
+                                content = content.replace("[CONTACT-TO]", con.automatic_emails_to || '');
+                                content = content.replace("[CONTACT-CC]", con.automatic_emails_cc || '');
+                                content = content.replace("[CONTACT-BCC]", con.automatic_emails_bcc || '');
+                                content = content.replace("[CONTACT-BOOKED-LOAD]", con.automatic_emails_booked_load || '');
+                                content = content.replace("[CONTACT-CHECK-CALLS]", con.automatic_emails_check_calls || '');
+                                content = content.replace("[CONTACT-CARRIER-ARRIVAL-SHIPPER]", con.automatic_emails_carrier_arrival_shipper || '');
+                                content = content.replace("[CONTACT-CARRIER-ARRIVAL-CONSIGNEE]", con.automatic_emails_carrier_arrival_consignee || '');
+                                content = content.replace("[CONTACT-LOADED]", con.automatic_emails_loaded || '');
+                                content = content.replace("[CONTACT-EMPTY]", con.automatic_emails_empty || '');
+
+                                if (panelContainer.find(".panel").length === 0) {
+                                    mainContainer.css("left", $(window).width() - mainContainer.width() + "px");
+                                    panelContainer.append(content);
+                                    reorderCustomerPanels();
+                                } else {
+                                    let exist = false;
+
+                                    for (let i = 0; i < panelContainer.find(".panel").length; i++) {
+                                        let panel = panelContainer.find(".panel").eq(i);
+
+                                        if (panel.attr("id") === "panel-contacts") {
+                                            panel.appendTo(panelContainer);
+                                            reorderCustomerPanels();
+                                            exist = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!exist) {
+                                        panelContainer.append(content);
+                                        reorderCustomerPanels();
+                                    }
+                                }
+
+                                setMaskedInput();
+                            });
+                        },
+                        "html"
+                    );
+                }
+            } else {
+                let id = row.find(".customer-id").text();
+                let code = row.find(".code").text();
+                let name = row.find(".name").text();
+                let address1 = row.find(".address1").text();
+                let address2 = row.find(".address2").text();
+                let city = row.find(".city").text();
+                let state = row.find(".state").text();
+                let zip = row.find(".zip").text();
+                let contact_name = row.find(".contact-name").text();
+                let contact_phone = row.find(".contact-phone").text();
+                let ext = row.find(".ext").text();
+                let email = row.find(".email").text();
+
+                let mailing_code = row.find(".mailing-code").text();
+                let mailing_name = row.find(".mailing-name").text();
+                let mailing_address1 = row.find(".mailing-address1").text();
+                let mailing_address2 = row.find(".mailing-address2").text();
+                let mailing_city = row.find(".mailing-city").text();
+                let mailing_state = row.find(".mailing-state").text();
+                let mailing_zip = row.find(".mailing-zip").text();
+                let mailing_contact_name = row.find(".mailing-contact-name").text();
+                let mailing_contact_phone = row.find(".mailing-contact-phone").text();
+                let mailing_ext = row.find(".mailing-ext").text();
+                let mailing_email = row.find(".mailing-email").text();
+
+                let mailing_bill_to = row.find(".mailing-bill-to").text();
+                let mailing_division = row.find(".mailing-division").text();
+                let mailing_agent_code = row.find(".mailing-agent-code").text();
+                let mailing_salesman = row.find(".mailing-salesman").text();
+                let mailing_fid = row.find(".mailing-fid").text();
+
+                $("#customer-container .customer-section input#txt-customer-customer-id").val(id);
+                $("#customer-container .customer-section input#txt-customer-customer-code").val(code);
+                $("#customer-container .customer-section input#txt-customer-customer-name").val(name);
+                $("#customer-container .customer-section input#txt-customer-customer-address-1").val(address1);
+                $("#customer-container .customer-section input#txt-customer-customer-address-2").val(address2);
+                $("#customer-container .customer-section input#txt-customer-customer-city").val(city);
+                $("#customer-container .customer-section input#txt-customer-customer-state").val(state);
+                $("#customer-container .customer-section input#txt-customer-customer-zip-code").val(zip);
+                $("#customer-container .customer-section input#txt-customer-customer-contact-name").val(contact_name);
+                $("#customer-container .customer-section input#txt-customer-customer-contact-phone").val(contact_phone);
+                $("#customer-container .customer-section input#txt-customer-customer-contact-phone-ext").val(ext);
+                $("#customer-container .customer-section input#txt-customer-customer-email").val(email);
+
+                $("#customer-container .mailing-address-section input#txt-mailing-address-code").val(mailing_code);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-name").val(mailing_name);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-address-1").val(mailing_address1);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-address-2").val(mailing_address2);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-city").val(mailing_city);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-state").val(mailing_state);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-zip-code").val(mailing_zip);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-contact-name").val(mailing_contact_name);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-contact-phone").val(mailing_contact_phone);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-contact-phone-ext").val(mailing_ext);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-email").val(mailing_email);
+
+                $("#customer-container .mailing-address-section input#txt-mailing-address-bill-to").val(mailing_bill_to === "" ? mailing_bill_to : mailing_code);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-division").val(mailing_division);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-agent-code").val(mailing_agent_code);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-salesman").val(mailing_salesman);
+                $("#customer-container .mailing-address-section input#txt-mailing-address-fid").val(mailing_fid);
+
+                let panel = row.closest(".panel");
+
+                $("#customer-container .customer-section input#txt-customer-customer-id").change();
+
+                panel.find(".panel-close-btn").click();
+            }
+            clickCount = 0;
+        }, timeout || 300);
+    }
 }

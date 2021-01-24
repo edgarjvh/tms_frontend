@@ -17,6 +17,12 @@
   position: relative;
   overflow: hidden;
 }
+.carrier-container .carrier-content .insurance {
+  cursor: default;
+}
+.carrier-container .carrier-content .insurance.no-carrier {
+  background-color: rgba(0, 0, 0, 0.3);
+}
 .carrier-container .carrier-content .insurance.expired {
   background-color: lightcoral;
 }
@@ -438,6 +444,12 @@
 .carrier-container .carrier-content .carrier-wrapper .cell-3.driver-information-section .form-section .vsep {
   margin: 2px 0;
 }
+.carrier-container .carrier-content .carrier-wrapper .cell-3.driver-information-section #carrier-drivers-info-delete-btn.disabled {
+  pointer-events: none;
+}
+.carrier-container .carrier-content .carrier-wrapper .cell-3.driver-information-section #carrier-drivers-info-delete-btn.disabled .mochi-button-base {
+  color: rgba(0, 0, 0, 0.5);
+}
 .carrier-container .carrier-content .carrier-wrapper .cell-3.drivers-list-section .carrier-drivers-list-container {
   position: relative;
   flex-direction: column;
@@ -526,18 +538,26 @@
 }
 .carrier-container .carrier-content .modal-carrier-notes.showing textarea {
   background-color: rgba(0, 0, 0, 0.1);
-  pointer-events: none;
 }
 .carrier-container .carrier-content .modal-carrier-notes.showing #carrier-carrier-notes-save-btn {
   display: none;
 }
+.carrier-container .carrier-content .modal-carrier-notes.showing #carrier-carrier-notes-print-btn {
+  display: block;
+}
 .carrier-container .carrier-content .modal-carrier-notes.adding textarea {
   background-color: white;
   pointer-events: all;
+}
+.carrier-container .carrier-content .modal-carrier-notes.adding #carrier-carrier-notes-print-btn {
+  display: none;
 }
 .carrier-container .carrier-content .modal-carrier-notes.adding #carrier-carrier-notes-save-btn {
   display: block;
 }
 .carrier-container .carrier-content .mochi-contextual-popup-item.selected {
   background-color: 'rgba(0,0,0,0.1)';
+}
+.carrier-container .carrier-content .mochi-contextual-popup-item span.hl {
+  color: red !important;
 }

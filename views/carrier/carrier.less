@@ -22,6 +22,14 @@
     position: relative;
     overflow: hidden;
 
+    .insurance{
+      cursor: default;
+    }
+
+    .insurance.no-carrier {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
     .insurance.expired {
       background-color: lightcoral;
     }
@@ -540,6 +548,14 @@
                 margin: 2px 0;
             }
           }
+
+          #carrier-drivers-info-delete-btn.disabled{
+            pointer-events: none;
+            
+            .mochi-button-base{
+              color:rgba(0, 0, 0, 0.5);              
+            }
+          }
       }
 
       .cell-3.drivers-list-section{
@@ -646,11 +662,15 @@
     .modal-carrier-notes.showing {
       textarea {
         background-color: rgba(0, 0, 0, 0.1);
-        pointer-events: none;
+        // pointer-events: none;
       }
 
       #carrier-carrier-notes-save-btn {
         display: none;
+      }
+
+      #carrier-carrier-notes-print-btn {
+        display: block;
       }
     }
 
@@ -660,6 +680,10 @@
         pointer-events: all;
       }
 
+      #carrier-carrier-notes-print-btn {
+        display: none;
+      }
+
       #carrier-carrier-notes-save-btn {
         display: block;
       }
@@ -667,6 +691,10 @@
 
     .mochi-contextual-popup-item.selected{
       background-color: 'rgba(0,0,0,0.1)';
+    }
+
+    .mochi-contextual-popup-item span.hl{
+      color: red !important;
     }
   }
 }

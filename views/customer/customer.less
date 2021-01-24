@@ -227,6 +227,13 @@
 
             .input-box-container {
               margin: 0;
+
+              label{
+                pointer-events: none;
+              }
+              input{
+                pointer-events: none;
+              }
             }
           }
         }
@@ -336,8 +343,8 @@
             }
 
             .input-box-container {
-              align-items: flex-end !important;
-              padding: 0 20px 0 5px !important;
+              align-items: center !important;
+              padding: 0 10px !important;
               flex-wrap: nowrap;
 
               label{
@@ -356,9 +363,10 @@
 
             .input-box-container.focusin {
               label {
-                top: 4px;
-                color: darkred;
-                font-size: 0.65rem;
+                // top: 4px;
+                // color: darkred;
+                // font-size: 0.65rem;
+                display: none;
               }
             }
 
@@ -381,9 +389,11 @@
               // height: 20px;
               margin-right: 3px;
               margin-bottom: 1px;
+              cursor: default;
 
               span {
                 font-size: 0.6rem;
+                cursor: default;
               }
 
               span.btn-delete-inputted-email-address {
