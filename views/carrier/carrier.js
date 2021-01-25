@@ -635,127 +635,6 @@ function eventListeners() {
         }
     });
 
-    // $(document).on('keyup', '#cbo-carrier-driver-info-equipment', function (e) {
-    //     e.preventDefault();
-    //     let input = $(this);
-    //     let key = e.keyCode || e.which;
-    //     let popupContainer = input.closest('.carrier-wrapper').find('.mochi-contextual-container');
-    //     let popup = popupContainer.find('.mochi-contextual-popup');
-    //     let value = input.val().trim();
-    //     let equipments = JSON.parse($('#txt-equipments-array').val());
-
-    //     if (key >= 37 && key <= 40) {
-    //         return;
-    //     } else if (key === 9) {
-    //         popupContainer.fadeOut('fast');
-    //         return;
-    //     } else {
-    //         let matches = equipments.filter(item => {
-    //             const regex = new RegExp(value, 'gi');
-    //             return item.name.match(regex);
-    //         })
-
-    //         if (value === '') {
-    //             popupContainer.fadeOut('fast');
-    //             return;
-    //         }
-
-    //         if (matches.length > 0) {
-    //             let html = `<div class="mochi-contextual-popup-content">
-    //                 <div class="mochi-contextual-popup-wrapper">`;
-
-    //             for (let i = 0; i < matches.length; i++) {
-    //                 let equipment = matches[i];
-    //                 let searchValue = new RegExp(value, 'gi');
-    //                 let equipmentName = equipment.name.replace(searchValue, `<span class="hl">$&</span>`);
-
-    //                 html += `
-    //                     <p id="driver-equipment-id-${equipment.id}" class="mochi-contextual-popup-item" data-equipment="${equipment.name}" data-id="${equipment.id}">${equipmentName}</p> 
-    //                     `;
-    //             }
-
-    //             html += `</div>
-    //                         </div>`;
-
-    //             let pos = getPopupPosition(input, popupContainer);
-
-    //             popup.attr('data-ctrl-id', input.attr('id'));
-
-    //             popup.attr('class',
-    //                 'mochi-contextual-popup is-dropdown ' +
-    //                 pos.isAboveBelow +
-    //                 pos.isCorner +
-    //                 pos.isLeftRight +
-    //                 pos.isVerticalHorizontal +
-    //                 pos.isLowHigh);
-
-    //             popup.html(html);
-
-    //             popupContainer.fadeIn('fast');
-    //         } else {
-    //             popupContainer.fadeOut('fast');
-    //         }
-    //     }
-    // });
-
-    // $(document).on('keydown', '#cbo-carrier-driver-info-equipment', function (e) {
-    //     let input = $(this);
-    //     let key = e.keyCode || e.which;
-    //     let popupContainer = input.closest('.carrier-wrapper').find('.mochi-contextual-container');
-    //     let popup = popupContainer.find('.mochi-contextual-popup');
-
-    //     if (popupContainer.is(':visible')) {
-    //         let curItem = popup.find('.mochi-contextual-popup-item');
-    //         let selItem = popup.find('.mochi-contextual-popup-item.selected');
-
-    //         curItem.removeClass('selected');
-
-    //         if (key === 37 || key === 38) {
-    //             e.preventDefault();
-    //             if (selItem.length > 0) {
-    //                 let index = selItem.index();
-
-    //                 if (index === 0) {
-    //                     curItem.eq(curItem.length - 1).addClass('selected');
-    //                 } else {
-    //                     curItem.eq(index - 1).addClass('selected');
-    //                 }
-    //             } else {
-    //                 curItem.eq(0).addClass('selected');
-    //             }
-
-    //             if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
-    //                 document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
-    //             }
-
-    //         } else if (key === 39 || key === 40) {
-    //             e.preventDefault();
-    //             if (selItem.length > 0) {
-    //                 let index = selItem.index();
-
-    //                 if (index === curItem.length - 1) {
-    //                     curItem.eq(0).addClass('selected');
-    //                 } else {
-    //                     curItem.eq(index + 1).addClass('selected');
-    //                 }
-    //             } else {
-    //                 curItem.eq(0).addClass('selected');
-    //             }
-
-    //             if (popup.find('.mochi-contextual-popup-item.selected').length > 0) {
-    //                 document.getElementById(popup.find('.mochi-contextual-popup-item.selected').attr('id')).scrollIntoView(true);
-    //             }
-    //         } else if (key === 9) {
-    //             if (selItem.length > 0) {
-    //                 input.val(selItem.attr('data-equipment'));
-    //                 popupContainer.fadeOut('fast');
-    //             }
-    //         }
-    //     } else {
-
-    //     }
-    // });
-
     $(document).on('keyup', '#txt-carrier-insurance-company', function (e) {
         e.preventDefault();
         let input = $(this);
@@ -900,7 +779,7 @@ function eventListeners() {
         }
     })
 
-    
+
 
     $(document).on('keydown', '#txt-carrier-driver-info-notes', function (e) {
         e.preventDefault();
@@ -3434,38 +3313,38 @@ function getInitials(length) {
     return result;
 }
 
-var insuranceTimer;
+var insuranceLocked = false;
 
 function validateInsuranceForSaving() {
-    clearTimeout(insuranceTimer);
+    let swiperSlideCarrier = $(document).find("#swiper-slide-carrier");
+    let carrierSection = swiperSlideCarrier.find(".carrier-section");
+    let insurancesSection = swiperSlideCarrier.find(".insurances-section");
+    let carrierId = carrierSection.find("input#txt-carrier-carrier-id");
+    let insuranceId = insurancesSection.find("input#txt-carrier-insurance-id");
+    let insuranceType = insurancesSection.find("input#cbo-carrier-insurance-type");
+    let insuranceCompany = insurancesSection.find("input#txt-carrier-insurance-company");
+    let insuranceExpirationDate = insurancesSection.find("input#txt-carrier-insurance-expiration-date");
+    let insuranceAmount = insurancesSection.find("input#txt-carrier-insurance-amount");
+    let insuranceDeductible = insurancesSection.find("input#txt-carrier-insurance-deductible");
+    let insuranceNotes = insurancesSection.find("input#txt-carrier-insurance-notes");
+    let insuranceIndicator = $(document).find('.input-box-container.insurance');
+    let insuranceListWrapper = swiperSlideCarrier.find('.insurances-list-wrapper');
+    
+    if (carrierId.val().trim() === "") {
+        return;
+    }
 
-    insuranceTimer = setTimeout(function () {
-        let swiperSlideCarrier = $(document).find("#swiper-slide-carrier");
-        let carrierSection = swiperSlideCarrier.find(".carrier-section");
-        let insurancesSection = swiperSlideCarrier.find(".insurances-section");
-        let carrierId = carrierSection.find("input#txt-carrier-carrier-id");
-        let insuranceId = insurancesSection.find("input#txt-carrier-insurance-id");
-        let insuranceType = insurancesSection.find("input#cbo-carrier-insurance-type");
-        let insuranceCompany = insurancesSection.find("input#txt-carrier-insurance-company");
-        let insuranceExpirationDate = insurancesSection.find("input#txt-carrier-insurance-expiration-date");
-        let insuranceAmount = insurancesSection.find("input#txt-carrier-insurance-amount");
-        let insuranceDeductible = insurancesSection.find("input#txt-carrier-insurance-deductible");
-        let insuranceNotes = insurancesSection.find("input#txt-carrier-insurance-notes");
-        let insuranceIndicator = $(document).find('.input-box-container.insurance');
-        let insuranceListWrapper = swiperSlideCarrier.find('.insurances-list-wrapper');
+    if (insuranceType.attr('data-selected-id') === "0" ||
+        insuranceCompany.val().trim() === "" ||
+        insuranceExpirationDate.val().trim() === "" ||
+        insuranceAmount.val().trim() === "") {
+        return;
+    }
 
-        console.log(insuranceId.val());
-
-        if (carrierId.val().trim() === "") {
-            return;
-        }
-
-        if (insuranceType.attr('data-selected-id') === "0" ||
-            insuranceCompany.val().trim() === "" ||
-            insuranceExpirationDate.val().trim() === "" ||
-            insuranceAmount.val().trim() === "") {
-            return;
-        }
+    if (insuranceLocked) {
+        window.setTimeout(validateInsuranceForSaving, 100);
+    } else {
+        insuranceLocked = true;
 
         let data = {
             insurance_id: insuranceId.val().trim(),
@@ -3484,6 +3363,7 @@ function validateInsuranceForSaving() {
                     insuranceCompany.val().trim() !== '' &&
                     insuranceExpirationDate.val().trim() !== '' &&
                     insuranceAmount.val().trim() !== '') {
+
                     insuranceId.val(res.insurance.id);
                 }
 
@@ -3542,9 +3422,21 @@ function validateInsuranceForSaving() {
             } else {
                 insuranceListWrapper.html("");
             }
+
+            insuranceLocked = false;
         });
-    }, 100);
+    }
+
+
+    // insuranceTimer = setTimeout(function () {
+
+
+
+
+    // }, 100);
 }
+
+var driverLocked = false;
 
 function validateDriverForSaving() {
 
@@ -3573,55 +3465,67 @@ function validateDriverForSaving() {
         return;
     }
 
-    let data = {
-        driver_id: driverId.val().trim(),
-        carrier_id: carrierId.val().trim(),
-        first_name: firstName.val().trim(),
-        last_name: lastName.val().trim(),
-        phone: phone.val().trim(),
-        email: email.val().trim(),
-        equipment: equipment.val().trim(),
-        truck: truck.val().trim(),
-        trailer: trailer.val().trim(),
-        notes: notes.val().trim()
-    }
+    if (driverLocked){
+        window.setTimeout(validateDriverForSaving, 100);
+    }else{
+        driverLocked = true;
 
-    $.post(serverURL + '/saveCarrierDriver', data).then(res => {
-        if (res.result === 'OK') {
-            driverId.val(res.driver.id);
-
-            let driverItems = ``;
-
-            for (let i = 0; i < res.drivers.length; i++) {
-                let driver = res.drivers[i];
-
-                driverItems += `
-                    <div class="carrier-drivers-list-item" 
-                        data-id="${driver.id}" 
-                        data-carrier-id="${driver.carrier_id}"                         
-                        data-first-name="${driver.first_name || ''}"                        
-                        data-last-name="${driver.last_name || ''}"
-                        data-phone="${driver.phone || ''}"
-                        data-email="${driver.email || ''}"
-                        data-equipment="${driver.equipment || ''}"
-                        data-truck="${driver.truck || ''}"
-                        data-trailer="${driver.trailer || ''}"
-                        data-notes="${driver.notes || ''}">      
-
-                            <div class="item-name">${(driver.first_name || '') + " " + (driver.last_name || '')}</div>
-                            <div class="item-phone">${driver.phone || ''}</div>
-                            <div class="item-email">${driver.email || ''}</div>
-                    </div>           
-                `;
+        let data = {
+            driver_id: driverId.val().trim(),
+            carrier_id: carrierId.val().trim(),
+            first_name: firstName.val().trim(),
+            last_name: lastName.val().trim(),
+            phone: phone.val().trim(),
+            email: email.val().trim(),
+            equipment: equipment.val().trim(),
+            truck: truck.val().trim(),
+            trailer: trailer.val().trim(),
+            notes: notes.val().trim()
+        }
+    
+        $.post(serverURL + '/saveCarrierDriver', data).then(res => {
+            if (res.result === 'OK') {
+                if (firstName.val().trim() !== ''){
+                    driverId.val(res.driver.id);
+                }
+    
+                let driverItems = ``;
+    
+                for (let i = 0; i < res.drivers.length; i++) {
+                    let driver = res.drivers[i];
+    
+                    driverItems += `
+                        <div class="carrier-drivers-list-item" 
+                            data-id="${driver.id}" 
+                            data-carrier-id="${driver.carrier_id}"                         
+                            data-first-name="${driver.first_name || ''}"                        
+                            data-last-name="${driver.last_name || ''}"
+                            data-phone="${driver.phone || ''}"
+                            data-email="${driver.email || ''}"
+                            data-equipment="${driver.equipment || ''}"
+                            data-truck="${driver.truck || ''}"
+                            data-trailer="${driver.trailer || ''}"
+                            data-notes="${driver.notes || ''}">      
+    
+                                <div class="item-name">${(driver.first_name || '') + " " + (driver.last_name || '')}</div>
+                                <div class="item-phone">${driver.phone || ''}</div>
+                                <div class="item-email">${driver.email || ''}</div>
+                        </div>           
+                    `;
+                }
+    
+                $('#txt-carrier-driver-info-id').change();
+    
+                driverListWrapper.html(driverItems);
+            } else {
+                driverListWrapper.html("");
             }
 
-            $('#txt-carrier-driver-info-id').change();
+            driverLocked = false;
+        });
+    }
 
-            driverListWrapper.html(driverItems);
-        } else {
-            driverListWrapper.html("");
-        }
-    })
+    
 }
 
 function validateContactForSaving() {

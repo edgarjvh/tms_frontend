@@ -13,33 +13,34 @@
                 <div class="row-fields">
                     <div class="input-box-container medium-size">
                         <input required type="text" id="txt-slide-carrier-docs-user-id"
-                        name="txt-slide-carrier-docs-user-id" title="User ID">
-                        <label for="txt-slide-carrier-docs-user-id">User ID</label>
+                            name="txt-slide-carrier-docs-user-id" title="User ID" value="[USER-ID]" disabled>
+                        <!-- <label for="txt-slide-carrier-docs-user-id">User ID</label> -->
                     </div>
                     <div class="separator"></div>
                     <div class="input-box-container medium-size">
                         <input required type="text" id="txt-slide-carrier-docs-date-entered"
-                        name="txt-slide-carrier-docs-date-entered" title="Date Entered">
-                        <label for="txt-slide-carrier-docs-date-entered">Date Entered</label>
+                            name="txt-slide-carrier-docs-date-entered" title="Date Entered" value="[DATE-ENTERED]"
+                            disabled>
+                        <!-- <label for="txt-slide-carrier-docs-date-entered">Date Entered</label> -->
                     </div>
                 </div>
                 <div class="separator"></div>
                 <div class="row-fields">
                     <div class="input-box-container fixed-size">
                         <input required type="text" id="txt-slide-carrier-docs-title"
-                        name="txt-slide-carrier-docs-title" title="Title">
+                            name="txt-slide-carrier-docs-title" title="Title">
                         <label for="txt-slide-carrier-docs-title">Title</label>
                     </div>
                     <div class="separator"></div>
                     <div class="input-box-container fixed-size">
                         <input required type="text" id="txt-slide-carrier-docs-subject"
-                        name="txt-slide-carrier-docs-subject" title="Subject">
+                            name="txt-slide-carrier-docs-subject" title="Subject">
                         <label for="txt-slide-carrier-docs-subject">Subject</label>
                     </div>
                     <div class="separator"></div>
                     <div class="input-box-container">
-                        <input required type="text" id="txt-slide-carrier-docs-tags"
-                        name="txt-slide-carrier-docs-tags" title="Tags">
+                        <input required type="text" id="txt-slide-carrier-docs-tags" name="txt-slide-carrier-docs-tags"
+                            title="Tags" style="text-transform: lowercase;">
                         <label for="txt-slide-carrier-docs-tags">Tags</label>
                     </div>
                 </div>
@@ -68,7 +69,7 @@
                 </div>
 
                 <form id="frm-document-upload-btn" style="display: none;" enctype="multipart/form-data">
-                    <input type="file" name="avatar" id="select-document-input" accept="image/*, application/pdf">                                
+                    <input type="file" name="avatar" id="select-document-input" accept="image/*, application/pdf">
                 </form>
             </div>
         </div>
@@ -82,19 +83,20 @@
                     <div class="right-border"></div>
                 </div>
                 <div class="portal-container">
-                    <div class="portal-content">
+                    <div class="carrier-docs-documents-wrapper">
+                        [DOCUMENTS-LIST]
                     </div>
                 </div>
             </div>
             <div class="separator"></div>
-            <div class="form-section" id="frm-carrier-docs-notes">                           
+            <div class="form-section" id="frm-carrier-docs-notes">
                 <div class="top-border-section">
                     <div class="left-border"></div>
                     <div class="section-title">Notes</div>
                     <div class="middle-border"></div>
                     <div class="right-border"></div>
                 </div>
-                                
+
                 <div class="portal-container">
                     <div class="portal-content">
                     </div>
@@ -103,7 +105,7 @@
         </div>
 
         <div class="row-content growed">
-            <div class="form-section" id="frm-carrier-docs-icons">
+            <div class="form-section" id="frm-carrier-docs-preview">
                 <div class="top-border-section no-title">
                     <div class="left-border"></div>
                     <div class="section-title">Preview</div>
@@ -111,7 +113,13 @@
                     <div class="right-border"></div>
                 </div>
                 <div class="portal-container">
-                    <div class="portal-content">
+                    <div class="portal-content" data-doc-id="">
+                        <!-- <iframe id="pdf-js-viewer" src="http://localhost:8000/customer-documents/600e581e8f51a.png#toolbar=0&navpanes=0&scrollbar=0" title="webviewer" frameborder="0" allowfullscreen width="100%" height="100%" ></iframe>                         -->
+                        <!-- <div class="img-wrapper">
+                            <img src="http://localhost:8000/customer-documents/600e581e8f51a.png" alt="">
+                        </div> -->
+
+                        
                     </div>
                 </div>
             </div>

@@ -602,37 +602,117 @@ function eventListeners() {
     $(document).on("click", "#customer-documents-btn", function () {
         let btn = $(this);
         let mainContainer = btn.closest(".swiper-slide").find(".main-panel-container");
+        let customer_id = btn.closest(".swiper-slide").find("#txt-customer-customer-id").val();
         let panelContainer = mainContainer.find(".panel-container");
+        let userId = Math.floor(Math.random() * (15 - 1)) + 1;
+        let dateEntered = moment().format('MM/DD/YYYY');
 
-        $.get(
-            location + "views/panels/documents/documents.html",
-            async function (content) {
-                if (panelContainer.find(".panel").length === 0) {
-                    mainContainer.css("left", $(window).width() - mainContainer.width() + "px");
-                    panelContainer.append(content);
-                    reorderCustomerPanels();
-                } else {
-                    let exist = false;
+        if (customer_id === '') {
+            alert('You must select a customer first!');
+            return;
+        }
 
-                    for (let i = 0; i < panelContainer.find(".panel").length; i++) {
-                        let panel = panelContainer.find(".panel").eq(i);
+        $.post(serverURL + '/getDocumentsByCustomer', { customer_id: customer_id }).then(res => {
+            let documentItems = ``;
 
-                        if (panel.attr("id") === "panel-carrier-docs") {
-                            panel.appendTo(panelContainer);
-                            reorderCustomerPanels();
-                            exist = true;
-                            break;
-                        }
-                    }
+            for (let i = 0; i < res.documents.length; i++) {
+                let doc = res.documents[i];
 
-                    if (!exist) {
+                documentItems += `
+                        <div class="carrier-docs-documents-item" 
+                            data-id="${doc.id}" 
+                            data-customer-id="${doc.customer_id}" 
+                            data-doc-id="${doc.doc_id}" 
+                            data-doc-name="${doc.doc_name}" 
+                            data-doc-extension="${doc.doc_extension}" 
+                            data-user-id="${doc.user_id}"
+                            data-date-entered="${doc.date_entered}" 
+                            data-title="${doc.title}" 
+                            data-subject="${doc.subject}" 
+                            data-tags="${doc.tags}">
+
+                            <div class="item-info">
+                                <div class="item-icon" title="${doc.doc_extension === 'pdf' ? 'Pdf File' : 'Image File'}"><span class="fas fa-file-${doc.doc_extension === 'pdf' ? 'pdf' : 'image'}"></div>
+                                <div class="item-user-id">${doc.user_id}</div>
+                                <div class="item-date-entered">${doc.date_entered}</div>
+                                <div class="item-title">${doc.title}</div>
+                                <div class="item-subject">${doc.subject}</div>
+                            </div>
+
+                            <div class="item-btn"><span class="fas fa-trash-alt"></span></div>
+                        </div>
+                            `
+                    ;
+            }
+
+            $.get(
+                location + "views/panels/documents/documents.html",
+                async function (content) {
+                    content = content.replace('[USER-ID]', userId);
+                    content = content.replace('[DATE-ENTERED]', dateEntered);
+                    content = content.replace('[DOCUMENTS-LIST]', documentItems);
+
+                    if (panelContainer.find(".panel").length === 0) {
+                        mainContainer.css("left", $(window).width() - mainContainer.width() + "px");
+
+
                         panelContainer.append(content);
                         reorderCustomerPanels();
+                    } else {
+                        let exist = false;
+
+                        for (let i = 0; i < panelContainer.find(".panel").length; i++) {
+                            let panel = panelContainer.find(".panel").eq(i);
+
+                            if (panel.attr("id") === "panel-carrier-docs") {
+                                panel.appendTo(panelContainer);
+                                reorderCustomerPanels();
+                                exist = true;
+                                break;
+                            }
+                        }
+
+                        if (!exist) {
+                            panelContainer.append(content);
+                            reorderCustomerPanels();
+                        }
                     }
-                }
-            },
-            "html"
-        );
+                },
+                "html"
+            );
+        });
+    });
+
+    $(document).on('click', '.carrier-docs-documents-item', function (e) {
+        let item = $(this);
+        let panel = item.closest('.panel');
+        let previewContainer = panel.find('#frm-carrier-docs-preview .portal-content');
+        let extension = item.attr('data-doc-extension');
+        let doc_id = item.attr('data-doc-id');
+
+        let loaderHtml = `<div class="preview-loader">
+                            <span class="fas fa-spin spinner"></span>
+                        </div>`;
+
+        let pdfHtml = `<iframe id="pdf-js-viewer" src="${serverURL}/customer-documents/${doc_id}#toolbar=0&navpanes=0&scrollbar=0" title="webviewer" frameborder="0" allowfullscreen width="100%" height="100%" ></iframe>`;
+
+        let imgHtml = `<div class="img-wrapper">
+                    <img src="${serverURL}/customer-documents/${doc_id}" alt="">
+                </div>`;
+
+        previewContainer.html(loaderHtml);
+
+        if (extension === 'pdf') {
+            previewContainer.html(pdfHtml);
+        } else {
+            previewContainer.html(imgHtml);
+        }
+
+        previewContainer.attr('data-doc-id', doc_id);
+
+        $(document).find('.carrier-docs-documents-item').removeClass('selected');
+
+        item.addClass('selected');
     });
 
     $(document).on("click", "#customers-customer-search-btn", function (e) {
@@ -965,7 +1045,7 @@ function eventListeners() {
             automaticEmailsSection.find("input[type=checkbox]").prop("checked", false);
             formSectionHours.find('input').val('');
         } else {
-            contactListFormSection.attr('class', 'form-section');            
+            contactListFormSection.attr('class', 'form-section');
 
             $.post(serverURL + "/getCustomerPayload", {
                 customer_id: customer_id,
@@ -988,7 +1068,7 @@ function eventListeners() {
                     if (res.automatic_emails) {
                         let ae = res.automatic_emails;
 
-                        
+
                         let inputBoxContainerTo = automaticEmailsSection.find('#ibc-automatic-emails-email-to');
                         inputBoxContainerTo.find('input').val('');
                         let inputBoxContainerCc = automaticEmailsSection.find('#ibc-automatic-emails-email-cc');
@@ -1005,16 +1085,16 @@ function eventListeners() {
                             for (let i = 0; i < arrEmailsTo.length; i++) {
                                 let curText = arrEmailsTo[i];
                                 let curEmail = arrEmailsTo[i];
-                                
-                                for (let x = 0; x < res.contacts.length; x++){
+
+                                for (let x = 0; x < res.contacts.length; x++) {
                                     let curContact = res.contacts[x];
 
-                                    if (curText === curContact.email_work || 
-                                        curText === curContact.email_personal || 
-                                        curText === curContact.email_other){
-                                            curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
-                                            break;
-                                        }
+                                    if (curText === curContact.email_work ||
+                                        curText === curContact.email_personal ||
+                                        curText === curContact.email_other) {
+                                        curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
+                                        break;
+                                    }
                                 }
 
                                 input.before(`
@@ -1037,16 +1117,16 @@ function eventListeners() {
                             for (let i = 0; i < arrEmailsCc.length; i++) {
                                 let curText = arrEmailsCc[i];
                                 let curEmail = arrEmailsCc[i];
-                                
-                                for (let x = 0; x < res.contacts.length; x++){
+
+                                for (let x = 0; x < res.contacts.length; x++) {
                                     let curContact = res.contacts[x];
 
-                                    if (curText === curContact.email_work || 
-                                        curText === curContact.email_personal || 
-                                        curText === curContact.email_other){
-                                            curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
-                                            break;
-                                        }
+                                    if (curText === curContact.email_work ||
+                                        curText === curContact.email_personal ||
+                                        curText === curContact.email_other) {
+                                        curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
+                                        break;
+                                    }
                                 }
 
                                 input.before(`
@@ -1069,16 +1149,16 @@ function eventListeners() {
                             for (let i = 0; i < arrEmailsBcc.length; i++) {
                                 let curText = arrEmailsBcc[i];
                                 let curEmail = arrEmailsBcc[i];
-                                
-                                for (let x = 0; x < res.contacts.length; x++){
+
+                                for (let x = 0; x < res.contacts.length; x++) {
                                     let curContact = res.contacts[x];
 
-                                    if (curText === curContact.email_work || 
-                                        curText === curContact.email_personal || 
-                                        curText === curContact.email_other){
-                                            curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
-                                            break;
-                                        }
+                                    if (curText === curContact.email_work ||
+                                        curText === curContact.email_personal ||
+                                        curText === curContact.email_other) {
+                                        curText = curContact.first_name + (curContact.middle_name === '' ? '' : ' ' + curContact.middle_name) + (curContact.last_name === '' ? '' : ' ' + curContact.last_name);
+                                        break;
+                                    }
                                 }
 
                                 input.before(`
@@ -2613,7 +2693,7 @@ function eventListeners() {
                 setTimeout(function () {
                     $('[tabindex=' + (tabindex) + ']').focus();
                 }, 50);
-                
+
                 popup.fadeOut('fast');
             } else {
                 if (popup.is(':visible')) {
@@ -2899,15 +2979,182 @@ function eventListeners() {
         }
     });
 
-    $(document).on('click', '#slide-carrier-docs-upload-documents-btn', function(e) {
+    $(document).on('click', '#slide-carrier-docs-upload-documents-btn', function (e) {
         let btn = $(this);
+        let slideCustomer = btn.closest('#swiper-slide-customer');
+        let customer_id = slideCustomer.find('#txt-customer-customer-id');
         let panel = btn.closest('.panel');
+        let title = panel.find('#txt-slide-carrier-docs-title');
+        let subject = panel.find('#txt-slide-carrier-docs-subject');
+        let tags = panel.find('#txt-slide-carrier-docs-tags');
+
+        if (customer_id.val().trim() === '') {
+            alert('You must select a customer first!');
+            return;
+        }
+
+        if (title.val().trim() === '') {
+            alert('You must enter the title first!');
+            return;
+        }
+
+        if (subject.val().trim() === '') {
+            alert('You must enter the subject first!');
+            return;
+        }
+
+        if (tags.val().trim() === '') {
+            alert('You must enter the tags first!');
+            return;
+        }
 
         let buttonsSection = btn.closest(".buttons-section");
         let form = buttonsSection.find("form#frm-document-upload-btn");
         let inputFile = form.find("input");
 
         inputFile.trigger("click");
+    });
+
+    $(document).on('click', '.carrier-docs-documents-item .item-btn', function (e) {
+        e.stopPropagation();
+
+        let btn = $(this);
+        let slideCustomer = btn.closest('#swiper-slide-customer');
+        let documentsWrapper = slideCustomer.find('.carrier-docs-documents-wrapper');
+        let previewContainer = slideCustomer.find('#frm-carrier-docs-preview .portal-content');
+        let item = btn.closest('.carrier-docs-documents-item');
+
+        let doc_id = item.attr('data-doc-id');
+        let customer_id = item.attr('data-customer-id');
+
+        let html = ``;
+
+        if (confirm('Are you sure to delete this document?')) {
+            $.post(serverURL + '/deleteCustomerDocument', {
+                doc_id: doc_id,
+                customer_id: customer_id
+            }).then(res => {
+
+                if (res.result === "OK") {
+                    for (let i = 0; i < res.documents.length; i++) {
+                        let doc = res.documents[i];
+
+                        html += `
+                                <div class="carrier-docs-documents-item" 
+                                    data-id="${doc.id}" 
+                                    data-customer-id="${doc.customer_id}" 
+                                    data-doc-id="${doc.doc_id}" 
+                                    data-doc-name="${doc.doc_name}" 
+                                    data-doc-extension="${doc.doc_extension}" 
+                                    data-user-id="${doc.user_id}"
+                                    data-date-entered="${doc.date_entered}" 
+                                    data-title="${doc.title}" 
+                                    data-subject="${doc.subject}" 
+                                    data-tags="${doc.tags}">
+
+                                    <div class="item-info">
+                                        <div class="item-icon" title="${doc.doc_extension === 'pdf' ? 'Pdf File' : 'Image File'}"><span class="fas fa-file-${doc.doc_extension === 'pdf' ? 'pdf' : 'image'}"></div>
+                                        <div class="item-user-id">${doc.user_id}</div>
+                                        <div class="item-date-entered">${doc.date_entered}</div>
+                                        <div class="item-title">${doc.title}</div>
+                                        <div class="item-subject">${doc.subject}</div>
+                                    </div>
+
+                                    <div class="item-btn"><span class="fas fa-trash-alt"></span></div>
+                                </div>
+                                    `
+                            ;
+                    }
+                }
+
+                if (doc_id === previewContainer.attr('data-doc-id')){
+                    previewContainer.html('');
+                    previewContainer.attr('data-doc-id', '');
+                }
+
+                documentsWrapper.html(html);
+            });
+        }
+    });
+
+    $(document).on('change', '#select-document-input', function (e) {
+        let input = $(this);
+        let slideCustomer = input.closest('#swiper-slide-customer');
+        let customer_id = slideCustomer.find('#txt-customer-customer-id');
+        let panel = input.closest('.panel');
+        let user_id = panel.find('#txt-slide-carrier-docs-user-id');
+        let date_entered = panel.find('#txt-slide-carrier-docs-date-entered');
+        let title = panel.find('#txt-slide-carrier-docs-title');
+        let subject = panel.find('#txt-slide-carrier-docs-subject');
+        let tags = panel.find('#txt-slide-carrier-docs-tags');
+
+        let frmDocuments = $(document).find('#frm-carrier-docs-documents');
+        let documentsWrapper = frmDocuments.find('.carrier-docs-documents-wrapper');
+        let files = e.target.files;
+        const maxSize = 1048576;
+        let formData = new FormData();
+
+        formData.append("doc", files[0]);
+        formData.append("customer_id", customer_id.val());
+        formData.append("user_id", user_id.val().trim());
+        formData.append("date_entered", date_entered.val().trim());
+        formData.append("title", title.val().trim());
+        formData.append("subject", subject.val().trim());
+        formData.append("tags", tags.val().trim());
+
+        let html = ``;
+
+        $.ajax({
+            method: "post",
+            url: serverURL + "/saveDocument",
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: false,
+            success: function (response) {
+                if (response.result === "OK") {
+                    for (let i = 0; i < response.documents.length; i++) {
+                        let doc = response.documents[i];
+
+                        html += `
+                                <div class="carrier-docs-documents-item" 
+                                    data-id="${doc.id}" 
+                                    data-customer-id="${doc.customer_id}" 
+                                    data-doc-id="${doc.doc_id}" 
+                                    data-doc-name="${doc.doc_name}" 
+                                    data-doc-extension="${doc.doc_extension}" 
+                                    data-user-id="${doc.user_id}"
+                                    data-date-entered="${doc.date_entered}" 
+                                    data-title="${doc.title}" 
+                                    data-subject="${doc.subject}" 
+                                    data-tags="${doc.tags}">
+
+                                    <div class="item-info">
+                                        <div class="item-icon" title="${doc.doc_extension === 'pdf' ? 'Pdf File' : 'Image File'}"><span class="fas fa-file-${doc.doc_extension === 'pdf' ? 'pdf' : 'image'}"></div>
+                                        <div class="item-user-id">${doc.user_id}</div>
+                                        <div class="item-date-entered">${doc.date_entered}</div>
+                                        <div class="item-title">${doc.title}</div>
+                                        <div class="item-subject">${doc.subject}</div>
+                                    </div>
+
+                                    <div class="item-btn"><span class="fas fa-trash-alt"></span></div>
+                                </div>
+                                    `
+                            ;
+                    }
+                    
+                    documentsWrapper.html(html);
+
+                    date_entered.val(moment().format('MM/DD/YYYY'));
+                    title.val('');
+                    subject.val('');
+                    tags.val('');
+                }
+            },
+            error: function (err) {
+                console.log("ajax error");
+            },
+        });
     });
 
     setMaskedInput();
