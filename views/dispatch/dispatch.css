@@ -261,6 +261,34 @@
 .dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .form-section .section-title {
   font-size: 0.6rem;
 }
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .form-section .portal-section {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-top: 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .form-section .portal-section .notes-for-carrier-portal-section-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .form-section .portal-section .notes-for-carrier-portal-section-wrapper .notes-for-carrier-list-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: ease 0.3s;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section .form-section .portal-section .notes-for-carrier-portal-section-wrapper .notes-for-carrier-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
 .dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .button-section.left {
   flex-grow: 1;
   display: flex;
@@ -288,6 +316,34 @@
   flex-direction: row;
   justify-content: flex-end;
   margin-right: 3px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .internal-notes-container .portal-section {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-top: 5px;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .internal-notes-container .portal-section .internal-notes-portal-section-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .internal-notes-container .portal-section .internal-notes-portal-section-wrapper .internal-notes-list-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: ease 0.3s;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .internal-notes-container .portal-section .internal-notes-portal-section-wrapper .internal-notes-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 .dispatch-container .dispatch-content .dispatch-wrapper .functions-section-container .commisions-container {
   display: flex;
@@ -358,4 +414,176 @@
 .dispatch-container .dispatch-content .dispatch-wrapper .carrier-notes-section-container .notes-section-2 .row-section .input-box-container.percentage-box {
   min-width: 4.5rem !important;
   max-width: 4.5rem !important;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper .modal-dispatch-notes-for-carrier-content {
+  width: 90%;
+  max-width: 400px;
+  min-height: 200px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper .modal-dispatch-notes-for-carrier-content .row-textinput {
+  flex-grow: 1;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper .modal-dispatch-notes-for-carrier-content .row-textinput textarea {
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 5px;
+  border-radius: 10px;
+  max-height: 500px;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper .modal-dispatch-notes-for-carrier-content .row-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper .modal-dispatch-notes-for-carrier-content .row-buttons .group-btn {
+  display: flex;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper .modal-dispatch-notes-for-carrier-content .row-buttons .mochi-button .mochi-button-decorator {
+  font-size: 1rem;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier .modal-dispatch-notes-for-carrier-wrapper .modal-dispatch-notes-for-carrier-content .row-buttons .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  display: inline-block;
+  white-space: normal;
+  font-size: 0.8rem;
+  line-height: initial;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.showing textarea {
+  background-color: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.showing #dispatch-notes-for-carrier-save-btn {
+  display: none;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.showing #dispatch-notes-for-carrier-edit-btn {
+  display: block;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.showing #dispatch-notes-for-carrier-delete-btn {
+  display: block;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.adding textarea,
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.editing textarea {
+  background-color: white;
+  pointer-events: all;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.adding #dispatch-notes-for-carrier-save-btn,
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.editing #dispatch-notes-for-carrier-save-btn {
+  display: block;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.adding #dispatch-notes-for-carrier-delete-btn,
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.editing #dispatch-notes-for-carrier-delete-btn {
+  display: none;
+}
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.adding #dispatch-notes-for-carrier-edit-btn,
+.dispatch-container .dispatch-content .modal-dispatch-notes-for-carrier.editing #dispatch-notes-for-carrier-edit-btn {
+  display: none;
+}
+.dispatch-container .modal-dispatch-internal-notes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper .modal-dispatch-internal-notes-content {
+  width: 90%;
+  max-width: 400px;
+  min-height: 200px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper .modal-dispatch-internal-notes-content .row-textinput {
+  flex-grow: 1;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper .modal-dispatch-internal-notes-content .row-textinput textarea {
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 5px;
+  border-radius: 10px;
+  max-height: 500px;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper .modal-dispatch-internal-notes-content .row-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper .modal-dispatch-internal-notes-content .row-buttons .group-btn {
+  display: flex;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper .modal-dispatch-internal-notes-content .row-buttons .mochi-button .mochi-button-decorator {
+  font-size: 1rem;
+}
+.dispatch-container .modal-dispatch-internal-notes .modal-dispatch-internal-notes-wrapper .modal-dispatch-internal-notes-content .row-buttons .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  display: inline-block;
+  white-space: normal;
+  font-size: 0.8rem;
+  line-height: initial;
+}
+.dispatch-container .modal-dispatch-internal-notes.showing textarea {
+  background-color: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+.dispatch-container .modal-dispatch-internal-notes.showing #dispatch-internal-notes-save-btn {
+  display: none;
+}
+.dispatch-container .modal-dispatch-internal-notes.showing #dispatch-internal-notes-edit-btn {
+  display: block;
+}
+.dispatch-container .modal-dispatch-internal-notes.showing #dispatch-internal-notes-delete-btn {
+  display: block;
+}
+.dispatch-container .modal-dispatch-internal-notes.adding textarea,
+.dispatch-container .modal-dispatch-internal-notes.editing textarea {
+  background-color: white;
+  pointer-events: all;
+}
+.dispatch-container .modal-dispatch-internal-notes.adding #dispatch-internal-notes-save-btn,
+.dispatch-container .modal-dispatch-internal-notes.editing #dispatch-internal-notes-save-btn {
+  display: block;
+}
+.dispatch-container .modal-dispatch-internal-notes.adding #dispatch-internal-notes-delete-btn,
+.dispatch-container .modal-dispatch-internal-notes.editing #dispatch-internal-notes-delete-btn {
+  display: none;
+}
+.dispatch-container .modal-dispatch-internal-notes.adding #dispatch-internal-notes-edit-btn,
+.dispatch-container .modal-dispatch-internal-notes.editing #dispatch-internal-notes-edit-btn {
+  display: none;
 }

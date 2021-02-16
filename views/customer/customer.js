@@ -1,6 +1,6 @@
 let location = window.location.href;
 // let serverURL = 'http://server.anchortms.com';
-let serverURL = "http://localhost:8000";
+let serverURL = "http://tmsserver.ddns.net";
 
 export class CustomerContainer {
     create(callback) {
@@ -103,9 +103,6 @@ function eventListeners() {
             .find(".main-panel-container");
         let panelContainer = mainContainer.find(".panel-container");
 
-        console.log(mainContainer);
-        console.log(panelContainer);
-
         $.get(
             location + "views/panels/revenue-info/revenue-information.html",
             async function (content) {
@@ -146,9 +143,6 @@ function eventListeners() {
             .closest(".swiper-slide")
             .find(".main-panel-container");
         let panelContainer = mainContainer.find(".panel-container");
-
-        console.log(mainContainer);
-        console.log(panelContainer);
 
         $.get(
             location + "views/panels/order-history/order-history.html",
@@ -206,7 +200,6 @@ function eventListeners() {
                         customer_id: customerContainer.find(".customer-section input#txt-customer-customer-id").val(),
                         contact_id: contactId.val(),
                     }).then((res) => {
-                        console.log(res);
                         let list = ``;
                         let lastLetter = "";
 
@@ -632,7 +625,7 @@ function eventListeners() {
                             data-tags="${doc.tags}">
 
                             <div class="item-info">
-                                <div class="item-icon" title="${doc.doc_extension === 'pdf' ? 'Pdf File' : 'Image File'}"><span class="fas fa-file-${doc.doc_extension === 'pdf' ? 'pdf' : 'image'}"></div>
+                                <div class="item-icon" title=""><span class="${getFileIconClass(doc.doc_extension)}"></span></div>
                                 <div class="item-user-id">${doc.user_id}</div>
                                 <div class="item-date-entered">${doc.date_entered}</div>
                                 <div class="item-title">${doc.title}</div>
@@ -683,36 +676,196 @@ function eventListeners() {
         });
     });
 
-    $(document).on('click', '.carrier-docs-documents-item', function (e) {
+    $(document).on('click', '.carrier-docs-documents-item:not(.selected)', function (e) {
         let item = $(this);
         let panel = item.closest('.panel');
         let previewContainer = panel.find('#frm-carrier-docs-preview .portal-content');
         let extension = item.attr('data-doc-extension');
-        let doc_id = item.attr('data-doc-id');
+        let id = item.attr('data-id');
+        let docId = item.attr('data-doc-id');
+        let userId = item.attr('data-user-id');
+        let dateEntered = item.attr('data-date-entered');
+        let title = item.attr('data-title');
+        let subject = item.attr('data-subject');
+        let tags = item.attr('data-tags').split(' ');
+        let docNotesWrapper = panel.find('.carrier-docs-notes-wrapper');
+
+        $.post(serverURL + '/getNotesByDocument', { doc_id: id }).then(res => {
+            let notesHtml = ``;
+
+            if (res.result === 'OK') {
+
+                for (let i = 0; i < res.documentNotes.length; i++) {
+                    let note = res.documentNotes[i];
+
+                    notesHtml += `
+                        <div class="carrier-docs-notes-item" data-id="${note.id}" data-user="${note.user}" data-datetime="${moment(note.date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY:HHmm')}" data-note="${note.note}">
+                            ${note.note}
+                        </div>
+                    `;
+                }
+            }
+
+            docNotesWrapper.html(notesHtml);
+        });
+
+        panel.find('input#txt-slide-carrier-docs-id').val(id);
+        panel.find('input#txt-slide-carrier-docs-user-id').val(userId);
+        panel.find('input#txt-slide-carrier-docs-date-entered').val(dateEntered);
+        panel.find('input#txt-slide-carrier-docs-title').val(title);
+        panel.find('input#txt-slide-carrier-docs-subject').val(subject);
+
+        let ibcTags = panel.find('.input-box-container.input-tag');
+        ibcTags.find('.inputted-tag').remove();
+        ibcTags.find('input').val('');
+
+        for (let i = 0; i < tags.length; i++) {
+            ibcTags.find('input').before(`
+                <div class="inputted-tag">
+                    <span class="fas fa-trash-alt btn-delete-inputted-tag"></span>
+                    <span style="white-space:nowrap" class="inputted-tag" data-tag="${tags[i]}">${tags[i]}</span>
+                </div>
+            `);
+        }
 
         let loaderHtml = `<div class="preview-loader">
                             <span class="fas fa-spin spinner"></span>
                         </div>`;
 
-        let pdfHtml = `<iframe id="pdf-js-viewer" src="${serverURL}/customer-documents/${doc_id}#toolbar=0&navpanes=0&scrollbar=0" title="webviewer" frameborder="0" allowfullscreen width="100%" height="100%" ></iframe>`;
+        let url = encodeURI(serverURL + '/customer-documents/' + docId);
 
-        let imgHtml = `<div class="img-wrapper">
-                    <img src="${serverURL}/customer-documents/${doc_id}" alt="">
-                </div>`;
+        let pdfHtml = `<iframe id="pdf-js-viewer" name="if-doc-preview" src="${url}#toolbar=1&navpanes=0&scrollbar=0" frameborder="0" allowfullscreen width="100%" height="100%" ></iframe>`;
+        let textHtml = `<iframe id="pdf-js-viewer" name="if-doc-preview" src="${url}#toolbar=1&navpanes=0&scrollbar=0" frameborder="0" allowfullscreen width="100%" height="100%" ></iframe>`;
+        // let officeHtml = `<iframe name="if-doc-preview" src="https://view.officeapps.live.com/op/embed.aspx?src=${url}#toolbar=1&navpanes=0&scrollbar=0" frameborder="0" allowfullscreen width="100%" height="100%"></iframe>`;
+        let officeHtml = `<iframe src="https://docs.google.com/gview?url=${url}&embedded=true&widget=true" frameborder="0" allowfullscreen width="100%" height="100%"></iframe>`;
+        let imgHtml = `<div class="img-wrapper" name="if-doc-preview"><img src="${url}" alt=""></div>`;
 
         previewContainer.html(loaderHtml);
 
-        if (extension === 'pdf') {
-            previewContainer.html(pdfHtml);
-        } else {
-            previewContainer.html(imgHtml);
+        switch (extension.toLowerCase()) {
+            case 'txt':
+                previewContainer.html(textHtml);
+                break;
+            case 'pdf':
+                previewContainer.html(pdfHtml);
+                break;
+            case 'xls':
+                previewContainer.html(officeHtml);
+                break;
+            case 'xlsx':
+                previewContainer.html(officeHtml);
+                break;
+            case 'doc':
+                previewContainer.html(officeHtml);
+                break;
+            case 'docx':
+                previewContainer.html(officeHtml);
+                break;
+            case 'ppt':
+                previewContainer.html(officeHtml);
+                break;
+            case 'pptx':
+                previewContainer.html(officeHtml);
+                break;
+            case 'jpg':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jpeg':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jpe':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jif':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jfif':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jfi':
+                previewContainer.html(imgHtml);
+                break;
+            case 'png':
+                previewContainer.html(imgHtml);
+                break;
+            case 'gif':
+                previewContainer.html(imgHtml);
+                break;
+            case 'webp':
+                previewContainer.html(imgHtml);
+                break;
+            case 'tiff':
+                previewContainer.html(imgHtml);
+                break;
+            case 'tif':
+                previewContainer.html(imgHtml);
+                break;
+            case 'bmp':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jp2':
+                previewContainer.html(imgHtml);
+                break;
+            case 'j2k':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jpf':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jpx':
+                previewContainer.html(imgHtml);
+                break;
+            case 'jpm':
+                previewContainer.html(imgHtml);
+                break;
+            case 'mj2':
+                previewContainer.html(imgHtml);
+                break;
+            case 'svg':
+                previewContainer.html(imgHtml);
+                break;
+            case 'svgz':
+                previewContainer.html(imgHtml);
+                break;
+
+            default:
+                previewContainer.html('No preview available for this file');
+                break;
         }
 
-        previewContainer.attr('data-doc-id', doc_id);
+        previewContainer.attr('data-doc-id', docId);
 
         $(document).find('.carrier-docs-documents-item').removeClass('selected');
 
         item.addClass('selected');
+
+        panel.find('#slide-carrier-docs-upload-documents-btn').addClass('disabled');
+    });
+
+    $(document).on('click', '#slide-carrier-docs-preview-print-btn', function(){
+        let panel = $(this).closest('.panel');
+        let iframe = panel.find('iframe[name=if-doc-preview]');
+
+        document.querySelector('iframe[name=if-doc-preview]').contentWindow.print();
+    });
+
+    $(document).on('click', '#slide-carrier-docs-clear-btn', function () {
+        let panel = $(this).closest('.panel');
+        let userId = Math.floor(Math.random() * (15 - 1)) + 1;
+        let dateEntered = moment().format('MM/DD/YYYY');
+
+        panel.find('input').val('');
+        panel.find('.inputted-tag').remove();
+        panel.find('.carrier-docs-notes-wrapper').html('');
+        panel.find('#txt-slide-carrier-docs-user-id').val(userId);
+        panel.find('#txt-slide-carrier-docs-date-entered').val(dateEntered);
+        panel.find('#slide-carrier-docs-upload-documents-btn').removeClass('disabled');
+        panel.find('.carrier-docs-documents-item').removeClass('selected');
+        panel.find('#frm-carrier-docs-preview .portal-content').html('');
+
+        setTimeout(function () {
+            panel.find('#txt-slide-carrier-docs-title').focus();
+        }, 100);
     });
 
     $(document).on("click", "#customers-customer-search-btn", function (e) {
@@ -1050,9 +1203,6 @@ function eventListeners() {
             $.post(serverURL + "/getCustomerPayload", {
                 customer_id: customer_id,
             }).then((res) => {
-
-                console.log(res);
-
                 if (res.result === "OK") {
                     let contactItems = ``;
                     let notesItems = ``;
@@ -1352,7 +1502,7 @@ function eventListeners() {
                         customer_id: customerContainer.find(".customer-section input#txt-customer-customer-id").val(),
                         contact_id: contactId,
                     }).then((res) => {
-                        console.log(res);
+
                         let list = ``;
                         let lastLetter = "";
 
@@ -1712,7 +1862,6 @@ function eventListeners() {
         }).then((res) => {
             let con = res.contact;
 
-            console.log(con);
             contact_id.val(con.id);
 
             if (con.avatar) {
@@ -1832,6 +1981,91 @@ function eventListeners() {
 
     $(document).on('blur', '.mailing-address-section input', function (e) {
         validateCustomerForSaving()
+    });
+
+    $(document).on("click", "#slide-carrier-docs-add-note-btn", function (e) {
+        console.log('here');
+        let panel = $(this).closest(".panel");
+        let docId = panel.find('#txt-slide-carrier-docs-id').val();
+
+        if (docId === '') {
+            alert('You must select a document first');
+            return;
+        }
+
+        let modal = panel.find(".modal-customer-document-notes");
+        modal.attr("class", "modal-customer-document-notes adding");
+        modal.find("textarea").val("");
+        modal.fadeIn();
+        modal.find("textarea").focus();
+    });
+
+    $(document).on("click", "#customer-document-notes-cancel-btn", function (e) {
+        let panel = $(this).closest(".panel");
+        let modal = panel.find(".modal-customer-document-notes");
+
+        modal.find("textarea").val();
+        modal.fadeOut();
+    });
+
+    $(document).on("click", "#customer-document-notes-save-btn", function (e) {
+        let panel = $(this).closest(".panel");
+        let docId = panel.find('#txt-slide-carrier-docs-id').val();
+        let modal = panel.find(".modal-customer-document-notes");
+        let textarea = modal.find("textarea");
+        let documentNotesWrapper = panel.find(".carrier-docs-notes-wrapper");
+
+        if (textarea.val().trim() === "") {
+            alert("You must type some text");
+            return;
+        }
+
+        let userInitials = getInitials(2);
+        let datetime = moment().format("YYYY-MM-DD HH:mm:ss");
+
+        $.post(serverURL + "/saveCustomerDocumentNote", {
+            note_id: 0,
+            doc_id: docId,
+            note: textarea.val().trim(),
+            user: userInitials,
+            date_time: datetime,
+        }).then((res) => {
+            let notesList = ``;
+
+            for (let i = 0; i < res.documentNotes.length; i++) {
+                notesList += `
+                <div 
+                    class="carrier-docs-notes-item" 
+                    data-id="${res.documentNotes[i].id}" 
+                    data-user="${res.documentNotes[i].user}" 
+                    data-note="${res.documentNotes[i].note}" 
+                    data-datetime="${moment(res.documentNotes[i].date_time, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY:HHmm")}">
+                        ${res.documentNotes[i].note}
+                </div>
+                `;
+            }
+
+            documentNotesWrapper.html(notesList);
+
+            setTimeout(function () {
+                $(document).find('#customer-document-notes-cancel-btn').click();
+            }, 100);
+        });
+    });
+
+    $(document).on("click", ".carrier-docs-notes-item", function (e) {
+        let panel = $(this).closest(".panel");
+
+        let noteUser = $(this).attr("data-user");
+        let noteDateTime = $(this).attr("data-datetime");
+        let noteText = $(this).text().trim();
+
+        let modal = panel.find(".modal-customer-document-notes");
+        let textarea = modal.find("textarea");
+        modal.attr("class", "modal-customer-document-notes showing");
+
+        textarea.val(noteUser + ":" + noteDateTime + " " + noteText);
+        modal.fadeIn();
     });
 
     $(document).on("click", "#customer-notes-add-note-btn", function (e) {
@@ -2394,18 +2628,14 @@ function eventListeners() {
 
             $.post(serverURL + '/saveCustomerHours', data)
                 .then(res => {
-                    console.log(res.result);
+
                 })
         }
 
     });
 
     $(document).on('click', '#customer-contacts-list-search-btn', function (e) {
-        let customerId = $(this).closest('.customer-content').find('#txt-customer-customer-id').val();
-
-        if (customerId !== '') {
-            return;
-        }
+        let customerId = $(this).closest('.customer-content').find('#txt-customer-customer-id').val();        
 
         let formSection = $(this).closest('.form-section');
         formSection.find('.customer-contact-list-section input').attr('tabindex', '0');
@@ -2424,6 +2654,7 @@ function eventListeners() {
         e.preventDefault();
         let form = $(this).closest(".form-section");
         let mainContainer = form.closest(".swiper-slide").find(".main-panel-container");
+        let customerId = form.closest('.swiper-slide').find('#txt-customer-customer-id').val();
         let panelContainer = mainContainer.find(".panel-container");
 
         let first_name = form.find("input#txt-customer-contacts-search-first-name").val();
@@ -2436,6 +2667,7 @@ function eventListeners() {
         let email = form.find("input#txt-customer-contacts-search-email").val();
 
         let data = {
+            customer_id: customerId === '' ? 0 : Number(customerId),
             first_name: first_name.toLowerCase(),
             last_name: last_name.toLowerCase(),
             address1: address1.toLowerCase(),
@@ -3003,8 +3235,8 @@ function eventListeners() {
             return;
         }
 
-        if (tags.val().trim() === '') {
-            alert('You must enter the tags first!');
+        if (panel.find('.input-box-container.input-tag .inputted-tag').length === 0) {
+            alert('You must enter at least one tag');
             return;
         }
 
@@ -3019,6 +3251,7 @@ function eventListeners() {
         e.stopPropagation();
 
         let btn = $(this);
+        let panel = btn.closest('.panel');
         let slideCustomer = btn.closest('#swiper-slide-customer');
         let documentsWrapper = slideCustomer.find('.carrier-docs-documents-wrapper');
         let previewContainer = slideCustomer.find('#frm-carrier-docs-preview .portal-content');
@@ -3036,11 +3269,12 @@ function eventListeners() {
             }).then(res => {
 
                 if (res.result === "OK") {
+
                     for (let i = 0; i < res.documents.length; i++) {
                         let doc = res.documents[i];
 
                         html += `
-                                <div class="carrier-docs-documents-item" 
+                                <div class="carrier-docs-documents-item"
                                     data-id="${doc.id}" 
                                     data-customer-id="${doc.customer_id}" 
                                     data-doc-id="${doc.doc_id}" 
@@ -3053,7 +3287,7 @@ function eventListeners() {
                                     data-tags="${doc.tags}">
 
                                     <div class="item-info">
-                                        <div class="item-icon" title="${doc.doc_extension === 'pdf' ? 'Pdf File' : 'Image File'}"><span class="fas fa-file-${doc.doc_extension === 'pdf' ? 'pdf' : 'image'}"></div>
+                                        <div class="item-icon" title=""><span class="${getFileIconClass(doc.doc_extension)}"></span></div>
                                         <div class="item-user-id">${doc.user_id}</div>
                                         <div class="item-date-entered">${doc.date_entered}</div>
                                         <div class="item-title">${doc.title}</div>
@@ -3067,12 +3301,14 @@ function eventListeners() {
                     }
                 }
 
-                if (doc_id === previewContainer.attr('data-doc-id')){
+                if (doc_id === previewContainer.attr('data-doc-id')) {
                     previewContainer.html('');
                     previewContainer.attr('data-doc-id', '');
                 }
 
                 documentsWrapper.html(html);
+
+                $(document).find('#slide-carrier-docs-clear-btn').click();
             });
         }
     });
@@ -3086,7 +3322,16 @@ function eventListeners() {
         let date_entered = panel.find('#txt-slide-carrier-docs-date-entered');
         let title = panel.find('#txt-slide-carrier-docs-title');
         let subject = panel.find('#txt-slide-carrier-docs-subject');
-        let tags = panel.find('#txt-slide-carrier-docs-tags');
+        let tags = '';
+
+        for (let i = 0; i < panel.find('.inputted-tag').length; i++) {
+            let tag = panel.find('.inputted-tag').eq(i);
+
+            tags += tag.find('span.inputted-tag').text() + ' ';
+        }
+
+        tags = tags.replace(/  +/g, ' ');
+        tags = tags.trim();
 
         let frmDocuments = $(document).find('#frm-carrier-docs-documents');
         let documentsWrapper = frmDocuments.find('.carrier-docs-documents-wrapper');
@@ -3100,7 +3345,7 @@ function eventListeners() {
         formData.append("date_entered", date_entered.val().trim());
         formData.append("title", title.val().trim());
         formData.append("subject", subject.val().trim());
-        formData.append("tags", tags.val().trim());
+        formData.append("tags", tags);
 
         let html = ``;
 
@@ -3130,7 +3375,7 @@ function eventListeners() {
                                     data-tags="${doc.tags}">
 
                                     <div class="item-info">
-                                        <div class="item-icon" title="${doc.doc_extension === 'pdf' ? 'Pdf File' : 'Image File'}"><span class="fas fa-file-${doc.doc_extension === 'pdf' ? 'pdf' : 'image'}"></div>
+                                        <div class="item-icon" title=""><span class="${getFileIconClass(doc.doc_extension)}"></span></div>
                                         <div class="item-user-id">${doc.user_id}</div>
                                         <div class="item-date-entered">${doc.date_entered}</div>
                                         <div class="item-title">${doc.title}</div>
@@ -3142,19 +3387,51 @@ function eventListeners() {
                                     `
                             ;
                     }
-                    
+
                     documentsWrapper.html(html);
 
-                    date_entered.val(moment().format('MM/DD/YYYY'));
-                    title.val('');
-                    subject.val('');
-                    tags.val('');
+                    $(document).find('#slide-carrier-docs-clear-btn').click();
                 }
             },
             error: function (err) {
                 console.log("ajax error");
             },
         });
+    });
+
+    $(document).on('keydown', 'input#txt-slide-carrier-docs-tags', function (e) {
+        let key = e.keycode || e.which;
+        let input = $(this);
+
+        let inputtedTag = `
+            <div class="inputted-tag" title="">
+                <span class="fas fa-trash-alt btn-delete-inputted-tag"></span>
+                <span style="white-space:nowrap" class="inputted-tag" data-tag="${input.val().trim()}">${input.val().trim()}</span>
+            </div>
+        `;
+
+        if (key === 32 || key === 9 || key === 13) {
+
+            if (key === 32) {
+                e.preventDefault();
+            }
+
+            if (input.val().trim() !== '') {
+                input.before(inputtedTag);
+                input.val('');
+
+                setTimeout(function () {
+                    input.focus();
+                }, 50);
+            }
+        }
+    });
+
+    $(document).on('click', '.btn-delete-inputted-tag', function () {
+        let btn = $(this);
+        let inputtedTag = btn.closest('.inputted-tag');
+
+        inputtedTag.remove();
     });
 
     setMaskedInput();
@@ -3164,7 +3441,195 @@ function eventListeners() {
     var delayTimer;
 }
 
+function getFileIconClass(ext) {
 
+    let iconClass = 'fas fa-file';
+
+    switch (ext.toLowerCase()) {
+        case 'doc':
+            iconClass = 'fas fa-file-word'
+            break;
+        case 'docx':
+            iconClass = 'fas fa-file-word'
+            break;
+        case 'html':
+            iconClass = 'fas fa-file-code'
+            break;
+        case 'htm':
+            iconClass = 'fas fa-file-code'
+            break;
+        case 'pdf':
+            iconClass = 'fas fa-file-pdf'
+            break;
+        case 'xls':
+            iconClass = 'fas fa-file-excel'
+            break;
+        case 'xlsx':
+            iconClass = 'fas fa-file-excel'
+            break;
+        case 'ppt':
+            iconClass = 'fas fa-file-powerpoint'
+            break;
+        case 'pptx':
+            iconClass = 'fas fa-file-powerpoint'
+            break;
+        case 'txt':
+            iconClass = 'fas fa-file-alt'
+            break;
+        case 'jpg':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jpeg':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jpe':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jif':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jfif':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jfi':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'png':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'gif':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'webp':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'tiff':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'tif':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'bmp':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jp2':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'j2k':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jpf':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jpx':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'jpm':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'mj2':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'svg':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'svgz':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'ai':
+            iconClass = 'fas fa-file-image'
+            break;
+        case 'psd':
+            iconClass = 'fas fa-file-image'
+            break;
+        case '7z':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'arc':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'arj':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'bz2':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'daa':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'gz':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'rar':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'tar':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'zim':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'zip':
+            iconClass = 'fas fa-file-archive'
+            break;
+        case 'webm':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'mpg':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'mp2':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'mpeg':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'mpe':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'mpv':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'ogg':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'mp4':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'm4p':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'm4v':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'avi':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'wmv':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'mov':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'qt':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'flv':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'swf':
+            iconClass = 'fas fa-file-video'
+            break;
+        case 'avchd':
+            iconClass = 'fas fa-file-video'
+            break;
+        default:
+            iconClass = 'fas fa-file'
+            break;
+    }
+
+    return iconClass;
+}
 
 function ValidateEmail(inputText) {
     var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -3272,8 +3737,6 @@ function validateAutomaticEmailsForSaving() {
     let automaticEmailsLoaded = automaticEmailsSection.find('input#cbox-automatic-emails-loaded').is(':checked') ? 1 : 0;
     let automaticEmailsEmpty = automaticEmailsSection.find('input#cbox-automatic-emails-empty').is(':checked') ? 1 : 0;
 
-    console.log(customerId.val().trim());
-
     if (customerId.val().trim() !== '') {
         let emailsToContainer = automaticEmailsSection.find('#ibc-automatic-emails-email-to');
         let emailsCcContainer = automaticEmailsSection.find('#ibc-automatic-emails-email-cc');
@@ -3310,7 +3773,7 @@ function validateAutomaticEmailsForSaving() {
 
         $.post(serverURL + '/saveAutomaticEmails', data)
             .then(res => {
-                console.log(res);
+                // nothing to do
             })
     }
 }
@@ -3563,7 +4026,6 @@ function validateCustomerForSaving(bill_to = false) {
             mailing_fid: mailing_fid.val().trim()
         }).then((res) => {
             let c = res.customer;
-            console.log(c);
             id.val(c.id);
             code.val(c.code + (c.code_number !== 0 ? c.code_number : ""));
             mailing_code.val(c.mailing_code + (c.mailing_code_number !== 0 ? c.mailing_code_number : ""));
@@ -3774,7 +4236,6 @@ function customerContactClicks(row) {
                                 customer_id: customerId,
                                 contact_id: contactId,
                             }).then((res) => {
-                                console.log(res);
                                 let list = ``;
                                 let lastLetter = "";
 

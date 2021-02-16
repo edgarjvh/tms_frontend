@@ -24,6 +24,27 @@
 #panel-carrier-docs .header .input-fields-section .row-fields .input-box-container {
   flex-grow: 1;
 }
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.hidden {
+  display: none;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.input-tag {
+  align-items: center;
+  padding: 0 5px;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.input-tag input {
+  width: unset;
+  flex-grow: 1;
+  padding: 0;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.input-tag span.btn-delete-inputted-tag {
+  margin-right: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: block;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.input-tag span.btn-delete-inputted-tag:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
 #panel-carrier-docs .header .input-fields-section .row-fields .input-box-container.medium-size {
   max-width: 100px;
 }
@@ -33,6 +54,40 @@
 #panel-carrier-docs .header .input-fields-section .row-fields > .separator {
   margin: 0 1px;
   width: 0;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .inputted-tag {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: lightgray;
+  padding: 1px 5px;
+  border-radius: 10px;
+  margin-right: 3px;
+  cursor: default;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .inputted-tag span {
+  font-size: 0.6rem;
+  cursor: default;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .inputted-tag span.btn-delete-inputted-tag-address {
+  margin-right: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: block;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .inputted-tag span.btn-delete-inputted-tag-address:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .inputted-tag.editing {
+  background-color: white;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .inputted-tag.editing span.btn-delete-inputted-tag-address {
+  display: none;
+}
+#panel-carrier-docs .header .input-fields-section .row-fields .inputted-tag.editing span.inputted-tag-address {
+  background-color: lightyellow;
+  min-width: 20px;
+  max-width: 100%;
 }
 #panel-carrier-docs .header .input-fields-section .row-fields:first-child {
   justify-content: flex-start;
@@ -54,6 +109,12 @@
   white-space: normal;
   line-height: 14px;
   font-weight: normal;
+}
+#panel-carrier-docs .header .buttons-section .mochi-button.disabled {
+  pointer-events: none !important;
+}
+#panel-carrier-docs .header .buttons-section .mochi-button.disabled .mochi-button-base {
+  color: rgba(0, 0, 0, 0.5);
 }
 #panel-carrier-docs .row-content {
   display: flex;
@@ -123,6 +184,30 @@
 #panel-carrier-docs .portal-container .carrier-docs-documents-wrapper .carrier-docs-documents-item:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
+#panel-carrier-docs .portal-container .carrier-docs-notes-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+#panel-carrier-docs .portal-container .carrier-docs-notes-wrapper .carrier-docs-notes-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 4.4px 5px;
+  cursor: default;
+  transition: ease 0.3s;
+}
+#panel-carrier-docs .portal-container .carrier-docs-notes-wrapper .carrier-docs-notes-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
 #panel-carrier-docs .portal-container .preview-loader {
   position: absolute;
   top: 50%;
@@ -140,4 +225,71 @@
 }
 #panel-carrier-docs .portal-container .img-wrapper img {
   max-width: 100% !important;
+}
+#panel-carrier-docs .modal-customer-document-notes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+#panel-carrier-docs .modal-customer-document-notes .modal-customer-document-notes-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#panel-carrier-docs .modal-customer-document-notes .modal-customer-document-notes-wrapper .modal-customer-document-notes-content {
+  width: 90%;
+  max-width: 400px;
+  min-height: 200px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+#panel-carrier-docs .modal-customer-document-notes .modal-customer-document-notes-wrapper .modal-customer-document-notes-content .row-textinput {
+  flex-grow: 1;
+}
+#panel-carrier-docs .modal-customer-document-notes .modal-customer-document-notes-wrapper .modal-customer-document-notes-content .row-textinput textarea {
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 5px;
+  border-radius: 10px;
+  max-height: 500px;
+}
+#panel-carrier-docs .modal-customer-document-notes .modal-customer-document-notes-wrapper .modal-customer-document-notes-content .row-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+#panel-carrier-docs .modal-customer-document-notes .modal-customer-document-notes-wrapper .modal-customer-document-notes-content .row-buttons .mochi-button .mochi-button-decorator {
+  font-size: 1rem;
+}
+#panel-carrier-docs .modal-customer-document-notes .modal-customer-document-notes-wrapper .modal-customer-document-notes-content .row-buttons .mochi-button .mochi-button-base {
+  flex-grow: 1;
+  display: inline-block;
+  white-space: normal;
+  font-size: 0.8rem;
+  line-height: initial;
+}
+#panel-carrier-docs .modal-customer-document-notes.showing textarea {
+  background-color: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+#panel-carrier-docs .modal-customer-document-notes.showing #customer-document-notes-save-btn {
+  display: none;
+}
+#panel-carrier-docs .modal-customer-document-notes.adding textarea {
+  background-color: white;
+  pointer-events: all;
+}
+#panel-carrier-docs .modal-customer-document-notes.adding #customer-document-notes-save-btn {
+  display: block;
 }

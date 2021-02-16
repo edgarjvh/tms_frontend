@@ -1,4 +1,6 @@
 let location = window.location.href;
+// let serverURL = 'http://server.anchortms.com';
+let serverURL = "http://tmsserver.ddns.net";
 
 export class LoadBoardContainer {
     create(callback) {
@@ -56,12 +58,12 @@ function eventListeners() {
         reorderCarrierPanels();
     });
 
-    $(document).on('click', '.panel-close-btn', function(){
+    $(document).on('click', '.panel-close-btn', function () {
         let btn = $(this);
         let panelContainer = btn.closest('.panel-container');
         let mainPanelContainer = btn.closest('.main-panel-container');
         let panel = btn.closest('.panel');
-        
+
         panel.animate({
             left: '100%'
         }, 100, function () {
@@ -73,7 +75,92 @@ function eventListeners() {
             }
         });
     });
+
+    $(document).on('click', '#load-board-available-print-btn', function () {
+        let formSection = $(this).closest('.form-section');
+
+        let html = `<h2>Available</h2>`;
+        html += `<ul>`;
+
+        for (let i = 0; i < 10; i++) {
+            html += `<li>Element ${(i + 1)}</li>`;
+        }
+
+        html += `</ul>`;
+
+        Popup(html);
+    });
+
+    $(document).on('click', '#load-board-booked-print-btn', function () {
+        let formSection = $(this).closest('.form-section');
+
+        let html = `<h2>Booked</h2>`;
+        html += `<ul>`;
+
+        for (let i = 0; i < 10; i++) {
+            html += `<li>Element ${(i + 1)}</li>`;
+        }
+
+        html += `</ul>`;
+
+        Popup(html);
+    });
+
+    $(document).on('click', '#load-board-in-transit-print-btn', function () {
+        let formSection = $(this).closest('.form-section');
+
+        let html = `<h2>In Transit</h2>`;
+        html += `<ul>`;
+
+        for (let i = 0; i < 10; i++) {
+            html += `<li>Element ${(i + 1)}</li>`;
+        }
+
+        html += `</ul>`;
+
+        Popup(html);
+    });
+
+    $(document).on('click', '#load-board-load-information-print-btn', function () {
+        let formSection = $(this).closest('.form-section');
+
+        let html = `<h2>Load Information</h2>`;
+        html += `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
+
+        Popup(html);
+    });
+
+    $(document).on('click', '#load-board-loads-delivered-print-btn', function () {
+        let formSection = $(this).closest('.form-section');
+
+        let html = `<h2>Loads Delivered but not Invoiced</h2>`;
+        html += `<ul>`;
+
+        for (let i = 0; i < 10; i++) {
+            html += `<li>Element ${(i + 1)}</li>`;
+        }
+
+        html += `</ul>`;
+
+        Popup(html);
+    });
 }
+
+function Popup(data) {
+    var mywindow = window.open('', 'new div', 'height=400,width=600');
+    mywindow.document.write('<html><head><title></title>');
+    mywindow.document.write('<link rel="stylesheet" href="../../css/index.css" type="text/css" media="all" />');
+    mywindow.document.write('</head><body >');
+    mywindow.document.write(data);
+    mywindow.document.write('</body></html>');
+    mywindow.document.close();
+    mywindow.focus();
+    setTimeout(function () { mywindow.print(); }, 1000);
+    // mywindow.close();
+
+    return true;
+}
+
 
 function reorderCarrierPanels() {
     let mainContainer = $(document).find('#load-board-main-panel-container');
@@ -204,7 +291,7 @@ function setPanelDraggableVertical() {
 
                     for (let i = 0; i < count; i++) {
                         let panel = panelContainer.find('.panel').eq(i);
-                        
+
                         panel.animate({
                             top: '0'
                         }, 100);
