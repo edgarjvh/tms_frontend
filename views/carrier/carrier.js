@@ -1,6 +1,7 @@
 let location = window.location.href;
 // let serverURL = 'http://server.anchortms.com';
-let serverURL = "http://tmsserver.ddns.net";
+// let serverURL = "http://tmsserver.ddns.net";
+let serverURL = "http://localhost:8000";
 
 export class CarrierContainer {
     create(callback) {

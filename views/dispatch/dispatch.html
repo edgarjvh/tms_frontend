@@ -36,7 +36,7 @@
                                     <label for="txt-trip-number">Trip Number</label>
                                 </div>
                                 <div class="hsep"></div>
-                                <div class="mochi-button text-center">
+                                <div class="mochi-button text-center" id="dispatch-clear-btn">
                                     <div class="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div class="mochi-button-base">
                                         Clear
@@ -853,7 +853,7 @@
                                             </div>
                                         </div>
                                         <div class="vsep"></div>
-                                        <div class="consignee-second-page-container page">
+                                        <div class="consignee-second-page-container page" style="display: flex; flex-direction: column;">
                                             <div class="row-section">
 
                                                 <div class="splitted-container">
@@ -896,13 +896,15 @@
 
                                             </div>
                                             <div class="vsep"></div>
-                                            <div class="row-section">
-                                                <div class="input-box-container shows-popup">
-                                                    <input required type="text" id="txt-consignee-special-instructions"
+                                            <div class="row-section" style="flex-grow: 1;display: flex; flex-direction: column;">
+                                                <div class="input-box-container shows-popup" style="border-radius: 15px; flex-grow: 1;width: 100%;">
+                                                    <textarea required type="text" id="txt-consignee-special-instructions"
                                                         name="txt-consignee-special-instructions"
-                                                        title="Consignee Special Instructions">
-                                                    <label for="txt-consignee-special-instructions">Special
-                                                        Instructions</label>
+                                                        title="Consignee Special Instructions" 
+                                                        style="width: 100%; resize: none; padding: 5px 10px;border: 0;font-size: 0.75rem; font-style: italic;font-family: 'Lato', 'Arial', 'sans-serif';"
+                                                        placeholder="Special Instructions"></textarea>                                                        
+                                                    <!-- <label for="txt-consignee-special-instructions">Special
+                                                        Instructions</label> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -1030,6 +1032,8 @@
                                         name="txt-carrier-event-notes" title="Event Notes" tabindex="34">
                                     <label for="txt-carrier-event-notes">Event Notes</label>
                                 </div>
+                                
+                                <div class="final-line-separator"></div>
                             </div>
                         </div>
                         <div class="notes-section-2">

@@ -1,6 +1,6 @@
 let location = window.location.href;
-// let serverURL = 'http://server.anchortms.com';
-let serverURL = "http://tmsserver.ddns.net";
+let serverURL = 'http://server.anchortms.com';
+// let serverURL = "http://tmsserver.ddns.net";
 
 export class LoadBoardContainer {
     create(callback) {

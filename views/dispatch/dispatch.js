@@ -1,6 +1,6 @@
 let location = window.location.href;
-// let serverURL = 'http://server.anchortms.com';
-let serverURL = "http://tmsserver.ddns.net";
+let serverURL = 'http://server.anchortms.com';
+// let serverURL = "http://tmsserver.ddns.net";
 
 export class DispatchContainer {
     create(callback) {
@@ -41,7 +41,7 @@ export class DispatchContainer {
                                 data-id="${note.id}" 
                                 data-user="${note.user}" 
                                 data-note="${note.note}" 
-                                data-datetime="${moment(note.date_time, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY:HHmm")}">
+                                data-datetime="${note.date_time}">
                                     ${note.note}
                             </div>
                             `;
@@ -1228,6 +1228,75 @@ function eventListeners() {
         modal.fadeIn();
     });
 
+    $(document).on("click", "#dispatch-internal-notes-add-note-btn", function (e) {
+        let dispatchContent = $(this).closest(".dispatch-content");
+        // let customerId = dispatchContent.find('#txt-customer-customer-id').val();
+
+        // if (customerId === '') {
+        //     alert('You must select a customer first');
+        //     return;
+        // }
+
+        let modal = dispatchContent.find(".modal-dispatch-internal-notes");
+        modal.attr("class", "modal-dispatch-internal-notes adding");
+        modal.find("textarea").val("");
+        modal.fadeIn();
+        modal.find("textarea").focus();
+    });
+
+
+    $(document).on("click", "#dispatch-internal-notes-cancel-btn", function (e) {
+        let dispatchContent = $(this).closest(".dispatch-content");
+        let modal = dispatchContent.find(".modal-dispatch-internal-notes");
+        modal.attr('data-id', '0');
+        modal.find("textarea").val('');
+        modal.fadeOut();
+    });
+
+    $(document).on("click", "#dispatch-internal-notes-save-btn", function (e) {
+        let modal = $(this).closest(".modal-dispatch-internal-notes");
+        let noteId = Number(modal.attr('data-id'));
+        let modalContainer = modal.find(".modal-dispatch-internal-notes-content");
+        let dispatchContent = modal.closest(".dispatch-content");
+        // let dispatchId = dispatchContent.find('#txt-dispatch-dispatch-id').val();
+
+        let internalNotesPortalSectionWrapper = dispatchContent.find(".internal-notes-portal-section-wrapper");
+        let textarea = modalContainer.find("textarea");
+
+        if (textarea.val().trim() === "") {
+            alert("You must type some text");
+            return;
+        }
+
+        let userInitials = getInitials(2);
+        let datetime = moment().format("YYYY-MM-DD HH:mm:ss");
+
+        $.post(serverURL + "/saveInternalNotes", {
+            id: noteId,
+            note: textarea.val().trim(),
+            user: noteId === 0 ? userInitials : modal.attr('data-user'),
+            date_time: noteId === 0 ? datetime : modal.attr('data-datetime'),
+        }).then((res) => {
+            let notesList = ``;
+
+            for (let i = 0; i < res.internal_notes.length; i++) {
+                notesList += `
+                <div 
+                    class="internal-notes-list-item" 
+                    data-id="${res.internal_notes[i].id}" 
+                    data-user="${res.internal_notes[i].user}" 
+                    data-note="${res.internal_notes[i].note}" 
+                    data-datetime="${res.internal_notes[i].date_time}">
+                        ${res.internal_notes[i].note}
+                </div>
+                `;
+            }
+
+            internalNotesPortalSectionWrapper.html(notesList);
+            $("#dispatch-internal-notes-cancel-btn").click();
+        });
+    });
+
     $(document).on("click", ".internal-notes-list-item", function (e) {
         let noteUser = $(this).attr("data-user");
         let noteDateTime = $(this).attr("data-datetime");
@@ -1245,6 +1314,11 @@ function eventListeners() {
 
         textarea.val(noteUser + ":" + (moment(noteDateTime, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY:HHmm')) + " " + noteText);
         modal.fadeIn();
+    });
+
+    $(document).on('click', '#dispatch-clear-btn', function(){
+        let dispatchContainer = $(this).closest('.dispatch-container');
+        dispatchContainer.find('input').val('');
     });
 
     //#region CARRIER PANEL 
@@ -1609,7 +1683,7 @@ function eventListeners() {
         }
     });
 
-    $(document).on('keydown', '.input-box-container.drop-down input', function (e) {
+    $(document).on('keydown', '#panel-dispatch-carrier-info .input-box-container.drop-down input', function (e) {
         let key = e.keyCode || e.which;
 
         if (key === 46 || key === 8) {
@@ -1713,7 +1787,7 @@ function eventListeners() {
         }
     });
 
-    $(document).on('keypress', '.input-box-container.drop-down input', function (e) {
+    $(document).on('keypress', '#panel-dispatch-carrier-info .input-box-container.drop-down input', function (e) {
         e.preventDefault();
         let input = $(this);
         let data = input.attr('data-options').split('|');
@@ -1982,7 +2056,7 @@ function eventListeners() {
         }
     })
 
-    $(document).on('click', '.input-box-container.drop-down input', function (e) {
+    $(document).on('click', '#panel-dispatch-carrier-info .input-box-container.drop-down input', function (e) {
         e.stopPropagation();
         let input = $(this);
         let inputOptions = input.attr('data-options');

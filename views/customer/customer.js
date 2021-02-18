@@ -1,6 +1,7 @@
 let location = window.location.href;
 // let serverURL = 'http://server.anchortms.com';
-let serverURL = "http://tmsserver.ddns.net";
+// let serverURL = "http://tmsserver.ddns.net";
+let serverURL = "http://localhost:8000";
 
 export class CustomerContainer {
     create(callback) {
@@ -736,8 +737,8 @@ function eventListeners() {
 
         let pdfHtml = `<iframe id="pdf-js-viewer" name="if-doc-preview" src="${url}#toolbar=1&navpanes=0&scrollbar=0" frameborder="0" allowfullscreen width="100%" height="100%" ></iframe>`;
         let textHtml = `<iframe id="pdf-js-viewer" name="if-doc-preview" src="${url}#toolbar=1&navpanes=0&scrollbar=0" frameborder="0" allowfullscreen width="100%" height="100%" ></iframe>`;
-        // let officeHtml = `<iframe name="if-doc-preview" src="https://view.officeapps.live.com/op/embed.aspx?src=${url}#toolbar=1&navpanes=0&scrollbar=0" frameborder="0" allowfullscreen width="100%" height="100%"></iframe>`;
-        let officeHtml = `<iframe src="https://docs.google.com/gview?url=${url}&embedded=true&widget=true" frameborder="0" allowfullscreen width="100%" height="100%"></iframe>`;
+        let officeHtml = `<iframe name="if-doc-preview" src="https://view.officeapps.live.com/op/embed.aspx?src=${url}#toolbar=1&navpanes=0&scrollbar=0" frameborder="0" allowfullscreen width="100%" height="100%"></iframe>`;
+        // let officeHtml = `<iframe src="https://docs.google.com/gview?url=${url}&embedded=true&widget=true" frameborder="0" allowfullscreen width="100%" height="100%"></iframe>`;
         let imgHtml = `<div class="img-wrapper" name="if-doc-preview"><img src="${url}" alt=""></div>`;
 
         previewContainer.html(loaderHtml);
