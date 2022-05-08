@@ -1,0 +1,26 @@
+.container-sheet{
+    background-color: white;
+    box-shadow: 2px 2px 2px 0 rgba(0,0,0,0.7);
+    padding: 0 15mm;
+    min-height: 11in;
+
+    &:last-child{
+        margin-bottom: 2rem;
+    }
+
+    .body-table{
+        > div:first-child{
+            background-color: rgba(0,0,0,0.2) !important;
+        }
+        > div:nth-child(odd){
+            background-color: rgba(0,0,0,0.1);
+        }
+        // > div:nth-child(even){
+        //     background-color: rgba(78, 129, 187, 0.904);
+        // }
+        > div{
+            min-height: 26.72px;
+            max-height: 26.72px;            
+        }
+    }
+}

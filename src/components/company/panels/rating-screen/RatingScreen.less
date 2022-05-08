@@ -1,0 +1,167 @@
+.currency{
+    text-align: right;
+}
+
+.rating-item{
+    &.selected{
+        background-color: rgba(43, 193, 255, 0.3) !important;
+    }
+}
+
+.mochi-button{
+    &.disabled{
+        pointer-events: none;
+    }
+}
+
+.form-portal{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    .tcol{
+        padding: 5px;
+        width: 7rem;
+        min-width: 7rem;
+        max-width: 7rem;
+        text-align: left;
+        font-size: 0.7rem;
+        // border-right: 1px solid rgba(0,0,0,0.5);
+    }
+
+    .tcol.description{
+        flex-grow: 1;
+        width: initial;
+        min-width: initial;
+        max-width: initial;
+    }
+
+    .tcol.pieces{
+        text-align: center;
+        width: 7rem;
+        min-width: 7rem;
+        max-width: 7rem;
+    }
+
+    .tcol.weight{
+        text-align: center;
+        width: 5rem;
+        min-width: 5rem;
+        max-width: 5rem;
+    }
+
+    .tcol.feet-required{
+        text-align: center;
+        width: 7rem;
+        min-width: 7rem;
+        max-width: 7rem;
+    }
+
+    .tcol.subtype{
+        text-align: center;
+        width: 6rem;
+        min-width: 6rem;
+        max-width: 6rem;
+    }
+
+    .tcol.miles{
+        text-align: center;
+        width: 5rem;
+        min-width: 5rem;
+        max-width: 5rem;
+    }
+
+    .tcol.percentage{
+        text-align: center;
+        width: 5rem;
+        min-width: 5rem;
+        max-width: 5rem;
+    }
+
+    .tcol.hours{
+        text-align: center;
+        width: 4rem;
+        min-width: 4rem;
+        max-width: 4rem;
+    }
+
+    .tcol.days{
+        text-align: center;
+        width: 4rem;
+        min-width: 4rem;
+        max-width: 4rem;
+    }
+
+    .tcol.linehaul{
+        text-align: right;
+        width: 6rem;
+        min-width: 6rem;
+        max-width: 6rem;
+    }
+
+    .tcol.rate{
+        text-align: right;
+        width: 5rem;
+        min-width: 5rem;
+        max-width: 5rem;
+    }
+
+    .tcol.total-charges{
+        text-align: right;
+        width: 7rem;
+        min-width: 7rem;
+        max-width: 7rem;
+    }
+
+    .tcol.btn{
+        text-align: center;
+        width: 1.5rem;
+        min-width: 1.5rem;
+        max-width: 1.5rem;
+    }
+
+    .rating-header{
+        display: flex;
+
+        .tcol{
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        
+    }
+
+    .rating-wrapper{
+        position: absolute;
+        width: 100%;
+        height: calc(100% - 25px);
+        top: 25px;
+        left: 0;
+        overflow-y: auto;
+        
+        .rating-item{
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            cursor: default;
+            transition: ease 0.3s;
+
+            &:hover{
+                background-color: rgba(0,0,0,0.05);
+            }
+
+            .tcol.linehaul{
+                text-align: right;
+            }
+    
+            .tcol.rate{
+                text-align: right;
+            }
+    
+            .tcol.total-charges{
+                text-align: right;
+            }
+        }
+    }    
+}

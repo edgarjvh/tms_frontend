@@ -1,0 +1,218 @@
+.import-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.import-buttons > div {
+  display: flex;
+  align-items: center;
+}
+.import-buttons .input-checkbox {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+}
+.import-buttons .input-checkbox input {
+  margin-right: 5px;
+  cursor: pointer;
+}
+.import-buttons .input-checkbox label {
+  font-size: 14px;
+  cursor: pointer;
+}
+.import-buttons .disabled {
+  pointer-events: none;
+  color: rgba(0, 0, 0, 0.5);
+}
+.form-bordered-box.import {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  padding: 0;
+}
+.form-bordered-box.import .trow {
+  display: flex;
+}
+.form-bordered-box.import .tcol {
+  padding: 2px;
+  font-size: 14px;
+}
+.form-bordered-box.import .tcol.status {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.form-bordered-box.import .tcol.code {
+  min-width: 4.5rem;
+  max-width: 4.5rem;
+}
+.form-bordered-box.import .tcol.name {
+  min-width: 14rem;
+  max-width: 14rem;
+}
+.form-bordered-box.import .tcol.address1 {
+  min-width: 14rem;
+  max-width: 14rem;
+}
+.form-bordered-box.import .tcol.address2 {
+  min-width: 14rem;
+  max-width: 14rem;
+}
+.form-bordered-box.import .tcol.city {
+  min-width: 10rem;
+  max-width: 10rem;
+}
+.form-bordered-box.import .tcol.state {
+  min-width: 3rem;
+  max-width: 3rem;
+}
+.form-bordered-box.import .tcol.zip {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.form-bordered-box.import .tcol.contact {
+  min-width: 10rem;
+  max-width: 10rem;
+}
+.form-bordered-box.import .tcol.phone {
+  min-width: 8.5rem;
+  max-width: 8.5rem;
+}
+.form-bordered-box.import .tcol.ext {
+  min-width: 4rem;
+  max-width: 4rem;
+}
+.form-bordered-box.import .tcol.email {
+  min-width: 14rem;
+  max-width: 14rem;
+}
+.form-bordered-box.import .tcol.mcnumber {
+  min-width: 6rem;
+  max-width: 6rem;
+}
+.form-bordered-box.import .tcol.dotnumber {
+  min-width: 7rem;
+  max-width: 7rem;
+}
+.form-bordered-box.import .tcol.scac {
+  min-width: 6rem;
+  max-width: 6rem;
+}
+.form-bordered-box.import .tcol.fid {
+  min-width: 6rem;
+  max-width: 6rem;
+}
+.form-bordered-box.import .tcol.donotuse {
+  min-width: 6rem;
+  max-width: 6rem;
+}
+.form-bordered-box.import .import-header {
+  position: relative;
+  height: 25px;
+}
+.form-bordered-box.import .import-header::before {
+  content: '';
+  position: absolute;
+  height: 10px;
+  width: 100%;
+  box-shadow: 0 0 7px 1px #000000;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  border-radius: 100%;
+}
+.form-bordered-box.import .import-header .import-header-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 1px;
+  left: 0;
+  z-index: 2;
+  background: #ffffff;
+  /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d3d3d3', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
+  display: flex;
+  align-items: center;
+}
+.form-bordered-box.import .import-header .import-header-wrapper .trow .tcol {
+  font-weight: bold;
+  padding: 2px 4px;
+}
+.form-bordered-box.import .import-body {
+  flex-grow: 1;
+  position: relative;
+  display: table;
+}
+.form-bordered-box.import .import-body .import-body-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: auto;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container {
+  display: table-row;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container.hidden {
+  display: none;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 4px 0;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow .tcol {
+  font-size: 12px;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow .tcol input {
+  background-color: transparent;
+  border: 0;
+  width: 100%;
+  font-size: 12px;
+  font-family: 'Mochi Med Oblique';
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow .tcol.status {
+  display: flex;
+  align-items: center;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow .tcol.status span {
+  margin-right: 5px;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow .tcol.status input {
+  width: unset;
+  cursor: pointer;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow .tcol.status .separator {
+  flex-grow: 1;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow .tcol.status .show-matches-btn {
+  font-size: 20px;
+  cursor: pointer;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow:not(:first-child):hover {
+  background-color: rgba(96, 171, 248, 0.3);
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .trow.save {
+  background-color: lightgreen;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .matches-container {
+  box-shadow: inset 0 0 2px 2px rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 0;
+  transition: height 0.3s ease-out;
+  overflow: hidden;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .matches-container .trow .tcol {
+  padding: 2px 4px !important;
+}
+.form-bordered-box.import .import-body .import-body-wrapper .row-container .matches-container.shown {
+  height: unset;
+}

@@ -1,0 +1,19 @@
+.container-sheet {
+  background-color: white;
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.7);
+  padding: 0 15mm;
+  min-height: 11in;
+}
+.container-sheet:last-child {
+  margin-bottom: 2rem;
+}
+.container-sheet .body-table > div:first-child {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+.container-sheet .body-table > div:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.container-sheet .body-table > div {
+  min-height: 26.72px;
+  max-height: 26.72px;
+}

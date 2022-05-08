@@ -1,0 +1,511 @@
+.carriers-main-container {
+  width                                             : 100%;
+  height                                            : 100%;
+  position                                          : relative;
+  display                                           : flex;
+  flex-direction                                    : column;
+  font-size                                         : 24px;
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#efefef+0,c8c8c8+100 */
+  background                                        : rgb(250, 250, 250);
+  /* Old browsers */
+  background                                        : -moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+  /* FF3.6-15 */
+  background                                        : -webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background                                        : radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter                                            : progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#c8c8c8', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
+
+  transition: all ease 0.7s;
+  overflow  : hidden;
+  padding   : 10px;
+
+  .selected-carrier-contact-primary-phone {
+    position      : absolute;
+    right         : 5px;
+    top           : 50%;
+    transform     : translateY(-50%);
+    font-size     : 0.7rem;
+    text-transform: capitalize;
+    font-weight   : bold;
+
+    &.pushed {
+      right: 20px;
+    }
+  }
+
+  .selected-carrier-contact-primary-email {
+    position      : absolute;
+    right         : 5px;
+    top           : 50%;
+    transform     : translateY(-50%);
+    font-size     : 0.7rem;
+    text-transform: capitalize;
+    font-weight   : bold;
+
+    &.pushed {
+      right: 20px;
+    }
+  }
+
+  .selected-mailing-contact-primary-phone {
+    position      : absolute;
+    right         : 5px;
+    top           : 50%;
+    transform     : translateY(-50%);
+    font-size     : 0.7rem;
+    text-transform: capitalize;
+    font-weight   : bold;
+
+    &.pushed {
+      right: 20px;
+    }
+  }
+
+  .selected-mailing-contact-primary-email {
+    position      : absolute;
+    right         : 5px;
+    top           : 50%;
+    transform     : translateY(-50%);
+    font-size     : 0.7rem;
+    text-transform: capitalize;
+    font-weight   : bold;
+
+    &.pushed {
+      right: 20px;
+    }
+  }
+
+  .selected-factoring-company-contact-primary-phone {
+    position      : absolute;
+    right         : 5px;
+    top           : 50%;
+    transform     : translateY(-50%);
+    font-size     : 0.7rem;
+    text-transform: capitalize;
+    font-weight   : bold;
+
+    &.pushed {
+      right: 20px;
+    }
+  }
+
+  .selected-factoring-company-contact-primary-email {
+    position      : absolute;
+    right         : 5px;
+    top           : 50%;
+    transform     : translateY(-50%);
+    font-size     : 0.7rem;
+    text-transform: capitalize;
+    font-weight   : bold;
+
+    &.pushed {
+      right: 20px;
+    }
+  }
+
+  .input-box-container {
+    position: relative;
+  }
+
+  .currency-symbol {
+    font-size: 0.8rem;
+    position : absolute;
+    left     : 2;
+  }
+
+  .currency {
+    text-align  : right;
+    padding-left: 10px;
+  }
+
+  .fields-container-row {
+    display   : flex;
+    flex-grow : 1;
+    flex-basis: 100%;
+
+    .fields-container-col {
+      margin-right: 10px;
+      display     : flex;
+      min-width   : 30%;
+      max-width   : 30%;
+    }
+
+    .fields-container-col.grow {
+      min-width     : calc(12% - 30px);
+      max-width     : calc(12% - 30px);
+      flex-direction: column;
+
+      .form-borderless-box {
+        flex-grow: 1;
+
+        .mochi-button {
+          display        : flex;
+          justify-content: space-between;
+          align-items    : center;
+          font-size      : 1.3rem;
+          width          : 100%;
+
+          .mochi-button-base {
+            white-space: pre-wrap;
+          }
+        }
+      }
+    }
+  }
+
+  .input-box-container.insurance-status {
+    background-color: rgba(0, 0, 0, 0.3);
+
+    input:read-only {
+      color: black;
+    }
+  }
+
+  .input-box-container.insurance-status.active {
+    background-color: lightgreen;
+  }
+
+  .input-box-container.insurance-status.warning {
+    background-color: yellow;
+  }
+
+  .input-box-container.insurance-status.expired {
+    background-color: lightcoral !important;
+  }
+
+  .form-slider {
+    position: relative;
+    width   : 100%;
+    height  : 100%;
+    overflow: hidden;
+
+    .form-slider-wrapper {
+      width     : 200%;
+      position  : absolute;
+      height    : 100%;
+      left      : 0;
+      display   : flex;
+      transition: ease 0.3s;
+
+      .contact-list-box {
+        width   : 50%;
+        position: relative;
+
+        .contact-list-header {
+          display        : flex;
+          font-size      : 0.7rem;
+          font-weight    : bold;
+          text-decoration: underline;
+          color          : rgba(0, 0, 0, 1);
+          min-height     : 1rem;
+          max-height     : 1rem;
+        }
+
+        .tcol.first-name {
+          min-width: 5rem;
+          max-width: 5rem;
+        }
+
+        .tcol.last-name {
+          min-width: 5rem;
+          max-width: 5rem;
+        }
+
+        .tcol.phone-work {
+          min-width: 5rem;
+          max-width: 5rem;
+        }
+
+        .tcol.email-work {
+          flex-grow: 1;
+        }
+
+        .tcol.pri {
+          // min-width : 0.65rem;
+          // max-width : 0.65rem;
+          text-align: center;
+        }
+
+        .contact-list-wrapper {
+          position   : absolute;
+          width      : 100%;
+          height     : calc(100% - 1rem);
+          bottom     : 0;
+          overflow-y : auto;
+          padding-top: 5px;
+
+          .contact-list-item {
+            font-size      : 0.7rem;
+            border-bottom  : 1px solid rgba(0, 0, 0, 0.1);
+            padding        : 5px 0;
+            cursor         : pointer;
+            transition     : ease 0.3s;
+            text-overflow  : ellipsis;
+            white-space    : nowrap;
+            overflow       : hidden;
+            display        : flex;
+            align-items    : center;
+            justify-content: space-between;
+            padding-right  : 5px;
+
+            >div {
+              white-space  : nowrap;
+              overflow     : hidden;
+              text-overflow: ellipsis;
+            }
+          }
+
+          .contact-list-item:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+
+      .contact-search-box {
+        width: 50%;
+      }
+    }
+  }
+
+  .drivers-list-container {
+    width   : 100%;
+    height  : 100%;
+    position: relative;
+
+    .drivers-list-header {
+      display        : flex;
+      font-size      : 0.7rem;
+      font-weight    : bold;
+      text-decoration: underline;
+      color          : rgba(0, 0, 0, 1);
+      min-height     : 1rem;
+      max-height     : 1rem;
+    }
+
+    .tcol.first-name {
+      min-width: 5rem;
+      max-width: 5rem;
+    }
+
+    .tcol.last-name {
+      min-width: 5rem;
+      max-width: 5rem;
+    }
+
+    .tcol.phone {
+      min-width: 5rem;
+      max-width: 5rem;
+    }
+
+    .tcol.email {
+      flex-grow: 1;
+    }
+
+    .drivers-list-wrapper {
+      position   : absolute;
+      width      : 100%;
+      height     : calc(100% - 1rem);
+      bottom     : 0;
+      overflow-y : auto;
+      padding-top: 5px;
+
+      .drivers-list-item {
+        font-size      : 0.7rem;
+        border-bottom  : 1px solid rgba(0, 0, 0, 0.1);
+        padding        : 5px 0;
+        cursor         : pointer;
+        transition     : ease 0.3s;
+        text-overflow  : ellipsis;
+        white-space    : nowrap;
+        overflow       : hidden;
+        display        : flex;
+        align-items    : center;
+        justify-content: space-between;
+        padding-right  : 5px;
+
+        >div {
+          white-space  : nowrap;
+          overflow     : hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .drivers-list-item:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .insurances-list-container {
+    width   : 100%;
+    height  : 100%;
+    position: relative;
+
+    .insurances-list-header {
+      display        : flex;
+      font-size      : 0.7rem;
+      font-weight    : bold;
+      text-decoration: underline;
+      color          : rgba(0, 0, 0, 1);
+      min-height     : 1rem;
+      max-height     : 1rem;
+      padding-right  : 1.2rem;
+
+      &.scrolling {
+        padding-right: 1.8rem;
+      }
+    }
+
+    .tcol.type {
+      min-width: 6rem;
+      max-width: 6rem;
+    }
+
+    .tcol.company {
+      flex-grow: 1;
+    }
+
+    .tcol.expiration-date {
+      min-width: 4.5rem;
+      max-width: 4.5rem;
+    }
+
+    .tcol.amount {
+      min-width : 6rem;
+      max-width : 6rem;
+      text-align: right;
+    }
+
+    .tcol.insurances-selected {
+      min-width      : 1rem;
+      max-width      : 1rem;
+      text-align     : center;
+      display        : flex;
+      justify-content: flex-end;
+      align-items    : center;
+    }
+
+    .insurances-list-wrapper {
+      position   : absolute;
+      width      : 100%;
+      height     : calc(100% - 1rem);
+      bottom     : 0;
+      overflow-y : auto;
+      padding-top: 5px;
+
+      .insurances-list-item {
+        font-size      : 0.7rem;
+        border-bottom  : 1px solid rgba(0, 0, 0, 0.1);
+        padding        : 5px 0;
+        cursor         : pointer;
+        transition     : ease 0.3s;
+        text-overflow  : ellipsis;
+        white-space    : nowrap;
+        overflow       : hidden;
+        display        : flex;
+        align-items    : center;
+        justify-content: space-between;
+        padding-right  : 0.2rem;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        // &.selected {
+        //   background-color: rgba(0, 0, 0, 0.1);
+        //   font-weight     : bold;
+        // }
+
+        >div {
+          white-space  : nowrap;
+          overflow     : hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  .notes-list-container {
+    width   : 100%;
+    height  : 100%;
+    position: relative;
+
+    .notes-list-wrapper {
+      position  : absolute;
+      width     : 100%;
+      height    : 100%;
+      overflow-y: auto;
+
+      .notes-list-item {
+        font-size    : 0.7rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding      : 5px 0;
+        cursor       : pointer;
+        transition   : ease 0.3s;
+        display: flex;
+        align-items: center;        
+
+        .tcol.note-text {
+          flex-grow    : 1;
+          text-overflow: ellipsis;
+          white-space  : nowrap;
+          overflow     : hidden;
+        }
+
+        .tcol.notes-selected {
+          margin-left: 0.5rem;
+          text-align     : center;
+          display        : flex;
+          justify-content: flex-end;
+          align-items    : center;
+        }
+      }
+
+      .notes-list-item:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .directions-list-container {
+    width   : 100%;
+    height  : 100%;
+    position: relative;
+
+    .directions-list-wrapper {
+      position  : absolute;
+      width     : 100%;
+      height    : 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      .directions-list-item {
+        font-size    : 0.7rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding      : 5px 0;
+        cursor       : pointer;
+        transition   : ease 0.3s;
+        text-overflow: ellipsis;
+        white-space  : nowrap;
+        overflow     : hidden;
+      }
+
+      .directions-list-item:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .buttons-container {
+    display       : flex;
+    flex-direction: column;
+    width         : 130px;
+    margin-top    : -5px;
+
+    >div {
+      margin-bottom: 20px;
+    }
+  }
+}

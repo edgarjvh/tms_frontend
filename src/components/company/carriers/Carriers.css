@@ -1,0 +1,429 @@
+.carriers-main-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-size: 24px;
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#efefef+0,c8c8c8+100 */
+  background: #fafafa;
+  /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, #fafafa 0%, #c8c8c8 100%);
+  /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, #fafafa 0%, #c8c8c8 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, #fafafa 0%, #c8c8c8 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#c8c8c8', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
+  transition: all ease 0.7s;
+  overflow: hidden;
+  padding: 10px;
+}
+.carriers-main-container .selected-carrier-contact-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.carriers-main-container .selected-carrier-contact-primary-phone.pushed {
+  right: 20px;
+}
+.carriers-main-container .selected-carrier-contact-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.carriers-main-container .selected-carrier-contact-primary-email.pushed {
+  right: 20px;
+}
+.carriers-main-container .selected-mailing-contact-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.carriers-main-container .selected-mailing-contact-primary-phone.pushed {
+  right: 20px;
+}
+.carriers-main-container .selected-mailing-contact-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.carriers-main-container .selected-mailing-contact-primary-email.pushed {
+  right: 20px;
+}
+.carriers-main-container .selected-factoring-company-contact-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.carriers-main-container .selected-factoring-company-contact-primary-phone.pushed {
+  right: 20px;
+}
+.carriers-main-container .selected-factoring-company-contact-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.carriers-main-container .selected-factoring-company-contact-primary-email.pushed {
+  right: 20px;
+}
+.carriers-main-container .input-box-container {
+  position: relative;
+}
+.carriers-main-container .currency-symbol {
+  font-size: 0.8rem;
+  position: absolute;
+  left: 2;
+}
+.carriers-main-container .currency {
+  text-align: right;
+  padding-left: 10px;
+}
+.carriers-main-container .fields-container-row {
+  display: flex;
+  flex-grow: 1;
+  flex-basis: 100%;
+}
+.carriers-main-container .fields-container-row .fields-container-col {
+  margin-right: 10px;
+  display: flex;
+  min-width: 30%;
+  max-width: 30%;
+}
+.carriers-main-container .fields-container-row .fields-container-col.grow {
+  min-width: calc(12% - 30px);
+  max-width: calc(12% - 30px);
+  flex-direction: column;
+}
+.carriers-main-container .fields-container-row .fields-container-col.grow .form-borderless-box {
+  flex-grow: 1;
+}
+.carriers-main-container .fields-container-row .fields-container-col.grow .form-borderless-box .mochi-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.3rem;
+  width: 100%;
+}
+.carriers-main-container .fields-container-row .fields-container-col.grow .form-borderless-box .mochi-button .mochi-button-base {
+  white-space: pre-wrap;
+}
+.carriers-main-container .input-box-container.insurance-status {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.carriers-main-container .input-box-container.insurance-status input:read-only {
+  color: black;
+}
+.carriers-main-container .input-box-container.insurance-status.active {
+  background-color: lightgreen;
+}
+.carriers-main-container .input-box-container.insurance-status.warning {
+  background-color: yellow;
+}
+.carriers-main-container .input-box-container.insurance-status.expired {
+  background-color: lightcoral !important;
+}
+.carriers-main-container .form-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.carriers-main-container .form-slider .form-slider-wrapper {
+  width: 200%;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  display: flex;
+  transition: ease 0.3s;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box {
+  width: 50%;
+  position: relative;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .contact-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .tcol.first-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .tcol.last-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .tcol.phone-work {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .tcol.email-work {
+  flex-grow: 1;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .tcol.pri {
+  text-align: center;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper .contact-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 5px;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper .contact-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper .contact-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.carriers-main-container .form-slider .form-slider-wrapper .contact-search-box {
+  width: 50%;
+}
+.carriers-main-container .drivers-list-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.carriers-main-container .drivers-list-container .drivers-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+}
+.carriers-main-container .drivers-list-container .tcol.first-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.carriers-main-container .drivers-list-container .tcol.last-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.carriers-main-container .drivers-list-container .tcol.phone {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.carriers-main-container .drivers-list-container .tcol.email {
+  flex-grow: 1;
+}
+.carriers-main-container .drivers-list-container .drivers-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.carriers-main-container .drivers-list-container .drivers-list-wrapper .drivers-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 5px;
+}
+.carriers-main-container .drivers-list-container .drivers-list-wrapper .drivers-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.carriers-main-container .drivers-list-container .drivers-list-wrapper .drivers-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.carriers-main-container .insurances-list-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.carriers-main-container .insurances-list-container .insurances-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+  padding-right: 1.2rem;
+}
+.carriers-main-container .insurances-list-container .insurances-list-header.scrolling {
+  padding-right: 1.8rem;
+}
+.carriers-main-container .insurances-list-container .tcol.type {
+  min-width: 6rem;
+  max-width: 6rem;
+}
+.carriers-main-container .insurances-list-container .tcol.company {
+  flex-grow: 1;
+}
+.carriers-main-container .insurances-list-container .tcol.expiration-date {
+  min-width: 4.5rem;
+  max-width: 4.5rem;
+}
+.carriers-main-container .insurances-list-container .tcol.amount {
+  min-width: 6rem;
+  max-width: 6rem;
+  text-align: right;
+}
+.carriers-main-container .insurances-list-container .tcol.insurances-selected {
+  min-width: 1rem;
+  max-width: 1rem;
+  text-align: center;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.carriers-main-container .insurances-list-container .insurances-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.carriers-main-container .insurances-list-container .insurances-list-wrapper .insurances-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 0.2rem;
+}
+.carriers-main-container .insurances-list-container .insurances-list-wrapper .insurances-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.carriers-main-container .insurances-list-container .insurances-list-wrapper .insurances-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.carriers-main-container .notes-list-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.carriers-main-container .notes-list-container .notes-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+.carriers-main-container .notes-list-container .notes-list-wrapper .notes-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  display: flex;
+  align-items: center;
+}
+.carriers-main-container .notes-list-container .notes-list-wrapper .notes-list-item .tcol.note-text {
+  flex-grow: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.carriers-main-container .notes-list-container .notes-list-wrapper .notes-list-item .tcol.notes-selected {
+  margin-left: 0.5rem;
+  text-align: center;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.carriers-main-container .notes-list-container .notes-list-wrapper .notes-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.carriers-main-container .directions-list-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.carriers-main-container .directions-list-container .directions-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.carriers-main-container .directions-list-container .directions-list-wrapper .directions-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.carriers-main-container .directions-list-container .directions-list-wrapper .directions-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.carriers-main-container .buttons-container {
+  display: flex;
+  flex-direction: column;
+  width: 130px;
+  margin-top: -5px;
+}
+.carriers-main-container .buttons-container > div {
+  margin-bottom: 20px;
+}
