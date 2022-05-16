@@ -2,10 +2,13 @@ import React, { useState, useRef } from 'react';
 import './Admin.css';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
-// import { Transition, Spring, animated as animated2, config } from 'react-spring/renderprops';
+import { useTransition, animated } from 'react-spring';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useDetectClickOutside } from "react-detect-click-outside";
+import Draggable from 'react-draggable';
+import axios from 'axios';
+import moment from 'moment';
 
 import {
     setMainScreen,
@@ -147,10 +150,8 @@ import {
 
 } from '../../actions/carriersActions';
 
-import axios from 'axios';
-
-import {Customers, Carriers} from './../company';
-
+import { Customers, Carriers } from './../company';
+import { CompanySetup } from './';
 
 function Admin(props) {
     const [chatOptionItems, setChatOptionItems] = useState([
@@ -166,6 +167,14 @@ function Admin(props) {
     const [showChatOptions, setShowChatOptions] = useState(false);
     const refShowChatOptionsDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowChatOptions(false) } });
     const refChatOptionPopupItems = useRef([]);
+
+    const [adminHomePanels, setAdminHomePanels] = useState([]);
+    const [customerPanels, setCustomerPanels] = useState([]);
+    const [carrierPanels, setCarrierPanels] = useState([]);
+    const [companySetupPanels, setCompanySetupPanels] = useState([]);
+
+    const baseWidth = 95;
+    const panelGap = 70;
 
     const containerCls = classnames({
         'main-admin-container': true,
@@ -204,8 +213,161 @@ function Admin(props) {
         props.setCarrierScreenFocused(true);
     }
 
+    const companySetupBtnClick = async () => {
+        let curPages = props.pages;
+
+        if (curPages.indexOf('company setup') === -1) {
+            await props.setPages([...curPages, 'company setup']);
+            await props.setSelectedPageIndex(curPages.length);
+
+        } else {
+            await props.setSelectedPageIndex(props.pages.indexOf('company setup'));
+        }
+
+        props.setSetupCompanyScreenFocused(true);
+    }
+
     const switchAppBtnClick = () => {
         props.setScale(props.scale === 1 ? 0.7 : 1);
+    }
+
+    const customerPanelTransition = useTransition(customerPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (customerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+                // setCompanySetupPanels([]);
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (customerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
+
+    const carrierPanelTransition = useTransition(carrierPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+                // setCompanySetupPanels([]);
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
+
+    const companySetupPanelTransition = useTransition(companySetupPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (companySetupPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+                // setCompanySetupPanels([]);
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (companySetupPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
+
+    const eventControl = (event, info, panelName, origin) => {
+        if (event.type === 'mouseup') {
+            if (info.x > 150) {
+                closePanel(panelName, origin);
+            }
+        }
+    }
+
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                setAdminHomePanels(adminHomePanels => [...adminHomePanels, panel]);
+            }
+        }        
+
+        if (origin === 'customer') {
+            if (customerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                setCustomerPanels(customerPanels => [...customerPanels, panel]);
+            }
+        }
+
+        if (origin === 'carrier') {
+            if (carrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                setCarrierPanels(carrierPanels => [...carrierPanels, panel]);
+            }
+        }
+       
+        if (origin === 'company') {
+            if (companySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                setCompanySetupPanels(companySetupPanels => [...companySetupPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            setAdminHomePanels(adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }        
+
+        if (origin === 'customer') {
+            setCustomerPanels(customerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'carrier') {
+            setCarrierPanels(carrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company') {
+            setCompanySetupPanels(companySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
     }
 
     return (
@@ -213,7 +375,7 @@ function Admin(props) {
             <div className="main-content">
                 <div className="menu-bar">
                     <div className="section">
-                    <div className="mochi-button" onClick={userClick}>
+                        <div className="mochi-button" onClick={userClick}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base">Company</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -224,7 +386,7 @@ function Admin(props) {
                             window.open('', '_blank').focus();
                         }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Chat</div>                            
+                            <div className="mochi-button-base">Chat</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
 
@@ -251,7 +413,7 @@ function Admin(props) {
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base">Home</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>                        
+                        </div>
                         <div className={classnames({
                             'mochi-button': true,
                             'screen-focused': props.customerScreenFocused
@@ -271,17 +433,17 @@ function Admin(props) {
                         <div className={classnames({
                             'mochi-button': true,
                             // 'screen-focused': props.loadBoardScreenFocused
-                        })} onClick={() => {}}>
+                        })} onClick={() => { }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base">Reports</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                         <div className={classnames({
                             'mochi-button': true,
-                            // 'screen-focused': props.invoiceScreenFocused
-                        })} onClick={() => {}}>
+                            'screen-focused': props.setupCompanyScreenFocused
+                        })} onClick={companySetupBtnClick}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Setup Company</div>
+                            <div className="mochi-button-base">Company Setup</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                         <div className={classnames({
@@ -291,7 +453,7 @@ function Admin(props) {
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base">Card View</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>  
+                        </div>
                     </div>
                 </div>
                 <div className="screen-content">
@@ -311,86 +473,57 @@ function Admin(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}>
+                            {
+                                customerPanelTransition((style, panel, item, index) => {
+                                    const origin = 'customer';
+
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}>
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
                             <Customers
-                                pageName={'Customer Page'}
-                                panelName={'customer-page'}
-                                tabTimes={2000}
-                                scale={props.scale}
-                                serverUrl={props.serverUrl}
-                                setOpenedPanels={props.setAdminCustomerOpenedPanels}
-                                openedPanels={props.adminCustomerOpenedPanels}
+                                pageName={'Customer'}
+                                title={'Customer'}
+                                panelName={'customer'}
+                                tabTimes={112000}
                                 screenFocused={props.customerScreenFocused}
-
-                                isAdmin={true}
-
-                                setCustomers={props.setAdminCustomers}
-                                setSelectedCustomer={props.setAdminSelectedCustomer}
-                                setCustomerSearch={props.setAdminCustomerSearch}
-                                setCustomerContacts={props.setAdminCustomerContacts}
-                                setSelectedContact={props.setAdminSelectedContact}
-                                setContactSearch={props.setAdminContactSearch}
-                                setIsEditingContact={props.setAdminIsEditingContact}
-                                setShowingContactList={props.setAdminShowingContactList}
-                                setContactSearchCustomer={props.setAdminContactSearchCustomer}
-                                setAutomaticEmailsTo={props.setAdminAutomaticEmailsTo}
-                                setAutomaticEmailsCc={props.setAdminAutomaticEmailsCc}
-                                setAutomaticEmailsBcc={props.setAdminAutomaticEmailsBcc}
-                                setSelectedNote={props.setAdminSelectedNote}
-                                setSelectedDirection={props.setAdminSelectedDirection}
-                                setSelectedDocument={props.setAdminSelectedDocument}
-
-                                setCustomerSelectedOrder={props.setCustomerSelectedOrder}
-                                setCustomerOrderNumber={props.setCustomerOrderNumber}
-                                setCustomerTripNumber={props.setCustomerTripNumber}
-                                setCustomerDivision={props.setCustomerDivision}
-                                setCustomerLoadType={props.setCustomerLoadType}
-                                setCustomerTemplate={props.setCustomerTemplate}
-                                setCustomerBillToCompanies={props.setCustomerBillToCompanies}
-                                setCustomerSelectedBillToCompanyInfo={props.setCustomerSelectedBillToCompanyInfo}
-                                setCustomerBillToCompanySearch={props.setCustomerBillToCompanySearch}
-                                setCustomerSelectedBillToCompanyContact={props.setCustomerSelectedBillToCompanyContact}
-                                setCustomerShipperCompanies={props.setCustomerShipperCompanies}
-                                setCustomerSelectedShipperCompanyInfo={props.setCustomerSelectedShipperCompanyInfo}
-                                setCustomerShipperCompanySearch={props.setCustomerShipperCompanySearch}
-                                setCustomerSelectedShipperCompanyContact={props.setCustomerSelectedShipperCompanyContact}
-                                setCustomerConsigneeCompanies={props.setCustomerConsigneeCompanies}
-                                setCustomerSelectedConsigneeCompanyInfo={props.setCustomerSelectedConsigneeCompanyInfo}
-                                setCustomerConsigneeCompanySearch={props.setCustomerConsigneeCompanySearch}
-                                setCustomerSelectedConsigneeCompanyContact={props.setCustomerSelectedConsigneeCompanyContact}
-                                setSelectedCustomerCarrierInfoCarrier={props.setSelectedCustomerCarrierInfoCarrier}
-                                setSelectedCustomerCarrierInfoContact={props.setSelectedCustomerCarrierInfoContact}
-                                setSelectedCustomerCarrierInfoDriver={props.setSelectedCustomerCarrierInfoDriver}
-                                setSelectedCustomerCarrierInfoInsurance={props.setSelectedCustomerCarrierInfoInsurance}
-
-                                customers={props.customers}
-                                selectedCustomer={props.selectedCustomer}
-                                customerSearch={props.customerSearch}
-                                contacts={props.contacts}
-                                selectedContact={props.selectedContact}
-                                contactSearch={props.contactSearch}
-                                showingContactList={props.showingContactList}
-                                automaticEmailsTo={props.automaticEmailsTo}
-                                automaticEmailsCc={props.automaticEmailsCc}
-                                automaticEmailsBcc={props.automaticEmailsBcc}
-                                selectedNote={props.selectedNote}
-                                selectedDirection={props.selectedDirection}
-
-                                selectedDocument={props.selectedDocument}
-                                selectedDocumentTags={props.selectedDocumentTags}
-                                selectedDocumentNote={props.selectedDocumentNote}
-                                isEditingContact={props.isEditingContact}
-                                contactSearchCustomer={props.contactSearchCustomer}
-
-
-
-                                customerSearchPanelName='admin-customer-search'
-                                customerContactsPanelName='admin-customer-contacts'
-                                customerContactSearchPanelName='admin-customer-contact-search'
-                                customerRevenueInformationPanelName='admin-revenue-information'
-                                customerOrderHistoryPanelName='admin-order-history'
-                                customerLaneHistoryPanelName='admin-lane-history'
-                                customerDocumentsPanelName='admin-documents'
-                                customerDispatchPanelName='admin-customer-dispatch'
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                origin='customer'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
                             />
                         </div>
 
@@ -402,75 +535,130 @@ function Admin(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}>
+                            {
+                                carrierPanelTransition((style, panel, item, index) => {
+                                    const origin = 'carrier';
+
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}>
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
                             <Carriers
-                                pageName={'Carriers Page'}
-                                panelName={'carrier-page'}
-                                tabTimes={3000}
-                                scale={props.scale}
-                                serverUrl={props.serverUrl}
-                                setOpenedPanels={props.setAdminCarrierOpenedPanels}
-                                openedPanels={props.adminCarrierOpenedPanels}
+                                pageName={'Carrier'}
+                                title={'Carrier'}
+                                panelName={'carrier'}
+                                tabTimes={113000}
                                 screenFocused={props.carrierScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                origin='carrier'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
+                            />
+                        </div>
 
-                                isAdmin={true}
+                        <div style={{
+                            width: `${100 / props.pages.length}%`,
+                            height: '100%',
+                            transform: `scale(${props.scale})`,
+                            transition: 'all ease 0.7s',
+                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
+                            borderRadius: props.scale === 1 ? 0 : '20px'
+                        }}>
 
-                                setCarriers={props.setAdminCarriers}
-                                setSelectedCarrier={props.setAdminSelectedCarrier}
-                                setSelectedCarrierContact={props.setAdminSelectedCarrierContact}
-                                setSelectedCarrierNote={props.setAdminSelectedCarrierNote}
-                                setContactSearch={props.setAdminCarrierContactSearch}
-                                setShowingCarrierContactList={props.setAdminShowingCarrierContactList}
-                                setCarrierSearch={props.setAdminCarrierSearch}
-                                setCarrierContacts={props.setAdminCarrierContacts}
-                                setContactSearchCarrier={props.setAdminContactSearchCarrier}
-                                setIsEditingContact={props.setAdminIsEditingCarrierContact}
-                                setSelectedCarrierDocument={props.setAdminSelectedCarrierDocument}
-                                setDrivers={props.setAdminDrivers}
-                                setSelectedDriver={props.setAdminSelectedDriver}
-                                setEquipments={props.setAdminEquipments}
-                                setInsuranceTypes={props.setAdminInsuranceTypes}
-                                setSelectedEquipment={props.setAdminSelectedEquipment}
-                                setSelectedInsuranceType={props.setAdminSelectedInsuranceType}
-                                setFactoringCompanySearch={props.setAdminFactoringCompanySearch}
-                                setFactoringCompanies={props.setAdminFactoringCompanies}
-                                setCarrierInsurances={props.setAdminCarrierInsurances}
-                                setSelectedInsurance={props.setAdminSelectedInsurance}
-                                setSelectedFactoringCompany={props.setAdminSelectedFactoringCompany}
-                                setSelectedFactoringCompanyContact={props.setAdminSelectedFactoringCompanyContact}
-                                setEquipmentInformation={props.setAdminEquipmentInformation}
+                        </div>
 
-                                carriers={props.carriers}
-                                contacts={props.carrierContacts}
-                                selectedCarrier={props.selectedCarrier}
-                                selectedContact={props.selectedCarrierContact}
-                                selectedNote={props.selectedCarrierNote}
-                                selectedDirection={props.selectedCarrierDirection}
-                                contactSearch={props.carrierContactSearch}
-                                showingContactList={props.showingCarrierContactList}
-                                carrierSearch={props.carrierSearch}
-                                selectedDocument={props.selectedCarrierDocument}
-                                drivers={props.drivers}
-                                selectedDriver={props.selectedDriver}
-                                equipments={props.equipments}
-                                insuranceTypes={props.insuranceTypes}
-                                selectedEquipment={props.selectedEquipment}
-                                selectedInsuranceType={props.selectedInsuranceType}
-                                factoringCompanySearch={props.factoringCompanySearch}
-                                factoringCompanies={props.factoringCompanies}
-                                carrierInsurances={props.carrierInsurances}
-                                selectedInsurance={props.selectedInsurance}
-                                selectedFactoringCompany={props.selectedFactoringCompany}
-                                equipmentInformation={props.equipmentInformation}
+                        <div style={{
+                            width: `${100 / props.pages.length}%`,
+                            height: '100%',
+                            transform: `scale(${props.scale})`,
+                            transition: 'all ease 0.7s',
+                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
+                            borderRadius: props.scale === 1 ? 0 : '20px'
+                        }}>
+                            {
+                                companySetupPanelTransition((style, panel, item, index) => {
+                                    const origin = 'company';
 
-                                carrierSearchPanelName='admin-carrier-search'
-                                carrierContactSearchPanelName='admin-carrier-contact-search'
-                                carrierContactsPanelName='admin-carrier-contacts'
-                                carrierDocumentsPanelName='admin-documents'
-                                carrierRevenueInformationPanelName='admin-revenue-information'
-                                carrierOrderHistoryPanelName='admin-order-history'
-                                carrierEquipmentPanelName='admin-equipment-information'
-                                carrierFactoringCompanySearchPanelName='admin-carrier-factoring-company-search'
-                                carrierFactoringCompanyPanelName='admin-carrier-factoring-company'
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}>
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
+                            <CompanySetup
+                                pageName={'Company Setup'}
+                                title={'Company Setup'}
+                                panelName={'company-setup'}
+                                tabTimes={114000}
+                                screenFocused={props.setupCompanyScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                origin='company'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
                             />
                         </div>
                     </div>

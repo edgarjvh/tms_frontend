@@ -1,0 +1,590 @@
+.company-setup-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    font-size: 24px;
+    background: rgb(250, 250, 250);
+    background: -moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+    background: radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#c8c8c8', GradientType=1);
+    transition: all ease 0.7s;
+    overflow: hidden;
+    padding: 10px;
+
+
+    .company-left-container {
+        min-width: 250px;
+        max-width: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .company-logo-container {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            position: relative;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+
+            .company-logo-wrapper {
+                overflow: hidden;
+                // position     : absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                border-radius: 50%;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+        }
+
+        .company-logo-buttons {
+            display: flex;
+            justify-content: center;
+
+        }
+
+        .company-extra-info {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-gap: 10px;
+            margin-top: 15px;
+        }
+    }
+
+    .company-right-container {
+        flex-grow: 1;
+        max-width: 900px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr 1fr;
+        grid-gap: 10px;
+        margin-left: 15px;
+
+        .company-info-employees {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            grid-gap: 10px;
+
+            .selected-company-employee-primary-phone {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .selected-company-employee-primary-email {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .form-slider {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+
+                .form-slider-wrapper {
+                    width: 200%;
+                    position: absolute;
+                    height: 100%;
+                    left: 0;
+                    display: flex;
+                    transition: ease 0.3s;
+
+                    .employee-list-box {
+                        width: 50%;
+                        position: relative;
+
+                        .employee-list-header {
+                            display: flex;
+                            font-size: 0.7rem;
+                            font-weight: bold;
+                            text-decoration: underline;
+                            color: rgba(0, 0, 0, 1);
+                            min-height: 1rem;
+                            max-height: 1rem;
+                        }
+
+                        .tcol.first-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.last-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.phone-work {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.email-work {
+                            flex-grow: 1;
+                        }
+
+                        .tcol.pri {
+                            // min-width : 0.65rem;
+                            // max-width : 0.65rem;
+                            text-align: center;
+                        }
+
+                        .employee-list-wrapper {
+                            position: absolute;
+                            width: 100%;
+                            height: calc(100% - 1rem);
+                            bottom: 0;
+                            overflow-y: auto;
+                            padding-top: 5px;
+
+                            .employee-list-item {
+                                font-size: 0.7rem;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                                padding: 5px 0;
+                                cursor: pointer;
+                                transition: ease 0.3s;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding-right: 5px;
+
+                                >div {
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                            }
+
+                            .employee-list-item:hover {
+                                background-color: rgba(0, 0, 0, 0.1);
+                            }
+                        }
+                    }
+
+                    .employee-search-box {
+                        width: 50%;
+                    }
+                }
+            }
+        }
+
+        .company-info-agents {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            grid-gap: 10px;
+
+            .selected-company-agent-primary-phone {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .selected-company-agent-primary-email {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .form-slider {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+
+                .form-slider-wrapper {
+                    width: 200%;
+                    position: absolute;
+                    height: 100%;
+                    left: 0;
+                    display: flex;
+                    transition: ease 0.3s;
+
+                    .agent-list-box {
+                        width: 50%;
+                        position: relative;
+
+                        .agent-list-header {
+                            display: flex;
+                            font-size: 0.7rem;
+                            font-weight: bold;
+                            text-decoration: underline;
+                            color: rgba(0, 0, 0, 1);
+                            min-height: 1rem;
+                            max-height: 1rem;
+                        }
+
+                        .tcol.first-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.last-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.phone-work {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.email-work {
+                            flex-grow: 1;
+                        }
+
+                        .tcol.pri {
+                            // min-width : 0.65rem;
+                            // max-width : 0.65rem;
+                            text-align: center;
+                        }
+
+                        .agent-list-wrapper {
+                            position: absolute;
+                            width: 100%;
+                            height: calc(100% - 1rem);
+                            bottom: 0;
+                            overflow-y: auto;
+                            padding-top: 5px;
+
+                            .agent-list-item {
+                                font-size: 0.7rem;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                                padding: 5px 0;
+                                cursor: pointer;
+                                transition: ease 0.3s;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding-right: 5px;
+
+                                >div {
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                            }
+
+                            .agent-list-item:hover {
+                                background-color: rgba(0, 0, 0, 0.1);
+                            }
+                        }
+                    }
+
+                    .agent-search-box {
+                        width: 50%;
+                    }
+                }
+            }
+        }
+
+        .company-info-drivers {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            grid-gap: 10px;
+
+            .selected-company-driver-primary-phone {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .selected-company-driver-primary-email {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .form-slider {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+
+                .form-slider-wrapper {
+                    width: 200%;
+                    position: absolute;
+                    height: 100%;
+                    left: 0;
+                    display: flex;
+                    transition: ease 0.3s;
+
+                    .driver-list-box {
+                        width: 50%;
+                        position: relative;
+
+                        .driver-list-header {
+                            display: flex;
+                            font-size: 0.7rem;
+                            font-weight: bold;
+                            text-decoration: underline;
+                            color: rgba(0, 0, 0, 1);
+                            min-height: 1rem;
+                            max-height: 1rem;
+                        }
+
+                        .tcol.first-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.last-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.phone-work {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.email-work {
+                            flex-grow: 1;
+                        }
+
+                        .tcol.pri {
+                            // min-width : 0.65rem;
+                            // max-width : 0.65rem;
+                            text-align: center;
+                        }
+
+                        .driver-list-wrapper {
+                            position: absolute;
+                            width: 100%;
+                            height: calc(100% - 1rem);
+                            bottom: 0;
+                            overflow-y: auto;
+                            padding-top: 5px;
+
+                            .driver-list-item {
+                                font-size: 0.7rem;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                                padding: 5px 0;
+                                cursor: pointer;
+                                transition: ease 0.3s;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding-right: 5px;
+
+                                >div {
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                            }
+
+                            .driver-list-item:hover {
+                                background-color: rgba(0, 0, 0, 0.1);
+                            }
+                        }
+                    }
+
+                    .driver-search-box {
+                        width: 50%;
+                    }
+                }
+            }
+        }
+
+        .company-info-owner-operators {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            grid-gap: 10px;
+
+            .selected-company-operator-primary-phone {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .selected-company-operator-primary-email {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.7rem;
+                text-transform: capitalize;
+                font-weight: bold;
+
+                &.pushed {
+                    right: 20px;
+                }
+            }
+
+            .form-slider {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+
+                .form-slider-wrapper {
+                    width: 200%;
+                    position: absolute;
+                    height: 100%;
+                    left: 0;
+                    display: flex;
+                    transition: ease 0.3s;
+
+                    .operator-list-box {
+                        width: 50%;
+                        position: relative;
+
+                        .operator-list-header {
+                            display: flex;
+                            font-size: 0.7rem;
+                            font-weight: bold;
+                            text-decoration: underline;
+                            color: rgba(0, 0, 0, 1);
+                            min-height: 1rem;
+                            max-height: 1rem;
+                        }
+
+                        .tcol.first-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.last-name {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.phone-work {
+                            min-width: 5rem;
+                            max-width: 5rem;
+                        }
+
+                        .tcol.email-work {
+                            flex-grow: 1;
+                        }
+
+                        .tcol.pri {
+                            // min-width : 0.65rem;
+                            // max-width : 0.65rem;
+                            text-align: center;
+                        }
+
+                        .operator-list-wrapper {
+                            position: absolute;
+                            width: 100%;
+                            height: calc(100% - 1rem);
+                            bottom: 0;
+                            overflow-y: auto;
+                            padding-top: 5px;
+
+                            .operator-list-item {
+                                font-size: 0.7rem;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                                padding: 5px 0;
+                                cursor: pointer;
+                                transition: ease 0.3s;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding-right: 5px;
+
+                                >div {
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                            }
+
+                            .operator-list-item:hover {
+                                background-color: rgba(0, 0, 0, 0.1);
+                            }
+                        }
+                    }
+
+                    .operator-search-box {
+                        width: 50%;
+                    }
+                }
+            }
+        }
+    }
+}

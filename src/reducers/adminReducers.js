@@ -5,7 +5,7 @@ export const adminReducers = (state = {
         'admin customer',
         'admin carrier',
         'reports',
-        'setup company'
+        'company setup'
     ],
     selectedPageIndex: -1,
     mainAdminScreenFocused: true,    

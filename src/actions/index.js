@@ -6,3 +6,4 @@ export * from './carriersActions';
 export * from './invoiceActions';
 export * from './dispatchActions';
 export * from './loadBoardActions';
+export * from './companySetupActions';

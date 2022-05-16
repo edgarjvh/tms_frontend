@@ -1,0 +1,496 @@
+.company-setup-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  font-size: 24px;
+  background: #fafafa;
+  background: -moz-radial-gradient(center, ellipse cover, #fafafa 0%, #c8c8c8 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #fafafa 0%, #c8c8c8 100%);
+  background: radial-gradient(ellipse at center, #fafafa 0%, #c8c8c8 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#c8c8c8', GradientType=1);
+  transition: all ease 0.7s;
+  overflow: hidden;
+  padding: 10px;
+}
+.company-setup-container .company-left-container {
+  min-width: 250px;
+  max-width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.company-setup-container .company-left-container .company-logo-container {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  position: relative;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.5);
+  margin-bottom: 20px;
+}
+.company-setup-container .company-left-container .company-logo-container .company-logo-wrapper {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+}
+.company-setup-container .company-left-container .company-logo-container .company-logo-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.company-setup-container .company-left-container .company-logo-buttons {
+  display: flex;
+  justify-content: center;
+}
+.company-setup-container .company-left-container .company-extra-info {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 10px;
+  margin-top: 15px;
+}
+.company-setup-container .company-right-container {
+  flex-grow: 1;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr 1fr;
+  grid-gap: 10px;
+  margin-left: 15px;
+}
+.company-setup-container .company-right-container .company-info-employees {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-gap: 10px;
+}
+.company-setup-container .company-right-container .company-info-employees .selected-company-employee-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-employees .selected-company-employee-primary-phone.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-employees .selected-company-employee-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-employees .selected-company-employee-primary-email.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper {
+  width: 200%;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  display: flex;
+  transition: ease 0.3s;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box {
+  width: 50%;
+  position: relative;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .employee-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .tcol.first-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .tcol.last-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .tcol.phone-work {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .tcol.email-work {
+  flex-grow: 1;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .tcol.pri {
+  text-align: center;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .employee-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .employee-list-wrapper .employee-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 5px;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .employee-list-wrapper .employee-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-list-box .employee-list-wrapper .employee-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.company-setup-container .company-right-container .company-info-employees .form-slider .form-slider-wrapper .employee-search-box {
+  width: 50%;
+}
+.company-setup-container .company-right-container .company-info-agents {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-gap: 10px;
+}
+.company-setup-container .company-right-container .company-info-agents .selected-company-agent-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-agents .selected-company-agent-primary-phone.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-agents .selected-company-agent-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-agents .selected-company-agent-primary-email.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper {
+  width: 200%;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  display: flex;
+  transition: ease 0.3s;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box {
+  width: 50%;
+  position: relative;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .agent-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .tcol.first-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .tcol.last-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .tcol.phone-work {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .tcol.email-work {
+  flex-grow: 1;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .tcol.pri {
+  text-align: center;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .agent-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .agent-list-wrapper .agent-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 5px;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .agent-list-wrapper .agent-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-list-box .agent-list-wrapper .agent-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.company-setup-container .company-right-container .company-info-agents .form-slider .form-slider-wrapper .agent-search-box {
+  width: 50%;
+}
+.company-setup-container .company-right-container .company-info-drivers {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-gap: 10px;
+}
+.company-setup-container .company-right-container .company-info-drivers .selected-company-driver-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-drivers .selected-company-driver-primary-phone.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-drivers .selected-company-driver-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-drivers .selected-company-driver-primary-email.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper {
+  width: 200%;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  display: flex;
+  transition: ease 0.3s;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box {
+  width: 50%;
+  position: relative;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .driver-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .tcol.first-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .tcol.last-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .tcol.phone-work {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .tcol.email-work {
+  flex-grow: 1;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .tcol.pri {
+  text-align: center;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .driver-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .driver-list-wrapper .driver-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 5px;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .driver-list-wrapper .driver-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-list-box .driver-list-wrapper .driver-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.company-setup-container .company-right-container .company-info-drivers .form-slider .form-slider-wrapper .driver-search-box {
+  width: 50%;
+}
+.company-setup-container .company-right-container .company-info-owner-operators {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-gap: 10px;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .selected-company-operator-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .selected-company-operator-primary-phone.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .selected-company-operator-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .selected-company-operator-primary-email.pushed {
+  right: 20px;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper {
+  width: 200%;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  display: flex;
+  transition: ease 0.3s;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box {
+  width: 50%;
+  position: relative;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .operator-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .tcol.first-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .tcol.last-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .tcol.phone-work {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .tcol.email-work {
+  flex-grow: 1;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .tcol.pri {
+  text-align: center;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .operator-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .operator-list-wrapper .operator-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 5px;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .operator-list-wrapper .operator-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-list-box .operator-list-wrapper .operator-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.company-setup-container .company-right-container .company-info-owner-operators .form-slider .form-slider-wrapper .operator-search-box {
+  width: 50%;
+}

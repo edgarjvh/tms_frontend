@@ -6,3 +6,4 @@ export * from './carrierReducers';
 export * from './invoiceReducers';
 export * from './dispatchReducers';
 export * from './loadBoardReducers';
+export * from './companySetupReducers';

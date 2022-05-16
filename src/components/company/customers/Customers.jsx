@@ -248,7 +248,7 @@ const Customers = (props) => {
     });
 
     useEffect(() => {
-        if ((props.selectecCustomer?.component_id || '') !== props.componentId) {
+        if ((props.selectedCustomer?.component_id || '') !== props.componentId) {
             if (((selectedCustomer?.id || 0) > 0 && (props.selectedCustomer?.id || 0) > 0) && selectedCustomer.id === props.selectedCustomer.id) {
                 setSelectedCustomer(selectedCustomer => {
                     return {
@@ -805,7 +805,7 @@ const Customers = (props) => {
                     new Promise((resolve, reject) => {
                         if (contact) {
                             setSelectedCustomer(contact.customer);
-                            setSelectedContact((contact.customer.contacts || []).find(c => c.is_primary === 1) || {});
+                            setSelectedContact(contact);
                             setAutomaticEmailsTo('');
                             setAutomaticEmailsCc('');
                             setAutomaticEmailsBcc('');
@@ -2719,7 +2719,7 @@ const Customers = (props) => {
                                 <div className="form-buttons">
                                     <div className="mochi-button" onClick={async () => {
                                         if (selectedCustomer?.id === undefined) {
-                                            window.alert('You must select a contact first!');
+                                            window.alert('You must select a customer first!');
                                             return;
                                         }
 
@@ -2759,7 +2759,7 @@ const Customers = (props) => {
                                     </div>
                                     <div className="mochi-button" onClick={() => {
                                         if (selectedCustomer?.id === undefined) {
-                                            window.alert('You must select a customer');
+                                            window.alert('You must select a customer first!');
                                             return;
                                         }
 

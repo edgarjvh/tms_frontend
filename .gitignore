@@ -24,3 +24,4 @@ yarn-debug.log*
 yarn-error.log*
 TMS Frontend.zip
 open_cmd here.cmd
+yarn.lock
