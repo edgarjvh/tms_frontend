@@ -485,7 +485,7 @@ export default class ToPrint extends Component {
                                             borderRight: '1px solid rgba(0,0,0,0.3)'
                                         }}>
                                             {
-                                                rating.rate_type?.name || ''
+                                                (rating.rate_type?.name || '').toLowerCase() === 'comment' ? '' : (rating.rate_type?.name || '')
                                             }
                                         </div>
 

@@ -195,7 +195,7 @@ export default class ToPrint extends Component {
                             }}>
                                 <span style={{ ...this.styleFieldName, marginRight: 10 }}>E-MAIL:</span> <span style={{ ...this.styleFieldDataBold }}>{
                                     (this.props.selectedOrder?.bill_to_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                        ? (this.props.selectedOrder?.bill_to_company?.contact_phone || '')
+                                        ? (this.props.selectedOrder?.bill_to_company?.email || '')
                                         : this.props.selectedOrder?.bill_to_company?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                             ? this.props.selectedOrder?.bill_to_company?.contacts.find(c => c.is_primary === 1).email_work
                                             : this.props.selectedOrder?.bill_to_company?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
@@ -312,16 +312,8 @@ export default class ToPrint extends Component {
                                     alignItems: 'flex-start',
                                     gridColumn: '1 / 3',
 
-                                }}><span style={{ ...this.styleFieldName, marginRight: 5 }}>SPECIAL INSTRUCTIONS:</span>
-                                </div>
-
-                                <div style={{
-                                    ...this.styleFieldDataBold,
-                                    // backgroundColor: 'violet',
-                                    alignItems: 'flex-start',
-                                    gridColumn: '1 / 3',
-
                                 }}>
+                                    <span style={{ ...this.styleFieldName, marginRight: 5 }}>SHIPPER:</span>
                                     {
                                         (this.props.selectedOrder?.pickups || []).map((pickup, index) => {
                                             return (
@@ -330,6 +322,28 @@ export default class ToPrint extends Component {
                                                     marginRight: index < (this.props.selectedOrder.pickups.length - 1) ? 3 : 0
                                                 }}>
                                                     {pickup.special_instructions}
+                                                </span>
+                                            )
+                                        })
+                                    }
+                                </div>
+
+                                <div style={{
+                                    ...this.styleFlexRow,
+                                    // backgroundColor: 'violet',
+                                    alignItems: 'flex-start',
+                                    gridColumn: '1 / 3',
+
+                                }}>
+                                    <span style={{ ...this.styleFieldName, marginRight: 5 }}>CONSIGNEE:</span>
+                                    {
+                                        (this.props.selectedOrder?.deliveries || []).map((delivery, index) => {
+                                            return (
+                                                <span key={index} style={{
+                                                    ...this.styleFieldDataBold,
+                                                    marginRight: index < (this.props.selectedOrder.deliveries.length - 1) ? 3 : 0
+                                                }}>
+                                                    {delivery.special_instructions}
                                                 </span>
                                             )
                                         })

@@ -129,19 +129,17 @@ const CustomerImport = (props) => {
                             phone = phone.slice(0, 3) + '-' + phone.slice(3);
                         }
 
-                        // let parseCity = city.toLowerCase().trim().replace(/\s/g, "").substring(0, 3);
+                        let contactNameSplitted = contact.split(' ');
+                        let contactFirstName = contactNameSplitted[0];
+                        let contactLastName = '';
 
-                        // if (parseCity.toLowerCase() === "ft.") {
-                        //     parseCity = "FO";
-                        // }
-                        // if (parseCity.toLowerCase() === "mt.") {
-                        //     parseCity = "MO";
-                        // }
-                        // if (parseCity.toLowerCase() === "st.") {
-                        //     parseCity = "SA";
-                        // }
+                        if (contactNameSplitted.length > 0){
+                            for(let i = 1; i < contactNameSplitted.length; i++){
+                                contactLastName += contactNameSplitted[i] + ' ';
+                            }
+                        }
 
-                        // code = ((name || '').trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + (state || '').trim().replace(/\s/g, "").substring(0, 2)).toUpperCase();
+                        contactLastName = contactLastName.trim();
 
                         item = {
                             code: code,
@@ -153,6 +151,8 @@ const CustomerImport = (props) => {
                             state: state,
                             zip: zip,
                             contact: contact,
+                            contactFirstName: contactFirstName,
+                            contactLastName: contactLastName,
                             phone: phone,
                             ext: ext,
                             email: email,
@@ -160,10 +160,7 @@ const CustomerImport = (props) => {
                             dotNumber: dotNumber,
                             scac: scac,
                             fid: fid,
-                            doNotUse: doNotUse,
-                            showMatches: false,
-                            save: carriers.filter(car => car.code.toUpperCase() === code).length === 0,
-                            matches: []
+                            doNotUse: doNotUse                            
                         }
 
                         return item;
@@ -197,32 +194,14 @@ const CustomerImport = (props) => {
 
     const processSubmit = () => {
         if (carrierList.length) {
-            axios.post(props.serverUrl + '/submitCarrierImport', {
-                code: carrierList[0].code,
-                codeNumber: carrierList[0].codeNumber,
-                name: carrierList[0].name,
-                address1: carrierList[0].address1,
-                address2: carrierList[0].address2,
-                city: carrierList[0].city,
-                state: carrierList[0].state,
-                zip: carrierList[0].zip,
-                contact: carrierList[0].contact,
-                phone: carrierList[0].phone,
-                ext: carrierList[0].ext,
-                email: carrierList[0].email,
-                mcNumber: carrierList[0].mcNumber,
-                dotNumber: carrierList[0].dotNumber,
-                scac: carrierList[0].scac,
-                fid: carrierList[0].fid,
-                doNotUse: carrierList[0].doNotUse
-            }).then(res => {
+            axios.post(props.serverUrl + '/submitCarrierImport2', {list: carrierList}).then(res => {
                 console.log(carrierList.length, res.data)
             }).catch(e => {
                 console.log(carrierList.length, e)
             }).finally(() => {
-                carrierList.shift();
-                setCarrierCurrentListLength(carrierTotalListLength - carrierList.length);
-                processSubmit();
+                setIsLoading(false);
+                setCarrierList([]);
+                refInputFile.current.value = "";
             })
         } else {
             setIsLoading(false);
@@ -231,7 +210,7 @@ const CustomerImport = (props) => {
 
     const submitBtnClasses = classNames({
         'mochi-button': true,
-        'disabled': carrierList.length === 0 || carrierList.filter(c => c.save).length === 0
+        'disabled': false
     })
 
     return (
@@ -244,7 +223,7 @@ const CustomerImport = (props) => {
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                            <div style={{
+                            {/* <div style={{
                                 position: 'relative',
                                 width: '90%',
                                 maxWidth: '600px',
@@ -266,7 +245,7 @@ const CustomerImport = (props) => {
                                     left: 0,
                                     width: (Math.floor((carrierCurrentListLength / carrierTotalListLength) * 100)) + '%'
                                 }}></div>
-                            </div>
+                            </div> */}
                         </div>
                     </animated.div>
                 )
@@ -332,8 +311,7 @@ const CustomerImport = (props) => {
                                 <div className="import-body-wrapper">
                                     <div className="import-header" style={{ width: '170%' }}>
                                         <div className="import-header-wrapper">
-                                            <div className="trow">
-                                                <div className="tcol status">Status</div>
+                                            <div className="trow">                                               
                                                 <div className="tcol code">Code</div>
                                                 <div className="tcol name">Name</div>
                                                 <div className="tcol address1">Address 1</div>
@@ -360,8 +338,7 @@ const CustomerImport = (props) => {
                                 <div className="import-body-wrapper">
                                     <div className="import-header" style={{ display: 'table-row' }}>
                                         <div className="import-header-wrapper">
-                                            <div className="trow">
-                                                <div className="tcol status">Status</div>
+                                            <div className="trow">                                                
                                                 <div className="tcol code">Code</div>
                                                 <div className="tcol name">Name</div>
                                                 <div className="tcol address1">Address 1</div>
@@ -385,80 +362,25 @@ const CustomerImport = (props) => {
                                     {
                                         carrierList.map((carrier, index) => {
 
-                                            // let parseCity = carrier.city.toLowerCase().trim().replace(/\s/g, "").substring(0, 3);
-
-                                            // if (parseCity.toLowerCase() === "ft.") {
-                                            //     parseCity = "FO";
-                                            // }
-                                            // if (parseCity.toLowerCase() === "mt.") {
-                                            //     parseCity = "MO";
-                                            // }
-                                            // if (parseCity.toLowerCase() === "st.") {
-                                            //     parseCity = "SA";
-                                            // }
-
-                                            // const code = ((carrier.name || '').trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + (carrier.state || '').trim().replace(/\s/g, "").substring(0, 2)).toUpperCase();
-
-                                            // carrier.matches = currentCarriers.filter(cus => cus.code.toUpperCase() === code);
-
                                             const rowContainerClasses = classNames({
                                                 'row-container': true,
                                                 'hidden': false,
-                                                'hidden': duplicatesShown && (carrier.matches || []).length === 0
+                                                'hidden': false
                                             });
 
                                             const rowClasses = classNames({
                                                 'trow': true,
-                                                'save': carrier.save
+                                                'save': true
                                             })
 
                                             const matchesContainerClasses = classNames({
                                                 'matches-container': true,
-                                                'shown': carrier.showMatches
+                                                'shown': false
                                             })
 
                                             return (
                                                 <div className={rowContainerClasses} key={index}>
                                                     <div className={rowClasses}>
-                                                        <div className="tcol status" onClick={() => {
-
-                                                        }}>
-                                                            <span><label htmlFor={'cbox-' + index}>Save</label></span>
-
-
-                                                            <input
-                                                                id={'cbox-' + index}
-                                                                name={'cbox-' + index}
-                                                                value={'Save'}
-                                                                type="checkbox"
-                                                                checked={carrier.save}
-                                                                onChange={(e) => {
-                                                                    setCarrierList(carrierList.map((item, i) => {
-                                                                        if (i === index) {
-                                                                            item.save = e.target.checked
-                                                                        }
-
-                                                                        return item;
-                                                                    }))
-                                                                }} />
-                                                            <div className="separator"></div>
-
-                                                            {
-                                                                carrier.matches.length > 0 &&
-                                                                <FontAwesomeIcon className='show-matches-btn' icon={carrier.showMatches ? faCaretUp : faCaretDown} onClick={() => {
-                                                                    setCarrierList(carrierList => {
-                                                                        return carrierList.map((item, i) => {
-                                                                            if (i === index) {
-                                                                                item.showMatches = !item.showMatches;
-                                                                            }
-
-                                                                            return item;
-                                                                        })
-                                                                    })
-                                                                }} />
-                                                            }
-                                                        </div>
-
                                                         <div className="tcol code">
                                                             <input type="text"
                                                                 onChange={(e) => { }}
@@ -715,60 +637,6 @@ const CustomerImport = (props) => {
                                                             />
                                                         </div>
                                                     </div>
-
-                                                    {
-                                                        carrier.matches.length > 0 &&
-                                                        <div className={matchesContainerClasses}>
-                                                            {
-                                                                (carrier.matches || []).map((item, index) => {
-                                                                    const contact = (item.contacts || []).find(c => c.is_primary === 1) || {}
-
-                                                                    const contactPhone = contact.primary_phone === 'work'
-                                                                        ? contact.phone_work
-                                                                        : contact.primary_phone === 'fax'
-                                                                            ? contact.phone_work_fax
-                                                                            : contact.primary_phone === 'mobile'
-                                                                                ? contact.phone_mobile
-                                                                                : contact.primary_phone === 'direct'
-                                                                                    ? contact.phone_direct
-                                                                                    : contact.primary_phone === 'other'
-                                                                                        ? contact.phone_other
-                                                                                        : ''
-
-                                                                    const contactEmail = contact.primary_email === 'work'
-                                                                        ? contact.email_work
-                                                                        : contact.primary_email === 'personal'
-                                                                            ? contact.email_personal
-                                                                            : contact.primary_email === 'other'
-                                                                                ? contact.email_other
-                                                                                : ''
-
-                                                                    return (
-                                                                        <div className="trow" key={index}>
-                                                                            <div className="tcol status"></div>
-                                                                            <div className="tcol code">{item.code}{item.code_number > 0 ? item.code_number : ''}</div>
-                                                                            <div className="tcol name">{item.name}</div>
-                                                                            <div className="tcol address1">{item.address1}</div>
-                                                                            <div className="tcol address2">{item.address2}</div>
-                                                                            <div className="tcol city">{item.city}</div>
-                                                                            <div className="tcol state">{item.state}</div>
-                                                                            <div className="tcol zip">{item.zip}</div>
-                                                                            <div className="tcol contact">{contact.first_name || ''} {contact.last_name || ''}</div>
-                                                                            <div className="tcol phone">{contactPhone || ''}</div>
-                                                                            <div className="tcol ext">{contact.phone_ext}</div>
-                                                                            <div className="tcol email">{contactEmail}</div>
-                                                                            <div className="tcol mcnumber">{item.mc_number}</div>
-                                                                            <div className="tcol dotnumber">{item.dot_number}</div>
-                                                                            <div className="tcol scac">{item.scac}</div>
-                                                                            <div className="tcol fid">{item.fid}</div>
-                                                                            <div className="tcol donotuse">{item.do_not_use > 0 ? 'Y' : 'N'}</div>
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    }
-
                                                 </div>
                                             )
                                         })

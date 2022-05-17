@@ -642,7 +642,7 @@ const Customers = (props) => {
                 });
             }
         }).catch(e => {
-            console.log('error getting customer orders', e);            
+            console.log('error getting customer orders', e);
         });
     }
 
@@ -1262,11 +1262,14 @@ const Customers = (props) => {
                                 <div className="form-title">Customer</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={importCustomerBtnClick}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Import</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
+                                    {
+                                        (props.isAdmin || false) &&
+                                        <div className="mochi-button" onClick={importCustomerBtnClick}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Import</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    }
                                     <div className="mochi-button" onClick={searchCustomerBtnClick}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Search</div>

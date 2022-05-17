@@ -19,6 +19,7 @@ import {
     setPages,
     setSelectedPageIndex,
     setMainAdminScreenFocused,
+    setDispatchScreenFocused,
     setCustomerScreenFocused,
     setCarrierScreenFocused,
     setReportsScreenFocused,
@@ -150,7 +151,7 @@ import {
 
 } from '../../actions/carriersActions';
 
-import { Customers, Carriers } from './../company';
+import { Dispatch, Customers, Carriers } from './../company';
 import { CompanySetup } from './';
 
 function Admin(props) {
@@ -169,6 +170,7 @@ function Admin(props) {
     const refChatOptionPopupItems = useRef([]);
 
     const [adminHomePanels, setAdminHomePanels] = useState([]);
+    const [dispatchPanels, setDispatchPanels] = useState([]);
     const [customerPanels, setCustomerPanels] = useState([]);
     const [carrierPanels, setCarrierPanels] = useState([]);
     const [companySetupPanels, setCompanySetupPanels] = useState([]);
@@ -183,6 +185,20 @@ function Admin(props) {
 
     const userClick = () => {
         props.setMainScreen('company');
+    }
+
+    const dispatchBtnClick = async () => {
+        let curPages = props.pages;
+
+        if (curPages.indexOf('admin dispatch') === -1) {
+            await props.setPages([...curPages, 'admin dispatch']);
+            await props.setSelectedPageIndex(curPages.length);
+
+        } else {
+            await props.setSelectedPageIndex(props.pages.indexOf('admin dispatch'));
+        }
+
+        props.setDispatchScreenFocused(true);
     }
 
     const customersBtnClick = async () => {
@@ -230,6 +246,35 @@ function Admin(props) {
     const switchAppBtnClick = () => {
         props.setScale(props.scale === 1 ? 0.7 : 1);
     }
+
+    const dispatchPanelTransition = useTransition(dispatchPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (dispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+                // setCompanySetupPanels([]);
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (dispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
 
     const customerPanelTransition = useTransition(customerPanels, {
         from: panel => {
@@ -331,7 +376,13 @@ function Admin(props) {
             if (adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
                 setAdminHomePanels(adminHomePanels => [...adminHomePanels, panel]);
             }
-        }        
+        }
+
+        if (origin === 'dispatch') {
+            if (dispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                setDispatchPanels(dispatchPanels => [...dispatchPanels, panel]);
+            }
+        }
 
         if (origin === 'customer') {
             if (customerPanels.find(p => p.panelName === panel.panelName) === undefined) {
@@ -344,7 +395,7 @@ function Admin(props) {
                 setCarrierPanels(carrierPanels => [...carrierPanels, panel]);
             }
         }
-       
+
         if (origin === 'company') {
             if (companySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
                 setCompanySetupPanels(companySetupPanels => [...companySetupPanels, panel]);
@@ -355,7 +406,11 @@ function Admin(props) {
     const closePanel = (panelName, origin) => {
         if (origin === 'admin-home') {
             setAdminHomePanels(adminHomePanels.filter(panel => panel.panelName !== panelName));
-        }        
+        }
+
+        if (origin === 'dispatch') {
+            setDispatchPanels(dispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
 
         if (origin === 'customer') {
             setCustomerPanels(customerPanels.filter(panel => panel.panelName !== panelName));
@@ -416,6 +471,14 @@ function Admin(props) {
                         </div>
                         <div className={classnames({
                             'mochi-button': true,
+                            'screen-focused': props.dispatchScreenFocused
+                        })} onClick={dispatchBtnClick}>
+                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                            <div className="mochi-button-base">Dispatch</div>
+                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                        </div>
+                        <div className={classnames({
+                            'mochi-button': true,
                             'screen-focused': props.customerScreenFocused
                         })} onClick={customersBtnClick}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -464,6 +527,71 @@ function Admin(props) {
                         overflowX: 'auto',
                         transform: `translateX(${((100 / props.pages.length) * -1) * (props.selectedPageIndex + 1)}%)`
                     }}>
+
+                        <div style={{
+                            width: `${100 / props.pages.length}%`,
+                            height: '100%',
+                            transform: `scale(${props.scale})`,
+                            transition: 'all ease 0.7s',
+                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
+
+                        }}>
+                            {
+                                dispatchPanelTransition((style, panel, item, index) => {
+                                    const origin = 'dispatch';
+
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}                                            
+                                            >
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
+                            <Dispatch
+                                pageName={'Dispatch Page'}
+                                panelName={'dispatch'}
+                                tabTimes={111000}
+                                screenFocused={props.dispatchScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                isAdmin={true}
+                                origin='dispatch'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
+                            />
+                        </div>
 
                         <div style={{
                             width: `${100 / props.pages.length}%`,
@@ -521,6 +649,7 @@ function Admin(props) {
                                 screenFocused={props.customerScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
+                                isAdmin={true}
                                 origin='customer'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
@@ -583,6 +712,7 @@ function Admin(props) {
                                 screenFocused={props.carrierScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
+                                isAdmin={true}
                                 origin='carrier'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
@@ -656,6 +786,7 @@ function Admin(props) {
                                 screenFocused={props.setupCompanyScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
+                                isAdmin={true}
                                 origin='company'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
@@ -676,6 +807,7 @@ const mapStateToProps = state => {
         pages: state.adminReducers.pages,
         selectedPageIndex: state.adminReducers.selectedPageIndex,
         mainAdminScreenFocused: state.adminReducers.mainAdminScreenFocused,
+        dispatchScreenFocused: state.adminReducers.dispatchScreenFocused,
         customerScreenFocused: state.adminReducers.customerScreenFocused,
         carrierScreenFocused: state.adminReducers.carrierScreenFocused,
         reportsScreenFocused: state.adminReducers.reportsScreenFocused,
@@ -735,6 +867,7 @@ export default connect(mapStateToProps, {
     setSelectedPageIndex,
     setScale,
     setMainAdminScreenFocused,
+    setDispatchScreenFocused,
     setCustomerScreenFocused,
     setCarrierScreenFocused,
     setReportsScreenFocused,

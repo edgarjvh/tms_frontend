@@ -1568,11 +1568,7 @@ const Dispatch = (props) => {
           return;
         }
 
-        axios
-          .post(props.serverUrl + "/carriers", {
-            code: e.target.value.toLowerCase(),
-          })
-          .then((res) => {
+        axios.post(props.serverUrl + "/carriers", {code: e.target.value.toLowerCase()}).then((res) => {
             if (res.data.result === "OK") {
               if (res.data.carriers.length > 0) {
                 setSelectedCarrier(res.data.carriers[0]);
@@ -1607,8 +1603,9 @@ const Dispatch = (props) => {
                         ? ""
                         : " " + res.data.carriers[0].drivers[0].last_name),
                   });
-                  selected_order.carrier_driver_id =
-                    res.data.carriers[0].drivers[0].id;
+                  selected_order.carrier_driver_id = res.data.carriers[0].drivers[0].id;
+                  selected_order.equipment = res.data.carriers[0].drivers[0].equipment;
+                  selected_order.equipment_id = res.data.carriers[0].drivers[0].equipment_id;
                 }
 
                 if ((selected_order.ae_number || "") === "") {
@@ -6537,11 +6534,15 @@ const Dispatch = (props) => {
                   <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
 
-                <div className="mochi-button" style={{ marginLeft: 5 }} onClick={importOrdersBtnClick}>
-                  <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                  <div className="mochi-button-base">Import</div>
-                  <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                </div>
+                {
+                  (props.isAdmin || false) &&
+                  <div className="mochi-button" style={{ marginLeft: 5 }} onClick={importOrdersBtnClick}>
+                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div className="mochi-button-base">Import</div>
+                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                  </div>
+                }
+
               </div>
             </div>
           </div>

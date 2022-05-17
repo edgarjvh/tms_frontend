@@ -213,18 +213,18 @@ const OrderImport = (props) => {
                         let customerRating = {
                             rateTypeId: (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id,
                             description: item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '',
-                            pieces: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')],
+                            pieces: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')],
                             piecesUnit: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk',
-                            weight: (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? '' : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')],
+                            weight: (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')],
                             total_charges: item[Object.keys(item).find(key => key.toLowerCase() === 'revenue')] || 0
                         };
 
                         let carrierRating = {
                             rateTypeId: (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id,
                             description: item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '',
-                            pieces: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')],
+                            pieces: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')],
                             piecesUnit: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk',
-                            weight: (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? '' : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')],
+                            weight: (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')],
                             total_charges: item[Object.keys(item).find(key => key.toLowerCase() === 'cost')] || 0
                         };
 
@@ -335,47 +335,96 @@ const OrderImport = (props) => {
     }
 
     const processSubmit = () => {
-        if (orderList.length) {            
-            axios.post(props.serverUrl + '/submitOrderImport', {
-                order: orderList[0].order,
-                trip: orderList[0].trip,
-                loadTypeId: orderList[0].loadType.id || 0,
-                hazMat: orderList[0].hazMat,
-                expedited: orderList[0].expedited,
-                miles: orderList[0].miles || 0,
-                orderDateTime: orderList[0].orderDateTime,
-                billToCustomerId: orderList[0].billToCustomer?.id || 0,
-                carrierId: orderList[0].carrierCustomer?.id || 0,
-                equipmentTypeId: orderList[0].equipment?.id || 0,
-                shipperCustomerId: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.id || 0 : 0,
-                pu_date1: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_date1 || '' : '',
-                pu_date2: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_date2 || '' : '',
-                pu_time1: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_time1 || '' : '',
-                pu_time2: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_time2 || '' : '',
-                ref_numbers: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.ref_numbers || '' : '',
-                consigneeCustomerId: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.id || 0 : 0,
-                delivery_date1: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_date1 || '' : '',
-                delivery_date2: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_date2 || '' : '',
-                delivery_time1: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_time1 || '' : '',
-                delivery_time2: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_time2 || '' : '',
-                customerRating: orderList[0].customerRating,
-                carrierRating: orderList[0].carrierRating,
-                loadedEvent: orderList[0].loadedEvent,
-                deliveredEvent: orderList[0].deliveredEvent,
-            }).then(res => {
+        if (orderList.length) {
+            let listToSend = orderList.map(item => {
+                let newItem = {
+                    order: item.order,
+                    trip: item.trip,
+                    loadTypeId: item.loadType.id || 0,
+                    hazMat: item.hazMat,
+                    expedited: item.expedited,
+                    miles: item.miles || 0,
+                    orderDateTime: item.orderDateTime,
+                    billToCustomerId: item.billToCustomer?.id || 0,
+                    carrierId: item.carrierCustomer?.id || 0,
+                    equipmentTypeId: item.equipment?.id || 0,
+                    shipperCustomerId: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.id || 0 : 0,
+                    pu_date1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date1 || '' : '',
+                    pu_date2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date2 || '' : '',
+                    pu_time1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time1 || '' : '',
+                    pu_time2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time2 || '' : '',
+                    ref_numbers: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.ref_numbers || '' : '',
+                    consigneeCustomerId: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.id || 0 : 0,
+                    delivery_date1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date1 || '' : '',
+                    delivery_date2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date2 || '' : '',
+                    delivery_time1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time1 || '' : '',
+                    delivery_time2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time2 || '' : '',
+                    customerRating: item.customerRating,
+                    carrierRating: item.carrierRating,
+                    loadedEvent: item.loadedEvent,
+                    deliveredEvent: item.deliveredEvent,
+                }
+
+                return newItem
+            })
+            axios.post(props.serverUrl + '/submitOrderImport2', { list: listToSend }).then(res => {
                 console.log(orderList.length, res.data)
             }).catch(e => {
                 console.log(orderList.length, e)
-            }).finally(() => {
-                orderList.shift();
-                setOrderCurrentListLength(orderTotalListLength - orderList.length);
-                processSubmit();
+            }).finally(() => {                
+                setIsLoading(false);
+                setIsSubmitting(false);
+                setOrderList([]);                
+                refInputFile.current.value = "";
             })
         } else {
             setIsLoading(false);
             setIsSubmitting(false);
         }
     }
+
+    // const processSubmit = () => {
+    //     if (orderList.length) {            
+    //         axios.post(props.serverUrl + '/submitOrderImport', {
+    //             order: orderList[0].order,
+    //             trip: orderList[0].trip,
+    //             loadTypeId: orderList[0].loadType.id || 0,
+    //             hazMat: orderList[0].hazMat,
+    //             expedited: orderList[0].expedited,
+    //             miles: orderList[0].miles || 0,
+    //             orderDateTime: orderList[0].orderDateTime,
+    //             billToCustomerId: orderList[0].billToCustomer?.id || 0,
+    //             carrierId: orderList[0].carrierCustomer?.id || 0,
+    //             equipmentTypeId: orderList[0].equipment?.id || 0,
+    //             shipperCustomerId: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.id || 0 : 0,
+    //             pu_date1: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_date1 || '' : '',
+    //             pu_date2: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_date2 || '' : '',
+    //             pu_time1: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_time1 || '' : '',
+    //             pu_time2: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_time2 || '' : '',
+    //             ref_numbers: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.ref_numbers || '' : '',
+    //             consigneeCustomerId: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.id || 0 : 0,
+    //             delivery_date1: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_date1 || '' : '',
+    //             delivery_date2: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_date2 || '' : '',
+    //             delivery_time1: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_time1 || '' : '',
+    //             delivery_time2: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_time2 || '' : '',
+    //             customerRating: orderList[0].customerRating,
+    //             carrierRating: orderList[0].carrierRating,
+    //             loadedEvent: orderList[0].loadedEvent,
+    //             deliveredEvent: orderList[0].deliveredEvent,
+    //         }).then(res => {
+    //             console.log(orderList.length, res.data)
+    //         }).catch(e => {
+    //             console.log(orderList.length, e)
+    //         }).finally(() => {
+    //             orderList.shift();
+    //             setOrderCurrentListLength(orderTotalListLength - orderList.length);
+    //             processSubmit();
+    //         })
+    //     } else {
+    //         setIsLoading(false);
+    //         setIsSubmitting(false);
+    //     }
+    // }
 
     const submitBtnClasses = classNames({
         'mochi-button': true,
@@ -392,7 +441,7 @@ const OrderImport = (props) => {
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                            {
+                            {/* {
                                 isSubmitting &&
                                 <div style={{
                                     position: 'relative',
@@ -417,7 +466,7 @@ const OrderImport = (props) => {
                                         width: (Math.floor((orderCurrentListLength / orderTotalListLength) * 100)) + '%'
                                     }}></div>
                                 </div>
-                            }
+                            } */}
                         </div>
                     </animated.div>
                 )

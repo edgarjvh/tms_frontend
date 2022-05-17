@@ -106,8 +106,6 @@ const CarrierImport = (props) => {
 
                         let hours = (item[Object.keys(item).find(key => key.toLowerCase() === 'hours')] || '').toString();
 
-                        console.log(hours);
-
                         let hoursOpen = '';
                         let hoursClose = '';
 
@@ -118,7 +116,7 @@ const CarrierImport = (props) => {
                             hoursClose = hours.trim().substring(5);
                         }
 
-                        let billToCode = (item[Object.keys(item).find(key => key.toLowerCase() === 'billto')] || '').toUpperCase();
+                        let billToCode = (item[Object.keys(item).find(key => key.toLowerCase() === 'bill_to_code')] || '').toUpperCase();
                         let billToCodeNumber = 0;
 
                         if (billToCode !== '') {
@@ -147,19 +145,17 @@ const CarrierImport = (props) => {
                             phone = phone.slice(0, 3) + '-' + phone.slice(3);
                         }
 
-                        // let parseCity = city.toLowerCase().trim().replace(/\s/g, "").substring(0, 3);
+                        let contactNameSplitted = contact.split(' ');
+                        let contactFirstName = contactNameSplitted[0];
+                        let contactLastName = '';
 
-                        // if (parseCity.toLowerCase() === "ft.") {
-                        //     parseCity = "FO";
-                        // }
-                        // if (parseCity.toLowerCase() === "mt.") {
-                        //     parseCity = "MO";
-                        // }
-                        // if (parseCity.toLowerCase() === "st.") {
-                        //     parseCity = "SA";
-                        // }
+                        if (contactNameSplitted.length > 0){
+                            for(let i = 1; i < contactNameSplitted.length; i++){
+                                contactLastName += contactNameSplitted[i] + ' ';
+                            }
+                        }
 
-                        // code = ((name || '').trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + (state || '').trim().replace(/\s/g, "").substring(0, 2)).toUpperCase();
+                        contactLastName = contactLastName.trim();
 
                         item = {
                             code: code,
@@ -171,16 +167,15 @@ const CarrierImport = (props) => {
                             state: state,
                             zip: zip,
                             contact: contact,
+                            contactFirstName: contactFirstName,
+                            contactLastName: contactLastName,
                             phone: phone,
                             ext: ext,
                             email: email,
                             hoursOpen: hoursOpen,
                             hoursClose: hoursClose,
                             billToCode: billToCode,
-                            billToCodeNumber: billToCodeNumber,
-                            showMatches: false,
-                            save: customers.filter(cus => cus.code.toUpperCase() === code).length === 0,
-                            matches: []
+                            billToCodeNumber: billToCodeNumber                          
                         }
 
                         return item;
@@ -214,31 +209,14 @@ const CarrierImport = (props) => {
 
     const processSubmit = () => {
         if (customerList.length) {
-            axios.post(props.serverUrl + '/submitCustomerImport', {
-                code: customerList[0].code,
-                codeNumber: customerList[0].codeNumber,
-                name: customerList[0].name,
-                address1: customerList[0].address1,
-                address2: customerList[0].address2,
-                city: customerList[0].city,
-                state: customerList[0].state,
-                zip: customerList[0].zip,
-                contact: customerList[0].contact,
-                phone: customerList[0].phone,
-                ext: customerList[0].ext,
-                email: customerList[0].email,
-                hoursOpen: customerList[0].hoursOpen,
-                hoursClose: customerList[0].hoursClose,
-                billToCode: customerList[0].billToCode,
-                billToCodeNumber: customerList[0].billToCodeNumber
-            }).then(res => {
+            axios.post(props.serverUrl + '/submitCustomerImport2', {list: customerList}).then(res => {
                 console.log(customerTotalListLength, customerList.length, res.data)
             }).catch(e => {
                 console.log(customerList.length, e)
             }).finally(() => {
-                customerList.shift();
-                setCustomerCurrentListLength(customerTotalListLength - customerList.length);
-                processSubmit();
+                setIsLoading(false);
+                setCustomerList([]);
+                refInputFile.current.value = "";
             })
         } else {
             setIsLoading(false);
@@ -247,7 +225,7 @@ const CarrierImport = (props) => {
 
     const submitBtnClasses = classNames({
         'mochi-button': true,
-        'disabled': customerList.length === 0 || customerList.filter(c => c.save).length === 0
+        'disabled': false
     })
 
     return (
@@ -260,7 +238,7 @@ const CarrierImport = (props) => {
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                            <div style={{
+                            {/* <div style={{
                                 position: 'relative',
                                 width: '90%',
                                 maxWidth: '600px',
@@ -282,7 +260,7 @@ const CarrierImport = (props) => {
                                     left: 0,
                                     width: (Math.floor((customerCurrentListLength / customerTotalListLength) * 100)) + '%'
                                 }}></div>
-                            </div>
+                            </div> */}
                         </div>
                     </animated.div>
                 )
@@ -348,8 +326,7 @@ const CarrierImport = (props) => {
                                 <div className="import-body-wrapper">
                                     <div className="import-header" style={{ width: '130%' }}>
                                         <div className="import-header-wrapper">
-                                            <div className="trow">
-                                                <div className="tcol status">Status</div>
+                                            <div className="trow">                                               
                                                 <div className="tcol code">Code</div>
                                                 <div className="tcol name">Name</div>
                                                 <div className="tcol address1">Address 1</div>
@@ -372,8 +349,7 @@ const CarrierImport = (props) => {
                                 <div className="import-body-wrapper">
                                     <div className="import-header" style={{ display: 'table-row' }}>
                                         <div className="import-header-wrapper">
-                                            <div className="trow">
-                                                <div className="tcol status">Status</div>
+                                            <div className="trow">                                                
                                                 <div className="tcol code">Code</div>
                                                 <div className="tcol name">Name</div>
                                                 <div className="tcol address1">Address 1</div>
@@ -413,61 +389,22 @@ const CarrierImport = (props) => {
                                             const rowContainerClasses = classNames({
                                                 'row-container': true,
                                                 'hidden': false,
-                                                'hidden': duplicatesShown && (customer.matches || []).length === 0
+                                                'hidden': false
                                             });
 
                                             const rowClasses = classNames({
                                                 'trow': true,
-                                                'save': customer.save
+                                                'save': true
                                             })
 
                                             const matchesContainerClasses = classNames({
                                                 'matches-container': true,
-                                                'shown': customer.showMatches
+                                                'shown': false
                                             })
 
                                             return (
                                                 <div className={rowContainerClasses} key={index}>
                                                     <div className={rowClasses}>
-                                                        <div className="tcol status" onClick={() => {
-
-                                                        }}>
-                                                            <span><label htmlFor={'cbox-' + index}>Save</label></span>
-
-
-                                                            <input
-                                                                id={'cbox-' + index}
-                                                                name={'cbox-' + index}
-                                                                value={'Save'}
-                                                                type="checkbox"
-                                                                checked={customer.save}
-                                                                onChange={(e) => {
-                                                                    setCustomerList(customerList.map((item, i) => {
-                                                                        if (i === index) {
-                                                                            item.save = e.target.checked
-                                                                        }
-
-                                                                        return item;
-                                                                    }))
-                                                                }} />
-                                                            <div className="separator"></div>
-
-                                                            {
-                                                                customer.matches.length > 0 &&
-                                                                <FontAwesomeIcon className='show-matches-btn' icon={customer.showMatches ? faCaretUp : faCaretDown} onClick={() => {
-                                                                    setCustomerList(customerList => {
-                                                                        return customerList.map((item, i) => {
-                                                                            if (i === index) {
-                                                                                item.showMatches = !item.showMatches;
-                                                                            }
-
-                                                                            return item;
-                                                                        })
-                                                                    })
-                                                                }} />
-                                                            }
-                                                        </div>
-
                                                         <div className="tcol code">
                                                             <input type="text"
                                                                 onChange={(e) => { }}
@@ -645,56 +582,6 @@ const CarrierImport = (props) => {
 
                                                         
                                                     </div>
-
-                                                    {
-                                                        customer.matches.length > 0 &&
-                                                        <div className={matchesContainerClasses}>
-                                                            {
-                                                                (customer.matches || []).map((item, index) => {
-                                                                    const contact = (item.contacts || []).find(c => c.is_primary === 1) || {}
-
-                                                                    const contactPhone = contact.primary_phone === 'work'
-                                                                        ? contact.phone_work
-                                                                        : contact.primary_phone === 'fax'
-                                                                            ? contact.phone_work_fax
-                                                                            : contact.primary_phone === 'mobile'
-                                                                                ? contact.phone_mobile
-                                                                                : contact.primary_phone === 'direct'
-                                                                                    ? contact.phone_direct
-                                                                                    : contact.primary_phone === 'other'
-                                                                                        ? contact.phone_other
-                                                                                        : ''
-
-                                                                    const contactEmail = contact.primary_email === 'work'
-                                                                        ? contact.email_work
-                                                                        : contact.primary_email === 'personal'
-                                                                            ? contact.email_personal
-                                                                            : contact.primary_email === 'other'
-                                                                                ? contact.email_other
-                                                                                : ''
-
-                                                                    return (
-                                                                        <div className="trow" key={index}>
-                                                                            <div className="tcol status"></div>
-                                                                            <div className="tcol code">{item.code}{item.code_number > 0 ? item.code_number : ''}</div>
-                                                                            <div className="tcol name">{item.name}</div>
-                                                                            <div className="tcol address1">{item.address1}</div>
-                                                                            <div className="tcol address2">{item.address2}</div>
-                                                                            <div className="tcol city">{item.city}</div>
-                                                                            <div className="tcol state">{item.state}</div>
-                                                                            <div className="tcol zip">{item.zip}</div>
-                                                                            <div className="tcol contact">{contact.first_name || ''} {contact.last_name || ''}</div>
-                                                                            <div className="tcol phone">{contactPhone || ''}</div>
-                                                                            <div className="tcol ext">{contact.phone_ext}</div>
-                                                                            <div className="tcol email">{contactEmail}</div>
-                                                                            <div className="tcol code"></div>
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    }
-
                                                 </div>
                                             )
                                         })

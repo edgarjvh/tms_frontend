@@ -275,11 +275,17 @@ export default class ToPrint extends Component {
                                     <span style={{ marginRight: 5 }}>Shipping Order Number: </span> <span style={{ fontWeight: 'normal' }}>{this.pad((this.props.selectedOrder?.order_number || 0), 5)}</span>
                                 </div>
 
-                                <div style={{ ...this.styleFieldData, padding: 10 }}>
-                                    <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>REF Numbers: </span> {
+                                <div style={{
+                                    ...this.styleFieldData,
+                                    padding: 10,
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    gridTemplateRows: '1fr 1fr'
+                                }}>
+                                    <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>BOL Number: </span> {
                                         (this.props.selectedOrder?.pickups || []).map((item, index) => {
                                             return (
-                                                <span style={{ fontWeight: 'normal' }}>{item.ref_numbers}</span>
+                                                <span style={{ fontWeight: 'normal' }}>{item.bol_numbers}</span>
                                             )
                                         })
                                     }</div>
@@ -287,6 +293,20 @@ export default class ToPrint extends Component {
                                         (this.props.selectedOrder?.pickups || []).map((item, index) => {
                                             return (
                                                 <span style={{ fontWeight: 'normal' }}>{item.po_numbers}</span>
+                                            )
+                                        })
+                                    }</div>
+                                    <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>REF Numbers: </span> {
+                                        (this.props.selectedOrder?.pickups || []).map((item, index) => {
+                                            return (
+                                                <span style={{ fontWeight: 'normal' }}>{item.ref_numbers}</span>
+                                            )
+                                        })
+                                    }</div>
+                                    <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>SEAL Number: </span> {
+                                        (this.props.selectedOrder?.pickups || []).map((item, index) => {
+                                            return (
+                                                <span style={{ fontWeight: 'normal' }}>{item.seal_number}</span>
                                             )
                                         })
                                     }</div>
@@ -378,10 +398,6 @@ export default class ToPrint extends Component {
                                     <div style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <div style={{ flexGrow: 1 }}><span style={{ fontWeight: 'bold', marginRight: 5 }}>Truck Number: </span> <span>{(this.props.selectedOrder?.driver?.truck || '')}</span></div>
                                         <div style={{ flexGrow: 1 }}><span style={{ fontWeight: 'bold', marginRight: 5 }}>Trailer Number: </span> <span>{(this.props.selectedOrder?.driver?.trailer || '')}</span></div>
-                                    </div>
-
-                                    <div style={{ marginBottom: 5 }}>
-                                        <div style={{ flexGrow: 1 }}><span style={{ fontWeight: 'bold', marginRight: 5 }}>Serial Number(s): </span></div>
                                     </div>
                                 </div>
                             </div>

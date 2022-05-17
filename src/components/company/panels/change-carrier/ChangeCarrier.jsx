@@ -89,6 +89,10 @@ const ChangeCarrier = (props) => {
     const searchCarrierBtnClick = () => {
         let carrierSearch = [
             {
+                field: 'Code',
+                data: (newCarrier.code || '').toLowerCase()
+            },
+            {
                 field: 'Name',
                 data: (newCarrier.name || '').toLowerCase()
             },

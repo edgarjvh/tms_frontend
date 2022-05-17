@@ -29,6 +29,13 @@ export const setMainAdminScreenFocused = bool => {
     }
 }
 
+export const setDispatchScreenFocused = bool => {
+    return {
+        type: adminConstants.SET_DISPATCH_SCREEN_FOCUSED,
+        payload: bool
+    }
+}
+
 export const setCustomerScreenFocused = bool => {
     return {
         type: adminConstants.SET_CUSTOMER_SCREEN_FOCUSED,

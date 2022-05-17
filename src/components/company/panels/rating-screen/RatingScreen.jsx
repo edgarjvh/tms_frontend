@@ -491,9 +491,11 @@ const RatingScreen = (props) => {
                     }
 
                     if ((selectedBillToRating.total_charges || 0) === 0) {
-                        window.alert('You must enter the total charges!');
-                        refBillToTotalCharges.current.inputElement.focus();
-                        return;
+                        if ((selectedBillToRating?.rate_type?.name || '').toLowerCase() !== 'comment') {
+                            window.alert('You must enter the total charges!');
+                            refBillToTotalCharges.current.inputElement.focus();
+                            return;
+                        }
                     }
                 }
 
@@ -720,9 +722,12 @@ const RatingScreen = (props) => {
                     }
 
                     if ((selectedCarrierRating.total_charges || 0) === 0) {
-                        window.alert('You must enter the total charges!');
-                        refCarrierTotalCharges.current.inputElement.focus();
-                        return;
+                        if ((selectedCarrierRating?.rate_type?.name || '').toLowerCase() !== 'comment'){
+                            window.alert('You must enter the total charges!');
+                            refCarrierTotalCharges.current.inputElement.focus();
+                            return;
+                        }
+                        
                     }
                 }
 
@@ -1314,7 +1319,7 @@ const RatingScreen = (props) => {
                                     let key = e.keyCode || e.which;
 
                                     if (key === 9) {
-                                        if ((selectedBillToRating?.rate_type?.id || 0) === 0) {
+                                        if ((selectedBillToRating?.rate_type?.id || 0) === 0 || (selectedBillToRating?.rate_type?.name || '').toLowerCase() === 'comment') {
                                             validateCustomerRatingForSaving(e);
                                         }
                                     }
@@ -3895,11 +3900,11 @@ const RatingScreen = (props) => {
                             />
                         </div>
 
-                        <div className="input-box-container" style={{ // CUSTOMER TOTAL CHARGES
+                        <div className="input-box-container" style={{ // CUSTOMER TOTAL CHARGES                            
                             width: '12rem',
                             minWidth: '12rem',
                             maxWidth: '12rem',
-                            display: (selectedBillToRating?.rate_type?.name || '') !== '' ? 'flex' : 'none'
+                            display: ((selectedBillToRating?.rate_type?.name || '') === '' || (selectedBillToRating.rate_type?.name || '').toLowerCase() === 'comment') ? 'none' : 'flex'
                         }}>
                             <div style={{ fontSize: '0.7rem', color: (selectedOrder?.invoice_customer_reviewed || 0) === 1 ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Total Charges $</div>
                             <MaskedInput
@@ -4064,7 +4069,9 @@ const RatingScreen = (props) => {
                                                     });
                                                 }
                                             }}>
-                                                <div className="tcol rate-type">{rating.rate_type?.name || ''}</div>
+                                                <div className="tcol rate-type">{
+                                                    (rating.rate_type?.name || '').toLowerCase() === 'comment' ? '' : (rating.rate_type?.name || '')
+                                                }</div>
                                                 <div className="tcol description">{rating.description}</div>
                                                 {
                                                     ((selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'flat') !== undefined ||
@@ -4814,11 +4821,12 @@ const RatingScreen = (props) => {
                                         style={{
                                             ...style,
                                             left: '0',
+                                            top: -155,
                                             display: 'block'
                                         }}
                                         ref={refCarrierRateTypeDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
+                                        <div className="mochi-contextual-popup vertical above right" style={{ height: 150 }}>
                                             <div className="mochi-contextual-popup-content" >
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
@@ -4903,9 +4911,11 @@ const RatingScreen = (props) => {
                                 onKeyDown={(e) => {
                                     let key = e.keyCode || e.which;
 
-                                    if (key === 9) {
-                                        if ((selectedCarrierRating?.rate_type?.id || 0) === 0) {
-                                            validateCarrierRatingForSaving(e);
+                                    if (key === 9) {                                        
+                                        if (key === 9) {
+                                            if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
+                                                validateCarrierRatingForSaving(e);
+                                            }
                                         }
                                     }
                                 }}
@@ -7439,11 +7449,11 @@ const RatingScreen = (props) => {
                             />
                         </div>
 
-                        <div className="input-box-container" style={{ // CUSTOMER TOTAL CHARGES
+                        <div className="input-box-container" style={{ // CARRIER TOTAL CHARGES
                             width: '12rem',
                             minWidth: '12rem',
                             maxWidth: '12rem',
-                            display: (selectedCarrierRating?.rate_type?.name || '') !== '' ? 'flex' : 'none'
+                            display: ((selectedCarrierRating?.rate_type?.name || '') === '' || (selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'comment') ? 'none' : 'flex'
                         }}>
                             <div style={{ fontSize: '0.7rem', color: (selectedOrder?.invoice_carrier_previewed || 0) === 1 ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Total Charges $</div>
                             <MaskedInput
@@ -7608,7 +7618,7 @@ const RatingScreen = (props) => {
                                                     });
                                                 }
                                             }}>
-                                                <div className="tcol rate-type">{rating.rate_type?.name || ''}</div>
+                                                <div className="tcol rate-type">{(rating.rate_type?.name || '').toLowerCase() === 'comment' ? '' : (rating.rate_type?.name || '')}</div>
                                                 <div className="tcol description">{rating.description}</div>
                                                 {
                                                     ((selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'flat') !== undefined ||

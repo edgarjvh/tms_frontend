@@ -735,6 +735,10 @@ const Carriers = (props) => {
     const searchCarrierBtnClick = () => {
         let carrierSearch = [
             {
+                field: 'Code',
+                data: (selectedCarrier.code || '').toLowerCase()
+            },
+            {
                 field: 'Name',
                 data: (selectedCarrier.name || '').toLowerCase()
             },
@@ -1755,11 +1759,14 @@ const Carriers = (props) => {
                             <div className="form-title">Carrier</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div className="mochi-button" onClick={importCarrierBtnClick}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Import</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
+                                {
+                                    (props.isAdmin || false) &&
+                                    <div className="mochi-button" onClick={importCarrierBtnClick}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Import</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
                                 <div className="mochi-button" onClick={searchCarrierBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Search</div>
