@@ -5449,7 +5449,7 @@ const Carriers = (props) => {
 
                                                         refInsuranceType.current.focus();
                                                     } else {
-                                                        console.log(res.data.result);
+                                                        
                                                     }
 
                                                     setIsSavingInsurance(false);

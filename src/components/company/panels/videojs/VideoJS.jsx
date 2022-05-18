@@ -20,7 +20,7 @@ export const VideoJS = ( props ) => {
     let player;
     if( videoElement ) {
       player = videojs( videoElement, options, () => {
-        console.log("player is ready");
+        
       });
     }
     return () => {

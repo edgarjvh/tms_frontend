@@ -143,7 +143,7 @@ const OrderHistory = (props) => {
                 formattedDate = moment(date.trim(), 'M').format('MM/DD/YYYY');
             }
         } catch (e) {
-            console.log(e);
+            
         }
 
         return formattedDate;
@@ -206,7 +206,6 @@ const OrderHistory = (props) => {
 
                         if ((stateOrigin || '').trim() !== '') {
                             newOrders = newOrders.filter(order => {
-                                console.log(order)
                                 if ((order.routing || []).length >= 2) {
                                     if (order.routing[0].type === 'pickup') {
                                         return (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '').toLowerCase().includes(stateOrigin.toLowerCase())
@@ -293,7 +292,7 @@ const OrderHistory = (props) => {
                 preventScroll: true
             });
         }).catch(e => {
-            console.log(e);
+            
         });
     }, [])
 
@@ -373,7 +372,6 @@ const OrderHistory = (props) => {
 
                 if ((stateOrigin || '').trim() !== '') {
                     newOrders = newOrders.filter(order => {
-                        console.log(order)
                         if ((order.routing || []).length >= 2) {
                             if (order.routing[0].type === 'pickup') {
                                 return (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '').toLowerCase().includes(stateOrigin.toLowerCase())
@@ -1217,7 +1215,7 @@ const OrderHistory = (props) => {
                                         suffix={'%'}
                                         type="text"
                                         onValueChange={(values) => {
-                                            console.log(values)
+                                           
                                         }}
                                         displayType={'text'}
                                         readOnly={true}

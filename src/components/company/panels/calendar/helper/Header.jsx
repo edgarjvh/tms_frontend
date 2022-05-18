@@ -20,9 +20,9 @@ export default function Header({ value, setValue }) {
     }
     return (
         <div className="header">
-            <div className="prev-month-btn" onClick={(e) => {console.log(value); e.stopPropagation(); setValue(prevMonth());}}><span className="fas fa-chevron-left"></span></div>
+            <div className="prev-month-btn" onClick={(e) => {e.stopPropagation(); setValue(prevMonth());}}><span className="fas fa-chevron-left"></span></div>
             <div className="month-name" onClick={(e) => {e.stopPropagation(); }}><span className="month">{currMonthName()}</span> <span className="year">{currYear()}</span></div>
-            <div className="next-month-btn" onClick={(e) => {console.log(value);e.stopPropagation(); setValue(nextMonth());}}><span className="fas fa-chevron-right"></span></div>
+            <div className="next-month-btn" onClick={(e) => {e.stopPropagation(); setValue(nextMonth());}}><span className="fas fa-chevron-right"></span></div>
         </div>
     )
 }

@@ -30,6 +30,7 @@ const OrderImport = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderList, setOrderList] = useState([]);
+    const [groupOrderList, setGroupOrderList] = useState([]);
     const [orderTotalListLength, setOrderTotalListLength] = useState(0);
     const [orderCurrentListLength, setOrderCurrentListLength] = useState(0);
     const [customersShown, setCustomersShown] = useState([]);
@@ -307,7 +308,6 @@ const OrderImport = (props) => {
 
                     setOrderTotalListLength(list.length);
                     setOrderList(list);
-                    console.log(list);
                     refInputFile.current.value = '';
                     setIsLoading(false);
                 }).catch(err => {
@@ -328,103 +328,72 @@ const OrderImport = (props) => {
         if (window.confirm('Are you sure you want to proceed?')) {
             setIsLoading(true);
             setIsSubmitting(true);
-            processSubmit();
 
+            if (orderList.length > 0) {
+                let listToSend = orderList.map(item => {
+                    let newItem = {
+                        order: item.order,
+                        trip: item.trip,
+                        loadTypeId: item.loadType.id || 0,
+                        hazMat: item.hazMat,
+                        expedited: item.expedited,
+                        miles: item.miles || 0,
+                        orderDateTime: item.orderDateTime,
+                        billToCustomerId: item.billToCustomer?.id || 0,
+                        carrierId: item.carrierCustomer?.id || 0,
+                        equipmentTypeId: item.equipment?.id || 0,
+                        shipperCustomerId: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.id || 0 : 0,
+                        pu_date1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date1 || '' : '',
+                        pu_date2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date2 || '' : '',
+                        pu_time1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time1 || '' : '',
+                        pu_time2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time2 || '' : '',
+                        ref_numbers: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.ref_numbers || '' : '',
+                        consigneeCustomerId: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.id || 0 : 0,
+                        delivery_date1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date1 || '' : '',
+                        delivery_date2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date2 || '' : '',
+                        delivery_time1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time1 || '' : '',
+                        delivery_time2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time2 || '' : '',
+                        customerRating: item.customerRating,
+                        carrierRating: item.carrierRating,
+                        loadedEvent: item.loadedEvent,
+                        deliveredEvent: item.deliveredEvent,
+                    }
 
+                    return newItem
+                });
+
+                const chunkSize = 500;
+
+                setGroupOrderList(listToSend.map((e, i) => {
+                    return i % chunkSize === 0 ? listToSend.slice(i, i + chunkSize) : null;
+                }).filter(e => { return e; }));
+            }
         }
     }
 
-    const processSubmit = () => {
-        if (orderList.length) {
-            let listToSend = orderList.map(item => {
-                let newItem = {
-                    order: item.order,
-                    trip: item.trip,
-                    loadTypeId: item.loadType.id || 0,
-                    hazMat: item.hazMat,
-                    expedited: item.expedited,
-                    miles: item.miles || 0,
-                    orderDateTime: item.orderDateTime,
-                    billToCustomerId: item.billToCustomer?.id || 0,
-                    carrierId: item.carrierCustomer?.id || 0,
-                    equipmentTypeId: item.equipment?.id || 0,
-                    shipperCustomerId: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.id || 0 : 0,
-                    pu_date1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date1 || '' : '',
-                    pu_date2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date2 || '' : '',
-                    pu_time1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time1 || '' : '',
-                    pu_time2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time2 || '' : '',
-                    ref_numbers: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.ref_numbers || '' : '',
-                    consigneeCustomerId: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.id || 0 : 0,
-                    delivery_date1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date1 || '' : '',
-                    delivery_date2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date2 || '' : '',
-                    delivery_time1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time1 || '' : '',
-                    delivery_time2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time2 || '' : '',
-                    customerRating: item.customerRating,
-                    carrierRating: item.carrierRating,
-                    loadedEvent: item.loadedEvent,
-                    deliveredEvent: item.deliveredEvent,
-                }
+    useEffect(() => {
+        if (groupOrderList.length > 0){
+            processSubmit();
+        }
+    }, [groupOrderList]);
 
-                return newItem
-            })
-            axios.post(props.serverUrl + '/submitOrderImport2', { list: listToSend }).then(res => {
-                console.log(orderList.length, res.data)
+    const processSubmit = () => {
+        if (groupOrderList.length) {
+            axios.post(props.serverUrl + '/submitOrderImport2', { list: groupOrderList[0] }).then(res => {
+                console.log(res.data);
             }).catch(e => {
-                console.log(orderList.length, e)
-            }).finally(() => {                
-                setIsLoading(false);
-                setIsSubmitting(false);
-                setOrderList([]);                
-                refInputFile.current.value = "";
+
+            }).finally(() => {
+                groupOrderList.shift();
+                processSubmit();
             })
         } else {
             setIsLoading(false);
             setIsSubmitting(false);
+            setOrderList([]);
+            refInputFile.current.value = "";
         }
     }
-
-    // const processSubmit = () => {
-    //     if (orderList.length) {            
-    //         axios.post(props.serverUrl + '/submitOrderImport', {
-    //             order: orderList[0].order,
-    //             trip: orderList[0].trip,
-    //             loadTypeId: orderList[0].loadType.id || 0,
-    //             hazMat: orderList[0].hazMat,
-    //             expedited: orderList[0].expedited,
-    //             miles: orderList[0].miles || 0,
-    //             orderDateTime: orderList[0].orderDateTime,
-    //             billToCustomerId: orderList[0].billToCustomer?.id || 0,
-    //             carrierId: orderList[0].carrierCustomer?.id || 0,
-    //             equipmentTypeId: orderList[0].equipment?.id || 0,
-    //             shipperCustomerId: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.id || 0 : 0,
-    //             pu_date1: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_date1 || '' : '',
-    //             pu_date2: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_date2 || '' : '',
-    //             pu_time1: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_time1 || '' : '',
-    //             pu_time2: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.pu_time2 || '' : '',
-    //             ref_numbers: orderList[0].shipperList.length > 0 ? orderList[0].shipperList[0].shipperCustomer?.ref_numbers || '' : '',
-    //             consigneeCustomerId: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.id || 0 : 0,
-    //             delivery_date1: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_date1 || '' : '',
-    //             delivery_date2: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_date2 || '' : '',
-    //             delivery_time1: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_time1 || '' : '',
-    //             delivery_time2: orderList[0].consigneeList.length > 0 ? orderList[0].consigneeList[0].consigneeCustomer?.delivery_time2 || '' : '',
-    //             customerRating: orderList[0].customerRating,
-    //             carrierRating: orderList[0].carrierRating,
-    //             loadedEvent: orderList[0].loadedEvent,
-    //             deliveredEvent: orderList[0].deliveredEvent,
-    //         }).then(res => {
-    //             console.log(orderList.length, res.data)
-    //         }).catch(e => {
-    //             console.log(orderList.length, e)
-    //         }).finally(() => {
-    //             orderList.shift();
-    //             setOrderCurrentListLength(orderTotalListLength - orderList.length);
-    //             processSubmit();
-    //         })
-    //     } else {
-    //         setIsLoading(false);
-    //         setIsSubmitting(false);
-    //     }
-    // }
 
     const submitBtnClasses = classNames({
         'mochi-button': true,
@@ -441,32 +410,6 @@ const OrderImport = (props) => {
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                            {/* {
-                                isSubmitting &&
-                                <div style={{
-                                    position: 'relative',
-                                    width: '90%',
-                                    maxWidth: '600px',
-                                    height: 15,
-                                    borderRadius: 10,
-                                    overflow: 'hidden',
-                                    marginTop: 15,
-                                    display: 'flex',
-                                    backgroundColor: 'lightgray',
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}>
-                                    <div style={{ fontSize: '12px', zIndex: 1 }}>{orderCurrentListLength} of {orderTotalListLength} | {Math.floor((orderCurrentListLength / orderTotalListLength) * 100)}%</div>
-                                    <div style={{
-                                        background: 'linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 50%,rgba(64,150,238,1) 100%)',
-                                        position: 'absolute',
-                                        height: '100%',
-                                        top: 0,
-                                        left: 0,
-                                        width: (Math.floor((orderCurrentListLength / orderTotalListLength) * 100)) + '%'
-                                    }}></div>
-                                </div>
-                            } */}
                         </div>
                     </animated.div>
                 )

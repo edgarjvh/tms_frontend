@@ -428,8 +428,7 @@ const ChangeCarrier = (props) => {
             <div className="button-container" tabIndex={-1} onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
 
-                if (key === 9) {
-                    console.log('aja');
+                if (key === 9) {                   
                     e.stopPropagation();
                     e.preventDefault();
                 }

@@ -926,7 +926,7 @@ const Dispatch = (props) => {
                       refPickupDate1.current.inputElement.focus();
                     })
                     .catch((e) => {
-                      console.log(e);
+                      
                     });
                 } else {
                   setSelectedOrder((selectedOrder) => {
@@ -1096,7 +1096,7 @@ const Dispatch = (props) => {
                     refDeliveryDate1.current.inputElement.focus();
                   })
                   .catch((e) => {
-                    console.log(e);
+                   
                   });
               } else {
                 setSelectedConsigneeCustomer({});
@@ -1837,7 +1837,7 @@ const Dispatch = (props) => {
         formattedDate = moment(date.trim(), "M").format("MM/DD/YYYY");
       }
     } catch (e) {
-      console.log(e);
+      
     }
 
     return formattedDate;
@@ -1923,7 +1923,7 @@ const Dispatch = (props) => {
         formattedHour = moment(hour.trim(), "H:m").format("HHmm");
       }
     } catch (e) {
-      console.log(e);
+      
     }
 
     return formattedHour;
@@ -2762,43 +2762,7 @@ const Dispatch = (props) => {
 
     if (keyCode === 9) {
       e.preventDefault();
-      setIsShowingShipperSecondPage(true);
-      // if (selectedShipperCustomer.id === undefined) {
-      //     return;
-      // }
-
-      // let contact = selectedShipperCustomerContact;
-
-      // if (contact.customer_id === undefined || contact.customer_id === 0) {
-      //     contact.customer_id = selectedShipperCustomer.id;
-      // }
-
-      // if ((contact.first_name || '').trim() === '' || (contact.last_name || '').trim() === '' || (contact.phone_work || '').trim() === '') {
-      //     return;
-      // }
-
-      // if ((contact.address1 || '').trim() === '' && (contact.address2 || '').trim() === '') {
-      //     contact.address1 = selectedShipperCustomer.address1;
-      //     contact.address2 = selectedShipperCustomer.address2;
-      //     contact.city = selectedShipperCustomer.city;
-      //     contact.state = selectedShipperCustomer.state;
-      //     contact.zip_code = selectedShipperCustomer.zip;
-      // }
-
-      // if (!isSavingShipperCompanyContact) {
-      //     setIsSavingShipperCompanyContact(true);
-
-      //     axios.post(props.serverUrl + '/saveContact', contact).then(async res => {
-      //         if (res.data.result === 'OK') {
-      //             await setSelectedShipperCustomer({ ...selectedShipperCustomer, contacts: res.data.contacts });
-      //             await setSelectedShipperCustomerContact(res.data.contact);
-      //         }
-
-      //         setIsSavingShipperCompanyContact(false);
-      //     }).catch(e => {
-      //         console.log('error saving contact', e);
-      //     });
-      // }
+      setIsShowingShipperSecondPage(true);      
     }
   };
 
@@ -3177,43 +3141,6 @@ const Dispatch = (props) => {
     let keyCode = e.keyCode || e.which;
 
     if (keyCode === 9) {
-      // if (selectedConsigneeCustomer.id === undefined) {
-      //     return;
-      // }
-
-      // let contact = selectedConsigneeCustomerContact;
-
-      // if (contact.customer_id === undefined || contact.customer_id === 0) {
-      //     contact.customer_id = selectedConsigneeCustomer.id;
-      // }
-
-      // if ((contact.first_name || '').trim() === '' || (contact.last_name || '').trim() === '' || (contact.phone_work || '').trim() === '') {
-      //     return;
-      // }
-
-      // if ((contact.address1 || '').trim() === '' && (contact.address2 || '').trim() === '') {
-      //     contact.address1 = selectedConsigneeCustomer.address1;
-      //     contact.address2 = selectedConsigneeCustomer.address2;
-      //     contact.city = selectedConsigneeCustomer.city;
-      //     contact.state = selectedConsigneeCustomer.state;
-      //     contact.zip_code = selectedConsigneeCustomer.zip;
-      // }
-
-      // if (!isSavingConsigneeCompanyContact) {
-      //     setIsSavingConsigneeCompanyContact(true);
-
-      //     axios.post(props.serverUrl + '/saveContact', contact).then(async res => {
-      //         if (res.data.result === 'OK') {
-      //             await setSelectedConsigneeCustomer({ ...selectedConsigneeCustomer, contacts: res.data.contacts });
-      //             await setSelectedConsigneeCustomerContact(res.data.contact);
-      //         }
-
-      //         setIsSavingConsigneeCompanyContact(false);
-      //     }).catch(e => {
-      //         console.log('error saving contact', e);
-      //     });
-      // }
-
       e.preventDefault();
       setIsShowingConsigneeSecondPage(true);
     }
@@ -3448,7 +3375,7 @@ const Dispatch = (props) => {
                         component_id: props.componentId,
                       });
                     } else {
-                      console.log(res.data.result);
+                      
                     }
 
                     setIsSavingOrder(false);
@@ -3584,7 +3511,7 @@ const Dispatch = (props) => {
               refShipperCompanyCode.current.focus();
             }
           } else {
-            console.log(res.data.result);
+            
           }
 
           setIsSavingOrder(false);
@@ -3796,7 +3723,7 @@ const Dispatch = (props) => {
                             }
                           );
                         } else {
-                          console.log(res.data.result);
+                         
 
                           selected_order.miles = 0;
                           setSelectedOrder(selected_order);
@@ -3839,7 +3766,7 @@ const Dispatch = (props) => {
                       });
                   }
                 } else {
-                  console.log(res.data.result);
+                  
                 }
                 setIsSavingPickupId(-1);
               })
@@ -4021,10 +3948,7 @@ const Dispatch = (props) => {
                                     }
                                   })
                                   .catch((e) => {
-                                    console.log(
-                                      "error on saving order miles",
-                                      e
-                                    );
+                                    console.log("error on saving order miles",e);
                                     setMileageLoaderVisible(false);
                                   });
                               },
@@ -4061,10 +3985,7 @@ const Dispatch = (props) => {
                                     }
                                   })
                                   .catch((e) => {
-                                    console.log(
-                                      "error on saving order miles",
-                                      e
-                                    );
+                                    console.log("error on saving order miles",e);
                                     setMileageLoaderVisible(false);
                                   });
                               }
@@ -4112,7 +4033,7 @@ const Dispatch = (props) => {
                     }
                   }
                 } else {
-                  console.log(res.data.result);
+                  
                 }
                 setIsSavingDeliveryId(-1);
               })
@@ -4593,7 +4514,7 @@ const Dispatch = (props) => {
         return false;
       });
     } catch (e) {
-      console.log(selectedOrder);
+      
     }
 
     return pickups;
@@ -6522,7 +6443,7 @@ const Dispatch = (props) => {
                           });
                         });
                       } else {
-                        console.log(res.data.result);
+                        
                       }
                     }).catch((e) => {
                       console.log("error saving order", e);
@@ -7631,7 +7552,7 @@ const Dispatch = (props) => {
                                   refDriverName.current.focus();
                                 })
                                 .catch((e) => {
-                                  console.log(e);
+                                  
                                 });
                             }
                             break;
@@ -7672,7 +7593,7 @@ const Dispatch = (props) => {
                                   refDriverName.current.focus();
                                 })
                                 .catch((e) => {
-                                  console.log(e);
+                                  
                                 });
                             }
                             break;
@@ -7875,7 +7796,7 @@ const Dispatch = (props) => {
                                             refDriverName.current.focus();
                                           })
                                           .catch((e) => {
-                                            console.log(e);
+                                            
                                           });
                                       }}
                                       ref={(ref) =>
@@ -8026,10 +7947,7 @@ const Dispatch = (props) => {
                                     }
                                   })
                                   .catch(async (e) => {
-                                    console.log(
-                                      "error getting carrier drivers",
-                                      e
-                                    );
+                                    console.log("error getting carrier drivers",e);
                                   });
                               }
                             }
@@ -8140,10 +8058,7 @@ const Dispatch = (props) => {
                                   }
                                 })
                                   .catch(async (e) => {
-                                    console.log(
-                                      "error getting carrier drivers",
-                                      e
-                                    );
+                                    console.log("error getting carrier drivers",e);
                                   });
                               }
                             }
@@ -8171,7 +8086,7 @@ const Dispatch = (props) => {
                                       component_id: props.componentId,
                                     });
                                   } else {
-                                    console.log(res.data.result);
+                                    
                                   }
 
                                   setIsSavingOrder(false);
@@ -8216,7 +8131,7 @@ const Dispatch = (props) => {
                                       component_id: props.componentId,
                                     });
                                   } else {
-                                    console.log(res.data.result);
+                                    
                                   }
 
                                   setIsSavingOrder(false);
@@ -8375,10 +8290,7 @@ const Dispatch = (props) => {
                                     );
                                   }
                                 }).catch(async (e) => {
-                                  console.log(
-                                    "error getting carrier drivers",
-                                    e
-                                  );
+                                  console.log("error getting carrier drivers",e);
                                 });
                               }
 
@@ -8447,15 +8359,12 @@ const Dispatch = (props) => {
                                                   props.componentId,
                                               });
                                             } else {
-                                              console.log(res.data.result);
+                                              
                                             }
 
                                             setIsSavingOrder(false);
                                           }).catch((e) => {
-                                            console.log(
-                                              "error saving order",
-                                              e
-                                            );
+                                            console.log("error saving order",e);
                                             setIsSavingOrder(false);
                                           });
 
@@ -9426,18 +9335,12 @@ const Dispatch = (props) => {
                                                   }
                                                 })
                                                 .catch((e) => {
-                                                  console.log(
-                                                    "error on saving order miles",
-                                                    e
-                                                  );
+                                                  console.log("error on saving order miles",e);
                                                   setMileageLoaderVisible(false);
                                                 });
                                             },
                                             (error) => {
-                                              console.log(
-                                                "error getting mileage",
-                                                error
-                                              );
+                                              console.log("error getting mileage",error);
                                               selected_order.miles = 0;
 
                                               setSelectedOrder(selected_order);
@@ -9474,17 +9377,12 @@ const Dispatch = (props) => {
                                                   }
                                                 })
                                                 .catch((e) => {
-                                                  console.log(
-                                                    "error on saving order miles",
-                                                    e
-                                                  );
+                                                  console.log("error on saving order miles",e);
                                                   setMileageLoaderVisible(false);
                                                 });
                                             }
                                           );
-                                        } else {
-                                          console.log(res.data.result);
-
+                                        } else {                                          
                                           selected_order.miles = 0;
                                           setSelectedOrder(selected_order);
                                           setMileageLoaderVisible(false);
@@ -9519,19 +9417,13 @@ const Dispatch = (props) => {
                                               }
                                             })
                                             .catch((e) => {
-                                              console.log(
-                                                "error on saving order miles",
-                                                e
-                                              );
+                                              console.log("error on saving order miles",e);
                                               setMileageLoaderVisible(false);
                                             });
                                         }
                                       })
                                       .catch((e) => {
-                                        console.log(
-                                          "error saving order miles",
-                                          e
-                                        );
+                                        console.log("error saving order miles",e);
                                         setMileageLoaderVisible(false);
                                       });
                                   } else {
@@ -9633,17 +9525,11 @@ const Dispatch = (props) => {
                                             })
                                             .catch((e) => {
                                               setMileageLoaderVisible(false);
-                                              console.log(
-                                                "error on saving order miles",
-                                                e
-                                              );
+                                              console.log("error on saving order miles",e);
                                             });
                                         },
                                         (error) => {
-                                          console.log(
-                                            "error getting mileage",
-                                            error
-                                          );
+                                          console.log("error getting mileage",error);
                                           selected_order.miles = 0;
                                           setSelectedOrder(selected_order);
                                           setMileageLoaderVisible(false);
@@ -9679,10 +9565,7 @@ const Dispatch = (props) => {
                                             })
                                             .catch((e) => {
                                               setMileageLoaderVisible(false);
-                                              console.log(
-                                                "error on saving order miles",
-                                                e
-                                              );
+                                              console.log("error on saving order miles",e);
                                             });
                                         }
                                       );
@@ -9722,10 +9605,7 @@ const Dispatch = (props) => {
                                         })
                                         .catch((e) => {
                                           setMileageLoaderVisible(false);
-                                          console.log(
-                                            "error on saving order miles",
-                                            e
-                                          );
+                                          console.log("error on saving order miles",e);
                                         });
                                     }
                                   }
@@ -9762,14 +9642,10 @@ const Dispatch = (props) => {
                                     })
                                     .catch((e) => {
                                       setMileageLoaderVisible(false);
-                                      console.log(
-                                        "error on saving order miles",
-                                        e
-                                      );
+                                      console.log("error on saving order miles",e);
                                     });
                                 }
-                              } else {
-                                console.log(res.data);
+                              } else {                                
                                 setMileageLoaderVisible(false);
                               }
                             })
@@ -10174,18 +10050,12 @@ const Dispatch = (props) => {
                                                   }
                                                 })
                                                 .catch((e) => {
-                                                  console.log(
-                                                    "error on saving order miles",
-                                                    e
-                                                  );
+                                                  console.log("error on saving order miles",e);
                                                   setMileageLoaderVisible(false);
                                                 });
                                             },
                                             (error) => {
-                                              console.log(
-                                                "error getting mileage",
-                                                error
-                                              );
+                                              console.log("error getting mileage",error);
                                               selected_order.miles = 0;
 
                                               setSelectedOrder(selected_order);
@@ -10222,17 +10092,12 @@ const Dispatch = (props) => {
                                                   }
                                                 })
                                                 .catch((e) => {
-                                                  console.log(
-                                                    "error on saving order miles",
-                                                    e
-                                                  );
+                                                  console.log("error on saving order miles",e);
                                                   setMileageLoaderVisible(false);
                                                 });
                                             }
                                           );
                                         } else {
-                                          console.log(res.data.result);
-
                                           selected_order.miles = 0;
                                           setSelectedOrder(selected_order);
                                           setMileageLoaderVisible(false);
@@ -10267,20 +10132,14 @@ const Dispatch = (props) => {
                                               }
                                             })
                                             .catch((e) => {
-                                              console.log(
-                                                "error on saving order miles",
-                                                e
-                                              );
+                                              console.log("error on saving order miles",e);
                                               setMileageLoaderVisible(false);
                                             });
                                         }
                                       })
                                       .catch((e) => {
                                         setMileageLoaderVisible(false);
-                                        console.log(
-                                          "error saving order miles",
-                                          e
-                                        );
+                                        console.log("error saving order miles",e);
                                       });
                                   } else {
                                     if (selected_order.routing.length >= 2) {
@@ -10380,18 +10239,12 @@ const Dispatch = (props) => {
                                               }
                                             })
                                             .catch((e) => {
-                                              console.log(
-                                                "error on saving order miles",
-                                                e
-                                              );
+                                              console.log("error on saving order miles",e);
                                               setMileageLoaderVisible(false);
                                             });
                                         },
                                         (error) => {
-                                          console.log(
-                                            "error getting mileage",
-                                            error
-                                          );
+                                          console.log("error getting mileage",error);
                                           selected_order.miles = 0;
                                           setSelectedOrder(selected_order);
                                           setMileageLoaderVisible(false);
@@ -10426,10 +10279,7 @@ const Dispatch = (props) => {
                                               }
                                             })
                                             .catch((e) => {
-                                              console.log(
-                                                "error on saving order miles",
-                                                e
-                                              );
+                                              console.log("error on saving order miles",e);
                                               setMileageLoaderVisible(false);
                                             });
                                         }
@@ -10459,10 +10309,7 @@ const Dispatch = (props) => {
                                           }
                                         })
                                         .catch((e) => {
-                                          console.log(
-                                            "error on saving order miles",
-                                            e
-                                          );
+                                          console.log("error on saving order miles",e);
                                           setMileageLoaderVisible(false);
                                         });
                                     }
@@ -10491,15 +10338,12 @@ const Dispatch = (props) => {
                                       }
                                     })
                                     .catch((e) => {
-                                      console.log(
-                                        "error on saving order miles",
-                                        e
-                                      );
+                                      console.log("error on saving order miles",e);
                                       setMileageLoaderVisible(false);
                                     });
                                 }
                               } else {
-                                console.log(res.data);
+                                
                               }
                             })
                             .catch((e) => {
@@ -18493,8 +18337,7 @@ const Dispatch = (props) => {
                             <div className="second-page">
                               <div className="page-wrapper">
                                 {dispatchEventSecondPageItems.map(
-                                  (item, index) => {
-                                    console.log(item);
+                                  (item, index) => {                                    
                                     const mochiItemClasses = classnames({
                                       "mochi-item": true,
                                       selected: item.selected,
@@ -18901,7 +18744,7 @@ const Dispatch = (props) => {
                   e.preventDefault();
 
                   let formatted = getFormattedHours(e.target.value);
-                  console.log(e.target.value, formatted);
+                  
                   await setDispatchEventTime(formatted);
 
                   if ((dispatchEvent?.name || "") === "") {

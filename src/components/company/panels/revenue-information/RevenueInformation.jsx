@@ -143,7 +143,7 @@ const RevenueInformation = (props) => {
                 formattedDate = moment(date.trim(), 'M').format('MM/DD/YYYY');
             }
         } catch (e) {
-            console.log(e);
+            
         }
 
         return formattedDate;
@@ -212,7 +212,6 @@ const RevenueInformation = (props) => {
 
                     if ((stateOrigin || '').trim() !== '') {
                         newOrders = newOrders.filter(order => {
-                            console.log(order)
                             if ((order.routing || []).length >= 2) {
                                 if (order.routing[0].type === 'pickup') {
                                     return (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '').toLowerCase().includes(stateOrigin.toLowerCase())
@@ -575,7 +574,6 @@ const RevenueInformation = (props) => {
 
                 if ((stateOrigin || '').trim() !== '') {
                     newOrders = newOrders.filter(order => {
-                        console.log(order)
                         if ((order.routing || []).length >= 2) {
                             if (order.routing[0].type === 'pickup') {
                                 return (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '').toLowerCase().includes(stateOrigin.toLowerCase())
@@ -1442,106 +1440,6 @@ const RevenueInformation = (props) => {
                                                                         )
                                                                     })
                                                                 }
-{/* 
-                                                                <div className="date-group-totals">
-                                                                    <div className="order-info-col order-number">Total <span style={{ fontWeight: 'bold' }}>{group.month}, {group.year}</span></div>
-                                                                    <div className="order-info-col order-totals">
-                                                                        <span style={{ fontWeight: 'bold', color: 'rgba(0, 0, 0, 0.7)', marginRight: 10 }}>Orders:</span>
-                                                                        {group.totals.orderCount}
-                                                                    </div>
-                                                                    <div className="order-info-col customer-charges">
-                                                                        <NumberFormat
-                                                                            className={classnames({
-                                                                                'negative-number': (group.totals.customerCharges) < 0
-                                                                            })}
-                                                                            value={group.totals.customerCharges}
-                                                                            thousandsGroupStyle="thousand"
-                                                                            thousandSeparator={true}
-                                                                            decimalScale={2}
-                                                                            fixedDecimalScale={true}
-                                                                            prefix={'$ '}
-                                                                            type="text"
-                                                                            onValueChange={(values) => { }}
-                                                                            displayType={'text'}
-                                                                            readOnly={true}
-                                                                        />
-                                                                    </div>
-                                                                    <div className="order-info-col carrier-costs">
-                                                                        <NumberFormat
-                                                                            className={classnames({
-                                                                                'negative-number': (group.totals.carrierCosts) < 0
-                                                                            })}
-                                                                            value={group.totals.carrierCosts}
-                                                                            thousandsGroupStyle="thousand"
-                                                                            thousandSeparator={true}
-                                                                            decimalScale={2}
-                                                                            fixedDecimalScale={true}
-                                                                            prefix={'$ '}
-                                                                            type="text"
-                                                                            onValueChange={(values) => { }}
-                                                                            displayType={'text'}
-                                                                            readOnly={true}
-                                                                        />
-                                                                    </div>
-                                                                    <div className="order-info-col profit">
-                                                                        <NumberFormat
-                                                                            className={classnames({
-                                                                                'negative-number': (group.totals.profit) < 0
-                                                                            })}
-                                                                            value={group.totals.profit}
-                                                                            thousandsGroupStyle="thousand"
-                                                                            thousandSeparator={true}
-                                                                            decimalScale={2}
-                                                                            fixedDecimalScale={true}
-                                                                            prefix={'$ '}
-                                                                            type="text"
-                                                                            onValueChange={(values) => { }}
-                                                                            displayType={'text'}
-                                                                            readOnly={true}
-                                                                        />
-                                                                    </div>
-                                                                    <div className="order-info-col percentage">
-                                                                        <NumberFormat
-                                                                            className={classnames({
-                                                                                'negative-number': (
-                                                                                    (group.totals.customerCharges > 0 || group.totals.carrierCosts > 0)
-                                                                                        ? (group.totals.profit * 100)
-                                                                                        /
-                                                                                        (
-                                                                                            group.totals.customerCharges > 0
-                                                                                                ? group.totals.customerCharges
-                                                                                                : group.totals.carrierCosts
-                                                                                        )
-                                                                                        : 0
-                                                                                ) < 0
-                                                                            })}
-                                                                            value={
-                                                                                (group.totals.customerCharges > 0 || group.totals.carrierCosts > 0)
-                                                                                    ? (group.totals.profit * 100)
-                                                                                    /
-                                                                                    (
-                                                                                        group.totals.customerCharges > 0
-                                                                                            ? group.totals.customerCharges
-                                                                                            : group.totals.carrierCosts
-                                                                                    )
-                                                                                    : 0
-                                                                            }
-                                                                            thousandsGroupStyle="thousand"
-                                                                            thousandSeparator={true}
-                                                                            decimalScale={2}
-                                                                            fixedDecimalScale={true}
-                                                                            prefix={''}
-                                                                            suffix={'%'}
-                                                                            type="text"
-                                                                            onValueChange={(values) => {
-                                                                                console.log(values)
-                                                                            }}
-                                                                            displayType={'text'}
-                                                                            readOnly={true}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                             */}
                                                             </div>
                                                         </div>
                                                     )
@@ -1640,7 +1538,7 @@ const RevenueInformation = (props) => {
                                                         suffix={'%'}
                                                         type="text"
                                                         onValueChange={(values) => {
-                                                            console.log(values)
+                                                            
                                                         }}
                                                         displayType={'text'}
                                                         readOnly={true}
@@ -1811,7 +1709,7 @@ const RevenueInformation = (props) => {
                                         suffix={'%'}
                                         type="text"
                                         onValueChange={(values) => {
-                                            console.log(values)
+                                           
                                         }}
                                         displayType={'text'}
                                         readOnly={true}

@@ -26,6 +26,7 @@ const CustomerImport = (props) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [carrierList, setCarrierList] = useState([]);
+    const [groupOrderList, setGroupOrderList] = useState([]);
     const [carrierTotalListLength, setCarrierTotalListLength] = useState(0);
     const [carrierCurrentListLength, setCarrierCurrentListLength] = useState(0);
     const [customersShown, setCustomersShown] = useState([]);
@@ -167,8 +168,7 @@ const CustomerImport = (props) => {
                     })
 
                     setCarrierTotalListLength(list.length);
-                    setCarrierList(list);
-                    console.log(list);
+                    setCarrierList(list);                    
                     refInputFile.current.value = '';
                     setIsLoading(false);
                 }).catch(err => {
@@ -188,25 +188,43 @@ const CustomerImport = (props) => {
     const submitImport = () => {
         if (window.confirm('Are you sure you want to proceed?')) {
             setIsLoading(true);
-            processSubmit();
+
+            if (carrierList.length > 0) {
+                let listToSend = carrierList.map(item => {
+                    return item;
+                });
+
+                const chunkSize = 500;
+
+                setGroupOrderList(listToSend.map((e, i) => {
+                    return i % chunkSize === 0 ? listToSend.slice(i, i + chunkSize) : null;
+                }).filter(e => { return e; }));                          
+            }
         }
     }
 
     const processSubmit = () => {
-        if (carrierList.length) {
-            axios.post(props.serverUrl + '/submitCarrierImport2', {list: carrierList}).then(res => {
-                console.log(carrierList.length, res.data)
+        if (groupOrderList.length) {
+            axios.post(props.serverUrl + '/submitCarrierImport2', { list: groupOrderList[0] }).then(res => {
+                console.log(res.data);
             }).catch(e => {
-                console.log(carrierList.length, e)
+
             }).finally(() => {
-                setIsLoading(false);
-                setCarrierList([]);
-                refInputFile.current.value = "";
+                groupOrderList.shift();
+                processSubmit();
             })
         } else {
             setIsLoading(false);
+                setCarrierList([]);
+                refInputFile.current.value = "";
         }
     }
+
+    useEffect(() => {
+        if (groupOrderList.length > 0){
+            processSubmit();
+        }
+    }, [groupOrderList]);
 
     const submitBtnClasses = classNames({
         'mochi-button': true,

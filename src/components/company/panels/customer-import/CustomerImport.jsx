@@ -26,6 +26,7 @@ const CarrierImport = (props) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [customerList, setCustomerList] = useState([]);
+    const [groupOrderList, setGroupOrderList] = useState([]);
     const [customerTotalListLength, setCustomerTotalListLength] = useState(0);
     const [customerCurrentListLength, setCustomerCurrentListLength] = useState(0);
     const [customersShown, setCustomersShown] = useState([]);
@@ -109,10 +110,10 @@ const CarrierImport = (props) => {
                         let hoursOpen = '';
                         let hoursClose = '';
 
-                        if (hours.trim().length === 4){
+                        if (hours.trim().length === 4) {
                             hoursOpen = hours.trim();
-                        }else if(hours.trim().length === 9){
-                            hoursOpen = hours.trim().substring(0,4);
+                        } else if (hours.trim().length === 9) {
+                            hoursOpen = hours.trim().substring(0, 4);
                             hoursClose = hours.trim().substring(5);
                         }
 
@@ -149,8 +150,8 @@ const CarrierImport = (props) => {
                         let contactFirstName = contactNameSplitted[0];
                         let contactLastName = '';
 
-                        if (contactNameSplitted.length > 0){
-                            for(let i = 1; i < contactNameSplitted.length; i++){
+                        if (contactNameSplitted.length > 0) {
+                            for (let i = 1; i < contactNameSplitted.length; i++) {
                                 contactLastName += contactNameSplitted[i] + ' ';
                             }
                         }
@@ -175,15 +176,14 @@ const CarrierImport = (props) => {
                             hoursOpen: hoursOpen,
                             hoursClose: hoursClose,
                             billToCode: billToCode,
-                            billToCodeNumber: billToCodeNumber                          
+                            billToCodeNumber: billToCodeNumber
                         }
 
                         return item;
                     })
-                    
+
                     setCustomerTotalListLength(list.length);
                     setCustomerList(list);
-                    console.log(list);
                     refInputFile.current.value = '';
                     setIsLoading(false);
                 }).catch(err => {
@@ -201,27 +201,45 @@ const CarrierImport = (props) => {
     }
 
     const submitImport = () => {
-        if (window.confirm('Are you sure you want to proceed?')) {            
+        if (window.confirm('Are you sure you want to proceed?')) {
             setIsLoading(true);
-            processSubmit();            
+
+            if (customerList.length > 0) {
+                let listToSend = customerList.map(item => {
+                    return item;
+                });
+
+                const chunkSize = 500;
+
+                setGroupOrderList(listToSend.map((e, i) => {
+                    return i % chunkSize === 0 ? listToSend.slice(i, i + chunkSize) : null;
+                }).filter(e => { return e; }));                
+            }
         }
     }
 
     const processSubmit = () => {
-        if (customerList.length) {
-            axios.post(props.serverUrl + '/submitCustomerImport2', {list: customerList}).then(res => {
-                console.log(customerTotalListLength, customerList.length, res.data)
+        if (groupOrderList.length) {
+            axios.post(props.serverUrl + '/submitCustomerImport2', { list: groupOrderList[0] }).then(res => {
+                console.log(res.data);
             }).catch(e => {
-                console.log(customerList.length, e)
+
             }).finally(() => {
-                setIsLoading(false);
-                setCustomerList([]);
-                refInputFile.current.value = "";
+                groupOrderList.shift();
+                processSubmit();
             })
         } else {
             setIsLoading(false);
+            setCustomerList([]);
+            refInputFile.current.value = "";
         }
     }
+
+    useEffect(() => {
+        if (groupOrderList.length > 0){
+            processSubmit();
+        }
+    }, [groupOrderList]);
 
     const submitBtnClasses = classNames({
         'mochi-button': true,
@@ -326,7 +344,7 @@ const CarrierImport = (props) => {
                                 <div className="import-body-wrapper">
                                     <div className="import-header" style={{ width: '130%' }}>
                                         <div className="import-header-wrapper">
-                                            <div className="trow">                                               
+                                            <div className="trow">
                                                 <div className="tcol code">Code</div>
                                                 <div className="tcol name">Name</div>
                                                 <div className="tcol address1">Address 1</div>
@@ -337,7 +355,7 @@ const CarrierImport = (props) => {
                                                 <div className="tcol contact">Contact</div>
                                                 <div className="tcol phone">Phone</div>
                                                 <div className="tcol ext">Ext</div>
-                                                <div className="tcol email">Email</div>                                                
+                                                <div className="tcol email">Email</div>
                                                 <div className="tcol code">Bill To</div>
                                             </div>
                                         </div>
@@ -349,7 +367,7 @@ const CarrierImport = (props) => {
                                 <div className="import-body-wrapper">
                                     <div className="import-header" style={{ display: 'table-row' }}>
                                         <div className="import-header-wrapper">
-                                            <div className="trow">                                                
+                                            <div className="trow">
                                                 <div className="tcol code">Code</div>
                                                 <div className="tcol name">Name</div>
                                                 <div className="tcol address1">Address 1</div>
@@ -360,9 +378,9 @@ const CarrierImport = (props) => {
                                                 <div className="tcol contact">Contact</div>
                                                 <div className="tcol phone">Phone</div>
                                                 <div className="tcol ext">Ext</div>
-                                                <div className="tcol email">Email</div>                                                
+                                                <div className="tcol email">Email</div>
                                                 <div className="tcol code">Bill To</div>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -580,7 +598,7 @@ const CarrierImport = (props) => {
                                                             />
                                                         </div>
 
-                                                        
+
                                                     </div>
                                                 </div>
                                             )

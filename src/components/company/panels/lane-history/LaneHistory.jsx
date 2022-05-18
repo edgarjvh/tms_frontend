@@ -138,7 +138,7 @@ const LaneHistory = (props) => {
                 formattedDate = moment(date.trim(), 'M').format('MM/DD/YYYY');
             }
         } catch (e) {
-            console.log(e);
+            
         }
 
         return formattedDate;
@@ -196,8 +196,7 @@ const LaneHistory = (props) => {
                     }
 
                     if ((stateOrigin || '').trim() !== '') {
-                        newOrders = newOrders.filter(order => {
-                            console.log(order)
+                        newOrders = newOrders.filter(order => {                            
                             if ((order.routing || []).length >= 2) {
                                 if (order.routing[0].type === 'pickup') {
                                     return (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '').toLowerCase().includes(stateOrigin.toLowerCase())
@@ -711,7 +710,6 @@ const LaneHistory = (props) => {
 
                                         if ((stateOrigin || '').trim() !== '') {
                                             newOrders = newOrders.filter(order => {
-                                                console.log(order)
                                                 if ((order.routing || []).length >= 2) {
                                                     if (order.routing[0].type === 'pickup') {
                                                         return (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '').toLowerCase().includes(stateOrigin.toLowerCase())
@@ -1107,7 +1105,7 @@ const LaneHistory = (props) => {
                                         suffix={'%'}
                                         type="text"
                                         onValueChange={(values) => {
-                                            console.log(values)
+                                            
                                         }}
                                         displayType={'text'}
                                         readOnly={true}

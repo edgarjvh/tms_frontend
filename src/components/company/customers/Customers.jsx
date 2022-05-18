@@ -611,8 +611,7 @@ const Customers = (props) => {
                             setSelectedCustomer(res.data.customers[0]);
                             setSelectedContact((res.data.customers[0].contacts || []).find(c => c.is_primary === 1) || {});
 
-                            getCustomerOrders(res.data.customers[0]);
-                            console.log(res.data.customers[0]);
+                            getCustomerOrders(res.data.customers[0]);                            
                         } else {
                             setInitialValues(false);
                         }
@@ -1201,7 +1200,7 @@ const Customers = (props) => {
                 formattedHour = moment(hour.trim(), 'H:m').format('HHmm');
             }
         } catch (e) {
-            console.log(e);
+            
         }
 
         return formattedHour;
@@ -5021,8 +5020,7 @@ const Customers = (props) => {
                                                     setTempEmpty(item.empty === 1);
                                                 }
 
-                                                if (itemIndex > -1) {
-                                                    // console.log(itemIndex, temp, temp.splice(itemIndex, 1, item));
+                                                if (itemIndex > -1) {                                                    
                                                     temp[itemIndex] = { ...item };
                                                     setTempAutomaticEmails(temp);
                                                 } else {

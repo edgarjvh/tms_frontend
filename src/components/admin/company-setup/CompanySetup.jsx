@@ -214,8 +214,7 @@ function CompanySetup(props) {
 
     useEffect(() => {
         if ((props.selectedCompany?.component_id || '') !== props.componentId) {
-            if (((selectedCompany?.id || 0) > 0 && (props.selectedCompany?.id || 0) > 0) && selectedCompany.id === props.selectedCompany.id) {
-                console.log('updating selected Company');
+            if (((selectedCompany?.id || 0) > 0 && (props.selectedCompany?.id || 0) > 0) && selectedCompany.id === props.selectedCompany.id) {                
                 setSelectedCompany(selectedCompany => {
                     return {
                         ...selectedCompany,

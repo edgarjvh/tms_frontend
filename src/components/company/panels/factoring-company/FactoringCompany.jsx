@@ -1099,7 +1099,7 @@ const FactoringCompany = (props) => {
 
                                     axios.post(props.serverUrl + '/deleteFactoringCompanyMailingAddress', { factoring_company_id: selectedFactoringCompany.id }).then(res => {
                                         if (res.data.result === 'OK') {
-                                            console.log(res.data.mailing_address);
+                                            
                                         }
                                     }).catch(e => {
                                         console.log('error deleting factoring company mailing address');

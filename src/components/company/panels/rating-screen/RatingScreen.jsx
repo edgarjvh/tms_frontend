@@ -531,8 +531,7 @@ const RatingScreen = (props) => {
 
                         setSelectedBillToRating({});
                         refBillToRateTypes.current.focus();
-                    } else {
-                        console.log(res.data);
+                    } else {                        
                         window.alert('An error occurred while saving');
                         refBillToTotalCharges.current.inputElement.focus();
                     }
@@ -765,8 +764,7 @@ const RatingScreen = (props) => {
 
                         setSelectedCarrierRating({});
                         refCarrierRateTypes.current.focus();
-                    } else {
-                        console.log(res.data);
+                    } else {                        
                         window.alert('An error occurred while saving');
                         refCarrierTotalCharges.current.inputElement.focus();
                     }
@@ -1520,7 +1518,7 @@ const RatingScreen = (props) => {
                                         }).then(response => {
                                             setSelectedCarrierRating({ ...selectedBillToRating });
                                         }).catch(e => {
-                                            // console.log(e);
+                                           
                                         });
                                     }}
                                     onChange={(e) => {
@@ -1689,7 +1687,7 @@ const RatingScreen = (props) => {
                                     }).then(response => {
                                         setSelectedCarrierRating({ ...selectedBillToRating });
                                     }).catch(e => {
-                                        // console.log(e);
+                                        
                                     });
                                 }}
                                 onChange={(e) => {
@@ -1757,7 +1755,7 @@ const RatingScreen = (props) => {
                                     }).then(response => {
                                         setSelectedCarrierRating({ ...selectedBillToRating });
                                     }).catch(e => {
-                                        // console.log(e);
+                                       
                                     });
                                 }}
                                 onChange={(e) => {
@@ -4050,16 +4048,7 @@ const RatingScreen = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedBillToRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                                    // axios.post(props.serverUrl + '/getRateTypes', {
-                                                    //     id: rating.rate_type.id
-                                                    // }).then(res => {
-                                                    //     if (res.data.result === 'OK') {
-
-                                                    //     }
-                                                    // }).catch(e => {
-                                                    //     console.log('error getting rate types', e);
-                                                    // })
+                                                if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {                                                    
                                                     const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedBillToRating({
@@ -7599,16 +7588,7 @@ const RatingScreen = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedCarrierRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                                    // axios.post(props.serverUrl + '/getRateTypes', {
-                                                    //     id: rating.rate_type.id
-                                                    // }).then(res => {
-                                                    //     if (res.data.result === 'OK') {
-
-                                                    //     }
-                                                    // }).catch(e => {
-                                                    //     console.log('error getting rate types', e);
-                                                    // })
+                                                if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {                                                    
                                                     const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedCarrierRating({

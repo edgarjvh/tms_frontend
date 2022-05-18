@@ -297,8 +297,6 @@ const Invoice = (props) => {
                 return;
             }
 
-            console.log(selected_order)
-
             selected_order.bill_to_customer_id = (selectedBillToCustomer?.id || 0) === 0 ? null : selectedBillToCustomer.id;
             selected_order.carrier_id = (selectedCarrier?.id || 0) === 0 ? null : selectedCarrier.id;
             selected_order.carrier_driver_id = (selectedCarrierDriver?.id || 0) === 0 ? null : selectedCarrierDriver.id;
@@ -340,7 +338,7 @@ const Invoice = (props) => {
                         component_id: props.componentId
                     });
                 } else {
-                    console.log(res.data.result);
+                    
                 }
 
                 setIsSavingOrder(false);
@@ -1246,7 +1244,7 @@ const Invoice = (props) => {
                 formattedDate = moment(date.trim(), 'M').format('MM/DD/YYYY');
             }
         } catch (e) {
-            // console.log(e);
+            
         }
 
         return formattedDate;
@@ -1333,7 +1331,7 @@ const Invoice = (props) => {
                 formattedHour = moment(hour.trim(), 'H:m').format('HHmm');
             }
         } catch (e) {
-            console.log(e);
+            
         }
 
         return formattedHour;
@@ -1550,8 +1548,7 @@ const Invoice = (props) => {
 
                         setSelectedBillToRating({});
                         refBillToRateTypes.current.focus();
-                    } else {
-                        console.log(res.data);
+                    } else {                        
                         window.alert('An error occurred while saving');
                         refBillToTotalCharges.current.inputElement.focus();
                     }
@@ -1775,8 +1772,7 @@ const Invoice = (props) => {
 
                         setSelectedCarrierRating({});
                         refCarrierRateTypes.current.focus();
-                    } else {
-                        console.log(res.data);
+                    } else {                        
                         window.alert('An error occurred while saving');
                         refCarrierTotalCharges.current.inputElement.focus();
                     }
@@ -1800,7 +1796,7 @@ const Invoice = (props) => {
                 return false;
             })
         } catch (e) {
-            console.log(selectedOrder)
+            
         }
 
         return pickups;
@@ -5238,16 +5234,6 @@ const Invoice = (props) => {
                                                 'selected': rating.id === (selectedBillToRating.id || 0)
                                             })} key={index} onClick={() => {
                                                 if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                                    // axios.post(props.serverUrl + '/getRateTypes', {
-                                                    //     id: rating.rate_type.id
-                                                    // }).then(res => {
-                                                    //     if (res.data.result === 'OK') {
-
-                                                    //     }
-                                                    // }).catch(e => {
-                                                    //     console.log('error getting rate types', e);
-                                                    // })
-
                                                     const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedBillToRating({
@@ -9024,16 +9010,6 @@ const Invoice = (props) => {
                                                 'selected': rating.id === (selectedCarrierRating.id || 0)
                                             })} key={index} onClick={() => {
                                                 if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                                    // axios.post(props.serverUrl + '/getRateTypes', {
-                                                    //     id: rating.rate_type.id
-                                                    // }).then(res => {
-                                                    //     if (res.data.result === 'OK') {
-
-                                                    //     }
-                                                    // }).catch(e => {
-                                                    //     console.log('error getting rate types', e);
-                                                    // })
-
                                                     const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedCarrierRating({
@@ -10691,37 +10667,7 @@ const Invoice = (props) => {
                                                     return true;
                                                 })
 
-                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });
-
-                                                // if ((selectedCarrier?.id || 0) > 0) {
-                                                //     axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                //         carrier_id: selectedCarrier.id
-                                                //     }).then(async res => {
-                                                //         if (res.data.result === 'OK') {
-                                                //             if (res.data.count > 1) {
-                                                //                 await setDriverItems(res.data.drivers.map((item, index) => {
-                                                //                     item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                //                         ? index === 0
-                                                //                         : item.id === selectedCarrierDriver.id
-                                                //                     return item;
-                                                //                 }))
-
-                                                //                 refDriverPopupItems.current.map((r, i) => {
-                                                //                     if (r && r.classList.contains('selected')) {
-                                                //                         r.scrollIntoView({
-                                                //                             behavior: 'auto',
-                                                //                             block: 'center',
-                                                //                             inline: 'nearest'
-                                                //                         })
-                                                //                     }
-                                                //                     return true;
-                                                //                 });
-                                                //             }
-                                                //         }
-                                                //     }).catch(async e => {
-                                                //         console.log('error getting carrier drivers', e);
-                                                //     })
-                                                // }
+                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });                                                
                                             }
                                         }}
                                         onChange={async (e) => {
@@ -10749,37 +10695,7 @@ const Invoice = (props) => {
                                                     return true;
                                                 })
 
-                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });
-
-                                                // if ((selectedCarrier?.id || 0) > 0) {
-                                                //     axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                //         carrier_id: selectedCarrier.id
-                                                //     }).then(async res => {
-                                                //         if (res.data.result === 'OK') {
-                                                //             if (res.data.count > 1) {
-                                                //                 await setDriverItems(res.data.drivers.map((item, index) => {
-                                                //                     item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                //                         ? index === 0
-                                                //                         : item.id === selectedCarrierDriver.id
-                                                //                     return item;
-                                                //                 }))
-
-                                                //                 refDriverPopupItems.current.map((r, i) => {
-                                                //                     if (r && r.classList.contains('selected')) {
-                                                //                         r.scrollIntoView({
-                                                //                             behavior: 'auto',
-                                                //                             block: 'center',
-                                                //                             inline: 'nearest'
-                                                //                         })
-                                                //                     }
-                                                //                     return true;
-                                                //                 });
-                                                //             }
-                                                //         }
-                                                //     }).catch(async e => {
-                                                //         console.log('error getting carrier drivers', e);
-                                                //     })
-                                                // }
+                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });                                                
                                             }
                                         }}
                                         value={(selectedCarrierDriver?.first_name || '') + ((selectedCarrierDriver?.last_name || '').trim() === '' ? '' : ' ' + selectedCarrierDriver?.last_name)}
@@ -11161,7 +11077,7 @@ const Invoice = (props) => {
                                                 setIsDateReceivedCalendarShown(true);
                                                 refDateReceived.current.inputElement.focus();
                                             }).catch(e => {
-                                                console.log(e);
+                                               
                                             });
 
                                         }
@@ -11354,7 +11270,7 @@ const Invoice = (props) => {
                                             setIsInvoiceReceivedDateCalendarShown(true);
                                             refInvoiceReceivedDate.current.inputElement.focus();
                                         }).catch(e => {
-                                            console.log(e);
+                                            
                                         });
                                     }
                                 }} />
@@ -11931,7 +11847,7 @@ const Invoice = (props) => {
                                             setIsDatePaidCalendarShown(true);
                                             refDatePaid.current.inputElement.focus();
                                         }).catch(e => {
-                                            console.log(e);
+                                           
                                         });
                                     }
                                 }} />

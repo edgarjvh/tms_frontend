@@ -296,10 +296,10 @@ const LoadBoard = (props) => {
                     let load_board_auto_refresh_enabled = res.data.config.find(c => c.name === 'load_board_auto_refresh_enabled');
 
                     if (load_board_auto_refresh_enabled === undefined) {
-                        console.log('timer detenido');
+                       
                     } else {
                         if (load_board_auto_refresh_enabled.value === '0') {
-                            console.log('timer detenido');
+                            
                         } else {
                             setIsLoading(true);
 

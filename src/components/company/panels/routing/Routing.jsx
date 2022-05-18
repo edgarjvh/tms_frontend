@@ -1882,37 +1882,7 @@ const Routing = (props) => {
                                                     return true;
                                                 })
 
-                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });
-
-                                                // if ((selectedCarrier?.id || 0) > 0) {
-                                                //     axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                //         carrier_id: selectedCarrier.id
-                                                //     }).then(async res => {
-                                                //         if (res.data.result === 'OK') {
-                                                //             if (res.data.count > 1) {
-                                                //                 await setDriverItems(res.data.drivers.map((item, index) => {
-                                                //                     item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                //                         ? index === 0
-                                                //                         : item.id === selectedCarrierDriver.id
-                                                //                     return item;
-                                                //                 }))
-
-                                                //                 refDriverPopupItems.current.map((r, i) => {
-                                                //                     if (r && r.classList.contains('selected')) {
-                                                //                         r.scrollIntoView({
-                                                //                             behavior: 'auto',
-                                                //                             block: 'center',
-                                                //                             inline: 'nearest'
-                                                //                         })
-                                                //                     }
-                                                //                     return true;
-                                                //                 });
-                                                //             }
-                                                //         }
-                                                //     }).catch(async e => {
-                                                //         console.log('error getting carrier drivers', e);
-                                                //     })
-                                                // }
+                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });                                                
                                             }
                                         }}
                                         onChange={async (e) => {
