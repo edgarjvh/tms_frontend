@@ -62,6 +62,7 @@ const Customers = (props) => {
     const [isFromItself, setIsFromItself] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingCustomerOrders, setIsLoadingCustomerOrders] = useState(false);
 
     const refPrintCustomerInformation = useRef();
     const refCustomerCode = useRef();
@@ -133,6 +134,13 @@ const Customers = (props) => {
         enter: { opacity: 1, display: 'block' },
         leave: { opacity: 0, display: 'none' },
         reverse: isLoading,
+    });
+
+    const loadingCustomerOrdersTransition = useTransition(isLoadingCustomerOrders, {
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
+        reverse: isLoadingCustomerOrders,
     });
 
     const mailingContactNamesTransition = useTransition(showMailingContactNames, {
@@ -611,7 +619,7 @@ const Customers = (props) => {
                             setSelectedCustomer(res.data.customers[0]);
                             setSelectedContact((res.data.customers[0].contacts || []).find(c => c.is_primary === 1) || {});
 
-                            getCustomerOrders(res.data.customers[0]);                            
+                            getCustomerOrders(res.data.customers[0]);
                         } else {
                             setInitialValues(false);
                         }
@@ -631,6 +639,7 @@ const Customers = (props) => {
     }
 
     const getCustomerOrders = (customer) => {
+        setIsLoadingCustomerOrders(true);
         axios.post(props.serverUrl + '/getCustomerOrders', {
             id: customer.id
         }).then(res => {
@@ -642,6 +651,8 @@ const Customers = (props) => {
             }
         }).catch(e => {
             console.log('error getting customer orders', e);
+        }).finally(() => {
+            setIsLoadingCustomerOrders(false);
         });
     }
 
@@ -664,6 +675,10 @@ const Customers = (props) => {
 
     const searchCustomerBtnClick = () => {
         let customerSearch = [
+            {
+                field: 'Code',
+                data: (selectedCustomer?.code || '').toLowerCase()
+            },
             {
                 field: 'Name',
                 data: (selectedCustomer?.name || '').toLowerCase()
@@ -706,31 +721,61 @@ const Customers = (props) => {
                 componentId={moment().format('x')}
                 customerSearch={customerSearch}
 
-                callback={(customer) => {
+                callback={(id) => {
                     new Promise((resolve, reject) => {
-                        if (customer) {
-                            setSelectedCustomer(customer);
-                            setSelectedContact((customer.contacts || []).find(c => c.is_primary === 1) || {});
+                        if ((id || 0) > 0) {
+                            axios.post(props.serverUrl + '/getCustomerById', { id: id }).then(res => {
+                                if (res.data.result === 'OK') {
+                                    setSelectedCustomer(res.data.customer);
+                                    setSelectedContact((res.data.customer.contacts || []).find(c => c.is_primary === 1) || {});
 
-                            if ((props.selectedCustomer?.id || 0) === 0) {
-                                props.setSelectedCustomer({
-                                    ...customer,
-                                    component_id: props.componentId
-                                });
-                                props.setSelectedContact({
-                                    ...((customer.contacts || []).find(c => c.is_primary === 1) || {}),
-                                    component_id: props.componentId
-                                });
-                            }
+                                    if ((props.selectedCustomer?.id || 0) === 0) {
+                                        props.setSelectedCustomer({
+                                            ...res.data.customer,
+                                            component_id: props.componentId
+                                        });
+                                        props.setSelectedContact({
+                                            ...((res.data.customer.contacts || []).find(c => c.is_primary === 1) || {}),
+                                            component_id: props.componentId
+                                        });
+                                    }
 
-                            setAutomaticEmailsTo('');
-                            setAutomaticEmailsCc('');
-                            setAutomaticEmailsBcc('');
+                                    setAutomaticEmailsTo('');
+                                    setAutomaticEmailsCc('');
+                                    setAutomaticEmailsBcc('');
 
-                            resolve('OK');
-                        } else {
-                            reject('no customer');
+                                    getCustomerOrders(res.data.customer);
+
+                                    resolve('OK');
+                                } else {
+                                    reject('no customer');
+                                }
+                            });
                         }
+
+                        // if (customer) {
+                        //     setSelectedCustomer(customer);
+                        //     setSelectedContact((customer.contacts || []).find(c => c.is_primary === 1) || {});
+
+                        //     if ((props.selectedCustomer?.id || 0) === 0) {
+                        //         props.setSelectedCustomer({
+                        //             ...customer,
+                        //             component_id: props.componentId
+                        //         });
+                        //         props.setSelectedContact({
+                        //             ...((customer.contacts || []).find(c => c.is_primary === 1) || {}),
+                        //             component_id: props.componentId
+                        //         });
+                        //     }
+
+                        //     setAutomaticEmailsTo('');
+                        //     setAutomaticEmailsCc('');
+                        //     setAutomaticEmailsBcc('');
+
+                        //     resolve('OK');
+                        // } else {
+                        //     reject('no customer');
+                        // }
                     }).then(response => {
                         props.closePanel(`${props.panelName}-customer-search`, props.origin);
                         refCustomerName.current.focus();
@@ -1200,7 +1245,7 @@ const Customers = (props) => {
                 formattedHour = moment(hour.trim(), 'H:m').format('HHmm');
             }
         } catch (e) {
-            
+
         }
 
         return formattedHour;
@@ -5020,7 +5065,7 @@ const Customers = (props) => {
                                                     setTempEmpty(item.empty === 1);
                                                 }
 
-                                                if (itemIndex > -1) {                                                    
+                                                if (itemIndex > -1) {
                                                     temp[itemIndex] = { ...item };
                                                     setTempAutomaticEmails(temp);
                                                 } else {
@@ -5367,7 +5412,7 @@ const Customers = (props) => {
 
                                                     props.openPanel(panel, props.origin);
                                                 }}>
-                                                    {order.order_number} {((order?.routing || []).length >= 2)
+                                                    <span style={{color: "#4682B4", fontWeight: 'bold', marginRight: 5}}>{order.order_number}</span> {((order?.routing || []).length >= 2)
                                                         ? order.routing[0].type === 'pickup'
                                                             ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
                                                                 ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
@@ -5385,6 +5430,16 @@ const Customers = (props) => {
                                     }
                                 </div>
                             </div>
+
+                            {
+                                loadingCustomerOrdersTransition((style, item) => item &&
+                                    <animated.div className='loading-container' style={style} >
+                                        <div className="loading-container-wrapper">
+                                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                                        </div>
+                                    </animated.div>
+                                )
+                            }
                         </div>
                     </div>
                 </div>

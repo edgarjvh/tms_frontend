@@ -28,7 +28,7 @@ const CustomerSearch = (props) => {
     });
 
     const rowDoubleClick = (e, c) => {
-        props.callback(c);
+        props.callback(c.id);
         // props.closePanel(props.panelName, props.origin);
     }
 

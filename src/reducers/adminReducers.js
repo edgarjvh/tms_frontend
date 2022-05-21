@@ -2,13 +2,14 @@ import { adminConstants } from '../constants';
 
 export const adminReducers = (state = {
     pages: [
+        'admin home',
         'admin dispatch',
         'admin customer',
         'admin carrier',
         'reports',
         'company setup'
     ],
-    selectedPageIndex: -1,
+    selectedPageIndex: 0,
     mainAdminScreenFocused: true,
     dispatchScreenFocused: false,
     customerScreenFocused: false,

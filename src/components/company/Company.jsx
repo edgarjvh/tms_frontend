@@ -427,7 +427,7 @@ function Company(props) {
     const carrierPanelTransition = useTransition(carrierPanels, {
         from: panel => {
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,                
+                width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(-100%)`,
             }
         },
@@ -741,7 +741,17 @@ function Company(props) {
                                 })
                             }
 
-                            <CompanyHome />
+                            <CompanyHome
+                                pageName={'Company Home Page'}
+                                panelName={'company-home'}
+                                tabTimes={500}
+                                screenFocused={props.mainCompanyScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                origin='company-home'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
+                            />
                         </div>
 
                         <div style={{
@@ -923,7 +933,7 @@ function Company(props) {
                                             //     // props.setCustomerOpenedPanels(_panels);
                                             // }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
@@ -993,7 +1003,7 @@ function Company(props) {
                                             //     // props.setCustomerOpenedPanels(_panels);
                                             // }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
@@ -1063,7 +1073,7 @@ function Company(props) {
                                             //     // props.setCustomerOpenedPanels(_panels);
                                             // }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel

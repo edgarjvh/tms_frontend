@@ -9,7 +9,7 @@ export const companyReducers = (state = {
         'load board',
         'invoice'
     ],
-    selectedPageIndex: -1,
+    selectedPageIndex: 0,
     mainCompanyScreenFocused: true,
     dispatchScreenFocused: false,
     customerScreenFocused: false,

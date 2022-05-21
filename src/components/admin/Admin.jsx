@@ -152,7 +152,7 @@ import {
 } from '../../actions/carriersActions';
 
 import { Dispatch, Customers, Carriers } from './../company';
-import { CompanySetup } from './';
+import { AdminHome, CompanySetup } from './';
 
 function Admin(props) {
     const [chatOptionItems, setChatOptionItems] = useState([
@@ -185,6 +185,20 @@ function Admin(props) {
 
     const userClick = () => {
         props.setMainScreen('company');
+    }
+
+    const homehBtnClick = async () => {
+        let curPages = props.pages;
+
+        if (curPages.indexOf('admin home') === -1) {
+            await props.setPages([...curPages, 'admin home']);
+            await props.setSelectedPageIndex(curPages.length);
+
+        } else {
+            await props.setSelectedPageIndex(props.pages.indexOf('admin home'));
+        }
+
+        props.setMainAdminScreenFocused(true);
     }
 
     const dispatchBtnClick = async () => {
@@ -246,6 +260,35 @@ function Admin(props) {
     const switchAppBtnClick = () => {
         props.setScale(props.scale === 1 ? 0.7 : 1);
     }
+
+    const adminHomePanelTransition = useTransition(adminHomePanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
 
     const dispatchPanelTransition = useTransition(dispatchPanels, {
         from: panel => {
@@ -462,9 +505,7 @@ function Admin(props) {
                         <div className={classnames({
                             'mochi-button': true,
                             'screen-focused': props.mainAdminScreenFocused
-                        })} onClick={() => {
-                            props.setSelectedPageIndex(-1); props.setMainAdminScreenFocused(true);
-                        }}>
+                        })} onClick={homehBtnClick}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base">Home</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -539,6 +580,60 @@ function Admin(props) {
 
                         }}>
                             {
+                                adminHomePanelTransition((style, panel, item, index) => {
+                                    const origin = 'admin-home';
+
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            >
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
+                            <AdminHome />
+                        </div>
+
+                        <div style={{
+                            width: `${100 / props.pages.length}%`,
+                            height: '100%',
+                            transform: `scale(${props.scale})`,
+                            transition: 'all ease 0.7s',
+                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
+
+                        }}>
+                            {
                                 dispatchPanelTransition((style, panel, item, index) => {
                                     const origin = 'dispatch';
 
@@ -558,7 +653,7 @@ function Admin(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
-                                            }}                                            
+                                            }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 

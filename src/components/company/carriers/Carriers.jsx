@@ -50,6 +50,10 @@ import {
     Modal as CarrierModal
 } from './../panels';
 
+import {
+    Dispatch
+} from './../../company';
+
 const Carriers = (props) => {
     // DECLARATIONS
     const [selectedCarrier, setSelectedCarrier] = useState({});
@@ -62,6 +66,7 @@ const Carriers = (props) => {
     const [showingContactList, setShowingContactList] = useState(true);
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingCarrierOrders, setIsLoadingCarrierOrders] = useState(false);
 
     const refPrintCarrierInformation = useRef();
     const refCarrierCode = useRef();
@@ -136,6 +141,12 @@ const Carriers = (props) => {
         reverse: isLoading,
     });
 
+    const loadingCarrierOrdersTransition = useTransition(isLoadingCarrierOrders, {
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
+        reverse: isLoadingCarrierOrders,
+    });
 
     const carrierContactPhonesTransition = useTransition(showCarrierContactPhones, {
         from: { opacity: 0, top: 'calc(100% + 7px)' },
@@ -781,26 +792,36 @@ const Carriers = (props) => {
                 componentId={moment().format('x')}
                 customerSearch={carrierSearch}
 
-                callback={(carrier) => {
+                callback={(id) => {
                     new Promise((resolve, reject) => {
-                        if (carrier) {
-                            setSelectedCarrier({ ...carrier });
-                            setSelectedContact((carrier.contacts || []).find(c => c.is_primary === 1) || {});
-                            setSelectedInsurance({});
-                            setSelectedDriver({});
+                        if ((id || 0) > 0) {
+                            axios.post(props.serverUrl + '/getCarrierById', { id: id }).then(res => {
+                                if (res.data.result === 'OK') {
+                                    setSelectedCarrier({ ...res.data.carrier });
+                                    setSelectedContact((res.data.carrier.contacts || []).find(c => c.is_primary === 1) || {});
+                                    setSelectedInsurance({});
+                                    setSelectedDriver({});
 
-                            if ((props.selectedCarrier?.id || 0) === 0) {
-                                props.setSelectedCarrier({
-                                    ...carrier,
-                                    component_id: props.componentId
-                                });
-                                props.setSelectedCarrierContact({
-                                    ...((carrier.contacts || []).find(c => c.is_primary === 1) || {}),
-                                    component_id: props.componentId
-                                });
-                            }
+                                    if ((props.selectedCarrier?.id || 0) === 0) {
+                                        props.setSelectedCarrier({
+                                            ...res.data.carrier,
+                                            component_id: props.componentId
+                                        });
+                                        props.setSelectedCarrierContact({
+                                            ...((res.data.carrier.contacts || []).find(c => c.is_primary === 1) || {}),
+                                            component_id: props.componentId
+                                        });
+                                    }
 
-                            resolve('OK');
+                                    getCarrierOrders(res.data.carrier);
+
+                                    resolve('OK');
+                                } else {
+                                    reject('no carrier');
+                                }
+                            });
+
+
                         } else {
                             reject('no carrier');
                         }
@@ -847,6 +868,9 @@ const Carriers = (props) => {
                                     component_id: props.componentId
                                 });
                             }
+
+                            console.log(carrier);
+                            getCarrierOrders(carrier);
                         } else {
                             setInitialValues(false);
                         }
@@ -1712,6 +1736,24 @@ const Carriers = (props) => {
         }
 
         props.openPanel(panel, props.origin);
+    }
+
+    const getCarrierOrders = (carrier) => {
+        setIsLoadingCarrierOrders(true);
+        axios.post(props.serverUrl + '/getCarrierOrders', {
+            id: carrier.id
+        }).then(res => {
+            if (res.data.result === 'OK') {
+                setSelectedCarrier({
+                    ...carrier,
+                    orders: res.data.orders
+                });
+            }
+        }).catch(e => {
+            console.log('error getting carrier orders', e);
+        }).finally(() => {
+            setIsLoadingCarrierOrders(false);
+        });
     }
 
     return (
@@ -5449,7 +5491,7 @@ const Carriers = (props) => {
 
                                                         refInsuranceType.current.focus();
                                                     } else {
-                                                        
+
                                                     }
 
                                                     setIsSavingInsurance(false);
@@ -5983,7 +6025,7 @@ const Carriers = (props) => {
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Past Orders</div>
                             <div className="top-border top-border-middle"></div>
-                            <div className="form-buttons">
+                            {/* <div className="form-buttons">
                                 <div className="mochi-button">
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Search</div>
@@ -6000,11 +6042,62 @@ const Carriers = (props) => {
                                     <div className="mochi-button-base">Print</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="top-border top-border-right"></div>
                         </div>
 
+                        <div className="orders-list-container">
+                            <div className="orders-list-wrapper">
+                                {
+                                    (selectedCarrier?.orders || []).map((order, index) => {
+                                        return (
+                                            <div className="orders-list-item" key={index} onClick={() => {
+                                                let panel = {
+                                                    panelName: `${props.panelName}-dispatch`,
+                                                    component: <Dispatch
+                                                        title='Dispatch'
+                                                        tabTimes={22000 + props.tabTimes}
+                                                        panelName={`${props.panelName}-dispatch`}
+                                                        origin={props.origin}
+                                                        isOnPanel={true}
+                                                        openPanel={props.openPanel}
+                                                        closePanel={props.closePanel}
+                                                        componentId={moment().format('x')}
 
+                                                        order_id={order.id}
+                                                    />
+                                                }
+
+                                                props.openPanel(panel, props.origin);
+                                            }}>
+                                                <span style={{ color: "#4682B4", fontWeight: 'bold', marginRight: 5 }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
+                                                    ? order.routing[0].type === 'pickup'
+                                                        ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
+                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+
+                                                        : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
+                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+                                                    : ''}
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
+
+                        {
+                            loadingCarrierOrdersTransition((style, item) => item &&
+                                <animated.div className='loading-container' style={style} >
+                                    <div className="loading-container-wrapper">
+                                        <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                                    </div>
+                                </animated.div>
+                            )
+                        }
                     </div>
                 </div>
             </div>

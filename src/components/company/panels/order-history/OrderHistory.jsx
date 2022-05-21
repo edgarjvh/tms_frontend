@@ -849,6 +849,13 @@ const OrderHistory = (props) => {
                         <input type="text"
                             maxLength={10}
                             style={{ textTransform: 'uppercase' }}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9){
+                                    doSearch();
+                                }
+                            }}
                             onInput={(e) => { setCustomerCode(e.target.value) }}
                             onChange={(e) => { setCustomerCode(e.target.value) }}
                             value={customerCode || ''}
