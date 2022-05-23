@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import './Customers.css';
-import { useTransition, animated } from 'react-spring';
 import moment from 'moment';
 import MaskedInput from 'react-text-mask';
 // import CustomerModal from './modal/Modal.jsx';
@@ -12,6 +11,7 @@ import { useDetectClickOutside } from "react-detect-click-outside";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import axios from 'axios';
+import { useTransition, animated } from 'react-spring';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 
@@ -511,7 +511,7 @@ const Customers = (props) => {
     }, [])
 
     useEffect(() => {
-        if (props.screenFocused) {
+        if (props.screenFocused) {           
             refCustomerCode.current.focus({
                 preventScroll: true
             });

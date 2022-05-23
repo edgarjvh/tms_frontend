@@ -7,6 +7,14 @@ export const setMainScreen = screen => {
     }
 }
 
+export const setUser = user => {
+    console.log(user);
+    return {
+        type: systemConstants.SET_USER,
+        payload: user
+    }
+}
+
 export const setScale = scale => {
     return {
         type: systemConstants.SET_SCALE,

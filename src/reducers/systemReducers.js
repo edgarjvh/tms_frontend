@@ -4,7 +4,8 @@ import { systemConstants } from '../constants';
 export const systemReducers = (state = {
     serverUrl: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PRO_SERVER_URL : process.env.REACT_APP_DEV_SERVER_URL,
     mainScreen: 'company',
-    
+    companyId: 1,
+    user: {},
     scale: 1
 }, action) => {
     switch (action.type) {
@@ -15,10 +16,12 @@ export const systemReducers = (state = {
             }
             break;
 
-
-            
-
-
+        case systemConstants.SET_USER:
+            state = {
+                ...state,
+                user: action.payload
+            }
+            break;
 
         case systemConstants.SET_SCALE:
             state = {

@@ -12,7 +12,8 @@ import axios from 'axios';
 
 import {
     setMainScreen,
-    setScale
+    setScale,
+    setUser
 } from '../../actions/systemActions';
 
 import {
@@ -243,7 +244,7 @@ function Company(props) {
     const containerCls = classnames({
         'main-company-container': true,
         'is-showing': props.mainScreen === 'company'
-    })
+    });
 
     const userClick = () => {
         props.setMainScreen('admin');
@@ -586,95 +587,143 @@ function Company(props) {
     return (
         <div className={containerCls}>
             <div className="main-content">
-                <div className="menu-bar">
-                    <div className="section">
-                        <div className="mochi-button" onClick={userClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Admin</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                    </div>
-                    <div className="section chat-video-buttons">
-                        <div className="mochi-button" onClick={() => {
-                            window.open('', '_blank').focus();
-                        }}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Chat</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
+                {
+                    (props.user?.id || 0) > 0 &&
+                    <div className="menu-bar">
+                        <div className="section">
+                            {
+                                (props.user?.type || '') === 'employee' &&
+                                <div className="mochi-button" onClick={userClick} style={{
+                                    marginRight: 20
+                                }}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Admin</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            }
 
-                        <div className="mochi-button" onClick={() => {
-                            window.open('', '_blank').focus();
-                        }}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Video</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            <div className="user-info" style={{
+                                fontSize: '0.7rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                lineHeight: '1rem'
+                            }}>
+                                <div className="user-name" style={{ display: 'flex', alignItems: 'center' }}>
+                                    <span>{(props.user.type === 'employee' ? 'EM' : 'AG') + props.user.id.toString().padStart(4, '0')}</span>
+                                    <span style={{ marginRight: 5, marginLeft: 5 }}>-</span>
+                                    <span>{props.user?.first_name || ''} {props.user?.last_name || ''}</span>
+                                </div>
+                            </div>
+
+                            <div className="mochi-button" onClick={() => {
+                                if (window.confirm('Are you sure to log out?')) {
+                                    axios.post(props.serverUrl + '/logout', null, {
+                                        withCredentials: true
+                                    }).then(() => {
+                                        props.setUser({});
+                                        props.setSelectedPageIndex(0);
+                                        props.setMainCompanyScreenFocused(true);
+                                        props.setMainScreen('company');
+                                    }).catch(error => {
+                                        props.setUser({});
+                                        props.setSelectedPageIndex(0);
+                                        props.setMainCompanyScreenFocused(true);
+                                        props.setMainScreen('company');
+                                    });
+                                }
+                            }} style={{
+                                marginLeft: 10,
+                                color: 'darkred'
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base" style={{
+                                    color: 'red'
+                                }}>Logout</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
+                        <div className="section chat-video-buttons">
+                            <div className="mochi-button" onClick={() => {
+                                window.open('', '_blank').focus();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Chat</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+
+                            <div className="mochi-button" onClick={() => {
+                                window.open('', '_blank').focus();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Video</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
+                        <div className="section">
+                            <div className="mochi-input-decorator">
+                                <input type="search" placeholder="just type" id="txt-main-search" />
+                            </div>
+                        </div>
+                        <div className="section">
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.mainCompanyScreenFocused
+                            })} onClick={homeBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Home</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.dispatchScreenFocused
+                            })} onClick={dispatchBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Dispatch</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.customerScreenFocused
+                            })} onClick={customersBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Customers</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.carrierScreenFocused
+                            })} onClick={carriersBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Carriers</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.loadBoardScreenFocused
+                            })} onClick={loadBoardBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Load Board</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.invoiceScreenFocused
+                            })} onClick={invoiceBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Invoice</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.scale !== 1
+                            })} onClick={switchAppBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Card View</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
                         </div>
                     </div>
-                    <div className="section">
-                        <div className="mochi-input-decorator">
-                            <input type="search" placeholder="just type" id="txt-main-search" />
-                        </div>
-                    </div>
-                    <div className="section">
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'screen-focused': props.mainCompanyScreenFocused
-                        })} onClick={homeBtnClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Home</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'screen-focused': props.dispatchScreenFocused
-                        })} onClick={dispatchBtnClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Dispatch</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'screen-focused': props.customerScreenFocused
-                        })} onClick={customersBtnClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Customers</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'screen-focused': props.carrierScreenFocused
-                        })} onClick={carriersBtnClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Carriers</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'screen-focused': props.loadBoardScreenFocused
-                        })} onClick={loadBoardBtnClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Load Board</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'screen-focused': props.invoiceScreenFocused
-                        })} onClick={invoiceBtnClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Invoice</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'screen-focused': props.scale !== 1
-                        })} onClick={switchAppBtnClick}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Card View</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                    </div>
-                </div>
+                }
                 <div className="screen-content">
                     <div className="pages-container" style={{
                         position: 'absolute',
@@ -1115,6 +1164,7 @@ function Company(props) {
 const mapStateToProps = state => {
     return {
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         scale: state.systemReducers.scale,
         mainScreen: state.systemReducers.mainScreen,
         pages: state.companyReducers.pages,
@@ -1275,6 +1325,7 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
     setMainScreen,
+    setUser,
     setPages,
     setSelectedPageIndex,
     setScale,

@@ -214,14 +214,12 @@ function CompanySetup(props) {
 
     useEffect(() => {
         if ((props.selectedCompany?.component_id || '') !== props.componentId) {
-            if (((selectedCompany?.id || 0) > 0 && (props.selectedCompany?.id || 0) > 0) && selectedCompany.id === props.selectedCompany.id) {                
-                setSelectedCompany(selectedCompany => {
-                    return {
-                        ...selectedCompany,
-                        ...props.selectedCompany
-                    }
-                })
-            }
+            setSelectedCompany(selectedCompany => {
+                return {
+                    ...selectedCompany,
+                    ...props.selectedCompany
+                }
+            })
         }
     }, [props.selectedCompany])
 
@@ -461,6 +459,15 @@ function CompanySetup(props) {
                             employees: res.data.employees
                         }
                     });
+
+                    props.setSelectedCompany(selectedCompany => {
+                        return {
+                            ...selectedCompany,
+                            employees: res.data.employees,
+                            component_id: props.componentId
+                        }
+                    });
+
                     setSelectedEmployee(res.data.employee);
                 }
 
@@ -509,6 +516,14 @@ function CompanySetup(props) {
                         return {
                             ...selectedCompany,
                             agents: res.data.agents
+                        }
+                    });
+
+                    props.setSelectedCompany(selectedCompany => {
+                        return {
+                            ...selectedCompany,
+                            agents: res.data.agents,
+                            component_id: props.componentId
                         }
                     });
                     setSelectedAgent(res.data.agent);
@@ -561,6 +576,14 @@ function CompanySetup(props) {
                             drivers: res.data.drivers
                         }
                     });
+
+                    props.setSelectedCompany(selectedCompany => {
+                        return {
+                            ...selectedCompany,
+                            drivers: res.data.drivers,
+                            component_id: props.componentId
+                        }
+                    });
                     setSelectedDriver(res.data.driver);
                 }
 
@@ -609,6 +632,14 @@ function CompanySetup(props) {
                         return {
                             ...selectedCompany,
                             operators: res.data.operators
+                        }
+                    });
+
+                    props.setSelectedCompany(selectedCompany => {
+                        return {
+                            ...selectedCompany,
+                            operators: res.data.operators,
+                            component_id: props.componentId
                         }
                     });
                     setSelectedOperator(res.data.operator);
@@ -688,7 +719,7 @@ function CompanySetup(props) {
             return;
         }
 
-        if (!isEditingMailingAddress){
+        if (!isEditingMailingAddress) {
             window.alert('You must click on Edit button first!');
             return;
         }
@@ -752,7 +783,7 @@ function CompanySetup(props) {
     }
 
     const searchEmployeeBtnClick = () => {
-        if ((selectedCompany?.id || 0) === 0){
+        if ((selectedCompany?.id || 0) === 0) {
             window.alert('You must select a company first!');
             return;
         }
@@ -837,7 +868,7 @@ function CompanySetup(props) {
     }
 
     const searchAgentBtnClick = () => {
-        if ((selectedCompany?.id || 0) === 0){
+        if ((selectedCompany?.id || 0) === 0) {
             window.alert('You must select a company first!');
             return;
         }
@@ -922,7 +953,7 @@ function CompanySetup(props) {
     }
 
     const searchDriverBtnClick = () => {
-        if ((selectedCompany?.id || 0) === 0){
+        if ((selectedCompany?.id || 0) === 0) {
             window.alert('You must select a company first!');
             return;
         }
@@ -1007,7 +1038,7 @@ function CompanySetup(props) {
     }
 
     const searchOperatorBtnClick = () => {
-        if ((selectedCompany?.id || 0) === 0){
+        if ((selectedCompany?.id || 0) === 0) {
             window.alert('You must select a company first!');
             return;
         }
@@ -1122,10 +1153,19 @@ function CompanySetup(props) {
             axios.post(props.serverUrl + '/uploadCompanyLogo', formData, options)
                 .then(async res => {
                     if (res.data.result === "OK") {
-                        setSelectedCompany({
+                        setSelectedCompany(selectedCompany => {
+                            return {
+                                ...selectedCompany,
+                                logo: res.data.company.logo
+                            }
+                        });
+
+                        props.setSelectedCompany({
                             ...selectedCompany,
-                            logo: res.data.company.logo
-                        })
+                            logo: res.data.company.logo,
+                            component_id: props.componentId
+                        });
+
                     }
                     refCompanyInputLogo.current.value = "";
                 })
@@ -1143,10 +1183,18 @@ function CompanySetup(props) {
     const removeCompanyLogo = () => {
         axios.post(props.serverUrl + '/removeCompanyLogo', { id: selectedCompany?.id }).then(async res => {
             if (res.data.result === "OK") {
-                setSelectedCompany({
+                setSelectedCompany(selectedCompany => {
+                    return {
+                        ...selectedCompany,
+                        logo: ''
+                    }
+                });
+
+                props.setSelectedCompany({
                     ...selectedCompany,
-                    logo: ''
-                })
+                    logo: '',
+                    component_id: props.componentId
+                });
             }
         }).catch(e => {
             console.log('error removig company logo', e);
@@ -1285,7 +1333,7 @@ function CompanySetup(props) {
                             <div className="input-box-container input-code">
                                 <input tabIndex={1 + props.tabTimes} type="text" placeholder="Code" maxLength="8" id="txt-company-code"
                                     ref={refCompanyCode}
-                                    readOnly={!isEditingCompany}
+                                    readOnly={true}
                                     onKeyDown={searchCompanyByCode}
                                     onInput={e => {
                                         setSelectedCompany({

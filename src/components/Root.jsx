@@ -1,12 +1,54 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { connect } from 'react-redux';
-import { setMainScreen } from '../actions';
 import Company from './company/Company.jsx';
 import Admin from './admin/Admin.jsx';
 import './Root.css';
 import classnames from 'classnames';
+import axios from 'axios';
+import { useTransition, animated } from 'react-spring';
+import Loader from 'react-loader-spinner';
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+
+import {
+    setSelectedCompany,
+    setUser,
+    setMainScreen
+} from './../actions';
 
 function Root(props) {
+    const [isLoading, setIsLoading] = useState(true);
+
+    const loadingTransition = useTransition(isLoading, {
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
+        reverse: isLoading,
+    });
+
+    useEffect(() => {
+        function checkUser(){
+            axios.post(props.serverUrl + '/getCompanyById', {id: props.companyId}).then(async res => {
+                if (res.data.result === 'OK'){
+                    props.setSelectedCompany(res.data.company);
+
+                    axios.get(props.serverUrl + '/user', {
+                        withCredentials: true
+                    }).then(res => {
+                        props.setUser(res.data);
+                    }).catch((error) => {
+                        props.setUser({});
+                        props.setMainScreen('company');
+                    }).finally(() => {
+                        setIsLoading(false);
+                    });
+                }
+            }).catch(error => {
+                console.log(error)
+            });            
+        }
+
+        checkUser();        
+    }, []);
 
     const rootCls = classnames({
         'root-container': true
@@ -24,18 +66,39 @@ function Root(props) {
 
     return (
         <div className={rootCls}>
-            <Company className={companyClasses} />
-            <Admin className={adminClasses} />
+            {
+                loadingTransition((style, item) => item &&
+                    <animated.div className='loading-container' style={style} >
+                        <div className="loading-container-wrapper">
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                            <div style={{marginLeft: 10}}>Loading System Data...</div>
+                        </div>
+                    </animated.div>
+                )
+            }
+
+            {
+                !isLoading &&
+                <div>
+                    <Company className={companyClasses} />
+                    <Admin className={adminClasses} />
+                </div>
+            }
         </div>
     )
 }
 
 const mapStateToProps = state => {
     return {
+        companyId: state.systemReducers.companyId,
+        serverUrl: state.systemReducers.serverUrl,
         mainScreen: state.systemReducers.mainScreen
     }
 }
 
 export default connect(mapStateToProps, {
+    setMainScreen,
+    setSelectedCompany,
+    setUser,
     setMainScreen
 })(Root)

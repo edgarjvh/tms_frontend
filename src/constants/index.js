@@ -1,6 +1,7 @@
 export const systemConstants = {
     SET_MAIN_SCREEN: 'SET_MAIN_SCREEN',
-    SET_SCALE: 'SET_SCALE'
+    SET_SCALE: 'SET_SCALE',
+    SET_USER: 'SET_USER',
 }
 
 export const companyConstants = {
