@@ -167,7 +167,7 @@ const Invoice = (props) => {
                     <ToPrint
                         ref={toPrintRef}
                         serverUrl={props.serverUrl}
-                        company_logo={props.company_logo}
+                        selectedCompany={props.selectedCompany}
                         selectedOrder={props.selectedOrder}
                     />
                 </div>
@@ -179,6 +179,7 @@ const Invoice = (props) => {
 const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
+        selectedCompany: state.companySetupReducers.selectedCompany,
         serverUrl: state.systemReducers.serverUrl,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,

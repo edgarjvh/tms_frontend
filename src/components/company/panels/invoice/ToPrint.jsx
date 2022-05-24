@@ -76,11 +76,18 @@ export default class ToPrint extends Component {
                             gridTemplateColumns: '1fr 1fr 1fr',
                         }}>
 
-                            <img src={this.props.serverUrl + '/images/' + this.props.company_logo} alt="" />
+                            <img src={((this.props.selectedCompany?.id || 0) > 0 && (this.props.selectedCompany?.logo || '') !== '') ? this.props.serverUrl + '/company-logo/' + this.props.selectedCompany.logo : 'img/company-logo-default.png'} alt="" style={{
+                                maxWidth: 270,
+                                maxHeight: 180
+                            }} />
                             <div>
-                                <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '1rem', fontFamily: 'Play', fontWeight: 'bold' }}>ET3 Logistics, LLC</div>
-                                <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '0.8rem' }}>P.O. Box 610129</div>
-                                <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '0.8rem' }}>Dallas, TX 75261</div>
+                                <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '1rem', fontFamily: 'Play', fontWeight: 'bold' }}>{this.props.selectedCompany?.name || 'Company Name'}</div>
+                                <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '0.8rem' }}>{this.props.selectedCompany?.address1 || 'Company Address 1'}</div>
+                                {
+                                    (this.props.selectedCompany?.address2 || '') !== '' &&
+                                    <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '0.8rem' }}>{this.props.selectedCompany.address2}</div>
+                                }
+                                <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '0.8rem' }}>{this.props.selectedCompany?.city || 'City'}, {this.props.selectedCompany?.state || 'State'} {this.props.selectedCompany?.zip || 'Zip'}</div>
                             </div>
                             <div>
                                 <div style={{ ...this.styleFieldName, textAlign: 'right', fontSize: '1.3rem', fontFamily: 'Play', fontWeight: 'bold', marginBottom: 10 }}>
@@ -213,7 +220,7 @@ export default class ToPrint extends Component {
                                             {
                                                 (this.props.selectedOrder?.pickups || []).map((item, index) => {
                                                     return (
-                                                        <span style={{ fontWeight: 'normal' }}>{item.po_numbers}</span>
+                                                        <span key={index} style={{ fontWeight: 'normal' }}>{item.po_numbers}</span>
                                                     )
                                                 })
                                             }

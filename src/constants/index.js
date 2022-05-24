@@ -2,6 +2,7 @@ export const systemConstants = {
     SET_MAIN_SCREEN: 'SET_MAIN_SCREEN',
     SET_SCALE: 'SET_SCALE',
     SET_USER: 'SET_USER',
+    SET_LOGIN_MESSAGE: 'SET_LOGIN_MESSAGE'
 }
 
 export const companyConstants = {

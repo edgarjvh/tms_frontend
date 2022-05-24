@@ -13,6 +13,7 @@ import { faCaretDown, faCaretRight, faPencilAlt, faCheck } from '@fortawesome/fr
 import { useDetectClickOutside } from "react-detect-click-outside";
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+import NumberFormat from "react-number-format";
 import {
     setCompanyOpenedPanels,
     setAdminOpenedPanels,
@@ -31,8 +32,13 @@ import {
     Documents,
     ContactSearch,
     FactoringCompanyInvoiceSearch,
-    FactoringCompanyPanelSearch
+    FactoringCompanyPanelSearch,
+    ACHWiringInfo
 } from './../../panels';
+
+import {
+    Invoice
+} from './../../../company';
 
 const FactoringCompany = (props) => {
     const [selectedFactoringCompany, setSelectedFactoringCompany] = useState({});
@@ -82,14 +88,23 @@ const FactoringCompany = (props) => {
     const [isSavingFactoringCompanyContact, setIsSavingFactoringCompanyContact] = useState(false);
     const [isSavingFactoringCompanyMailingAddress, setIsSavingFactoringCompanyMailingAddress] = useState(false);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [showingACHWiringInfo, setShowingACHWiringInfo] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
         from: { opacity: 0, display: 'block' },
         enter: { opacity: 1, display: 'block' },
         leave: { opacity: 0, display: 'none' },
         reverse: isLoading,
+    });
+
+    const loadingOrdersTransition = useTransition(isLoadingOrders, {
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
+        reverse: isLoadingOrders,
     });
 
 
@@ -173,6 +188,13 @@ const FactoringCompany = (props) => {
         reverse: !selectedFactoringCompanyIsShowingInvoiceList
     });
 
+    const achWiringInfoTransition = useTransition(showingACHWiringInfo, {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: showingACHWiringInfo,
+        config: { duration: 100 },
+    });
 
     useEffect(() => {
         if ((props.factoringCompanyId || 0) > 0) {
@@ -182,8 +204,25 @@ const FactoringCompany = (props) => {
                 if (res.data.result === 'OK') {
                     setSelectedFactoringCompany({ ...res.data.factoring_company })
                     setSelectedFactoringCompanyContact({ ...((res.data.factoring_company.contacts || []).find(c => c.is_primary === 1) || {}) })
+
+                    axios.post(props.serverUrl + '/getFactoringCompanyOutstandingInvoices', {
+                        factoring_company_id: props.factoringCompanyId
+                    }).then(res => {
+                        if (res.data.result === 'OK'){
+                            setSelectedFactoringCompany(selectedFactoringCompany => {
+                                return {
+                                    ...selectedFactoringCompany,
+                                    orders: res.data.orders
+                                }
+                            })
+                        }
+                    }).catch(e => {
+                        console.log('error getting factoring company invoices');
+                    }).finally(() => {
+                        setIsLoading(false);
+                    });
                 }
-                setIsLoading(false);
+                
             }).catch(e => {
                 console.log('error getting factoring company by id', e);
             })
@@ -558,10 +597,11 @@ const FactoringCompany = (props) => {
             if (e.target.value.trim() === '') {
                 setInitialValues();
             } else {
+                setIsLoading(true);
                 axios.post(props.serverUrl + '/factoringCompanies', { code: e.target.value.trim().toLowerCase() }).then(async res => {
                     if (res.data.result === 'OK') {
                         if (res.data.factoring_companies.length > 0) {
-                            setSelectedFactoringCompany(res.data.factoring_companies[0]);
+                            setSelectedFactoringCompany({...res.data.factoring_companies[0]});
 
                             if (res.data.factoring_companies[0].contacts.length > 0) {
                                 res.data.factoring_companies[0].contacts.map((contact, index) => {
@@ -572,6 +612,23 @@ const FactoringCompany = (props) => {
                                     return true;
                                 });
                             }
+
+                            axios.post(props.serverUrl + '/getFactoringCompanyOutstandingInvoices', {
+                                factoring_company_id: res.data.factoring_companies[0].id
+                            }).then(res => {
+                                if (res.data.result === 'OK'){
+                                    setSelectedFactoringCompany(selectedFactoringCompany => {
+                                        return {
+                                            ...selectedFactoringCompany,
+                                            orders: res.data.orders
+                                        }
+                                    })
+                                }
+                            }).catch(e => {
+                                console.log('error getting factoring company invoices');
+                            }).finally(() => {
+                                setIsLoading(false);
+                            });
                         } else {
                             setInitialValues(false);
                         }
@@ -1099,7 +1156,7 @@ const FactoringCompany = (props) => {
 
                                     axios.post(props.serverUrl + '/deleteFactoringCompanyMailingAddress', { factoring_company_id: selectedFactoringCompany.id }).then(res => {
                                         if (res.data.result === 'OK') {
-                                            
+
                                         }
                                     }).catch(e => {
                                         console.log('error deleting factoring company mailing address');
@@ -3204,6 +3261,18 @@ const FactoringCompany = (props) => {
                     <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
                         <div className='mochi-button' onClick={() => {
                             if ((selectedFactoringCompany.id || 0) > 0) {
+                                setShowingACHWiringInfo(true);
+                            } else {
+                                window.alert('You must select a factoring company first!');
+                            }
+                        }}>
+                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                            <div className='mochi-button-base'>ACH/Wiring Info</div>
+                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                        </div>
+
+                        <div className='mochi-button' onClick={() => {
+                            if ((selectedFactoringCompany.id || 0) > 0) {
                                 let panel = {
                                     panelName: `${props.panelName}-documents`,
                                     component: <Documents
@@ -3406,18 +3475,68 @@ const FactoringCompany = (props) => {
                                 factoringInvoiceFirstPageTransition((style, item) => item && (
                                     <animated.div style={{ ...style }} className="factoring-company-invoice-list-container">
                                         <div className="factoring-company-invoice-list-wrapper">
-                                            <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold', marginBottom: 5, color: 'rgba(0,0,0,1)' }}>
-                                                <div style={{ width: '6rem', textDecoration: 'underline' }}>Invoice Date</div>
-                                                <div style={{ width: '6rem', textDecoration: 'underline' }}>Invoice Number</div>
-                                                <div style={{ flexGrow: 1, textDecoration: 'underline' }}>Order Number</div>
-                                                <div style={{ width: '6rem', textAlign: 'right', textDecoration: 'underline' }}>Amount</div>
-                                            </div>
-                                            <div className="factoring-company-invoice-list-item" onClick={() => { }}>
-                                                <div style={{ width: '6rem' }}>03/09/2021</div>
-                                                <div style={{ width: '6rem' }}>12345</div>
-                                                <div style={{ flexGrow: 1 }}>54321</div>
-                                                <div style={{ width: '6rem', textAlign: 'right' }}>$25,000.00</div>
-                                            </div>
+                                            {
+                                                (selectedFactoringCompany?.orders || []).length > 0 &&
+                                                <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold', marginBottom: 5, color: 'rgba(0,0,0,1)' }}>
+                                                    <div style={{ width: '6rem', textDecoration: 'underline' }}>Invoice Date</div>
+                                                    <div style={{ width: '6rem', textDecoration: 'underline' }}>Invoice Number</div>
+                                                    <div style={{ flexGrow: 1, textDecoration: 'underline' }}>Order Number</div>
+                                                    <div style={{ width: '6rem', textAlign: 'right', textDecoration: 'underline' }}>Amount</div>
+                                                </div>
+                                            }
+
+                                            {
+                                                (selectedFactoringCompany?.orders || []).map((order, index) => {
+                                                    return (
+                                                        <div className="factoring-company-invoice-list-item" key={index} onDoubleClick={() => {
+                                                            let panel = {
+                                                                panelName: `${props.panelName}-invoice`,
+                                                                component: <Invoice
+                                                                    pageName={'Invoice'}
+                                                                    title={'Invoice'}
+                                                                    panelName={'invoice'}
+                                                                    tabTimes={15000 + props.tabTimes}
+                                                                    screenFocused={props.invoiceScreenFocused}
+                                                                    componentId={moment().format('x')}
+                                                                    isOnPanel={true}
+                                                                    origin={props.origin}
+                                                                    openPanel={props.openPanel}
+                                                                    closePanel={props.closePanel}
+                                                                    order_id={order.id}
+                                                                />
+                                                            }
+                
+                                                            props.openPanel(panel, props.origin);
+                                                        }}>
+                                                            <div style={{ width: '6rem' }}>{order.invoice_received_date || ''}</div>
+                                                            <div style={{ width: '6rem' }}>{order.invoice_number || ''}</div>
+                                                            <div style={{ flexGrow: 1 }}>{order.order_number || ''}</div>
+                                                            <div style={{ width: '6rem', textAlign: 'right' }}>
+                                                                <NumberFormat
+                                                                    className={classnames({
+                                                                        "negative-number":
+                                                                            (order.total_carrier_rating || 0) < 0,
+                                                                    })}
+                                                                    style={{ fontSize: "0.7rem", textAlign: "center" }}
+                                                                    value={new Intl.NumberFormat("en-US", {
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    }).format(order.total_carrier_rating || 0)}
+                                                                    thousandsGroupStyle="thousand"
+                                                                    thousandSeparator={true}
+                                                                    decimalScale={2}
+                                                                    fixedDecimalScale={true}
+                                                                    prefix={"$ "}
+                                                                    type="text"
+                                                                    onValueChange={(values) => { }}
+                                                                    displayType={"text"}
+                                                                    readOnly={true}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
                                         </div>
 
                                     </animated.div>
@@ -3518,9 +3637,63 @@ const FactoringCompany = (props) => {
                                 ))
                             }
                         </div>
+
+                        {
+                            loadingOrdersTransition((style, item) => item &&
+                                <animated.div className='loading-container' style={style} >
+                                    <div className="loading-container-wrapper">
+                                        <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                                    </div>
+                                </animated.div>
+                            )
+                        }
                     </div>
                 </div>
             </div>
+
+            {achWiringInfoTransition(
+                (style, item) =>
+                    item && (
+                        <animated.div
+                            className="ach-wiring-info-main-container"
+                            style={{
+                                ...style,
+                                position: "absolute",
+                                width: "100%",
+                                height: "100%",
+                                top: 0,
+                                left: 0,
+                                backgroundColor: "rgba(0,0,0,0.3)",
+                            }}
+                        >
+                            <div
+                                className="ach-wiring-info-wrapper"
+                                style={{
+                                    position: "relative",
+                                    width: "100%",
+                                    height: "100%",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <ACHWiringInfo
+                                    panelName={`${props.panelName}-ach-wiring-info`}
+                                    tabTimes={props.tabTimes}
+                                    componentId={moment().format("x")}
+                                    openPanel={props.openPanel}
+                                    closePanel={props.closePanel}
+                                    origin={props.origin}
+                                    closeModal={() => {
+                                        setShowingACHWiringInfo(false);
+                                    }}
+                                    selectedFactoringCompany={selectedFactoringCompany}
+                                    setSelectedFactoringCompany={setSelectedFactoringCompany}
+                                />
+                            </div>
+                        </animated.div>
+                    )
+            )}
 
             {
                 noteTransition((style, item) => item && (

@@ -1829,7 +1829,7 @@ const Invoice = (props) => {
                     <ToPrintInvoice
                         ref={refPrintInvoice}
                         serverUrl={props.serverUrl}
-                        company_logo='et3_logo.png'
+                        selectedCompany={props.selectedCompany}
                         selectedOrder={selectedOrder}
                     />
                 </div>
@@ -1993,8 +1993,7 @@ const Invoice = (props) => {
                                         openPanel={props.openPanel}
                                         closePanel={props.closePanel}
                                         componentId={moment().format('x')}
-                                        company_logo='et3_logo.png'
-
+                                        selectedCompany={props.selectedCompany}
                                         selectedOrder={{ ...selectedOrder }}
                                     />
                                 }
@@ -11990,6 +11989,7 @@ const Invoice = (props) => {
 const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
+        selectedCompany: state.companySetupReducers.selectedCompany,
         serverUrl: state.systemReducers.serverUrl,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,

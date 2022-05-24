@@ -7,11 +7,17 @@ export const setMainScreen = screen => {
     }
 }
 
-export const setUser = user => {
-    console.log(user);
+export const setUser = user => {    
     return {
         type: systemConstants.SET_USER,
         payload: user
+    }
+}
+
+export const setLoginMessage = message => {    
+    return {
+        type: systemConstants.SET_LOGIN_MESSAGE,
+        payload: message
     }
 }
 

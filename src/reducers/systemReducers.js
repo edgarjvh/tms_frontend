@@ -6,6 +6,7 @@ export const systemReducers = (state = {
     mainScreen: 'company',
     companyId: 1,
     user: {},
+    loginMessage: '',
     scale: 1
 }, action) => {
     switch (action.type) {
@@ -20,6 +21,13 @@ export const systemReducers = (state = {
             state = {
                 ...state,
                 user: action.payload
+            }
+            break;
+
+        case systemConstants.SET_LOGIN_MESSAGE:
+            state = {
+                ...state,
+                loginMessage: action.payload
             }
             break;
 

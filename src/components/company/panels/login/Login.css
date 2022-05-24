@@ -1,0 +1,93 @@
+.login-main-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.login-main-container .login-main-container-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.login-main-container .login-main-container-wrapper .login-form-container {
+  position: relative;
+  overflow: hidden;
+  width: 90%;
+  max-width: 400px;
+  padding: 10px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+.login-main-container .login-main-container-wrapper .login-form-container .company-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  width: 160px;
+  height: 160px;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .company-logo img {
+  width: 100%;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .company-name {
+  text-align: center;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .user-type-row {
+  display: flex;
+  margin: 10px 0;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .user-type-row .user-type {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .user-type-row .user-type input,
+.login-main-container .login-main-container-wrapper .login-form-container .user-type-row .user-type label {
+  cursor: pointer;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .login-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  grid-gap: 10px;
+  margin-bottom: 10px;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .login-form input {
+  text-align: center;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .login-button-row {
+  display: flex;
+  justify-content: center;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .forgot-password-row {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 3px;
+  align-items: center;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .forgot-password-row .login-message {
+  color: darkred;
+  font-weight: bold;
+  font-size: 14px;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .forgot-password-row a {
+  font-size: 14px;
+  text-decoration: underline;
+  color: #4682B4;
+  font-weight: bold;
+}
+.login-main-container .login-main-container-wrapper .login-form-container .forgot-password-row a:visited {
+  color: #4682B4;
+}

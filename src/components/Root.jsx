@@ -12,7 +12,8 @@ import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import {
     setSelectedCompany,
     setUser,
-    setMainScreen
+    setMainScreen,
+    setLoginMessage
 } from './../actions';
 
 function Root(props) {
@@ -38,6 +39,7 @@ function Root(props) {
                     }).catch((error) => {
                         props.setUser({});
                         props.setMainScreen('company');
+                        console.error(error.response);
                     }).finally(() => {
                         setIsLoading(false);
                     });
@@ -79,7 +81,7 @@ function Root(props) {
 
             {
                 !isLoading &&
-                <div>
+                <div>                    
                     <Company className={companyClasses} />
                     <Admin className={adminClasses} />
                 </div>
@@ -100,5 +102,6 @@ export default connect(mapStateToProps, {
     setMainScreen,
     setSelectedCompany,
     setUser,
-    setMainScreen
+    setMainScreen,
+    setLoginMessage
 })(Root)

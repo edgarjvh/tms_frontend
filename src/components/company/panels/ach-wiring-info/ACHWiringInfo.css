@@ -1,0 +1,70 @@
+.ach-wiring-info-content {
+  width: 400px;
+  height: 300px;
+  border-radius: 15px;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.7);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+18,ffffff+18,d3d3d3+100 */
+  background: #ffffff;
+  /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d3d3d3', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
+}
+.ach-wiring-info-content .form-container {
+  display: grid;
+  grid-gap: 0.6rem;
+  grid-template-rows: 1fr 1fr;
+  flex-grow: 1;
+}
+.ach-wiring-info-content .form-container .form-bordered-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-gap: 0.5rem;
+}
+.ach-wiring-info-content .form-container .form-bordered-box .input-radio-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ach-wiring-info-content .form-container .form-title {
+  font-size: 0.7rem;
+}
+.ach-wiring-info-content .form-container .mochi-button-decorator,
+.ach-wiring-info-content .form-container .mochi-button-base {
+  font-size: 0.7rem !important;
+}
+.ach-wiring-info-content .form-container .loading-container2 {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+}
+.ach-wiring-info-content .form-container .input-radio-container.disabled input,
+.ach-wiring-info-content .form-container .input-radio-container.disabled label {
+  pointer-events: none;
+}
+.ach-wiring-info-content .button-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 0.5rem;
+}
+.ach-wiring-info-content .button-container .mochi-button {
+  pointer-events: all;
+}
+.ach-wiring-info-content .button-container .mochi-button.disabled {
+  pointer-events: none;
+}
+.ach-wiring-info-content .button-container .mochi-button.disabled .mochi-button-decorator,
+.ach-wiring-info-content .button-container .mochi-button.disabled .mochi-button-base {
+  color: rgba(0, 0, 0, 0.8);
+}
