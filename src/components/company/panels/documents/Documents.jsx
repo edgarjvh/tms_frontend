@@ -26,6 +26,10 @@ import {
     setSelectedCustomer,
     setSelectedCarrier,
     setSelectedFactoringCompany,
+    setSelectedEmployee,
+    setSelectedAgent,
+    setSelectedCompanyDriver,
+    setSelectedOwnerOperator,
     setSelectedOrder
 } from './../../../../actions';
 
@@ -61,12 +65,65 @@ const Documents = (props) => {
     });
 
     useEffect(() => {
-        setSelectedOwner({ ...props.selectedOwner });
+        // setSelectedOwner({ ...props.selectedOwner });
         setSelectedOwnerDocument({ ...props.selectedOwnerDocument });
         setSavingDocumentUrl(props.savingDocumentUrl);
         setDeletingDocumentUrl(props.deletingDocumentUrl);
         setSavingDocumentNoteUrl(props.savingDocumentNoteUrl);
         setServerDocumentsFolder(props.serverDocumentsFolder);
+
+        let getDocumentsUrl = '';
+
+        switch (props.suborigin) {
+            case 'company-employee':
+                getDocumentsUrl = '/getDocumentsByEmployee';
+                break;
+            case 'company-agent':
+                getDocumentsUrl = '/getDocumentsByAgent';
+                break;
+            case 'company-driver':
+                getDocumentsUrl = '/getDocumentsByDriver';
+                break;
+            case 'company-operator':
+                getDocumentsUrl = '/getDocumentsByOperator';
+                break;
+            case 'customer':
+                getDocumentsUrl = '/getDocumentsByCustomer';
+                break;
+            case 'carrier':
+                getDocumentsUrl = '/getDocumentsByCarrier';
+                break;
+            case 'factoring-company':
+                getDocumentsUrl = '/getDocumentsByFactoringCompany';
+                break;
+            case 'order':
+                getDocumentsUrl = '/getDocumentsByOrder';
+                break;
+            case 'order-billing':
+                getDocumentsUrl = '/getDocumentsByOrderBilling';
+                break;
+            default:
+                break;
+        }
+
+        axios.post(props.serverUrl + getDocumentsUrl, {
+            employee_id: props.selectedOwner.id,
+            agent_id: props.selectedOwner.id,
+            driver_id: props.selectedOwner.id,
+            operator_id: props.selectedOwner.id,
+            customer_id: props.selectedOwner.id,
+            carrier_id: props.selectedOwner.id,
+            factoring_company_id: props.selectedOwner.id,
+            order_id: props.selectedOwner.id,
+            order_billing_id: props.selectedOwner.id,
+        }).then(res => {
+            if (res.data.result === 'OK') {
+                setSelectedOwner({
+                    ...props.selectedOwner,
+                    documents: [...res.data.documents]
+                })
+            }
+        });
     }, [])
 
     const getSizeUnit = (size) => {
@@ -143,6 +200,10 @@ const Documents = (props) => {
         let files = e.target.files;
 
         formData.append("doc", files[0]);
+        formData.append("employee_id", selectedOwner.id);
+        formData.append("agent_id", selectedOwner.id);
+        formData.append("driver_id", selectedOwner.id);
+        formData.append("operator_id", selectedOwner.id);
         formData.append("customer_id", selectedOwner.id);
         formData.append("carrier_id", selectedOwner.id);
         formData.append("factoring_company_id", selectedOwner.id);
@@ -170,6 +231,66 @@ const Documents = (props) => {
             axios.post(props.serverUrl + savingDocumentUrl, formData, options)
                 .then(res => {
                     if (res.data.result === "OK") {
+                        if (props.suborigin === 'company-employee') {
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+
+                            props.setSelectedEmployee({
+                                id: selectedOwner.id,
+                                documents: res.data.documents,
+                                component_id: props.componentId
+                            });
+                        }
+
+                        if (props.suborigin === 'company-agent') {
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+
+                            props.setSelectedAgent({
+                                id: selectedOwner.id,
+                                documents: res.data.documents,
+                                component_id: props.componentId
+                            });
+                        }
+
+                        if (props.suborigin === 'company-driver') {
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+
+                            props.setSelectedCompanyDriver({
+                                id: selectedOwner.id,
+                                documents: res.data.documents,
+                                component_id: props.componentId
+                            });
+                        }
+
+                        if (props.suborigin === 'company-operator') {
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+
+                            props.setSelectedOwnerOperator({
+                                id: selectedOwner.id,
+                                documents: res.data.documents,
+                                component_id: props.componentId
+                            });
+                        }
+
                         if (props.suborigin === 'customer') {
                             setSelectedOwner(selectedOwner => {
                                 return {
@@ -356,7 +477,7 @@ const Documents = (props) => {
                         }}>Quick type links:</div>
 
                         {
-                            (props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -371,7 +492,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'order' && props.origin === 'invoice') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' && props.origin === 'invoice') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -386,7 +507,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'order-billing' && props.origin === 'invoice') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing' && props.origin === 'invoice') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -401,7 +522,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'order' || props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -416,7 +537,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -431,7 +552,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -446,7 +567,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -461,7 +582,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -476,7 +597,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -491,7 +612,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'carrier' || props.suborigin === 'factoring.company') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring.company') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -503,6 +624,21 @@ const Documents = (props) => {
                                 });
                                 refTagInput.current.focus();
                             }}>NOA</div>
+                        }
+
+                        {
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            <div className={quickTypeLinkClasses} onClick={() => {
+                                setSelectedOwnerDocument({
+                                    id: 0,
+                                    user_id: Math.floor(Math.random() * (15 - 1)) + 1,
+                                    date_entered: moment().format('MM/DD/YYYY'),
+                                    title: 'Standard Carrier Alpha Code',
+                                    subject: 'SCAC',
+                                    tags: 'SCAC'
+                                });
+                                refTagInput.current.focus();
+                            }}>SCAC</div>
                         }
                     </div>
 
@@ -634,8 +770,49 @@ const Documents = (props) => {
 
                                     return (
                                         <div className={itemClasses} key={index} onClick={() => {
-                                            setSelectedOwnerDocument(document);
+                                            let getDocumentNotesUrl = '';
 
+                                            switch (props.suborigin) {
+                                                case 'company-employee':
+                                                    getDocumentNotesUrl = '/getNotesByEmployeeDocument';
+                                                    break;
+                                                case 'company-agent':
+                                                    getDocumentNotesUrl = '/getNotesByAgentDocument';
+                                                    break;
+                                                case 'company-driver':
+                                                    getDocumentNotesUrl = '/getNotesByDriverDocument';
+                                                    break;
+                                                case 'company-operator':
+                                                    getDocumentNotesUrl = '/getNotesByOperatorDocument';
+                                                    break;
+                                                case 'customer':
+                                                    getDocumentNotesUrl = '/getNotesByCustomerDocument';
+                                                    break;
+                                                case 'carrier':
+                                                    getDocumentNotesUrl = '/getNotesByCarrierDocument';
+                                                    break;
+                                                case 'factoring-company':
+                                                    getDocumentNotesUrl = '/getNotesByFactoringCompanyDocument';
+                                                    break;
+                                                case 'order':
+                                                    getDocumentNotesUrl = '/getNotesByOrderDocument';
+                                                    break;
+                                                case 'order-billing':
+                                                    getDocumentNotesUrl = '/getNotesByOrderBillingDocument';
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+
+                                            axios.post(props.serverUrl + getDocumentNotesUrl, {
+                                                doc_id: document.id,
+                                            }).then(res => {
+                                                if (res.data.result === 'OK') {
+                                                    document.notes = [...res.data.documentNotes]
+                                                }
+
+                                                setSelectedOwnerDocument(document);
+                                            });
                                         }}>
                                             <div className="item-info">
                                                 <span className={docIconClasses}></span>
@@ -658,9 +835,62 @@ const Documents = (props) => {
 
                                                     axios.post(props.serverUrl + deletingDocumentUrl, {
                                                         doc_id: document.doc_id,
-                                                        order_id: selectedOwner.id
+                                                        order_id: selectedOwner.id,
+                                                        employee_id: selectedOwner.id,
+                                                        agent_id: selectedOwner.id,
+                                                        driver_id: selectedOwner.id,
+                                                        operator_id: selectedOwner.id,
                                                     }).then(res => {
                                                         if (res.data.result === 'OK') {
+
+                                                            if (props.suborigin === 'company-employee') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return { ...selectedOwner, documents: res.data.documents }
+                                                                })
+
+                                                                props.setSelectedEmployee({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
+                                                            if (props.suborigin === 'company-agent') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return { ...selectedOwner, documents: res.data.documents }
+                                                                })
+
+                                                                props.setSelectedAgent({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
+                                                            if (props.suborigin === 'company-driver') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return { ...selectedOwner, documents: res.data.documents }
+                                                                })
+
+                                                                props.setSelectedCompanyDriver({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
+                                                            if (props.suborigin === 'company-operator') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return { ...selectedOwner, documents: res.data.documents }
+                                                                })
+
+                                                                props.setSelectedOwnerOperator({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
                                                             if (props.suborigin === 'customer') {
                                                                 setSelectedOwner(selectedOwner => {
                                                                     return { ...selectedOwner, documents: res.data.documents }
@@ -865,78 +1095,136 @@ const Documents = (props) => {
                         setSelectedData={setSelectedOwnerDocumentNote}
                         selectedParent={selectedOwnerDocument}
                         setSelectedParent={(notes) => {
-
-                            if (props.suborigin === 'customer') {
-                                props.setSelectedCustomer({
-                                    id: selectedOwner.id,
-                                    documents: props.selectedCustomer.documents.map((document, index) => {
-                                        if (document.id === selectedOwnerDocument.id) {
-                                            document.notes = notes;
-                                        }
-                                        return document;
-                                    }),
-                                    component_id: props.componentId
-                                });
-                            }
-
-                            if (props.suborigin === 'carrier') {
-                                props.setSelectedCarrier({
-                                    id: selectedOwner.id,
-                                    documents: props.selectedCarrier.documents.map((document, index) => {
-                                        if (document.id === selectedOwnerDocument.id) {
-                                            document.notes = notes;
-                                        }
-                                        return document;
-                                    }),
-                                    component_id: props.componentId
-                                });
-                            }
-
-                            if (props.suborigin === 'factoring-company') {
-                                props.setSelectedFactoringCompany({
-                                    id: selectedOwner.id,
-                                    documents: props.selectedFactoringCompany.documents.map((document, index) => {
-                                        if (document.id === selectedOwnerDocument.id) {
-                                            document.notes = notes;
-                                        }
-                                        return document;
-                                    }),
-                                    component_id: props.componentId
-                                });
-                            }
-
-                            if (props.suborigin === 'order') {
-                                props.setSelectedOrder({
-                                    id: selectedOwner.id,
-                                    documents: props.selected_order.documents.map((document, index) => {
-                                        if (document.id === selectedOwnerDocument.id) {
-                                            document.notes = notes;
-                                        }
-                                        return document;
-                                    }),
-                                    component_id: props.componentId
-                                });
-                            }
-
-                            if (props.suborigin === 'order-billing') {
-                                props.setSelectedOrder({
-                                    id: selectedOwner.id,
-                                    billing_documents: props.selected_order.billing_documents.map((document, index) => {
-                                        if (document.id === selectedOwnerDocument.id) {
-                                            document.notes = notes;
-                                        }
-                                        return document;
-                                    }),
-                                    component_id: props.componentId
-                                });
-                            }
-
-                            setSelectedOwnerDocument(selectedOwnerDocument => {
-                                return {
-                                    ...selectedOwnerDocument,
-                                    notes: notes
-                                }
+                            setSelectedOwnerDocument({
+                                ...selectedOwnerDocument,
+                                notes: notes
                             });
+
+                            setSelectedOwnerDocumentNote({});
+
+                            switch (props.suborigin) {
+                                case 'company-employee':
+                                    props.setSelectedEmployee({
+                                        id: selectedOwner.id,
+                                        documents: props.selectedEmployee.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'company-agent':
+                                    props.setSelectedAgent({
+                                        id: selectedOwner.id,
+                                        documents: props.selectedAgent.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'company-driver':
+                                    props.setSelectedCompanyDriver({
+                                        id: selectedOwner.id,
+                                        documents: props.selectedDriver.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'company-operator':
+                                    props.setSelectedOwnerOperator({
+                                        id: selectedOwner.id,
+                                        documents: props.selectedOperator.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'customer':
+                                    props.setSelectedCustomer({
+                                        id: selectedOwner.id,
+                                        documents: props.selectedCustomer.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'carrier':
+                                    props.setSelectedCarrier({
+                                        id: selectedOwner.id,
+                                        documents: props.selectedCarrier.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'factoring-company':
+                                    props.setSelectedFactoringCompany({
+                                        id: selectedOwner.id,
+                                        documents: props.selectedFactoringCompany.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'order':
+                                    props.setSelectedOrder({
+                                        id: selectedOwner.id,
+                                        documents: props.selected_order.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'order-billing':
+                                    props.setSelectedOrder({
+                                        id: selectedOwner.id,
+                                        billing_documents: props.selected_order.billing_documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = notes;
+                                            }
+                                            return document;
+                                        }),
+                                        component_id: props.componentId
+                                    });
+                                    break;
+
+                                default:
+                                    break;
+                            }
+
+
                         }}
                         savingDataUrl={savingDocumentNoteUrl}
                         deletingDataUrl=''
@@ -964,6 +1252,10 @@ const mapStateToProps = (state) => {
         selectedCustomer: state.customerReducers.selectedCustomer,
         selectedCarrier: state.carrierReducers.selectedCarrier,
         selectedFactoringCompany: state.carrierReducers.selectedFactoringCompany,
+        selectedEmployee: state.companySetupReducers.selectedEmployee,
+        selectedAgent: state.companySetupReducers.selectedAgent,
+        selectedDriver: state.companySetupReducers.selectedDriver,
+        selectedOperator: state.companySetupReducers.selectedOperator
     }
 }
 
@@ -979,5 +1271,9 @@ export default connect(mapStateToProps, {
     setSelectedCustomer,
     setSelectedCarrier,
     setSelectedFactoringCompany,
-    setSelectedOrder
+    setSelectedOrder,
+    setSelectedEmployee,
+    setSelectedAgent,
+    setSelectedCompanyDriver,
+    setSelectedOwnerOperator
 })(Documents)

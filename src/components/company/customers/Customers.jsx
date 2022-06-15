@@ -6,7 +6,7 @@ import moment from 'moment';
 import MaskedInput from 'react-text-mask';
 // import CustomerModal from './modal/Modal.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCheck, faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretRight, faCheck, faPencilAlt, faTrashAlt, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { useDetectClickOutside } from "react-detect-click-outside";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
@@ -60,6 +60,14 @@ const Customers = (props) => {
     const [contactSearch, setContactSearch] = useState({});
     const [showingContactList, setShowingContactList] = useState(true);
     const [isFromItself, setIsFromItself] = useState(false);
+
+    const refCustomerEmail = useRef();
+    const [showCustomerEmailCopyBtn, setShowCustomerEmailCopyBtn] = useState(false);
+    const [showCustomerContactEmailCopyBtn, setShowCustomerContactEmailCopyBtn] = useState(false);
+    const [showMailingContactEmailCopyBtn, setShowMailingContactEmailCopyBtn] = useState(false);
+    const [showAutomaticEmailToCopyBtn, setShowAutomaticEmailToEmailCopyBtn] = useState(false);
+    const [showAutomaticEmailCcCopyBtn, setShowAutomaticEmailCcEmailCopyBtn] = useState(false);
+    const [showAutomaticEmailBccCopyBtn, setShowAutomaticEmailBccEmailCopyBtn] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingCustomerOrders, setIsLoadingCustomerOrders] = useState(false);
@@ -511,7 +519,7 @@ const Customers = (props) => {
     }, [])
 
     useEffect(() => {
-        if (props.screenFocused) {           
+        if (props.screenFocused) {
             refCustomerCode.current.focus({
                 preventScroll: true
             });
@@ -1488,8 +1496,28 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}>
+                                <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
+                                    onMouseEnter={() => {
+                                        if ((selectedCustomer?.email || '') !== '') {
+                                            setShowCustomerEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if ((selectedCustomer?.email || '') !== '') {
+                                            setShowCustomerEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        window.setTimeout(() => {
+                                            setShowCustomerEmailCopyBtn(false);
+                                        }, 1000);
+                                    }}
+                                    onMouseLeave={() => {
+                                        setShowCustomerEmailCopyBtn(false);
+                                    }}
+                                >
                                     <input tabIndex={11 + props.tabTimes}
+                                        ref={refCustomerEmail}
                                         type="text"
                                         placeholder="E-Mail"
                                         style={{ textTransform: 'lowercase' }}
@@ -1525,6 +1553,25 @@ const Customers = (props) => {
                                             })}>
                                             {selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email}
                                         </div>
+                                    }
+
+                                    {
+                                        showCustomerEmailCopyBtn &&
+                                        <FontAwesomeIcon style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            right: 30,
+                                            zIndex: 1,
+                                            cursor: 'pointer',
+                                            transform: 'translateY(-50%)',
+                                            color: '#2bc1ff',
+                                            margin: 0,
+                                            transition: 'ease 0.2s',
+                                            fontSize: '1rem'
+                                        }} icon={faCopy} onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(refCustomerEmail.current.value);
+                                        }} />
                                     }
                                 </div>
                             </div>
@@ -2374,7 +2421,30 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="select-box-container" style={{ flexGrow: 1 }}>
+                                <div className="select-box-container" style={{ flexGrow: 1 }}
+                                    onMouseEnter={() => {
+                                        if ((selectedCustomer?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                            (selectedCustomer?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                            (selectedCustomer?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                            setShowMailingContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if ((selectedCustomer?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                            (selectedCustomer?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                            (selectedCustomer?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                            setShowMailingContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        window.setTimeout(() => {
+                                            setShowMailingContactEmailCopyBtn(false);
+                                        }, 1000);
+                                    }}
+                                    onMouseLeave={() => {
+                                        setShowMailingContactEmailCopyBtn(false);
+                                    }}>
+                                        
                                     <div className="select-box-wrapper">
                                         <input tabIndex={28 + props.tabTimes} type="text" placeholder="E-Mail"
                                             ref={refMailingContactEmail}
@@ -2557,6 +2627,25 @@ const Customers = (props) => {
                                         }
 
                                         {
+                                            showMailingContactEmailCopyBtn &&
+                                            <FontAwesomeIcon style={{
+                                                position: 'absolute',
+                                                top: '50%',
+                                                right: 30,
+                                                zIndex: 1,
+                                                cursor: 'pointer',
+                                                transform: 'translateY(-50%)',
+                                                color: '#2bc1ff',
+                                                margin: 0,
+                                                transition: 'ease 0.2s',
+                                                fontSize: '1rem'
+                                            }} icon={faCopy} onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigator.clipboard.writeText(refMailingContactEmail.current.value);
+                                            }} />
+                                        }
+
+                                        {
                                             mailingContactEmailItems.length > 1 &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
                                                 if (showMailingContactEmails) {
@@ -2692,25 +2781,122 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={33 + props.tabTimes} type="text" placeholder="Division" readOnly={!props.isAdmin} />
+                                    <input tabIndex={33 + props.tabTimes} type="text" placeholder="Division"
+                                        readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        division: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        division: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.mailing_address?.division || ''}
+                                    />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={34 + props.tabTimes} type="text" placeholder="Agent Code" readOnly={!props.isAdmin} />
+                                    <input tabIndex={34 + props.tabTimes} type="text" placeholder="Agent Code" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        agent_code: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        agent_code: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.mailing_address?.agent_code || ''}
+                                    />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={35 + props.tabTimes} type="text" placeholder="Salesman" readOnly={!props.isAdmin} />
+                                    <input tabIndex={35 + props.tabTimes} type="text" placeholder="Salesman" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        salesman: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        salesman: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.mailing_address?.salesman || ''}
+                                    />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={36 + props.tabTimes} type="text" placeholder="FID" readOnly={!props.isAdmin} />
+                                    <input tabIndex={36 + props.tabTimes} type="text" placeholder="FID" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        fid: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    mailing_address: {
+                                                        ...selectedCustomer?.mailing_address,
+                                                        fid: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.mailing_address?.fid || ''}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -2726,31 +2912,121 @@ const Customers = (props) => {
 
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={37 + props.tabTimes} type="text" placeholder="Invoicing Terms" readOnly={!props.isAdmin} />
+                                    <input tabIndex={37 + props.tabTimes} type="text" placeholder="Invoicing Terms" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    invoicing_terms: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    invoicing_terms: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.invoicing_terms || ''}
+                                    />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={38 + props.tabTimes} type="text" placeholder="Credit Limit Total" readOnly={!props.isAdmin} />
+                                    <input tabIndex={38 + props.tabTimes} type="text" placeholder="Credit Limit Total" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    credit_limit_total: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    credit_limit_total: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.credit_limit_total || ''}
+                                    />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input type="text" placeholder="Credit Ordered" readOnly={!props.isAdmin} />
+                                    <input type="text" placeholder="Credit Ordered" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    credit_ordered: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    credit_ordered: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.credit_ordered || ''}
+                                    />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input type="text" placeholder="Credit Delivered Not Invoiced" readOnly={!props.isAdmin} />
+                                    <input type="text" placeholder="Credit Delivered Not Invoiced" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    credit_delivered_not_invoiced: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    credit_delivered_not_invoiced: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.credit_delivered_not_invoiced || ''}
+                                    />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input type="text" placeholder="Available Credit" readOnly={!props.isAdmin} />
+                                    <input type="text" placeholder="Available Credit" readOnly={!props.isAdmin}
+                                        onInput={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    available_credit: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedCustomer(selectedCustomer => {
+                                                return {
+                                                    ...selectedCustomer,
+                                                    available_credit: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedCustomer?.available_credit || ''}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -3284,7 +3560,29 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="select-box-container" style={{ flexGrow: 1 }}>
+                                <div className="select-box-container" style={{ flexGrow: 1 }}
+                                    onMouseEnter={() => {
+                                        if ((selectedContact?.email_work || '') !== '' ||
+                                            (selectedContact?.email_personal || '') !== '' ||
+                                            (selectedContact?.email_other || '') !== '') {
+                                            setShowCustomerContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if ((selectedContact?.email_work || '') !== '' ||
+                                            (selectedContact?.email_personal || '') !== '' ||
+                                            (selectedContact?.email_other || '') !== '') {
+                                            setShowCustomerContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        window.setTimeout(() => {
+                                            setShowCustomerContactEmailCopyBtn(false);
+                                        }, 1000);
+                                    }}
+                                    onMouseLeave={() => {
+                                        setShowCustomerContactEmailCopyBtn(false);
+                                    }}>
                                     <div className="select-box-wrapper">
                                         <input
                                             style={{
@@ -3500,6 +3798,25 @@ const Customers = (props) => {
                                                             : ''
                                             }
                                         />
+
+                                        {
+                                            showCustomerContactEmailCopyBtn &&
+                                            <FontAwesomeIcon style={{
+                                                position: 'absolute',
+                                                top: '50%',
+                                                right: 30,
+                                                zIndex: 1,
+                                                cursor: 'pointer',
+                                                transform: 'translateY(-50%)',
+                                                color: '#2bc1ff',
+                                                margin: 0,
+                                                transition: 'ease 0.2s',
+                                                fontSize: '1rem'
+                                            }} icon={faCopy} onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigator.clipboard.writeText(refCustomerContactEmail.current.value);
+                                            }} />
+                                        }
 
                                         {
                                             (selectedContact?.id || 0) > 0 &&
@@ -5412,7 +5729,7 @@ const Customers = (props) => {
 
                                                     props.openPanel(panel, props.origin);
                                                 }}>
-                                                    <span style={{color: "#4682B4", fontWeight: 'bold', marginRight: 5}}>{order.order_number}</span> {((order?.routing || []).length >= 2)
+                                                    <span style={{ color: "#4682B4", fontWeight: 'bold', marginRight: 5 }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
                                                         ? order.routing[0].type === 'pickup'
                                                             ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
                                                                 ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'

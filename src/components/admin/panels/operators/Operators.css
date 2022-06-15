@@ -32,6 +32,25 @@
   height: 100%;
   overflow-y: auto;
 }
+.operator-container .operator-list-container .operator-list .operator-list-wrapper .row-operator-info {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 15px;
+  grid-template-rows: auto;
+}
+.operator-container .operator-list-container .operator-list .operator-list-wrapper .row-operator-info .info-row .info-row-label {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.operator-container .operator-list-container .operator-list .operator-list-wrapper .row-operator-info .info-row .info-row-input {
+  display: flex;
+  align-items: center;
+}
+.operator-container .operator-list-container .operator-list .operator-list-wrapper .row-operator-info .info-row .info-row-input span {
+  margin-left: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
 .operator-container .operator-list-container .operator-list .operator-list-wrapper .letter-header {
   font-size: 2.5rem;
   font-family: 'Mochi Light';
@@ -239,8 +258,8 @@
 .operator-container .operator-form-bg .operator-form .operator-form-header .operator-info .operator-username-info {
   flex-grow: 1;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  flex-direction: row;
+  align-items: flex-end;
   padding-bottom: 15px;
 }
 .operator-container .operator-form-bg .operator-form .operator-form-header .operator-info .operator-username-info .operator-username {
@@ -248,6 +267,9 @@
   font-weight: 600;
   color: darkgreen;
   margin-bottom: 5px;
+}
+.operator-container .operator-form-bg .operator-form .operator-form-header .operator-info .operator-username-info > div:not(:first-child) {
+  margin-left: 30px;
 }
 .operator-container .operator-form-bg .operator-form .operator-form-header .operator-buttons {
   display: flex;
@@ -316,10 +338,10 @@
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00eeeeee', endColorstr='#00eeeeee', GradientType=0);
   /* IE6-9 */
 }
-.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-emails {
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info {
   position: relative;
 }
-.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-emails .col-title {
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info .col-title {
   position: absolute;
   width: 100%;
   display: flex;
@@ -328,6 +350,45 @@
   left: 0;
   font-size: 1rem;
   font-weight: bold;
+}
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info .operator-info-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding-left: 10px;
+}
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info .operator-info-wrapper .field-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info .operator-info-wrapper .field-container .field-title {
+  font-size: 1rem;
+}
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info .operator-info-wrapper .field-container input {
+  border: 0;
+  background-color: transparent;
+  padding: 5px 0;
+  font-family: 'Mochi Light';
+  font-size: 1rem;
+}
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info .operator-info-wrapper .field-container .field-border-bottom {
+  height: 1px;
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#999999+0,000000+100&0.65+0,0+100 */
+  background: -moz-linear-gradient(left, rgba(153, 153, 153, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(left, rgba(153, 153, 153, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right, rgba(153, 153, 153, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#a6999999', endColorstr='#00000000', GradientType=1);
+  /* IE6-9 */
+}
+.operator-container .operator-form-bg .operator-form .operator-form-fields .col-operator-info .operator-info-wrapper .field-container .field-border-bottom.disabled {
+  background: transparent;
 }
 .operator-container .footer {
   position: absolute;

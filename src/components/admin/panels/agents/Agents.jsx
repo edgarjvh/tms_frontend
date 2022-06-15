@@ -9,6 +9,7 @@ import './Agents.css';
 import MaskedInput from 'react-text-mask';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faCalendarAlt, faCheck, faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
 import {
     setCompanyOpenedPanels,
     setDispatchOpenedPanels,
@@ -24,6 +25,8 @@ import {
 } from './../../../../actions';
 
 import { PassModal } from './../../panels';
+
+import { Documents } from './../../../company/panels';
 
 const Agents = (props) => {
     const refPrefix = useRef();
@@ -321,74 +324,172 @@ const Agents = (props) => {
 
                     <div className="agent-list">
                         <div className="agent-list-wrapper">
-                            {
-                                (agentSearchCompany.agents || []).map((agent, index) => {
-                                    let curLetter = agent.last_name.substring(0, 1).toLowerCase();
-                                    if (curLetter !== lastLetter) {
-                                        lastLetter = curLetter;
-                                        return (
-                                            <div key={index}>
-                                                <div className="letter-header">{curLetter}</div>
+                            <div className="row-agent" style={{
+                                marginTop: 10
+                            }}>
+                                <div className="agent-avatar-container">
+                                    <img src={agentSearchCompany?.selectedAgent?.avatar ? props.serverUrl + '/avatars/' + agentSearchCompany?.selectedAgent?.avatar : 'img/avatar-user-default.png'} alt="" />
+                                </div>
 
-                                                <div className="row-agent" onClick={async () => {
-                                                    await setAgentSearchCompany({ ...agentSearchCompany, selectedAgent: agent });
-                                                    setIsEditingAgent(false);
-                                                }}>
-                                                    <div className="agent-avatar-container">
-                                                        <img src={agent.avatar ? props.serverUrl + '/avatars/' + agent.avatar : 'img/avatar-user-default.png'} alt="" />
-                                                    </div>
+                                <div className="agent-data">
+                                    <div className="agent-name">
+                                        {(agentSearchCompany?.selectedAgent?.prefix || '') + " " + (agentSearchCompany?.selectedAgent?.first_name || '') + " " + (agentSearchCompany?.selectedAgent?.middle_name || '') + " " + (agentSearchCompany?.selectedAgent?.last_name || '')}
+                                    </div>
+                                    <div className="online-status">
+                                        {isEditingAgent ? tempSelectedAgent.prefix || '' : agentSearchCompany?.selectedAgent?.prefix || ''}
+                                        <div className={(isEditingAgent ? tempSelectedAgent.is_online : agentSearchCompany?.selectedAgent?.is_online) === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Chat</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Video</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                                    <div className="agent-data">
-                                                        <div className="agent-name" style={{
-                                                            display: 'flex', alignItems: 'center'
-                                                        }}>
-                                                            <div style={{ flexGrow: 1 }}>
-                                                                {(agent.prefix || '') + " " + agent.first_name + " " + (agent.middle_name || '') + " " + agent.last_name}
-                                                            </div>
-                                                            {
-                                                                (agent.is_primary === 1) &&
-                                                                <div className="agent-list-col tcol pri">
-                                                                    <FontAwesomeIcon icon={faCheck} />
-                                                                </div>
-                                                            }</div>
-                                                        <div className="online-status">
-                                                            <div className={agent.is_online === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
-                                                            <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
-                                                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                                                <div className="mochi-button-base">Chat</div>
-                                                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    } else {
-                                        return (
-                                            <div key={index} className="row-agent" onClick={async () => {
-                                                await setAgentSearchCompany({ ...agentSearchCompany, selectedAgent: agent });
-                                                setIsEditingAgent(false);
-                                            }}>
-                                                <div className="agent-avatar-container">
-                                                    <img src={agent.avatar ? props.serverUrl + '/avatars/' + agent.avatar : 'img/avatar-user-default.png'} alt="" />
-                                                </div>
+                            <div className="row-agent-info">
+                                <div className="info-row">
+                                    <div className="info-row-label">Agent Number:</div>
+                                    <div className="info-row-input">
+                                        {agentSearchCompany?.selectedAgent?.id !== undefined
+                                            ? 'AG' + agentSearchCompany?.selectedAgent.id.toString().padStart(4, '0')
+                                            : ''}
+                                    </div>
+                                </div>
 
-                                                <div className="agent-data">
-                                                    <div className="agent-name">{(agent.prefix || '') + " " + agent.first_name + " " + (agent.middle_name || '') + " " + agent.last_name}</div>
-                                                    <div className="online-status">
-                                                        <div className={agent.is_online === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
-                                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
-                                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                                            <div className="mochi-button-base">Chat</div>
-                                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                })
-                            }
+                                <div className="info-row">
+                                    <div className="info-row-label">E-mail Address:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.email_work || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Phone Number:</div>
+                                    <div className="info-row-input">
+                                        <div>{agentSearchCompany?.selectedAgent?.phone_work || '-'}</div>
+                                        <div><span>ext:</span> {agentSearchCompany?.selectedAgent?.phone_ext || '-'}</div>
+                                    </div>
+                                </div>
+
+                                {/* <div className="info-row">
+                                    <div className="info-row-label">Department:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.department || '-'}</div>
+                                </div> */}
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Phone Mobile:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.phone_mobile || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Regional Manager:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.regional_manager || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Division:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.division || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Agent Pay Brokerage:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.aget_pay_brokerage || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Agent Pay Company Trucks:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.regional_manager || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Does Agent Own Units?:</div>
+                                    <div className="info-row-input">
+                                        <div className="input-option">
+                                            <input type="radio" id='agent-own-unit-yes' name='agent-own-unit' checked={(agentSearchCompany?.selectedAgent?.agent_own_units || 0) === 1}
+                                                onChange={e => {
+                                                    setAgentSearchCompany(agentSearchCompany => {
+                                                        return {
+                                                            ...agentSearchCompany,
+                                                            selectedAgent: {
+                                                                ...agentSearchCompany.selectedAgent,
+                                                                agent_own_units: e.target.checked ? 1 : 0
+                                                            }
+                                                        }
+                                                    })
+
+                                                    if ((agentSearchCompany?.selectedAgent?.id || 0) > 0){
+                                                        axios.post(props.serverUrl + props.savingAgentUrl, {
+                                                            ...agentSearchCompany.selectedAgent,
+                                                            agent_own_units: e.target.checked ? 1 : 0
+                                                        }).then(res => {
+                                                            if (res.data.result === 'OK') {
+                                                                props.setSelectedCompany({ ...props.selectedCompany, id: (res.data.agent.company_id || 0), agents: res.data.agents });
+                                                                props.setSelectedAgent(res.data.agent);
+    
+                                                                setAgentSearchCompany({ ...agentSearchCompany, selectedAgent: res.data.agent, agents: res.data.agents });
+                                                                setIsEditingAgent(false);
+                                                            }
+                                                        }).catch(e => {
+                                                            console.log('error saving agent', e);
+                                                        });
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor="agent-own-unit-yes">Yes</label>
+                                        </div>
+
+                                        <div className="input-option" style={{ marginLeft: 15 }}>
+                                            <input type="radio" id='agent-own-unit-no' name='agent-own-unit' checked={(agentSearchCompany?.selectedAgent?.agent_own_units || 0) === 0}
+                                                onChange={e => {
+                                                    setAgentSearchCompany(agentSearchCompany => {
+                                                        return {
+                                                            ...agentSearchCompany,
+                                                            selectedAgent: {
+                                                                ...agentSearchCompany.selectedAgent,
+                                                                agent_own_units: e.target.checked ? 0 : 1
+                                                            }
+                                                        }
+                                                    })
+
+                                                    if ((agentSearchCompany?.selectedAgent?.id || 0) > 0){
+                                                        axios.post(props.serverUrl + props.savingAgentUrl, {
+                                                            ...agentSearchCompany.selectedAgent,
+                                                            agent_own_units: e.target.checked ? 0 : 1
+                                                        }).then(res => {
+                                                            if (res.data.result === 'OK') {
+                                                                props.setSelectedCompany({ ...props.selectedCompany, id: (res.data.agent.company_id || 0), agents: res.data.agents });
+                                                                props.setSelectedAgent(res.data.agent);
+    
+                                                                setAgentSearchCompany({ ...agentSearchCompany, selectedAgent: res.data.agent, agents: res.data.agents });
+                                                                setIsEditingAgent(false);
+                                                            }
+                                                        }).catch(e => {
+                                                            console.log('error saving agent', e);
+                                                        });
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor="agent-own-unit-no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Carrier Code:</div>
+                                    <div className="info-row-input">
+                                        {(agentSearchCompany?.selectedAgent?.carrier_code || '') === '' ? '-' : agentSearchCompany?.selectedAgent?.carrier_code + ((agentSearchCompany?.selectedAgent?.carrier_code_number || 0) === 0 ? '' : agentSearchCompany?.selectedAgent?.carrier_code_number)}
+                                    </div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Agent Pay Own Units:</div>
+                                    <div className="info-row-input">{agentSearchCompany?.selectedAgent?.agent_pay_own_units || '-'}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -418,7 +519,7 @@ const Agents = (props) => {
                                 <div className="agent-name">
                                     {(agentSearchCompany?.selectedAgent?.prefix || '') + " " + (agentSearchCompany?.selectedAgent?.first_name || '') + " " + (agentSearchCompany?.selectedAgent?.middle_name || '') + " " + (agentSearchCompany?.selectedAgent?.last_name || '')}
                                 </div>
-                                <div className="agent-code">
+                                {/* <div className="agent-code">
                                     {
                                         (agentSearchCompany?.selectedAgent?.id || 0) > 0 &&
                                         <span>
@@ -427,13 +528,39 @@ const Agents = (props) => {
                                                 : ''}
                                         </span>
                                     }
+                                </div> */}
+
+                                <div className="agent-company">
+                                    <span>
+                                        {agentSearchCompany?.selectedAgent?.id !== undefined ? agentSearchCompany.name : ''}
+                                    </span>
+
+                                    <span>
+                                        {(agentSearchCompany?.selectedAgent?.title || '')}
+                                    </span>
+
+                                    <span>
+                                        {(agentSearchCompany?.selectedAgent?.department || '')}
+                                    </span>
                                 </div>
+
                                 <div className="agent-username-info">
-                                    <div className="agent-username">@username</div>
-                                    <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Chat</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    <div className="username-chat">
+                                        <div className="agent-username">@username</div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Chat</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="username-video">
+                                        <div className="agent-username">@username</div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Video</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -496,6 +623,42 @@ const Agents = (props) => {
                                         </div>
                                     }
 
+                                </div>
+
+                                <div className="mochi-button" style={{ margin: '5px 0' }} onClick={() => {
+                                    if ((agentSearchCompany?.selectedAgent?.id || 0) > 0) {
+                                        let panel = {
+                                            panelName: `${props.panelName}-agent-documents`,
+                                            component: <Documents
+                                                title='Documents'
+                                                tabTimes={426000 + props.tabTimes}
+                                                panelName={`${props.panelName}-agent-documents`}
+                                                origin={props.origin}
+                                                suborigin={'company-agent'}
+                                                openPanel={props.openPanel}
+                                                closePanel={props.closePanel}
+                                                componentId={moment().format('x')}
+                                                selectedOwner={{ ...agentSearchCompany.selectedAgent }}
+                                                selectedOwnerDocument={{
+                                                    id: 0,
+                                                    user_id: Math.floor(Math.random() * (15 - 1)) + 1,
+                                                    date_entered: moment().format('MM/DD/YYYY')
+                                                }}
+                                                savingDocumentUrl='/saveAgentDocument'
+                                                deletingDocumentUrl='/deleteAgentDocument'
+                                                savingDocumentNoteUrl='/saveAgentDocumentNote'
+                                                serverDocumentsFolder='/agent-documents/'
+                                            />
+                                        }
+
+                                        props.openPanel(panel, props.origin);
+                                    } else {
+                                        window.alert('You must select an agent first!');
+                                    }
+                                }}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Documents</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             </div>
                         </div>
@@ -885,8 +1048,8 @@ const Agents = (props) => {
                             <div className="col-agent-splitter">
 
                             </div>
-                            <div className="col-agent-emails">
-                                <div className="col-title">E-mails</div>
+                            <div className="col-agent-permissions">
+                                <div className="col-title">Permissions</div>
                             </div>
                         </div>
                     </div>

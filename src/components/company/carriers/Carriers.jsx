@@ -4903,7 +4903,7 @@ const Carriers = (props) => {
                                                             insurance_type_id: item.id,
                                                             amount: (item.name || '').toLowerCase() === 'cargo'
                                                                 ? accounting.formatNumber(100000, 2, ',', '.')
-                                                                : (item.name || '').toLowerCase() === 'liability'
+                                                                : (item.name || '').toLowerCase() === 'automotive liability'
                                                                     ? accounting.formatNumber(1000000, 2, ',', '.')
                                                                     : ''
                                                         });
@@ -4923,7 +4923,7 @@ const Carriers = (props) => {
                                                             insurance_type_id: item.id,
                                                             amount: (item.name || '').toLowerCase() === 'cargo'
                                                                 ? accounting.formatNumber(100000, 2, ',', '.')
-                                                                : (item.name || '').toLowerCase() === 'liability'
+                                                                : (item.name || '').toLowerCase() === 'automotive liability'
                                                                     ? accounting.formatNumber(1000000, 2, ',', '.')
                                                                     : ''
                                                         });
@@ -5078,7 +5078,7 @@ const Carriers = (props) => {
                                                                                 insurance_type_id: item.id,
                                                                                 amount: (item.name || '').toLowerCase() === 'cargo'
                                                                                     ? accounting.formatNumber(100000, 2, ',', '.')
-                                                                                    : (item.name || '').toLowerCase() === 'liability'
+                                                                                    : (item.name || '').toLowerCase() === 'automotive liability'
                                                                                         ? accounting.formatNumber(1000000, 2, ',', '.')
                                                                                         : ''
                                                                             });

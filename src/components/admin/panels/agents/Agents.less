@@ -33,6 +33,31 @@
                 height    : 100%;
                 overflow-y: auto;
 
+                .row-agent-info{                    
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    grid-gap: 15px;
+                    grid-template-rows: auto;
+
+                    .info-row{
+                        .info-row-label{
+                            font-weight: bold;
+                            font-size: 0.9rem;
+                        }
+
+                        .info-row-input{
+                            display: flex;
+                            align-items: center;
+                            
+                            span{
+                                margin-left: 10px;
+                                font-weight: bold;
+                                font-size: 0.9rem;
+                            }
+                        }
+                    }
+                }
+
                 .letter-header {
                     font-size     : 2.5rem;
                     font-family   : 'Mochi Light';
@@ -281,8 +306,9 @@
                     .agent-username-info{
                         flex-grow: 1;
                         display: flex;
-                        flex-direction: column;
-                        justify-content: flex-end;
+                        flex-direction: row;
+                        // justify-content: space-between;
+                        align-items: flex-end;
                         padding-bottom: 15px;
 
                         .agent-username{
@@ -290,6 +316,10 @@
                             font-weight: 600;
                             color: darkgreen;
                             margin-bottom: 5px;
+                        }
+
+                        &>div:not(:first-child){
+                            margin-left: 30px;
                         }
                     }
                 }
@@ -374,7 +404,7 @@
 
                 }
 
-                .col-agent-emails {
+                .col-agent-permissions {
                     position: relative;
 
                     .col-title {

@@ -9,6 +9,7 @@ import './Employees.css';
 import MaskedInput from 'react-text-mask';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faCalendarAlt, faCheck, faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
 import {
     setCompanyOpenedPanels,
     setDispatchOpenedPanels,
@@ -24,6 +25,8 @@ import {
 } from './../../../../actions';
 
 import { PassModal } from './../../panels';
+
+import { Documents } from './../../../company/panels';
 
 const Employees = (props) => {
     const refPrefix = useRef();
@@ -62,6 +65,33 @@ const Employees = (props) => {
         }
 
     }, [])
+
+    useEffect(() => {
+        if ((props.selectedEmployee?.component_id || '') !== props.componentId) {
+            if (((employeeSearchCompany?.selectedEmployee?.id || 0) > 0 && (props.selectedEmployee?.id || 0) > 0) && employeeSearchCompany.selectedEmployee.id === props.selectedEmployee.id) {
+                setEmployeeSearchCompany(employeeSearchCompany => {
+                    return {
+                        ...employeeSearchCompany,
+                        selectedEmployee: {
+                            ...employeeSearchCompany.selectedEmployee,
+                            ...props.selectedEmployee
+                        }
+                    }
+                })
+
+                props.setSelectedCompany({
+                    ...props.selectedCompany,
+                    employees: (props.selectedCompany.employees || []).map(employee => {
+                        if (employee.id === employeeSearchCompany.selectedEmployee.id){
+                            employee = {...props.selectedEmployee}
+                        }
+
+                        return employee;
+                    })
+                })
+            }
+        }
+    }, [props.selectedEmployee])
 
     const saveEmployee = () => {
         let employee = employeeSearchCompany?.selectedEmployee;
@@ -321,74 +351,67 @@ const Employees = (props) => {
 
                     <div className="employee-list">
                         <div className="employee-list-wrapper">
-                            {
-                                (employeeSearchCompany.employees || []).map((employee, index) => {
-                                    let curLetter = employee.last_name.substring(0, 1).toLowerCase();
-                                    if (curLetter !== lastLetter) {
-                                        lastLetter = curLetter;
-                                        return (
-                                            <div key={index}>
-                                                <div className="letter-header">{curLetter}</div>
+                            <div className="row-employee" style={{
+                                marginTop: 10
+                            }}>
+                                <div className="employee-avatar-container">
+                                    <img src={employeeSearchCompany?.selectedEmployee?.avatar ? props.serverUrl + '/avatars/' + employeeSearchCompany?.selectedEmployee?.avatar : 'img/avatar-user-default.png'} alt="" />
+                                </div>
 
-                                                <div className="row-employee" onClick={async () => {
-                                                    await setEmployeeSearchCompany({ ...employeeSearchCompany, selectedEmployee: employee });
-                                                    setIsEditingEmployee(false);
-                                                }}>
-                                                    <div className="employee-avatar-container">
-                                                        <img src={employee.avatar ? props.serverUrl + '/avatars/' + employee.avatar : 'img/avatar-user-default.png'} alt="" />
-                                                    </div>
+                                <div className="employee-data">
+                                    <div className="employee-name">
+                                        {(employeeSearchCompany?.selectedEmployee?.prefix || '') + " " + (employeeSearchCompany?.selectedEmployee?.first_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.middle_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.last_name || '')}
+                                    </div>
+                                    <div className="online-status">
+                                        {isEditingEmployee ? tempSelectedEmployee.prefix || '' : employeeSearchCompany?.selectedEmployee?.prefix || ''}
+                                        <div className={(isEditingEmployee ? tempSelectedEmployee.is_online : employeeSearchCompany?.selectedEmployee?.is_online) === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Chat</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Video</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                                    <div className="employee-data">
-                                                        <div className="employee-name" style={{
-                                                            display: 'flex', alignItems: 'center'
-                                                        }}>
-                                                            <div style={{ flexGrow: 1 }}>
-                                                                {(employee.prefix || '') + " " + employee.first_name + " " + (employee.middle_name || '') + " " + employee.last_name}
-                                                            </div>
-                                                            {
-                                                                (employee.is_primary === 1) &&
-                                                                <div className="employee-list-col tcol pri">
-                                                                    <FontAwesomeIcon icon={faCheck} />
-                                                                </div>
-                                                            }</div>
-                                                        <div className="online-status">
-                                                            <div className={employee.is_online === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
-                                                            <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
-                                                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                                                <div className="mochi-button-base">Chat</div>
-                                                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    } else {
-                                        return (
-                                            <div key={index} className="row-employee" onClick={async () => {
-                                                await setEmployeeSearchCompany({ ...employeeSearchCompany, selectedEmployee: employee });
-                                                setIsEditingEmployee(false);
-                                            }}>
-                                                <div className="employee-avatar-container">
-                                                    <img src={employee.avatar ? props.serverUrl + '/avatars/' + employee.avatar : 'img/avatar-user-default.png'} alt="" />
-                                                </div>
+                            <div className="row-employee-info">
+                                <div className="info-row">
+                                    <div className="info-row-label">Employee Number:</div>
+                                    <div className="info-row-input">
+                                        {employeeSearchCompany?.selectedEmployee?.id !== undefined
+                                            ? 'EM' + employeeSearchCompany?.selectedEmployee.id.toString().padStart(4, '0')
+                                            : ''}
+                                    </div>
+                                </div>
 
-                                                <div className="employee-data">
-                                                    <div className="employee-name">{(employee.prefix || '') + " " + employee.first_name + " " + (employee.middle_name || '') + " " + employee.last_name}</div>
-                                                    <div className="online-status">
-                                                        <div className={employee.is_online === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
-                                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
-                                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                                            <div className="mochi-button-base">Chat</div>
-                                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                })
-                            }
+                                <div className="info-row">
+                                    <div className="info-row-label">E-mail Address:</div>
+                                    <div className="info-row-input">{employeeSearchCompany?.selectedEmployee?.email_work || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Phone Number:</div>
+                                    <div className="info-row-input">
+                                        <div>{employeeSearchCompany?.selectedEmployee?.phone_work || '-'}</div>
+                                        <div><span>ext:</span> {employeeSearchCompany?.selectedEmployee?.phone_ext || '-'}</div>
+                                    </div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Department:</div>
+                                    <div className="info-row-input">{employeeSearchCompany?.selectedEmployee?.department || '-'}</div>
+                                </div>
+
+                                <div className="info-row">
+                                    <div className="info-row-label">Phone Mobile:</div>
+                                    <div className="info-row-input">{employeeSearchCompany?.selectedEmployee?.phone_mobile || '-'}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -418,7 +441,7 @@ const Employees = (props) => {
                                 <div className="employee-name">
                                     {(employeeSearchCompany?.selectedEmployee?.prefix || '') + " " + (employeeSearchCompany?.selectedEmployee?.first_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.middle_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.last_name || '')}
                                 </div>
-                                <div className="employee-code">
+                                {/* <div className="employee-code">
                                     {
                                         (employeeSearchCompany?.selectedEmployee?.id || 0) > 0 &&
                                         <span>
@@ -428,13 +451,39 @@ const Employees = (props) => {
                                         </span>
                                     }
 
+                                </div> */}
+
+                                <div className="employee-company">
+                                    <span>
+                                        {employeeSearchCompany?.selectedEmployee?.id !== undefined ? employeeSearchCompany.name : ''}
+                                    </span>
+
+                                    <span>
+                                        {(employeeSearchCompany?.selectedEmployee?.title || '')}
+                                    </span>
+
+                                    <span>
+                                        {(employeeSearchCompany?.selectedEmployee?.department || '')}
+                                    </span>
                                 </div>
+
                                 <div className="employee-username-info">
-                                    <div className="employee-username">@username</div>
-                                    <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Chat</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    <div className="username-chat">
+                                        <div className="employee-username">@username</div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Chat</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="username-video">
+                                        <div className="employee-username">@username</div>
+                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Video</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -447,7 +496,7 @@ const Employees = (props) => {
                                         disabled={!isEditingEmployee}
                                         checked={isEditingEmployee ? (tempSelectedEmployee.is_primary_admin || 0) === 1 : (employeeSearchCompany?.selectedEmployee?.is_primary_admin || 0) === 1} />
                                     <label htmlFor="cbox-panel-company-employees-primary-btn">
-                                        <div className="label-text">Primary Admin</div>
+                                        <div className="label-text">Admin</div>
                                         <div className="input-toggle-btn"></div>
                                     </label>
                                 </div>
@@ -510,6 +559,42 @@ const Employees = (props) => {
                                         </div>
                                     }
 
+                                </div>
+
+                                <div className="mochi-button" style={{ margin: '5px 0' }} onClick={() => {
+                                    if ((employeeSearchCompany?.selectedEmployee?.id || 0) > 0) {
+                                        let panel = {
+                                            panelName: `${props.panelName}-employee-documents`,
+                                            component: <Documents
+                                                title='Documents'
+                                                tabTimes={426000 + props.tabTimes}
+                                                panelName={`${props.panelName}-employee-documents`}
+                                                origin={props.origin}
+                                                suborigin={'company-employee'}
+                                                openPanel={props.openPanel}
+                                                closePanel={props.closePanel}
+                                                componentId={moment().format('x')}
+                                                selectedOwner={{ ...employeeSearchCompany.selectedEmployee }}
+                                                selectedOwnerDocument={{
+                                                    id: 0,
+                                                    user_id: Math.floor(Math.random() * (15 - 1)) + 1,
+                                                    date_entered: moment().format('MM/DD/YYYY')
+                                                }}
+                                                savingDocumentUrl='/saveEmployeeDocument'
+                                                deletingDocumentUrl='/deleteEmployeeDocument'
+                                                savingDocumentNoteUrl='/saveEmployeeDocumentNote'
+                                                serverDocumentsFolder='/employee-documents/'
+                                            />
+                                        }
+
+                                        props.openPanel(panel, props.origin);
+                                    } else {
+                                        window.alert('You must select an employee first!');
+                                    }
+                                }}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Documents</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             </div>
                         </div>
@@ -899,8 +984,8 @@ const Employees = (props) => {
                             <div className="col-employee-splitter">
 
                             </div>
-                            <div className="col-employee-emails">
-                                <div className="col-title">E-mails</div>
+                            <div className="col-employee-permissions">
+                                <div className="col-title">Permissions</div>
                             </div>
                         </div>
                     </div>

@@ -33,6 +33,31 @@
                 height    : 100%;
                 overflow-y: auto;
 
+                .row-operator-info{                    
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    grid-gap: 15px;
+                    grid-template-rows: auto;
+
+                    .info-row{
+                        .info-row-label{
+                            font-weight: bold;
+                            font-size: 0.9rem;
+                        }
+
+                        .info-row-input{
+                            display: flex;
+                            align-items: center;
+                            
+                            span{
+                                margin-left: 10px;
+                                font-weight: bold;
+                                font-size: 0.9rem;
+                            }
+                        }
+                    }
+                }
+
                 .letter-header {
                     font-size     : 2.5rem;
                     font-family   : 'Mochi Light';
@@ -281,8 +306,9 @@
                     .operator-username-info{
                         flex-grow: 1;
                         display: flex;
-                        flex-direction: column;
-                        justify-content: flex-end;
+                        flex-direction: row;
+                        // justify-content: space-between;
+                        align-items: flex-end;
                         padding-bottom: 15px;
 
                         .operator-username{
@@ -290,6 +316,10 @@
                             font-weight: 600;
                             color: darkgreen;
                             margin-bottom: 5px;
+                        }
+
+                        &>div:not(:first-child){
+                            margin-left: 30px;
                         }
                     }
                 }
@@ -374,7 +404,7 @@
 
                 }
 
-                .col-operator-emails {
+                .col-operator-info {
                     position: relative;
 
                     .col-title {
@@ -386,6 +416,51 @@
                         left           : 0;
                         font-size      : 1rem;
                         font-weight    : bold;
+                    }
+
+                    .operator-info-wrapper{
+                        position  : absolute;
+                        width     : 100%;
+                        height    : 100%;
+                        top       : 0;
+                        left      : 0;
+                        overflow-y: auto;
+                        padding-left: 10px;
+
+                        .field-container {
+                            display       : flex;
+                            flex-direction: column;
+                            margin-bottom : 15px;
+
+                            .field-title {
+                                font-size: 1rem;
+                            }
+
+                            input {
+                                border          : 0;
+                                background-color: transparent;
+                                padding         : 5px 0;
+                                font-family     : 'Mochi Light';
+                                font-size       : 1rem;
+                            }
+
+                            .field-border-bottom {
+                                height                                            : 1px;
+                                /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#999999+0,000000+100&0.65+0,0+100 */
+                                background                                        : -moz-linear-gradient(left, rgba(153, 153, 153, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+                                /* FF3.6-15 */
+                                background                                        : -webkit-linear-gradient(left, rgba(153, 153, 153, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+                                /* Chrome10-25,Safari5.1-6 */
+                                background                                        : linear-gradient(to right, rgba(153, 153, 153, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+                                /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+                                filter                                            : progid:DXImageTransform.Microsoft.gradient(startColorstr='#a6999999', endColorstr='#00000000', GradientType=1);
+                                /* IE6-9 */
+                            }
+
+                            .field-border-bottom.disabled {
+                                background: transparent;
+                            }
+                        }
                     }
                 }
             }

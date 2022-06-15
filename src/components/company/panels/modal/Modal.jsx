@@ -33,6 +33,10 @@ const Modal = (props) => {
 
         $.post(props.serverUrl + props.savingDataUrl, {
             id: props.selectedData.id,
+            employee_id: props.selectedParent.id,
+            agent_id: props.selectedParent.id,
+            driver_id: props.selectedParent.id,
+            operator_id: props.selectedParent.id,
             customer_id: props.selectedParent.id,
             carrier_id: props.selectedParent.id,
             factoring_company_id: props.selectedParent.id,

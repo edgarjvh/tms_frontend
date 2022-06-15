@@ -59,13 +59,13 @@ const Routing = (props) => {
     const [list, setList] = useState([]);
 
     const mapRef = useRef();
-    // const H = window.H;
-    // const platform = new H.service.Platform({
-    //     apikey: "_aKHLFzgJTYQLzsSzVqRKyiKk8iuywH3jbtV8Mxw5Gs",
-    //     app_id: "X4qy0Sva14BQxJCbVqXL"
-    // });
-    // const routingService = platform.getRoutingService();
-    const routingService = {};
+    const H = window.H;
+    const platform = new H.service.Platform({
+        apikey: "_aKHLFzgJTYQLzsSzVqRKyiKk8iuywH3jbtV8Mxw5Gs",
+        app_id: "X4qy0Sva14BQxJCbVqXL"
+    });
+    const routingService = platform.getRoutingService();
+    // const routingService = {};
 
     const [equipmentItems, setEquipmentItems] = useState([]);
     const refEquipmentDropDown = useDetectClickOutside({ onTriggered: async () => { await setEquipmentItems([]) } });

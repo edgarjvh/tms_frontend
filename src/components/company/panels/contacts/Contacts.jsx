@@ -43,10 +43,12 @@ const Contacts = (props) => {
         'disabled': !isEditingContact
     });
 
-    useEffect( async() => {
+    useEffect(async () => {
         setContactSearchCustomer(props.contactSearchCustomer || {});
-        
-        if (props.isEditingContact){
+
+        setTempSelectedContact({ ...props.contactSearchCustomer.selectedContact });
+
+        if (props.isEditingContact) {
             setIsEditingContact(true);
             refPrefix.current.focus({
                 preventScroll: true
@@ -191,20 +193,20 @@ const Contacts = (props) => {
 
         axios.post(props.serverUrl + props.savingContactUrl, tempSelectedContact).then(res => {
             if (res.data.result === 'OK') {
-                if (props.owner === 'customer'){
-                    props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });    
+                if (props.owner === 'customer') {
+                    props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
                     props.setSelectedContact(res.data.contact);
                 }
 
-                if (props.owner === 'carrier'){
-                    props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });    
+                if (props.owner === 'carrier') {
+                    props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });
                     props.setSelectedCarrierContact(res.data.contact);
                 }
 
-                if (props.owner === 'factoring-company'){
-                    props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });    
+                if (props.owner === 'factoring-company') {
+                    props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });
                     props.setSelectedFactoringCompanyContact(res.data.contact);
-                }                
+                }
 
                 setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: res.data.contact, contacts: res.data.contacts });
                 setIsEditingContact(false);
@@ -220,20 +222,20 @@ const Contacts = (props) => {
         if (window.confirm('Are you sure to delete this contact?')) {
             axios.post(props.serverUrl + props.deletingContactUrl, contact).then(res => {
                 if (res.data.result === 'OK') {
-                    if (props.owner === 'customer'){
-                        props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });    
-                        props.setSelectedContact({id: contact.id, deleted: true});
+                    if (props.owner === 'customer') {
+                        props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
+                        props.setSelectedContact({ id: contact.id, deleted: true });
                     }
-    
-                    if (props.owner === 'carrier'){
-                        props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });    
-                        props.setSelectedCarrierContact({id: contact.id, deleted: true});
+
+                    if (props.owner === 'carrier') {
+                        props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });
+                        props.setSelectedCarrierContact({ id: contact.id, deleted: true });
                     }
-    
-                    if (props.owner === 'factoring-company'){
-                        props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });    
-                        props.setSelectedFactoringCompanyContact({id: contact.id, deleted: true});
-                    }     
+
+                    if (props.owner === 'factoring-company') {
+                        props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });
+                        props.setSelectedFactoringCompanyContact({ id: contact.id, deleted: true });
+                    }
 
                     setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: {}, contacts: res.data.contacts });
                     setIsEditingContact(false);
@@ -273,17 +275,17 @@ const Contacts = (props) => {
             axios.post(props.serverUrl + props.uploadAvatarUrl, formData, options)
                 .then(async res => {
                     if (res.data.result === "OK") {
-                        if (props.owner === 'customer'){
-                            props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });    
+                        if (props.owner === 'customer') {
+                            props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
                         }
-        
-                        if (props.owner === 'carrier'){
-                            props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });    
+
+                        if (props.owner === 'carrier') {
+                            props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });
                         }
-        
-                        if (props.owner === 'factoring-company'){
-                            props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });    
-                        }    
+
+                        if (props.owner === 'factoring-company') {
+                            props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });
+                        }
 
                         await setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: res.data.contact, contacts: res.data.contacts });
                     }
@@ -303,17 +305,17 @@ const Contacts = (props) => {
     const removeContactAvatar = (e) => {
         axios.post(props.serverUrl + props.removeAvatarUrl, contactSearchCustomer?.selectedContact).then(async res => {
             if (res.data.result === "OK") {
-                if (props.owner === 'customer'){
-                    props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });    
+                if (props.owner === 'customer') {
+                    props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
                 }
 
-                if (props.owner === 'carrier'){
-                    props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });    
+                if (props.owner === 'carrier') {
+                    props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });
                 }
 
-                if (props.owner === 'factoring-company'){
-                    props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });    
-                }   
+                if (props.owner === 'factoring-company') {
+                    props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });
+                }
 
                 await setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: res.data.contact, contacts: res.data.contacts });
             }
@@ -908,8 +910,26 @@ const Contacts = (props) => {
                 <div className="footer">
                     <div className="left-buttons">
                         <div className="mochi-button" onClick={() => {
-                            setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, customer_id: contactSearchCustomer.id } });
-                            setTempSelectedContact({ id: 0, customer_id: contactSearchCustomer.id });
+                            switch (props.owner) {
+                                case 'customer':
+                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, customer_id: contactSearchCustomer.id } });
+                                    setTempSelectedContact({ id: 0, customer_id: contactSearchCustomer.id });
+                                    break;
+
+                                case 'carrier':
+                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, carrier_id: contactSearchCustomer.id } });
+                                    setTempSelectedContact({ id: 0, carrier_id: contactSearchCustomer.id });
+                                    break;
+
+                                case 'factoring-company':
+                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, factoring_company_id: contactSearchCustomer.id } });
+                                    setTempSelectedContact({ id: 0, factoring_company_id: contactSearchCustomer.id });
+                                    break;
+                                default:
+                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, customer_id: contactSearchCustomer.id } });
+                                    setTempSelectedContact({ id: 0, customer_id: contactSearchCustomer.id });
+                                    break;
+                            }
 
                             setIsEditingContact(true);
                             refPrefix.current.focus();
@@ -959,7 +979,7 @@ export default connect(mapStateToProps, {
     setLoadBoardOpenedPanels,
     setInvoiceOpenedPanels,
     setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,    
+    setAdminCarrierOpenedPanels,
     setSelectedCustomer,
     setSelectedContact,
     setSelectedCarrier,

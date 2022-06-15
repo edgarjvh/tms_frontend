@@ -1898,7 +1898,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-employees`,
                                         component: <Employees
-                                            title='Employees'
+                                            title='Employee'
                                             tabTimes={122000 + props.tabTimes}
                                             panelName={`${props.panelName}-employees`}
                                             savingEmployeeUrl='/saveEmployee'
@@ -1933,7 +1933,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-employees`,
                                         component: <Employees
-                                            title='Employees'
+                                            title='Employee'
                                             tabTimes={122000 + props.tabTimes}
                                             panelName={`${props.panelName}-employees`}
                                             savingEmployeeUrl='/saveEmployee'
@@ -2928,7 +2928,7 @@ function CompanySetup(props) {
                                                         let panel = {
                                                             panelName: `${props.panelName}-employees`,
                                                             component: <Employees
-                                                                title='Employees'
+                                                                title='Employee'
                                                                 tabTimes={122000 + props.tabTimes}
                                                                 panelName={`${props.panelName}-employees`}
                                                                 savingEmployeeUrl='/saveEmployee'
@@ -3077,7 +3077,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-agents`,
                                         component: <Agents
-                                            title='Agents'
+                                            title='Agent'
                                             tabTimes={222000 + props.tabTimes}
                                             panelName={`${props.panelName}-agents`}
                                             savingAgentUrl='/saveAgent'
@@ -3112,7 +3112,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-agents`,
                                         component: <Agents
-                                            title='Agents'
+                                            title='Agent'
                                             tabTimes={222000 + props.tabTimes}
                                             panelName={`${props.panelName}-agents`}
                                             savingAgentUrl='/saveAgent'
@@ -4101,8 +4101,8 @@ function CompanySetup(props) {
                                                         let panel = {
                                                             panelName: `${props.panelName}-agents`,
                                                             component: <Agents
-                                                                title='Agents'
-                                                                tabTimes={122000 + props.tabTimes}
+                                                                title='Agent'
+                                                                tabTimes={222000 + props.tabTimes}
                                                                 panelName={`${props.panelName}-agents`}
                                                                 savingAgentUrl='/saveAgent'
                                                                 deletingAgentUrl='/deleteAgent'
@@ -4250,7 +4250,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-drivers`,
                                         component: <Drivers
-                                            title='Drivers'
+                                            title='Driver'
                                             tabTimes={322000 + props.tabTimes}
                                             panelName={`${props.panelName}-drivers`}
                                             savingDriverUrl='/saveDriver'
@@ -4285,7 +4285,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-drivers`,
                                         component: <Drivers
-                                            title='Drivers'
+                                            title='Driver'
                                             tabTimes={322000 + props.tabTimes}
                                             panelName={`${props.panelName}-drivers`}
                                             savingDriverUrl='/saveDriver'
@@ -5274,8 +5274,8 @@ function CompanySetup(props) {
                                                         let panel = {
                                                             panelName: `${props.panelName}-drivers`,
                                                             component: <Drivers
-                                                                title='Drivers'
-                                                                tabTimes={122000 + props.tabTimes}
+                                                                title='Driver'
+                                                                tabTimes={322000 + props.tabTimes}
                                                                 panelName={`${props.panelName}-drivers`}
                                                                 savingDriverUrl='/saveDriver'
                                                                 deletingDriverUrl='/deleteDriver'
@@ -5423,7 +5423,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-operators`,
                                         component: <Operators
-                                            title='Operators'
+                                            title='Operator'
                                             tabTimes={422000 + props.tabTimes}
                                             panelName={`${props.panelName}-operators`}
                                             savingOperatorUrl='/saveOperator'
@@ -5458,7 +5458,7 @@ function CompanySetup(props) {
                                     let panel = {
                                         panelName: `${props.panelName}-operators`,
                                         component: <Operators
-                                            title='Operators'
+                                            title='Operator'
                                             tabTimes={422000 + props.tabTimes}
                                             panelName={`${props.panelName}-operators`}
                                             savingOperatorUrl='/saveOperator'
@@ -6447,8 +6447,8 @@ function CompanySetup(props) {
                                                         let panel = {
                                                             panelName: `${props.panelName}-operators`,
                                                             component: <Operators
-                                                                title='Operators'
-                                                                tabTimes={122000 + props.tabTimes}
+                                                                title='Operator'
+                                                                tabTimes={422000 + props.tabTimes}
                                                                 panelName={`${props.panelName}-operators`}
                                                                 savingOperatorUrl='/saveOperator'
                                                                 deletingOperatorUrl='/deleteOperator'
