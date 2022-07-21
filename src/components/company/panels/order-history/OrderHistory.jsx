@@ -928,6 +928,7 @@ const OrderHistory = (props) => {
                                                     title='Dispatch'
                                                     tabTimes={1000 + (props.tabTimes || 0)}
                                                     isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
                                                     origin={props.origin}
                                                     openPanel={props.openPanel}
                                                     closePanel={props.closePanel}

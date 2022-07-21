@@ -157,7 +157,7 @@ import {
 
 } from '../../actions/carriersActions';
 
-import { Dispatch, Customers, Carriers } from './../company';
+import { Dispatch, Customers, Carriers, Reports } from './../company';
 import { AdminHome, CompanySetup } from './';
 
 function Admin(props) {
@@ -179,6 +179,7 @@ function Admin(props) {
     const [dispatchPanels, setDispatchPanels] = useState([]);
     const [customerPanels, setCustomerPanels] = useState([]);
     const [carrierPanels, setCarrierPanels] = useState([]);
+    const [reportsPanels, setReportsPanels] = useState([]);
     const [companySetupPanels, setCompanySetupPanels] = useState([]);
 
     const baseWidth = 95;
@@ -247,6 +248,20 @@ function Admin(props) {
         }
 
         props.setCarrierScreenFocused(true);
+    }
+
+    const reportsBtnClick = async () => {
+        let curPages = props.pages;
+
+        if (curPages.indexOf('admin reports') === -1) {
+            await props.setPages([...curPages, 'admin reports']);
+            await props.setSelectedPageIndex(curPages.length);
+
+        } else {
+            await props.setSelectedPageIndex(props.pages.indexOf('admin reports'));
+        }
+
+        props.setReportsScreenFocused(true);
     }
 
     const companySetupBtnClick = async () => {
@@ -378,6 +393,35 @@ function Admin(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
+
+    const reportsPanelTransition = useTransition(reportsPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (reportsPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+                // setCompanySetupPanels([]);
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (reportsPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
@@ -586,8 +630,8 @@ function Admin(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                // 'screen-focused': props.loadBoardScreenFocused
-                            })} onClick={() => { }}>
+                                'screen-focused': props.reportsScreenFocused
+                            })} onClick={reportsBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Reports</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -598,14 +642,6 @@ function Admin(props) {
                             })} onClick={companySetupBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Company Setup</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
-                            <div className={classnames({
-                                'mochi-button': true,
-                                'screen-focused': props.scale !== 1
-                            })} onClick={switchAppBtnClick}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Card View</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -728,7 +764,7 @@ function Admin(props) {
 
                             <Dispatch
                                 pageName={'Dispatch Page'}
-                                panelName={'dispatch'}
+                                panelName={'admin-dispatch'}
                                 tabTimes={111000}
                                 screenFocused={props.dispatchScreenFocused}
                                 componentId={moment().format('x')}
@@ -791,7 +827,7 @@ function Admin(props) {
                             <Customers
                                 pageName={'Customer'}
                                 title={'Customer'}
-                                panelName={'customer'}
+                                panelName={'admin-customer'}
                                 tabTimes={112000}
                                 screenFocused={props.customerScreenFocused}
                                 componentId={moment().format('x')}
@@ -854,7 +890,7 @@ function Admin(props) {
                             <Carriers
                                 pageName={'Carrier'}
                                 title={'Carrier'}
-                                panelName={'carrier'}
+                                panelName={'admin-carrier'}
                                 tabTimes={113000}
                                 screenFocused={props.carrierScreenFocused}
                                 componentId={moment().format('x')}
@@ -874,7 +910,67 @@ function Admin(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}>
+                            {
+                                reportsPanelTransition((style, panel, item, index) => {
+                                    const origin = 'reports';
 
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            // onClick={() => {
+                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                            //     // let _panels = [...props.customerOpenedPanels];
+                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+
+                                            //     // props.setCustomerOpenedPanels(_panels);
+                                            // }}
+                                            >
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
+                            <Reports
+                                pageName={'Reports'}
+                                title={'Reports'}
+                                panelName={'admin-reports'}
+                                tabTimes={5000}
+                                screenFocused={props.reportsScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                isAdmin={false}
+                                origin='reports'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
+                            />
                         </div>
 
                         <div style={{

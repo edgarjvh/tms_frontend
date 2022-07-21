@@ -726,6 +726,7 @@ const LoadBoard = (props) => {
                                                     panelName={`${props.panelName}-dispatch`}
                                                     origin={props.origin}
                                                     isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
                                                     openPanel={props.openPanel}
                                                     closePanel={props.closePanel}
                                                     componentId={moment().format('x')}
@@ -838,6 +839,7 @@ const LoadBoard = (props) => {
                                                     panelName={`${props.panelName}-dispatch`}
                                                     origin={props.origin}
                                                     isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
                                                     openPanel={props.openPanel}
                                                     closePanel={props.closePanel}
                                                     componentId={moment().format('x')}
@@ -951,6 +953,7 @@ const LoadBoard = (props) => {
                                                     panelName={`${props.panelName}-dispatch`}
                                                     origin={props.origin}
                                                     isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
                                                     openPanel={props.openPanel}
                                                     closePanel={props.closePanel}
                                                     componentId={moment().format('x')}
@@ -1216,6 +1219,7 @@ const LoadBoard = (props) => {
                                                         tabTimes={28000 + props.tabTimes}
                                                         componentId={moment().format('x')}
                                                         isOnPanel={true}
+                                                        isAdmin={props.isAdmin}
                                                         origin={props.origin}
                                                         openPanel={props.openPanel}
                                                         closePanel={props.closePanel}
@@ -1373,6 +1377,7 @@ const LoadBoard = (props) => {
                                                         screenFocused={props.carrierScreenFocused}
                                                         componentId={moment().format('x')}
                                                         isOnPanel={true}
+                                                        isAdmin={props.isAdmin}
                                                         origin={props.origin}
                                                         openPanel={props.openPanel}
                                                         closePanel={props.closePanel}
@@ -1651,7 +1656,7 @@ const LoadBoard = (props) => {
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
                                             componentId={moment().format('x')}
-
+                                            isAdmin={props.isAdmin}
                                             selectedOrder={selectedOrder}
                                         />
                                     }
@@ -1779,6 +1784,7 @@ const LoadBoard = (props) => {
                                                         tabTimes={28000 + props.tabTimes}
                                                         componentId={moment().format('x')}
                                                         isOnPanel={true}
+                                                        isAdmin={props.isAdmin}
                                                         origin={props.origin}
                                                         openPanel={props.openPanel}
                                                         closePanel={props.closePanel}
@@ -2102,6 +2108,7 @@ const LoadBoard = (props) => {
                                                         tabTimes={28000 + props.tabTimes}
                                                         componentId={moment().format('x')}
                                                         isOnPanel={true}
+                                                        isAdmin={props.isAdmin}
                                                         origin={props.origin}
                                                         openPanel={props.openPanel}
                                                         closePanel={props.closePanel}

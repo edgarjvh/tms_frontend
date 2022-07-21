@@ -798,7 +798,7 @@ const Operators = (props) => {
                                     <div className="info-row-label">O/O Number:</div>
                                     <div className="info-row-input">
                                         {operatorSearchCompany?.selectedOperator?.id !== undefined
-                                            ? 'OO' + operatorSearchCompany?.selectedOperator.id.toString().padStart(4, '0')
+                                            ? 'OP' + operatorSearchCompany?.selectedOperator.id.toString().padStart(4, '0')
                                             : ''}
                                     </div>
                                 </div>
@@ -942,7 +942,7 @@ const Operators = (props) => {
                                         (operatorSearchCompany?.selectedOperator?.id || 0) > 0 &&
                                         <span>
                                             {operatorSearchCompany?.selectedOperator?.id !== undefined
-                                                ? 'OO' + operatorSearchCompany?.selectedOperator.id.toString().padStart(4, '0')
+                                                ? 'OP' + operatorSearchCompany?.selectedOperator.id.toString().padStart(4, '0')
                                                 : ''}
                                         </span>
                                     }

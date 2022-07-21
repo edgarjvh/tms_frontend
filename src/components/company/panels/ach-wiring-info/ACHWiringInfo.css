@@ -36,6 +36,12 @@
   justify-content: center;
   align-items: center;
 }
+.ach-wiring-info-content .form-container .form-bordered-box .input-radio-container input {
+  margin: 0;
+}
+.ach-wiring-info-content .form-container .form-bordered-box .input-radio-container label {
+  font-size: 16px;
+}
 .ach-wiring-info-content .form-container .form-title {
   font-size: 0.7rem;
 }

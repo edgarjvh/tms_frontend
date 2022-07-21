@@ -14,7 +14,7 @@ import axios from 'axios';
 import { useTransition, animated } from 'react-spring';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
-
+import Highlighter from "react-highlight-words";
 import ToPrint from './ToPrint.jsx';
 import { useReactToPrint } from 'react-to-print';
 
@@ -60,6 +60,7 @@ const Customers = (props) => {
     const [contactSearch, setContactSearch] = useState({});
     const [showingContactList, setShowingContactList] = useState(true);
     const [isFromItself, setIsFromItself] = useState(false);
+    const [term, setTerm] = useState({});
 
     const refCustomerEmail = useRef();
     const [showCustomerEmailCopyBtn, setShowCustomerEmailCopyBtn] = useState(false);
@@ -136,6 +137,16 @@ const Customers = (props) => {
     const [tempLoaded, setTempLoaded] = useState(false);
     const [tempEmpty, setTempEmpty] = useState(false);
 
+    const refDivision = useRef();
+    const [divisionItems, setDivisionItems] = useState([]);
+    const refDivisionDropDown = useDetectClickOutside({ onTriggered: async () => { await setDivisionItems([]); } });
+    const refDivisionPopupItems = useRef([]);
+
+    const refTerms = useRef();
+    const [termsItems, setTermsItems] = useState([]);
+    const refTermsDropDown = useDetectClickOutside({ onTriggered: async () => { await setTermsItems([]); } });
+    const refTermsPopupItems = useRef([]);
+
 
     const loadingTransition = useTransition(isLoading, {
         from: { opacity: 0, display: 'block' },
@@ -173,6 +184,14 @@ const Customers = (props) => {
         leave: { opacity: 0, top: 'calc(100% + 7px)' },
         config: { duration: 100 },
         reverse: showMailingContactEmails
+    });
+
+    const divisionTransition = useTransition(divisionItems.length > 0, {
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
+        reverse: divisionItems.length > 0
     });
 
     const customerContactPhonesTransition = useTransition(showCustomerContactPhones, {
@@ -229,6 +248,14 @@ const Customers = (props) => {
         leave: { opacity: 0 },
         reverse: selectedDirection?.id !== undefined,
         config: { duration: 100 }
+    });
+
+    const termsTransition = useTransition(termsItems.length > 0, {
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
+        reverse: termsItems.length > 0
     });
 
 
@@ -443,6 +470,9 @@ const Customers = (props) => {
                 if (mailing_address.id === undefined) {
                     mailing_address.id = 0;
                 }
+
+                console.log(mailing_address);
+
                 mailing_address.customer_id = selectedCustomer.id;
 
                 if (
@@ -467,26 +497,26 @@ const Customers = (props) => {
                     let newCode = (mailing_address.name || '').trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + (mailing_address.state || '').trim().replace(/\s/g, "").substring(0, 2);
 
                     mailing_address.code = newCode.toUpperCase();
-
-                    axios.post(props.serverUrl + '/saveCustomerMailingAddress', mailing_address).then(res => {
-                        if (res.data.result === 'OK') {
-                            setSelectedCustomer({ ...selectedCustomer, mailing_address: res.data.mailing_address });
-
-                            props.setSelectedCustomer({
-                                ...selectedCustomer,
-                                mailing_address: res.data.mailing_address,
-                                component_id: props.componentId
-                            });
-                        }
-
-                        setIsSavingMailingAddress(false);
-                    }).catch(e => {
-                        console.log('error on saving customer mailing address', e);
-                        setIsSavingMailingAddress(false);
-                    });
-                } else {
-                    setIsSavingMailingAddress(false);
                 }
+
+                axios.post(props.serverUrl + '/saveCustomerMailingAddress', mailing_address).then(res => {
+                    if (res.data.result === 'OK') {
+                        setSelectedCustomer({ ...selectedCustomer, mailing_address: res.data.mailing_address });
+
+                        props.setSelectedCustomer({
+                            ...selectedCustomer,
+                            mailing_address: res.data.mailing_address,
+                            component_id: props.componentId
+                        });
+                    }
+
+                    setIsSavingMailingAddress(false);
+                }).catch(e => {
+                    console.log('error on saving customer mailing address', e);
+                    setIsSavingMailingAddress(false);
+                });
+            } else {
+                setIsSavingMailingAddress(false);
             }
         }
     }, [isSavingMailingAddress]);
@@ -894,7 +924,7 @@ const Customers = (props) => {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-
+                isAdmin={props.isAdmin}
                 selectedCustomer={selectedCustomer}
             />
         }
@@ -914,7 +944,7 @@ const Customers = (props) => {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-
+                isAdmin={props.isAdmin}
                 selectedCustomer={selectedCustomer}
             />
         }
@@ -1423,7 +1453,8 @@ const Customers = (props) => {
                                         }}
                                         value={
                                             (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.contact_name || '')
+                                                // ? (selectedCustomer?.contact_name || '')
+                                                ? ''
                                                 : selectedCustomer?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCustomer?.contacts.find(c => c.is_primary === 1).last_name
                                         }
                                     />
@@ -1447,7 +1478,8 @@ const Customers = (props) => {
                                         }}
                                         value={
                                             (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.contact_phone || '')
+                                                // ? (selectedCustomer?.contact_phone || '')
+                                                ? ''
                                                 : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
                                                     ? selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_work
                                                     : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
@@ -1488,7 +1520,8 @@ const Customers = (props) => {
                                         }}
                                         value={
                                             (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.ext || '')
+                                                // ? (selectedCustomer?.ext || '')
+                                                ? ''
                                                 : selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_ext
                                         }
                                     />
@@ -1534,7 +1567,8 @@ const Customers = (props) => {
                                         }}
                                         value={
                                             (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.email || '')
+                                                // ? (selectedCustomer?.email || '')
+                                                ? ''
                                                 : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                                     ? selectedCustomer?.contacts.find(c => c.is_primary === 1).email_work
                                                     : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
@@ -2444,7 +2478,7 @@ const Customers = (props) => {
                                     onMouseLeave={() => {
                                         setShowMailingContactEmailCopyBtn(false);
                                     }}>
-                                        
+
                                     <div className="select-box-wrapper">
                                         <input tabIndex={28 + props.tabTimes} type="text" placeholder="E-Mail"
                                             ref={refMailingContactEmail}
@@ -2780,34 +2814,415 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={33 + props.tabTimes} type="text" placeholder="Division"
-                                        readOnly={!props.isAdmin}
-                                        onInput={e => {
-                                            setSelectedCustomer(selectedCustomer => {
-                                                return {
-                                                    ...selectedCustomer,
-                                                    mailing_address: {
-                                                        ...selectedCustomer?.mailing_address,
-                                                        division: e.target.value
+                                <div className="select-box-container grow">
+
+                                    <div className="select-box-wrapper">
+                                        <input
+                                            type="text"
+                                            readOnly={!props.isAdmin}
+                                            tabIndex={33 + props.tabTimes}
+                                            placeholder="Division"
+                                            ref={refDivision}
+                                            onKeyDown={async (e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (!props.isAdmin) {
+                                                    e.preventDefault();
+                                                } else {
+                                                    switch (key) {
+                                                        case 37: case 38: // arrow left | arrow up
+                                                            e.preventDefault();
+                                                            if (divisionItems.length > 0) {
+                                                                let selectedIndex = divisionItems.findIndex((item) => item.selected);
+
+                                                                if (selectedIndex === -1) {
+                                                                    await setDivisionItems(
+                                                                        divisionItems.map((item, index) => {
+                                                                            item.selected = index === 0;
+                                                                            return item;
+                                                                        })
+                                                                    );
+                                                                } else {
+                                                                    await setDivisionItems(
+                                                                        divisionItems.map((item, index) => {
+                                                                            if (selectedIndex === 0) {
+                                                                                item.selected =
+                                                                                    index === divisionItems.length - 1;
+                                                                            } else {
+                                                                                item.selected =
+                                                                                    index === selectedIndex - 1;
+                                                                            }
+                                                                            return item;
+                                                                        })
+                                                                    );
+                                                                }
+
+                                                                refDivisionPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            } else {
+                                                                axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        await setDivisionItems(res.data.divisions.map((item, index) => {
+                                                                            item.selected =
+                                                                                (selectedCustomer?.mailing_address?.division?.id ||
+                                                                                    0) === 0
+                                                                                    ? index === 0
+                                                                                    : item.id ===
+                                                                                    selectedCustomer.mailing_address.division.id;
+                                                                            return item;
+                                                                        }));
+
+                                                                        refDivisionPopupItems.current.map((r, i) => {
+                                                                            if (r && r.classList.contains("selected")) {
+                                                                                r.scrollIntoView({
+                                                                                    behavior: "auto",
+                                                                                    block: "center",
+                                                                                    inline: "nearest",
+                                                                                });
+                                                                            }
+                                                                            return true;
+                                                                        });
+                                                                    }
+                                                                }).catch(async (e) => {
+                                                                    console.log("error getting divisions", e);
+                                                                });
+                                                            }
+                                                            break;
+
+                                                        case 39: case 40: // arrow right | arrow down
+                                                            e.preventDefault();
+                                                            if (divisionItems.length > 0) {
+                                                                let selectedIndex = divisionItems.findIndex((item) => item.selected);
+
+                                                                if (selectedIndex === -1) {
+                                                                    await setDivisionItems(divisionItems.map((item, index) => {
+                                                                        item.selected = index === 0;
+                                                                        return item;
+                                                                    }));
+                                                                } else {
+                                                                    await setDivisionItems(divisionItems.map((item, index) => {
+                                                                        if (selectedIndex === divisionItems.length - 1) {
+                                                                            item.selected = index === 0;
+                                                                        } else {
+                                                                            item.selected = index === selectedIndex + 1;
+                                                                        }
+                                                                        return item;
+                                                                    }));
+                                                                }
+
+                                                                refDivisionPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            } else {
+                                                                axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        await setDivisionItems(res.data.divisions.map(
+                                                                            (item, index) => {
+                                                                                item.selected =
+                                                                                    (selectedCustomer?.mailing_address?.division?.id ||
+                                                                                        0) === 0
+                                                                                        ? index === 0
+                                                                                        : item.id ===
+                                                                                        selectedCustomer?.mailing_address?.division.id;
+                                                                                return item;
+                                                                            }
+                                                                        )
+                                                                        );
+
+                                                                        refDivisionPopupItems.current.map((r, i) => {
+                                                                            if (r && r.classList.contains("selected")) {
+                                                                                r.scrollIntoView({
+                                                                                    behavior: "auto",
+                                                                                    block: "center",
+                                                                                    inline: "nearest",
+                                                                                });
+                                                                            }
+                                                                            return true;
+                                                                        });
+                                                                    }
+                                                                }).catch(async (e) => {
+                                                                    console.log("error getting divisions", e);
+                                                                });
+                                                            }
+                                                            break;
+
+                                                        case 27: // escape
+                                                            setDivisionItems([]);
+                                                            break;
+
+                                                        case 13: // enter
+                                                            if (divisionItems.length > 0 && divisionItems.findIndex((item) => item.selected) > -1) {
+                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                    return {
+                                                                        ...selectedCustomer,
+                                                                        mailing_address: {
+                                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                                            division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                                            division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
+                                                                        }
+                                                                    }
+                                                                })
+
+                                                                validateMailingAddressForSaving({ keyCode: 9 });
+                                                                setDivisionItems([]);
+                                                                refDivision.current.focus();
+                                                            }
+                                                            break;
+
+                                                        case 9: // tab
+                                                            if (divisionItems.length > 0) {
+                                                                e.preventDefault();
+                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                    return {
+                                                                        ...selectedCustomer,
+                                                                        mailing_address: {
+                                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                                            division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                                            division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
+                                                                        }
+                                                                    }
+                                                                })
+
+                                                                validateMailingAddressForSaving({ keyCode: 9 });
+                                                                setDivisionItems([]);
+                                                                refDivision.current.focus();
+                                                            }
+                                                            break;
+
+                                                        default:
+                                                            break;
                                                     }
                                                 }
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedCustomer(selectedCustomer => {
-                                                return {
-                                                    ...selectedCustomer,
-                                                    mailing_address: {
-                                                        ...selectedCustomer?.mailing_address,
-                                                        division: e.target.value
-                                                    }
+                                            }}
+                                            onBlur={async () => {
+                                                if ((selectedCustomer?.mailing_address?.division?.id || 0) === 0) {
+                                                    await setSelectedCustomer(selectedCustomer => {
+                                                        return {
+                                                            ...selectedCustomer,
+                                                            mailing_address: {
+                                                                ...(selectedCustomer?.mailing_address || {}),
+                                                                division: {},
+                                                                division_id: null
+                                                            }
+                                                        }
+                                                    })
                                                 }
-                                            })
-                                        }}
-                                        value={selectedCustomer?.mailing_address?.division || ''}
-                                    />
+                                            }}
+                                            onInput={async (e) => {
+                                                let division = selectedCustomer?.mailing_address?.division || {};
+
+                                                division.id = 0;
+                                                division.name = e.target.value;
+
+                                                await setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        mailing_address: {
+                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                            division: division,
+                                                            division_id: division.id
+                                                        }
+                                                    }
+                                                })
+
+                                                if (e.target.value.trim() === "") {
+                                                    setDivisionItems([]);
+                                                } else {
+                                                    axios.post(props.serverUrl + "/getDivisions", { name: e.target.value.trim() }).then(async (res) => {
+                                                        if (res.data.result === "OK") {
+                                                            await setDivisionItems(
+                                                                res.data.divisions.map((item, index) => {
+                                                                    item.selected = (selectedCustomer?.mailing_address?.division?.id || 0) === 0
+                                                                        ? index === 0
+                                                                        : item.id ===
+                                                                        selectedCustomer.mailing_address.division.id;
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+                                                    }).catch(async (e) => {
+                                                        console.log("error getting divisions", e);
+                                                    });
+                                                }
+                                            }}
+                                            onChange={async (e) => {
+                                                let division = selectedCustomer?.mailing_address?.division || {};
+
+                                                division.id = 0;
+                                                division.name = e.target.value;
+
+                                                await setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        mailing_address: {
+                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                            division: division,
+                                                            division_id: division.id
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                            value={selectedCustomer?.mailing_address?.division?.name || ""}
+                                        />
+                                        {
+                                            props.isAdmin &&
+                                            <FontAwesomeIcon
+                                                className="dropdown-button"
+                                                icon={faCaretDown}
+                                                style={{
+                                                    pointerEvents: props.isAdmin ? 'all' : 'none'
+                                                }}
+                                                onClick={() => {
+                                                    if (divisionItems.length > 0) {
+                                                        setDivisionItems([]);
+                                                    } else {
+                                                        if ((selectedCustomer?.mailing_address?.division?.id || 0) === 0 && (selectedCustomer?.mailing_address?.division?.name || "") !== "") {
+                                                            axios.post(props.serverUrl + "/getDivisions", { name: selectedCustomer.mailing_address.division.name }).then(async (res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    await setDivisionItems(res.data.divisions.map((item, index) => {
+                                                                        item.selected = (selectedCustomer?.mailing_address?.division?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCustomer.mailing_address.division.id;
+                                                                        return item;
+                                                                    }));
+
+                                                                    refDivisionPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(async (e) => {
+                                                                console.log("error getting divisions", e);
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    await setDivisionItems(res.data.divisions.map((item, index) => {
+                                                                        item.selected = (selectedCustomer?.mailing_address?.division?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCustomer.mailing_address.division.id;
+                                                                        return item;
+                                                                    }));
+
+                                                                    refDivisionPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(async (e) => {
+                                                                console.log("error getting divisions", e);
+                                                            });
+                                                        }
+                                                    }
+
+                                                    refDivision.current.focus();
+                                                }}
+                                            />
+                                        }
+                                    </div>
+
+                                    {
+                                        divisionTransition((style, item) => item && (
+                                            <animated.div
+                                                className="mochi-contextual-container"
+                                                id="mochi-contextual-container-division"
+                                                style={{
+                                                    ...style,
+                                                    left: "-50%",
+                                                    display: "block",
+                                                }}
+                                                ref={refDivisionDropDown}>
+
+                                                <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
+                                                    <div className="mochi-contextual-popup-content">
+                                                        <div className="mochi-contextual-popup-wrapper">
+                                                            {divisionItems.map((item, index) => {
+                                                                const mochiItemClasses = classnames({
+                                                                    "mochi-item": true,
+                                                                    selected: item.selected,
+                                                                });
+
+                                                                const searchValue = (selectedCustomer?.mailing_address?.division?.id || 0) === 0 && (selectedCustomer?.mailing_address?.division?.name || "") !== ""
+                                                                    ? selectedCustomer?.mailing_address?.division?.name
+                                                                    : undefined;
+
+                                                                return (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={mochiItemClasses}
+                                                                        id={item.id}
+                                                                        onClick={() => {
+                                                                            setSelectedCustomer(selectedCustomer => {
+                                                                                return {
+                                                                                    ...selectedCustomer,
+                                                                                    mailing_address: {
+                                                                                        ...(selectedCustomer?.mailing_address || {}),
+                                                                                        division: item,
+                                                                                        division_id: item.id
+                                                                                    }
+                                                                                }
+                                                                            })
+
+                                                                            window.setTimeout(() => {
+                                                                                validateMailingAddressForSaving({ keyCode: 9 });
+                                                                                setDivisionItems([]);
+                                                                                refDivision.current.focus();
+                                                                            }, 0);
+                                                                        }}
+                                                                        ref={(ref) => refDivisionPopupItems.current.push(ref)}
+                                                                    >
+                                                                        {searchValue === undefined ? (item.name) : (
+                                                                            <Highlighter
+                                                                                highlightClassName="mochi-item-highlight-text"
+                                                                                searchWords={[searchValue]}
+                                                                                autoEscape={true}
+                                                                                textToHighlight={item.name}
+                                                                            />
+                                                                        )}
+                                                                        {item.selected && (
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </animated.div>
+                                        ))
+                                    }
                                 </div>
+
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
@@ -2911,26 +3326,368 @@ const Customers = (props) => {
                             </div>
 
                             <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={37 + props.tabTimes} type="text" placeholder="Invoicing Terms" readOnly={!props.isAdmin}
-                                        onInput={e => {
-                                            setSelectedCustomer(selectedCustomer => {
-                                                return {
-                                                    ...selectedCustomer,
-                                                    invoicing_terms: e.target.value
+                                <div className="select-box-container" style={{ position: 'relative', flexGrow: 1 }}>
+                                    <div className="select-box-wrapper">
+                                        <input type="text" placeholder="Invoicing Terms"
+                                            readOnly={!props.isAdmin}
+                                            tabIndex={37 + props.tabTimes}
+                                            ref={refTerms}
+                                            onKeyDown={async (e) => {
+                                                let key = e.keyCode || e.which;
+                                                if (!props.isAdmin) {
+                                                    e.preventDefault();
+                                                } else {
+                                                    switch (key) {
+                                                        case 37: case 38: // arrow left | arrow up
+                                                            e.preventDefault();
+                                                            if (termsItems.length > 0) {
+                                                                let selectedIndex = termsItems.findIndex(item => item.selected);
+
+                                                                if (selectedIndex === -1) {
+                                                                    await setTermsItems(termsItems.map((item, index) => {
+                                                                        item.selected = index === 0;
+                                                                        return item;
+                                                                    }))
+                                                                } else {
+                                                                    await setTermsItems(termsItems.map((item, index) => {
+                                                                        if (selectedIndex === 0) {
+                                                                            item.selected = index === (termsItems.length - 1);
+                                                                        } else {
+                                                                            item.selected = index === (selectedIndex - 1)
+                                                                        }
+                                                                        return item;
+                                                                    }))
+                                                                }
+
+                                                                refTermsPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            } else {
+                                                                axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                                    if (res.data.result === 'OK') {
+                                                                        await setTermsItems(res.data.terms.map((item, index) => {
+                                                                            item.selected = (selectedCustomer?.term?.id || 0) === 0
+                                                                                ? index === 0
+                                                                                : item.id === selectedCustomer?.term?.id
+                                                                            return item;
+                                                                        }))
+
+                                                                        refTermsPopupItems.current.map((r, i) => {
+                                                                            if (r && r.classList.contains('selected')) {
+                                                                                r.scrollIntoView({
+                                                                                    behavior: 'auto',
+                                                                                    block: 'center',
+                                                                                    inline: 'nearest'
+                                                                                })
+                                                                            }
+                                                                            return true;
+                                                                        });
+                                                                    }
+                                                                }).catch(async e => {
+                                                                    console.log('error getting terms', e);
+                                                                })
+                                                            }
+                                                            break;
+
+                                                        case 39: case 40: // arrow right | arrow down
+                                                            e.preventDefault();
+                                                            if (termsItems.length > 0) {
+                                                                let selectedIndex = termsItems.findIndex(item => item.selected);
+
+                                                                if (selectedIndex === -1) {
+                                                                    await setTermsItems(termsItems.map((item, index) => {
+                                                                        item.selected = index === 0;
+                                                                        return item;
+                                                                    }))
+                                                                } else {
+                                                                    await setTermsItems(termsItems.map((item, index) => {
+                                                                        if (selectedIndex === (termsItems.length - 1)) {
+                                                                            item.selected = index === 0;
+                                                                        } else {
+                                                                            item.selected = index === (selectedIndex + 1)
+                                                                        }
+                                                                        return item;
+                                                                    }))
+                                                                }
+
+                                                                refTermsPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            } else {
+                                                                axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                                    if (res.data.result === 'OK') {
+                                                                        await setTermsItems(res.data.terms.map((item, index) => {
+                                                                            item.selected = (selectedCustomer?.term?.id || 0) === 0
+                                                                                ? index === 0
+                                                                                : item.id === selectedCustomer?.term?.id
+                                                                            return item;
+                                                                        }))
+
+                                                                        refTermsPopupItems.current.map((r, i) => {
+                                                                            if (r && r.classList.contains('selected')) {
+                                                                                r.scrollIntoView({
+                                                                                    behavior: 'auto',
+                                                                                    block: 'center',
+                                                                                    inline: 'nearest'
+                                                                                })
+                                                                            }
+                                                                            return true;
+                                                                        });
+                                                                    }
+                                                                }).catch(async e => {
+                                                                    console.log('error getting terms', e);
+                                                                })
+                                                            }
+                                                            break;
+
+                                                        case 27: // escape
+                                                            setTermsItems([]);
+                                                            break;
+
+                                                        case 13: // enter
+                                                            if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
+                                                                setSelectedCustomer(selectedCustomer => {
+                                                                    return {
+                                                                        ...selectedCustomer,
+                                                                        term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                                        term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                                    }
+                                                                })
+
+                                                                validateCustomerForSaving({ keyCode: 9 });
+                                                                setTermsItems([]);
+                                                                refTerms.current.focus();
+                                                            }
+                                                            break;
+
+                                                        case 9: // tab
+                                                            if (termsItems.length > 0) {
+                                                                e.preventDefault();
+                                                                setSelectedCustomer(selectedCustomer => {
+                                                                    return {
+                                                                        ...selectedCustomer,
+                                                                        term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                                        term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                                    }
+                                                                })
+
+                                                                validateCustomerForSaving({ keyCode: 9 });
+                                                                setTermsItems([]);
+                                                                refTerms.current.focus();
+                                                            }
+                                                            break;
+
+                                                        default:
+                                                            break;
+                                                    }
                                                 }
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedCustomer(selectedCustomer => {
-                                                return {
-                                                    ...selectedCustomer,
-                                                    invoicing_terms: e.target.value
+                                            }}
+                                            onBlur={async () => {
+                                                if ((selectedCustomer?.term?.id || 0) === 0) {
+                                                    await setSelectedCustomer(selectedCustomer => {
+                                                        return {
+                                                            ...selectedCustomer,
+                                                            term: {},
+                                                            term_id: null
+                                                        }
+                                                    })
                                                 }
-                                            })
-                                        }}
-                                        value={selectedCustomer?.invoicing_terms || ''}
-                                    />
+                                            }}
+                                            onInput={async (e) => {
+                                                let term = selectedCustomer?.division || {};
+
+                                                term.id = 0;
+                                                term.name = e.target.value;
+
+                                                await setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        term: term,
+                                                        term_id: term.id
+                                                    }
+                                                })
+
+                                                if (e.target.value.trim() === '') {
+                                                    setTermsItems([]);
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getTerms', { name: e.target.value.trim() }).then(async res => {
+                                                        if (res.data.result === 'OK') {
+                                                            await setTermsItems(res.data.terms.map((item, index) => {
+                                                                item.selected = (selectedCustomer?.term?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedCustomer?.term?.id
+                                                                return item;
+                                                            }))
+                                                        }
+                                                    }).catch(async e => {
+                                                        console.log('error getting terms', e);
+                                                    })
+                                                }
+                                            }}
+                                            onChange={async (e) => {
+                                                let term = selectedCustomer?.division || {};
+
+                                                term.id = 0;
+                                                term.name = e.target.value;
+
+                                                await setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        term: term,
+                                                        term_id: term.id
+                                                    }
+                                                })
+                                            }}
+                                            value={selectedCustomer?.term?.name || ''}
+                                        />
+                                        {
+                                            props.isAdmin &&
+                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={(e) => {
+                                                if (termsItems.length > 0) {
+                                                    setTermsItems([]);
+                                                } else {
+                                                    if ((selectedCustomer?.term?.id || 0) === 0 && (selectedCustomer?.term?.name || '') !== '') {
+                                                        axios.post(props.serverUrl + '/getTerms', {
+                                                            name: selectedCustomer?.term?.name
+                                                        }).then(async res => {
+                                                            if (res.data.result === 'OK') {
+                                                                await setTermsItems(res.data.terms.map((item, index) => {
+                                                                    item.selected = (selectedCustomer?.term?.id || 0) === 0
+                                                                        ? index === 0
+                                                                        : item.id === selectedCustomer?.term?.id
+                                                                    return item;
+                                                                }))
+
+                                                                refTermsPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }).catch(async e => {
+                                                            console.log('error getting terms', e);
+                                                        })
+                                                    } else {
+                                                        axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                            if (res.data.result === 'OK') {
+                                                                await setTermsItems(res.data.terms.map((item, index) => {
+                                                                    item.selected = (selectedCustomer?.term?.id || 0) === 0
+                                                                        ? index === 0
+                                                                        : item.id === selectedCustomer?.term?.id
+                                                                    return item;
+                                                                }))
+
+                                                                refTermsPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }).catch(async e => {
+                                                            console.log('error getting terms', e);
+                                                        })
+                                                    }
+                                                }
+
+                                                refTerms.current.focus();
+                                            }} />
+                                        }
+                                    </div>
+                                    {
+                                        termsTransition((style, item) => item && (
+                                            <animated.div
+                                                className="mochi-contextual-container"
+                                                id="mochi-contextual-container-terms"
+                                                style={{
+                                                    ...style,
+                                                    left: "-50%",
+                                                    display: "block",
+                                                }}
+                                                ref={refTermsDropDown}
+                                            >
+                                                <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
+                                                    <div className="mochi-contextual-popup-content" >
+                                                        <div className="mochi-contextual-popup-wrapper">
+                                                            {
+                                                                termsItems.map((item, index) => {
+                                                                    const mochiItemClasses = classnames({
+                                                                        'mochi-item': true,
+                                                                        'selected': item.selected
+                                                                    });
+
+                                                                    const searchValue = (selectedCustomer?.term?.id || 0) === 0 && (selectedCustomer?.term?.name || '') !== ''
+                                                                        ? selectedCustomer?.term?.name : undefined;
+
+                                                                    return (
+                                                                        <div
+                                                                            key={index}
+                                                                            className={mochiItemClasses}
+                                                                            id={item.id}
+                                                                            onClick={() => {
+                                                                                setSelectedCustomer(selectedCustomer => {
+                                                                                    return {
+                                                                                        ...selectedCustomer,
+                                                                                        term: item,
+                                                                                        term_id: item.id
+                                                                                    }
+                                                                                })
+
+                                                                                window.setTimeout(() => {
+                                                                                    validateCustomerForSaving({ keyCode: 9 });
+                                                                                    setTermsItems([]);
+                                                                                    refTerms.current.focus();
+                                                                                }, 0);
+                                                                            }}
+                                                                            ref={ref => refTermsPopupItems.current.push(ref)}
+                                                                        >
+                                                                            {
+                                                                                searchValue === undefined
+                                                                                    ? item.name
+                                                                                    : <Highlighter
+                                                                                        highlightClassName="mochi-item-highlight-text"
+                                                                                        searchWords={[searchValue]}
+                                                                                        autoEscape={true}
+                                                                                        textToHighlight={item.name}
+                                                                                    />
+                                                                            }
+                                                                            {
+                                                                                item.selected &&
+                                                                                <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            }
+                                                                        </div>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </animated.div>
+                                        ))
+                                    }
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
@@ -3069,7 +3826,14 @@ const Customers = (props) => {
 
                                                 contactSearchCustomer={{
                                                     ...selectedCustomer,
-                                                    selectedContact: selectedContact
+                                                    selectedContact: {
+                                                        ...selectedContact,
+                                                        address1: (selectedCustomer?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedCustomer?.address1 || '') : (selectedContact?.address1 || ''),
+                                                        address2: (selectedCustomer?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedCustomer?.address2 || '') : (selectedContact?.address2 || ''),
+                                                        city: (selectedCustomer?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedCustomer?.city || '') : (selectedContact?.city || ''),
+                                                        state: (selectedCustomer?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedCustomer?.state || '') : (selectedContact?.state || ''),
+                                                        zip_code: (selectedCustomer?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedCustomer?.zip || '') : (selectedContact?.zip_code || ''),
+                                                    }
                                                 }}
                                             />
                                         }
@@ -3745,47 +4509,79 @@ const Customers = (props) => {
                                                 }
                                             }}
                                             onInput={(e) => {
-                                                switch (selectedContact?.primary_email) {
-                                                    case 'work':
+                                                if ((selectedContact?.id || 0) === 0) {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_work: e.target.value,
+                                                        primary_email: 'work'
+                                                    });
+                                                } else {
+                                                    if ((selectedContact?.primary_email || '') === '') {
                                                         setSelectedContact({
                                                             ...selectedContact,
-                                                            email_work: e.target.value
+                                                            email_work: e.target.value,
+                                                            primary_email: 'work'
                                                         });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_personal: e.target.value
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_other: e.target.value
-                                                        });
-                                                        break;
+                                                    } else {
+                                                        switch (selectedContact?.primary_email) {
+                                                            case 'work':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    email_work: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'personal':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    email_personal: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'other':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    email_other: e.target.value
+                                                                });
+                                                                break;
+                                                        }
+                                                    }
                                                 }
                                             }}
                                             onChange={(e) => {
-                                                switch (selectedContact?.primary_email) {
-                                                    case 'work':
+                                                if ((selectedContact?.id || 0) === 0) {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_work: e.target.value,
+                                                        primary_email: 'work'
+                                                    });
+                                                } else {
+                                                    if ((selectedContact?.primary_email || '') === '') {
                                                         setSelectedContact({
                                                             ...selectedContact,
-                                                            email_work: e.target.value
+                                                            email_work: e.target.value,
+                                                            primary_email: 'work'
                                                         });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_personal: e.target.value
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_other: e.target.value
-                                                        });
-                                                        break;
+                                                    } else {
+                                                        switch (selectedContact?.primary_email) {
+                                                            case 'work':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    email_work: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'personal':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    email_personal: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'other':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    email_other: e.target.value
+                                                                });
+                                                                break;
+                                                        }
+                                                    }
                                                 }
                                             }}
                                             value={
@@ -4079,7 +4875,7 @@ const Customers = (props) => {
                                             <SwiperSlide>
                                                 <input type="text"
                                                     tabIndex={29 + props.tabTimes}
-                                                    placeholder="E-mail To"
+                                                    placeholder="E-Mail To"
                                                     ref={refAutomaticEmailsTo}
                                                     onKeyDown={async (e) => {
                                                         let key = e.keyCode || e.which;
@@ -4446,7 +5242,7 @@ const Customers = (props) => {
                                             <SwiperSlide>
                                                 <input type="text"
                                                     tabIndex={30 + props.tabTimes}
-                                                    placeholder="E-mail Cc"
+                                                    placeholder="E-Mail Cc"
                                                     ref={refAutomaticEmailsCc}
                                                     onKeyDown={async (e) => {
                                                         let key = e.keyCode || e.which;
@@ -4818,7 +5614,7 @@ const Customers = (props) => {
                                             <SwiperSlide>
                                                 <input type="text"
                                                     tabIndex={31 + props.tabTimes}
-                                                    placeholder="E-mail Bcc"
+                                                    placeholder="E-Mail Bcc"
                                                     ref={refAutomaticEmailsBcc}
                                                     onKeyDown={async (e) => {
                                                         let key = e.keyCode || e.which;
@@ -5587,9 +6383,16 @@ const Customers = (props) => {
                                 <div className="form-title">Notes</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => setSelectedNote({ id: 0, customer_id: selectedCustomer?.id })}>
+                                    <div className="mochi-button" onClick={() => {
+                                        if ((selectedCustomer?.id || 0) === 0) {
+                                            window.alert('You must select a customer first!');
+                                            return;
+                                        }
+
+                                        setSelectedNote({ id: 0, customer_id: selectedCustomer.id })
+                                    }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Add note</div>
+                                        <div className="mochi-button-base">Add Note</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                     <div className="mochi-button" onClick={() => {
@@ -5644,7 +6447,14 @@ const Customers = (props) => {
                                 <div className="form-title">Directions</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => setSelectedDirection({ id: 0, customer_id: selectedCustomer?.id })}>
+                                    <div className="mochi-button" onClick={() => {
+                                        if ((selectedCustomer?.id || 0) === 0) {
+                                            window.alert('You must select a customer first!');
+                                            return;
+                                        }
+
+                                        setSelectedDirection({ id: 0, customer_id: selectedCustomer?.id })
+                                    }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Add direction</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -5719,6 +6529,7 @@ const Customers = (props) => {
                                                             panelName={`${props.panelName}-dispatch`}
                                                             origin={props.origin}
                                                             isOnPanel={true}
+                                                            isAdmin={props.isAdmin}
                                                             openPanel={props.openPanel}
                                                             closePanel={props.closePanel}
                                                             componentId={moment().format('x')}
@@ -5825,10 +6636,10 @@ const Customers = (props) => {
                                 props.setSelectedCustomer({ ...selectedCustomer, notes: notes })
                             }}
                             savingDataUrl='/saveCustomerNote'
-                            deletingDataUrl=''
+                            deletingDataUrl='/deleteCustomerNote'
                             type='note'
-                            isEditable={false}
-                            isDeletable={false}
+                            isEditable={props.isAdmin}
+                            isDeletable={props.isAdmin}
                             isAdding={selectedNote.id === 0}
                         />
                     </animated.div>

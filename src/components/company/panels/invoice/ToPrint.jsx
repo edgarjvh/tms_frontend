@@ -192,7 +192,7 @@ export default class ToPrint extends Component {
                                             // backgroundColor: 'rgba(0,0,0,0.1)',
                                             textAlign: 'center',
                                             padding: 3,
-                                        }}>{this.props.selectedOrder?.term?.name || ''}</div>
+                                        }}>{this.props.selectedOrder?.bill_to_company?.term?.name || ''}</div>
                                     </div>
                                     <div style={{
                                         // borderLeft: '1px solid rgba(0,0,0,0.7)',

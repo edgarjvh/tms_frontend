@@ -65,10 +65,10 @@ const Contacts = (props) => {
             return;
         }
 
-        if ((tempSelectedContact.last_name || '').trim() === '') {
-            window.alert('You must enter the last name!');
-            return;
-        }
+        // if ((tempSelectedContact.last_name || '').trim() === '') {
+        //     window.alert('You must enter the last name!');
+        //     return;
+        // }
 
         if ((tempSelectedContact.phone_work || '').trim() === '' &&
             (tempSelectedContact.phone_work_fax || '').trim() === '' &&
@@ -912,22 +912,78 @@ const Contacts = (props) => {
                         <div className="mochi-button" onClick={() => {
                             switch (props.owner) {
                                 case 'customer':
-                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, customer_id: contactSearchCustomer.id } });
-                                    setTempSelectedContact({ id: 0, customer_id: contactSearchCustomer.id });
+                                    setContactSearchCustomer({
+                                        ...contactSearchCustomer,
+                                        selectedContact: {
+                                            id: 0,
+                                            customer_id: contactSearchCustomer.id
+                                        }
+                                    });
+                                    setTempSelectedContact({
+                                        id: 0,
+                                        customer_id: contactSearchCustomer.id,
+                                        address1: contactSearchCustomer?.address1 || '',
+                                        address2: contactSearchCustomer?.address2 || '',
+                                        city: contactSearchCustomer?.city || '',
+                                        state: contactSearchCustomer?.state || '',
+                                        zip_code: contactSearchCustomer?.zip || ''
+                                    });
                                     break;
 
                                 case 'carrier':
-                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, carrier_id: contactSearchCustomer.id } });
-                                    setTempSelectedContact({ id: 0, carrier_id: contactSearchCustomer.id });
+                                    setContactSearchCustomer({
+                                        ...contactSearchCustomer,
+                                        selectedContact: {
+                                            id: 0,
+                                            carrier_id: contactSearchCustomer.id
+                                        }
+                                    });
+                                    setTempSelectedContact({
+                                        id: 0,
+                                        carrier_id: contactSearchCustomer.id,
+                                        address1: contactSearchCustomer?.address1 || '',
+                                        address2: contactSearchCustomer?.address2 || '',
+                                        city: contactSearchCustomer?.city || '',
+                                        state: contactSearchCustomer?.state || '',
+                                        zip_code: contactSearchCustomer?.zip || ''
+                                    });
                                     break;
 
                                 case 'factoring-company':
-                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, factoring_company_id: contactSearchCustomer.id } });
-                                    setTempSelectedContact({ id: 0, factoring_company_id: contactSearchCustomer.id });
+                                    setContactSearchCustomer({
+                                        ...contactSearchCustomer,
+                                        selectedContact: {
+                                            id: 0,
+                                            factoring_company_id: contactSearchCustomer.id
+                                        }
+                                    });
+                                    setTempSelectedContact({
+                                        id: 0,
+                                        factoring_company_id: contactSearchCustomer.id,
+                                        address1: contactSearchCustomer?.address1 || '',
+                                        address2: contactSearchCustomer?.address2 || '',
+                                        city: contactSearchCustomer?.city || '',
+                                        state: contactSearchCustomer?.state || '',
+                                        zip_code: contactSearchCustomer?.zip || ''
+                                    });
                                     break;
                                 default:
-                                    setContactSearchCustomer({ ...contactSearchCustomer, selectedContact: { id: 0, customer_id: contactSearchCustomer.id } });
-                                    setTempSelectedContact({ id: 0, customer_id: contactSearchCustomer.id });
+                                    setContactSearchCustomer({
+                                        ...contactSearchCustomer,
+                                        selectedContact: {
+                                            id: 0,
+                                            customer_id: contactSearchCustomer.id
+                                        }
+                                    });
+                                    setTempSelectedContact({
+                                        id: 0,
+                                        customer_id: contactSearchCustomer.id,
+                                        address1: contactSearchCustomer?.address1 || '',
+                                        address2: contactSearchCustomer?.address2 || '',
+                                        city: contactSearchCustomer?.city || '',
+                                        state: contactSearchCustomer?.state || '',
+                                        zip_code: contactSearchCustomer?.zip || ''
+                                    });
                                     break;
                             }
 

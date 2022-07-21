@@ -7,7 +7,8 @@ export const companyReducers = (state = {
         'customer',
         'carrier',
         'load board',
-        'invoice'
+        'invoice',
+        'reports'
     ],
     selectedPageIndex: 0,
     mainCompanyScreenFocused: true,
@@ -16,6 +17,7 @@ export const companyReducers = (state = {
     carrierScreenFocused: false,
     loadBoardScreenFocused: false,
     invoiceScreenFocused: false,
+    reportsScreenFocused: false,
     companyOpenedPanels: [],
 }, action) => {
     switch (action.type) {
@@ -48,6 +50,7 @@ export const companyReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
             }
             break;
         case companyConstants.SET_DISPATCH_SCREEN_FOCUSED:
@@ -59,6 +62,7 @@ export const companyReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
             }
             break;
         case companyConstants.SET_CUSTOMER_SCREEN_FOCUSED:
@@ -70,6 +74,7 @@ export const companyReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
             }
             break;
         case companyConstants.SET_CARRIER_SCREEN_FOCUSED:
@@ -81,6 +86,7 @@ export const companyReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
             }
             break;
         case companyConstants.SET_LOAD_BOARD_SCREEN_FOCUSED:
@@ -92,6 +98,7 @@ export const companyReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
             }
             break;
         case companyConstants.SET_INVOICE_SCREEN_FOCUSED:
@@ -103,6 +110,19 @@ export const companyReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
+                reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
+            }
+            break;
+        case companyConstants.SET_REPORTS_SCREEN_FOCUSED:
+            state = {
+                ...state,
+                reportsScreenFocused: action.payload,
+                mainCompanyScreenFocused: action.payload ? false : state.mainCompanyScreenFocused,
+                dispatchScreenFocused: action.payload ? false : state.dispatchScreenFocused,
+                customerScreenFocused: action.payload ? false : state.customerScreenFocused,
+                carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
+                loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
         default:

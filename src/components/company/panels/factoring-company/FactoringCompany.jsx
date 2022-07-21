@@ -9,7 +9,7 @@ import { Modal } from './../../panels';
 import { useTransition, animated, Transition } from 'react-spring';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faPencilAlt, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretRight, faPencilAlt, faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { useDetectClickOutside } from "react-detect-click-outside";
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
@@ -53,6 +53,10 @@ const FactoringCompany = (props) => {
 
     const refFactoringCompanyCode = useRef();
     const refFactoringCompanyName = useRef();
+    const refFactoringCompanyEmail = useRef();
+    const [showFactoringCompanyEmailCopyBtn, setShowFactoringCompanyEmailCopyBtn] = useState(false);
+    const [showFactoringCompanyContactEmailCopyBtn, setShowFactoringCompanyContactEmailCopyBtn] = useState(false);
+    const [showMailingContactEmailCopyBtn, setShowMailingContactEmailCopyBtn] = useState(false);
 
     const refFactoringCompanyContactPhone = useRef();
     const [carrierContactPhoneItems, setFactoringCompanyContactPhoneItems] = useState([]);
@@ -208,7 +212,7 @@ const FactoringCompany = (props) => {
                     axios.post(props.serverUrl + '/getFactoringCompanyOutstandingInvoices', {
                         factoring_company_id: props.factoringCompanyId
                     }).then(res => {
-                        if (res.data.result === 'OK'){
+                        if (res.data.result === 'OK') {
                             setSelectedFactoringCompany(selectedFactoringCompany => {
                                 return {
                                     ...selectedFactoringCompany,
@@ -222,7 +226,7 @@ const FactoringCompany = (props) => {
                         setIsLoading(false);
                     });
                 }
-                
+
             }).catch(e => {
                 console.log('error getting factoring company by id', e);
             })
@@ -601,7 +605,7 @@ const FactoringCompany = (props) => {
                 axios.post(props.serverUrl + '/factoringCompanies', { code: e.target.value.trim().toLowerCase() }).then(async res => {
                     if (res.data.result === 'OK') {
                         if (res.data.factoring_companies.length > 0) {
-                            setSelectedFactoringCompany({...res.data.factoring_companies[0]});
+                            setSelectedFactoringCompany({ ...res.data.factoring_companies[0] });
 
                             if (res.data.factoring_companies[0].contacts.length > 0) {
                                 res.data.factoring_companies[0].contacts.map((contact, index) => {
@@ -616,7 +620,7 @@ const FactoringCompany = (props) => {
                             axios.post(props.serverUrl + '/getFactoringCompanyOutstandingInvoices', {
                                 factoring_company_id: res.data.factoring_companies[0].id
                             }).then(res => {
-                                if (res.data.result === 'OK'){
+                                if (res.data.result === 'OK') {
                                     setSelectedFactoringCompany(selectedFactoringCompany => {
                                         return {
                                             ...selectedFactoringCompany,
@@ -924,7 +928,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedFactoringCompany?.contact_name || '')
+                                            // ? (selectedFactoringCompany?.contact_name || '')
+                                            ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).last_name
                                     }
                                 />
@@ -947,7 +952,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedFactoringCompany?.contact_phone || '')
+                                            // ? (selectedFactoringCompany?.contact_phone || '')
+                                            ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
                                                 ? selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).phone_work
                                                 : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
@@ -988,7 +994,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedFactoringCompany?.ext || '')
+                                            // ? (selectedFactoringCompany?.ext || '')
+                                            ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).phone_ext
                                     }
                                 />
@@ -996,8 +1003,28 @@ const FactoringCompany = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}>
+                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedFactoringCompany?.email || '') !== '') {
+                                        setShowFactoringCompanyEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedFactoringCompany?.email || '') !== '') {
+                                        setShowFactoringCompanyEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowFactoringCompanyEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowFactoringCompanyEmailCopyBtn(false);
+                                }}
+                            >
                                 <input type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
+                                    ref={refFactoringCompanyEmail}
                                     onKeyDown={validateFactoringCompanyToSave}
                                     onInput={(e) => {
                                         if ((selectedFactoringCompany?.contacts || []).length === 0) {
@@ -1011,7 +1038,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedFactoringCompany?.email || '')
+                                            // ? (selectedFactoringCompany?.email || '')
+                                            ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                                 ? selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).email_work
                                                 : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
@@ -1030,6 +1058,25 @@ const FactoringCompany = (props) => {
                                         })}>
                                         {selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_email}
                                     </div>
+                                }
+
+                                {
+                                    showFactoringCompanyEmailCopyBtn &&
+                                    <FontAwesomeIcon style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: 30,
+                                        zIndex: 1,
+                                        cursor: 'pointer',
+                                        transform: 'translateY(-50%)',
+                                        color: '#2bc1ff',
+                                        margin: 0,
+                                        transition: 'ease 0.2s',
+                                        fontSize: '1rem'
+                                    }} icon={faCopy} onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(refFactoringCompanyEmail.current.value);
+                                    }} />
                                 }
                             </div>
                         </div>
@@ -1874,7 +1921,29 @@ const FactoringCompany = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedFactoringCompany?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                        setShowMailingContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedFactoringCompany?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                        setShowMailingContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowMailingContactEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowMailingContactEmailCopyBtn(false);
+                                }}>
                                 <div className="select-box-wrapper">
                                     <input type="text" placeholder="E-Mail"
                                         ref={refMailingContactEmail}
@@ -2059,6 +2128,25 @@ const FactoringCompany = (props) => {
                                     }
 
                                     {
+                                        showMailingContactEmailCopyBtn &&
+                                        <FontAwesomeIcon style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            right: 30,
+                                            zIndex: 1,
+                                            cursor: 'pointer',
+                                            transform: 'translateY(-50%)',
+                                            color: '#2bc1ff',
+                                            margin: 0,
+                                            transition: 'ease 0.2s',
+                                            fontSize: '1rem'
+                                        }} icon={faCopy} onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(refMailingContactEmail.current.value);
+                                        }} />
+                                    }
+
+                                    {
                                         mailingContactEmailItems.length > 1 &&
                                         <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
                                             if (showMailingContactEmails) {
@@ -2201,7 +2289,14 @@ const FactoringCompany = (props) => {
 
                                             contactSearchCustomer={{
                                                 ...selectedFactoringCompany,
-                                                selectedContact: selectedFactoringCompanyContact
+                                                selectedContact: {
+                                                    ...selectedFactoringCompanyContact,
+                                                    address1: (selectedFactoringCompany?.address1 || '').toLowerCase() === (selectedFactoringCompanyContact?.address1 || '').toLowerCase() ? (selectedFactoringCompany?.address1 || '') : (selectedFactoringCompanyContact?.address1 || ''),
+                                                    address2: (selectedFactoringCompany?.address2 || '').toLowerCase() === (selectedFactoringCompanyContact?.address2 || '').toLowerCase() ? (selectedFactoringCompany?.address2 || '') : (selectedFactoringCompanyContact?.address2 || ''),
+                                                    city: (selectedFactoringCompany?.city || '').toLowerCase() === (selectedFactoringCompanyContact?.city || '').toLowerCase() ? (selectedFactoringCompany?.city || '') : (selectedFactoringCompanyContact?.city || ''),
+                                                    state: (selectedFactoringCompany?.state || '').toLowerCase() === (selectedFactoringCompanyContact?.state || '').toLowerCase() ? (selectedFactoringCompany?.state || '') : (selectedFactoringCompanyContact?.state || ''),
+                                                    zip_code: (selectedFactoringCompany?.zip || '').toLowerCase() === (selectedFactoringCompanyContact?.zip_code || '').toLowerCase() ? (selectedFactoringCompany?.zip || '') : (selectedFactoringCompanyContact?.zip_code || ''),
+                                                }
                                             }}
                                         />
                                     }
@@ -2244,7 +2339,7 @@ const FactoringCompany = (props) => {
                                     props.openPanel(panel, props.origin);
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Add contact</div>
+                                    <div className="mochi-button-base">Add Contact</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                                 <div className="mochi-button" onClick={() => setSelectedFactoringCompanyContact({})}>
@@ -2686,7 +2781,29 @@ const FactoringCompany = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedFactoringCompanyContact?.email_work || '') !== '' ||
+                                        (selectedFactoringCompanyContact?.email_personal || '') !== '' ||
+                                        (selectedFactoringCompanyContact?.email_other || '') !== '') {
+                                        setShowFactoringCompanyContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedFactoringCompanyContact?.email_work || '') !== '' ||
+                                        (selectedFactoringCompanyContact?.email_personal || '') !== '' ||
+                                        (selectedFactoringCompanyContact?.email_other || '') !== '') {
+                                        setShowFactoringCompanyContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowFactoringCompanyContactEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowFactoringCompanyContactEmailCopyBtn(false);
+                                }}>
                                 <div className="select-box-wrapper">
                                     <input
                                         style={{
@@ -2933,6 +3050,25 @@ const FactoringCompany = (props) => {
                                                         : ''
                                         }
                                     />
+
+                                    {
+                                        showFactoringCompanyContactEmailCopyBtn &&
+                                        <FontAwesomeIcon style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            right: 30,
+                                            zIndex: 1,
+                                            cursor: 'pointer',
+                                            transform: 'translateY(-50%)',
+                                            color: '#2bc1ff',
+                                            margin: 0,
+                                            transition: 'ease 0.2s',
+                                            fontSize: '1rem'
+                                        }} icon={faCopy} onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(refFactoringCompanyContactEmail.current.value);
+                                        }} />
+                                    }
 
                                     {
                                         (selectedFactoringCompanyContact?.id || 0) > 0 &&
@@ -3505,7 +3641,7 @@ const FactoringCompany = (props) => {
                                                                     order_id={order.id}
                                                                 />
                                                             }
-                
+
                                                             props.openPanel(panel, props.origin);
                                                         }}>
                                                             <div style={{ width: '6rem' }}>{order.invoice_received_date || ''}</div>
@@ -3664,8 +3800,7 @@ const FactoringCompany = (props) => {
                                 top: 0,
                                 left: 0,
                                 backgroundColor: "rgba(0,0,0,0.3)",
-                            }}
-                        >
+                            }}>
                             <div
                                 className="ach-wiring-info-wrapper"
                                 style={{
@@ -3675,8 +3810,7 @@ const FactoringCompany = (props) => {
                                     display: "flex",
                                     justifyContent: "center",
                                     alignItems: "center",
-                                }}
-                            >
+                                }}>
                                 <ACHWiringInfo
                                     panelName={`${props.panelName}-ach-wiring-info`}
                                     tabTimes={props.tabTimes}
@@ -3687,8 +3821,10 @@ const FactoringCompany = (props) => {
                                     closeModal={() => {
                                         setShowingACHWiringInfo(false);
                                     }}
-                                    selectedFactoringCompany={selectedFactoringCompany}
-                                    setSelectedFactoringCompany={setSelectedFactoringCompany}
+                                    selectedOwner={selectedFactoringCompany}
+                                    setSelectedOwner={setSelectedFactoringCompany}
+                                    owner='factoring-company'
+                                    savingUrl='/saveFactoringCompanyAchWiringInfo'
                                 />
                             </div>
                         </animated.div>

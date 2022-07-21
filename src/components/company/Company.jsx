@@ -26,6 +26,7 @@ import {
     setCarrierScreenFocused,
     setLoadBoardScreenFocused,
     setInvoiceScreenFocused,
+    setReportsScreenFocused
 } from '../../actions/companyActions';
 
 import {
@@ -227,7 +228,7 @@ import {
     setSelectedOrderInvoiceBillingNote,
 } from '../../actions/invoiceActions';
 
-import { CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice } from './../company';
+import { CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports } from './../company';
 import moment from 'moment';
 
 function Company(props) {
@@ -240,6 +241,7 @@ function Company(props) {
     const [carrierPanels, setCarrierPanels] = useState([]);
     const [loadBoardPanels, setLoadBoardPanels] = useState([]);
     const [invoicePanels, setInvoicePanels] = useState([]);
+    const [reportsPanels, setReportsPanels] = useState([]);
 
     const containerCls = classnames({
         'main-company-container': true,
@@ -334,8 +336,18 @@ function Company(props) {
         props.setInvoiceScreenFocused(true);
     }
 
-    const switchAppBtnClick = () => {
-        props.setScale(props.scale === 1 ? 0.7 : 1);
+    const reportsBtnClick = async () => {
+        let curPages = props.pages;
+
+        if (curPages.indexOf('reports') === -1) {
+            await props.setPages([...curPages, 'reports']);
+            await props.setSelectedPageIndex(curPages.length);
+
+        } else {
+            await props.setSelectedPageIndex(props.pages.indexOf('reports'));
+        }
+
+        props.setReportsScreenFocused(true);
     }
 
     const homePanelTransition = useTransition(homePanels, {
@@ -507,6 +519,35 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (invoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
+
+    const reportsPanelTransition = useTransition(reportsPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (reportsPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+                // setInvoicePanels([]);
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (reportsPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
@@ -716,9 +757,9 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.scale !== 1
-                            })} onClick={switchAppBtnClick}>
+                            })} onClick={reportsBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Card View</div>
+                                <div className="mochi-button-base">Reports</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -868,6 +909,7 @@ function Company(props) {
                                 screenFocused={props.dispatchScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
+                                isAdmin={false}
                                 origin='dispatch'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
@@ -939,6 +981,7 @@ function Company(props) {
                                 screenFocused={props.customerScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
+                                isAdmin={false}
                                 origin='customer'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
@@ -1079,6 +1122,7 @@ function Company(props) {
                                 screenFocused={props.loadBoardScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
+                                isAdmin={false}
                                 origin='load-board'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
@@ -1154,6 +1198,77 @@ function Company(props) {
                                 closePanel={closePanel}
                             />
                         </div>
+
+                        <div style={{
+                            width: `${100 / props.pages.length}%`,
+                            height: '100%',
+                            transform: `scale(${props.scale})`,
+                            transition: 'all ease 0.7s',
+                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
+                            borderRadius: props.scale === 1 ? 0 : '20px'
+                        }}>
+                            {
+                                reportsPanelTransition((style, panel, item, index) => {
+                                    const origin = 'reports';
+
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            // onClick={() => {
+                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                            //     // let _panels = [...props.customerOpenedPanels];
+                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+
+                                            //     // props.setCustomerOpenedPanels(_panels);
+                                            // }}
+                                            >
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
+                            <Reports
+                                pageName={'Reports'}
+                                title={'Reports'}
+                                panelName={'reports'}
+                                tabTimes={5000}
+                                screenFocused={props.reportsScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                isAdmin={false}
+                                origin='reports'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1175,6 +1290,7 @@ const mapStateToProps = state => {
         carrierScreenFocused: state.companyReducers.carrierScreenFocused,
         loadBoardScreenFocused: state.companyReducers.loadBoardScreenFocused,
         invoiceScreenFocused: state.companyReducers.invoiceScreenFocused,
+        reportsScreenFocused: state.companyReducers.reportsScreenFocused,
 
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
@@ -1335,6 +1451,7 @@ export default connect(mapStateToProps, {
     setCarrierScreenFocused,
     setLoadBoardScreenFocused,
     setInvoiceScreenFocused,
+    setReportsScreenFocused,
     setCompanyOpenedPanels,
     setAdminOpenedPanels,
 

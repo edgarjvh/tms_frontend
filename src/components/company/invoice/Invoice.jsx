@@ -9557,6 +9557,7 @@ const Invoice = (props) => {
                                             tabTimes={28000 + props.tabTimes}
                                             componentId={moment().format('x')}
                                             isOnPanel={true}
+                                            isAdmin={props.isAdmin}
                                             origin={props.origin}
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
@@ -9924,6 +9925,7 @@ const Invoice = (props) => {
                                             screenFocused={props.carrierScreenFocused}
                                             componentId={moment().format('x')}
                                             isOnPanel={true}
+                                            isAdmin={props.isAdmin}
                                             origin={props.origin}
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}

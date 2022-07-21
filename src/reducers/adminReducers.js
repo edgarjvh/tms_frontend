@@ -6,7 +6,7 @@ export const adminReducers = (state = {
         'admin dispatch',
         'admin customer',
         'admin carrier',
-        'reports',
+        'admin reports',
         'company setup'
     ],
     selectedPageIndex: 0,

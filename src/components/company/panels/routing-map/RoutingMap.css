@@ -1,0 +1,4 @@
+.panel-content.routing-map .map-main-container {
+  flex-grow: 1;
+  position: relative;
+}

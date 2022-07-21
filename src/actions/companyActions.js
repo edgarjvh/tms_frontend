@@ -57,6 +57,13 @@ export const setInvoiceScreenFocused = bool => {
     }
 }
 
+export const setReportsScreenFocused = bool => {
+    return {
+        type: companyConstants.SET_REPORTS_SCREEN_FOCUSED,
+        payload: bool
+    }
+}
+
 export const setCompanyOpenedPanels = panels => {
     return {
         type: companyConstants.SET_COMPANY_OPENED_PANELS,

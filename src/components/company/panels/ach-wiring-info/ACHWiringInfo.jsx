@@ -9,7 +9,7 @@ import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 
 const ACHWiringInfo = (props) => {
-    const [selectedFactoringCompany, setSelectedFactoringCompany] = useState({});
+    const [selectedOwner, setSelectedOwner] = useState({});
     const [isEditing, setIsEditing] = useState(false);
 
     const refAchBankingInfo = useRef();
@@ -24,10 +24,10 @@ const ACHWiringInfo = (props) => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        setSelectedFactoringCompany({
-            ...props.selectedFactoringCompany,
-            ach_type: (props.selectedFactoringCompany?.ach_type || '') === '' ? 'checking' : props.selectedFactoringCompany.ach_type,
-            wiring_type: (props.selectedFactoringCompany?.wiring_type || '') === '' ? 'checking' : props.selectedFactoringCompany.wiring_type
+        setSelectedOwner({
+            ...props.selectedOwner,
+            ach_type: (props.selectedOwner?.ach_type || '') === '' ? 'checking' : props.selectedOwner.ach_type,
+            wiring_type: (props.selectedOwner?.wiring_type || '') === '' ? 'checking' : props.selectedOwner.wiring_type
         });
 
         refAchBankingInfo.current.focus({
@@ -35,30 +35,42 @@ const ACHWiringInfo = (props) => {
         })
     }, [])
 
-    const updateFactoringCompany = () => {
-        if ((selectedFactoringCompany?.id || 0) > 0){
+    const updateOwner = () => {
+        if ((selectedOwner?.id || 0) > 0) {
             setIsLoading(true);
 
-            axios.post(props.serverUrl + '/saveAchWiringInfo', {
-                factoring_company_id: selectedFactoringCompany.id,
-                ach_banking_info: selectedFactoringCompany?.ach_banking_info || '',
-                ach_account_info: selectedFactoringCompany?.ach_account_info || '',
-                ach_aba_routing: selectedFactoringCompany?.ach_aba_routing || '',
-                ach_remittence_email: (selectedFactoringCompany?.ach_remittence_email || '').toLowerCase(),
-                ach_type: selectedFactoringCompany?.ach_type || 'checking',
-                wiring_banking_info: selectedFactoringCompany?.wiring_banking_info || '',
-                wiring_account_info: selectedFactoringCompany?.wiring_account_info || '',
-                wiring_aba_routing: selectedFactoringCompany?.wiring_aba_routing || '',
-                wiring_remittence_email: (selectedFactoringCompany?.wiring_remittence_email || '').toLowerCase(),
-                wiring_type: selectedFactoringCompany?.wiring_type || 'checking'
+            axios.post(props.serverUrl + props.savingUrl, {
+                factoring_company_id: selectedOwner.id,
+                carrier_id: selectedOwner.id,
+                ach_banking_info: selectedOwner?.ach_banking_info || '',
+                ach_account_info: selectedOwner?.ach_account_info || '',
+                ach_aba_routing: selectedOwner?.ach_aba_routing || '',
+                ach_remittence_email: (selectedOwner?.ach_remittence_email || '').toLowerCase(),
+                ach_type: selectedOwner?.ach_type || 'checking',
+                wiring_banking_info: selectedOwner?.wiring_banking_info || '',
+                wiring_account_info: selectedOwner?.wiring_account_info || '',
+                wiring_aba_routing: selectedOwner?.wiring_aba_routing || '',
+                wiring_remittence_email: (selectedOwner?.wiring_remittence_email || '').toLowerCase(),
+                wiring_type: selectedOwner?.wiring_type || 'checking'
             }).then(res => {
-                if (res.data.result === 'OK'){
-                    props.setSelectedFactoringCompany(factoringCompany => {
-                        return {
-                            ...factoringCompany,
-                            ...res.data.factoring_company
-                        }
-                    });
+                if (res.data.result === 'OK') {
+                    if (props.owner === 'carrier') {
+                        props.setSelectedOwner(selectedOwner => {
+                            return {
+                                ...selectedOwner,
+                                ...res.data.carrier
+                            }
+                        });
+                    }
+
+                    if (props.owner === 'factoring-company') {
+                        props.setSelectedOwner(selectedOwner => {
+                            return {
+                                ...selectedOwner,
+                                ...res.data.factoring_company
+                            }
+                        });
+                    }
                 }
             }).catch(e => {
                 console.log('error saving ach/wiring info');
@@ -98,7 +110,7 @@ const ACHWiringInfo = (props) => {
         <div className="ach-wiring-info-content" onKeyDown={e => {
             let key = e.keyCode || e.which;
 
-            if (key === 27){
+            if (key === 27) {
                 props.closeModal();
             }
         }}>
@@ -110,9 +122,9 @@ const ACHWiringInfo = (props) => {
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
                             <div className={buttonClasses} onClick={() => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         ach_banking_info: '',
                                         ach_account_info: '',
                                         ach_aba_routing: '',
@@ -136,14 +148,14 @@ const ACHWiringInfo = (props) => {
                             readOnly={!isEditing}
                             ref={refAchBankingInfo}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         ach_banking_info: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.ach_banking_info || '')}
+                            value={(selectedOwner?.ach_banking_info || '')}
                         />
                     </div>
 
@@ -152,14 +164,14 @@ const ACHWiringInfo = (props) => {
                             readOnly={!isEditing}
                             ref={refAchAccountInfo}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         ach_account_info: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.ach_account_info || '')}
+                            value={(selectedOwner?.ach_account_info || '')}
                         />
                     </div>
 
@@ -168,44 +180,44 @@ const ACHWiringInfo = (props) => {
                             readOnly={!isEditing}
                             ref={refAchAbaRouting}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         ach_aba_routing: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.ach_aba_routing || '')}
+                            value={(selectedOwner?.ach_aba_routing || '')}
                         />
                     </div>
 
                     <div className={inputBoxClasses}>
-                        <input type="text" placeholder="Remittence E-mail" style={{textTransform: 'lowercase'}}
+                        <input type="text" placeholder="Remittence E-mail" style={{ textTransform: 'lowercase' }}
                             readOnly={!isEditing}
                             ref={refAchRemittenceEmail}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         ach_remittence_email: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.ach_remittence_email || '')}
+                            value={(selectedOwner?.ach_remittence_email || '')}
                         />
                     </div>
 
                     <div className={inputRadioClasses}>
                         <input type="radio" id="fc-ach-type-checking"
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         ach_type: e.target.checked ? 'checking' : 'saving'
                                     }
                                 })
                             }}
-                            checked={(selectedFactoringCompany?.ach_type || '') === 'checking'}
+                            checked={(selectedOwner?.ach_type || '') === 'checking'}
                         />
                         <label htmlFor="fc-ach-type-checking" style={{ marginLeft: 5 }}>Checking</label>
                     </div>
@@ -213,14 +225,14 @@ const ACHWiringInfo = (props) => {
                     <div className={inputRadioClasses}>
                         <input type="radio" id="fc-ach-type-saving"
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         ach_type: e.target.checked ? 'saving' : 'checking'
                                     }
                                 })
                             }}
-                            checked={(selectedFactoringCompany?.ach_type || '') === 'saving'}
+                            checked={(selectedOwner?.ach_type || '') === 'saving'}
                         />
                         <label htmlFor="fc-ach-type-saving" style={{ marginLeft: 5 }}>Saving</label>
                     </div>
@@ -234,9 +246,28 @@ const ACHWiringInfo = (props) => {
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
                             <div className={buttonClasses} onClick={() => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
+                                        wiring_banking_info: selectedOwner?.ach_banking_info || '',
+                                        wiring_account_info: selectedOwner?.ach_account_info || '',
+                                        wiring_aba_routing: selectedOwner?.ach_aba_routing || '',
+                                        wiring_remittence_email: selectedOwner?.ach_remittence_email || '',
+                                        wiring_type: selectedOwner?.ach_type || 'checking'
+                                    }
+                                });
+
+                                refWiringBankingInfo.current.focus();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Same as above</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+
+                            <div className={buttonClasses} onClick={() => {
+                                setSelectedOwner(selectedOwner => {
+                                    return {
+                                        ...selectedOwner,
                                         wiring_banking_info: '',
                                         wiring_account_info: '',
                                         wiring_aba_routing: '',
@@ -260,14 +291,14 @@ const ACHWiringInfo = (props) => {
                             readOnly={!isEditing}
                             ref={refWiringBankingInfo}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         wiring_banking_info: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.wiring_banking_info || '')}
+                            value={(selectedOwner?.wiring_banking_info || '')}
                         />
                     </div>
 
@@ -276,14 +307,14 @@ const ACHWiringInfo = (props) => {
                             readOnly={!isEditing}
                             ref={refWiringAccountInfo}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         wiring_account_info: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.wiring_account_info || '')}
+                            value={(selectedOwner?.wiring_account_info || '')}
                         />
                     </div>
 
@@ -292,44 +323,44 @@ const ACHWiringInfo = (props) => {
                             readOnly={!isEditing}
                             ref={refWiringAbaRouting}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         wiring_aba_routing: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.wiring_aba_routing || '')}
+                            value={(selectedOwner?.wiring_aba_routing || '')}
                         />
                     </div>
 
                     <div className={inputBoxClasses}>
-                        <input type="text" placeholder="Remittence E-mail" style={{textTransform: 'lowercase'}}
+                        <input type="text" placeholder="Remittence E-mail" style={{ textTransform: 'lowercase' }}
                             readOnly={!isEditing}
                             ref={refWiringRemittenceEmail}
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         wiring_remittence_email: e.target.value
                                     }
                                 })
                             }}
-                            value={(selectedFactoringCompany?.wiring_remittence_email || '')}
+                            value={(selectedOwner?.wiring_remittence_email || '')}
                         />
                     </div>
 
                     <div className={inputRadioClasses}>
                         <input type="radio" id="fc-wiring-type-checking"
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         wiring_type: e.target.checked ? 'checking' : 'saving'
                                     }
                                 })
                             }}
-                            checked={(selectedFactoringCompany?.wiring_type || '') === 'checking'}
+                            checked={(selectedOwner?.wiring_type || '') === 'checking'}
                         />
                         <label htmlFor="fc-wiring-type-checking" style={{ marginLeft: 5 }}>Checking</label>
                     </div>
@@ -337,14 +368,14 @@ const ACHWiringInfo = (props) => {
                     <div className={inputRadioClasses}>
                         <input type="radio" id="fc-wiring-type-saving"
                             onChange={e => {
-                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                setSelectedOwner(selectedOwner => {
                                     return {
-                                        ...selectedFactoringCompany,
+                                        ...selectedOwner,
                                         wiring_type: e.target.checked ? 'saving' : 'checking'
                                     }
                                 })
                             }}
-                            checked={(selectedFactoringCompany?.wiring_type || '') === 'saving'}
+                            checked={(selectedOwner?.wiring_type || '') === 'saving'}
                         />
                         <label htmlFor="fc-wiring-type-saving" style={{ marginLeft: 5 }}>Saving</label>
                     </div>
@@ -376,7 +407,7 @@ const ACHWiringInfo = (props) => {
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
 
-                <div className={buttonClasses} onClick={updateFactoringCompany}>
+                <div className={buttonClasses} onClick={updateOwner}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">Update</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -387,8 +418,8 @@ const ACHWiringInfo = (props) => {
 }
 
 const mapStateToProps = (state) => {
-    return {        
-        serverUrl: state.systemReducers.serverUrl        
+    return {
+        serverUrl: state.systemReducers.serverUrl
     }
 }
 

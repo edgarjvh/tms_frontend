@@ -34,7 +34,8 @@ import {
 } from './../../../company';
 
 import {
-    RateConf
+    RateConf,
+    RoutingMap
 } from './../../panels';
 
 const Routing = (props) => {
@@ -62,9 +63,9 @@ const Routing = (props) => {
     const H = window.H;
     const platform = new H.service.Platform({
         apikey: "_aKHLFzgJTYQLzsSzVqRKyiKk8iuywH3jbtV8Mxw5Gs",
-        app_id: "X4qy0Sva14BQxJCbVqXL"
+        // app_id: "X4qy0Sva14BQxJCbVqXL"
     });
-    const routingService = platform.getRoutingService();
+    const routingService = platform.getRoutingService(null, 8);
     // const routingService = {};
 
     const [equipmentItems, setEquipmentItems] = useState([]);
@@ -251,7 +252,7 @@ const Routing = (props) => {
                     }
 
                     setSelectedOrder(selected_order);
-                    
+
                     props.setSelectedOrder({
                         id: selectedOrder.id,
                         routing: res.data.order.routing,
@@ -259,42 +260,93 @@ const Routing = (props) => {
                     })
 
                     if (res.data.order.routing.length >= 2) {
-                        let params = {
-                            mode: 'fastest;car;traffic:disabled',
-                            routeAttributes: 'summary'
+                        let origin = null;
+                        let destination = null;
+
+                        let start = res.data.order.routing[0];
+                        let waypoints = [];
+                        let end = res.data.order.routing[res.data.order.routing.length - 1];
+
+                        if (start.type === 'pickup') {
+                            selected_order.pickups.map((p, i) => {
+                                if (p.id === start.pickup_id) {
+                                    if ((p.customer?.zip_data || '') !== '') {
+                                        origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
+                                    }
+                                }
+                                return false;
+                            })
+                        } else {
+                            selected_order.deliveries.map((d, i) => {
+                                if (d.id === start.delivery_id) {
+                                    if ((d.customer?.zip_data || '') !== '') {
+                                        origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
+                                    }
+                                }
+                                return false;
+                            })
                         }
 
-                        let waypointCount = 0;
-
                         res.data.order.routing.map((item, i) => {
-                            if (item.type === 'pickup') {
-                                selected_order.pickups.map((p, i) => {
-                                    if (p.id === item.pickup_id) {
-                                        if ((p.customer?.zip_data || '') !== '') {
-                                            params['waypoint' + waypointCount] = 'geo!' + p.customer.zip_data.latitude.toString() + ',' + p.customer.zip_data.longitude.toString();
-                                            waypointCount += 1;
+                            if (i > 0 && i < (res.data.order.routing.length - 1)) {
+                                if (item.type === 'pickup') {
+                                    selected_order.pickups.map((p, i) => {
+                                        if (p.id === item.pickup_id) {
+                                            if ((p.customer?.zip_data || '') !== '') {
+                                                waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
+                                            }
                                         }
-                                    }
-                                    return false;
-                                })
-                            } else {
-                                selected_order.deliveries.map((d, i) => {
-                                    if (d.id === item.delivery_id) {
-                                        if ((d.customer?.zip_data || '') !== '') {
-                                            params['waypoint' + waypointCount] = 'geo!' + d.customer.zip_data.latitude.toString() + ',' + d.customer.zip_data.longitude.toString();
-                                            waypointCount += 1;
+                                        return false;
+                                    })
+                                } else {
+                                    selected_order.deliveries.map((d, i) => {
+                                        if (d.id === item.delivery_id) {
+                                            if ((d.customer?.zip_data || '') !== '') {
+                                                waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
+                                            }
                                         }
-                                    }
-                                    return false;
-                                })
+                                        return false;
+                                    })
+                                }
                             }
 
                             return true;
                         });
 
+                        if (end.type === 'pickup') {
+                            selected_order.pickups.map((p, i) => {
+                                if (p.id === end.pickup_id) {
+                                    if ((p.customer?.zip_data || '') !== '') {
+                                        destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
+                                    }
+                                }
+                                return false;
+                            })
+                        } else {
+                            selected_order.deliveries.map((d, i) => {
+                                if (d.id === end.delivery_id) {
+                                    if ((d.customer?.zip_data || '') !== '') {
+                                        destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
+                                    }
+                                }
+                                return false;
+                            })
+                        }
+
+                        let params = {
+                            'routingMode': 'fast',
+                            'transportMode': 'car',
+                            'origin': origin,
+                            'via': new H.service.Url.MultiValueQueryParameter(waypoints),
+                            'destination': destination,
+                            'return': 'summary'
+                        }
+
                         routingService.calculateRoute(params,
                             (result) => {
-                                let miles = result.response.route[0].summary.distance || 0;
+                                let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                    return a + b.summary.length;
+                                }, 0) || 0;
 
                                 selected_order.miles = miles;
 
@@ -331,7 +383,7 @@ const Routing = (props) => {
                                 });
                             },
                             (error) => {
-                                console.log('error getting mileage', error);
+                                console.log('error getting mileage', error.message);
                                 selected_order.miles = 0;
 
                                 setSelectedOrder(selected_order)
@@ -447,7 +499,7 @@ const Routing = (props) => {
         setDragging(false);
 
         setTrigger(true);
-    }   
+    }
 
     const getRandomInt = (min, max) => {
         min = Math.ceil(min);
@@ -963,7 +1015,7 @@ const Routing = (props) => {
 
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                gridTemplateColumns: '1fr 1fr 1fr 1fr auto',
                 gridGap: '1rem',
                 width: '50%',
                 marginTop: 15,
@@ -1003,6 +1055,28 @@ const Routing = (props) => {
                     }}>
                         <Loader type="ThreeDots" color="#333738" height={20} width={20} visible={mileageLoaderVisible} />
                     </div>
+                </div>
+
+                <div className='mochi-button' onClick={() => {
+                    let panel = {
+                        panelName: `${props.panelName}-routing-map`,
+                        component: <RoutingMap
+                            title='Routing Map'
+                            tabTimes={484000 + props.tabTimes}
+                            panelName={`${props.panelName}-routing-map`}
+                            componentId={moment().format('x')}
+                            origin={props.origin}
+                            openPanel={props.openPanel}
+                            closePanel={props.closePanel}
+                            selectedOrder={selectedOrder}
+                        />
+                    }
+
+                    props.openPanel(panel, props.origin);
+                }}>
+                    <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                    <div className='mochi-button-base'>Map</div>
+                    <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
                 </div>
             </div>
 
@@ -1092,6 +1166,7 @@ const Routing = (props) => {
                                             screenFocused={props.carrierScreenFocused}
                                             componentId={moment().format('x')}
                                             isOnPanel={true}
+                                            isAdmin={props.isAdmin}
                                             origin={props.origin}
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
@@ -1883,7 +1958,7 @@ const Routing = (props) => {
                                                     return true;
                                                 })
 
-                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });                                                
+                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });
                                             }
                                         }}
                                         onChange={async (e) => {

@@ -10,7 +10,7 @@ import PanelContainer from './panels/panel-container/PanelContainer.jsx';
 // import CarrierModal from './modal/Modal.jsx';
 import accounting from 'accounting';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { useDetectClickOutside } from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
 import "react-datepicker/dist/react-datepicker.css";
@@ -47,7 +47,8 @@ import {
     OrderHistory,
     FactoringCompany,
     EquipmentInformation,
-    Modal as CarrierModal
+    Modal as CarrierModal,
+    ACHWiringInfo
 } from './../panels';
 
 import {
@@ -72,16 +73,25 @@ const Carriers = (props) => {
     const refCarrierCode = useRef();
     const refFactoringCompanyCode = useRef();
     const refCarrierName = useRef();
+    const refCarrierEmail = useRef();
     const refFactoringCompanyName = useRef();
     const refCarrierContactPhone = useRef();
     const refCarrierContactFirstName = useRef();
     const refCarrierDriverFirstName = useRef();
+    const refCarrierDriverEmail = useRef();
     const refInsurancesListWrapper = useRef();
     const [insurancesScrollBarVisible, setInsurancesScrollBarVisible] = useState(false);
     const [carrierContactPhoneItems, setCarrierContactPhoneItems] = useState([]);
     const [showCarrierContactPhones, setShowCarrierContactPhones] = useState(false);
     const refCarrierContactPhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowCarrierContactPhones(false) } });
     const refCarrierContactPhonePopupItems = useRef([]);
+
+    const [showCarrierEmailCopyBtn, setShowCarrierEmailCopyBtn] = useState(false);
+    const [showCarrierContactEmailCopyBtn, setShowCarrierContactEmailCopyBtn] = useState(false);
+    const [showCarrierDriverEmailCopyBtn, setShowCarrierDriverEmailCopyBtn] = useState(false);
+    const [showMailingContactEmailCopyBtn, setShowMailingContactEmailCopyBtn] = useState(false);
+    const [showFactoringCompanyEmailCopyBtn, setShowFactoringCompanyEmailCopyBtn] = useState(false);
+
 
     const refCarrierContactEmail = useRef();
     const [carrierContactEmailItems, setCarrierContactEmailItems] = useState([]);
@@ -133,6 +143,10 @@ const Carriers = (props) => {
     const refInsuranceType = useRef();
     const refExpirationDate = useRef();
     const refInsuranceCompany = useRef();
+    const refFactoringCompanyEmail = useRef();
+
+
+    const [showingACHWiringInfo, setShowingACHWiringInfo] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
         from: { opacity: 0, display: 'block' },
@@ -228,6 +242,14 @@ const Carriers = (props) => {
         config: { duration: 100 }
     });
 
+    const achWiringInfoTransition = useTransition(showingACHWiringInfo, {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: showingACHWiringInfo,
+        config: { duration: 100 },
+    });
+
 
     const handledPrintCarrierInformation = useReactToPrint({
         // pageStyle: () => {
@@ -259,10 +281,6 @@ const Carriers = (props) => {
         },
         content: () => refPrintCarrierInformation.current
     });
-
-    useEffect(() => {
-        setInsurancesScrollBarVisible($(`#${props.panelName}-insurances-list-wrapper`).hasScrollBar());
-    }, [selectedCarrier?.insurances?.length])
 
     useEffect(() => {
         if (isSavingCarrier) {
@@ -362,8 +380,7 @@ const Carriers = (props) => {
                 contact.carrier_id = selectedCarrier.id;
             }
 
-            if ((contact.first_name || '').trim() === '' ||
-                (contact.last_name || '').trim() === '' ||
+            if ((contact.first_name || '').trim() === '' ||                
                 ((contact.phone_work || '').trim() === '' &&
                     (contact.phone_work_fax || '').trim() === '' &&
                     (contact.phone_mobile || '').trim() === '' &&
@@ -729,6 +746,10 @@ const Carriers = (props) => {
         selectedCarrier?.mailing_address?.mailing_contact?.primary_phone
     ]);
 
+    useEffect(() => {
+        setInsurancesScrollBarVisible($(`#${props.panelName}-insurances-list-wrapper`).hasScrollBar());
+    }, [selectedCarrier?.insurances?.length])
+
     const setInitialValues = (clearCode = true) => {
         setIsSavingCarrier(false);
         setIsSavingDriver(false);
@@ -868,8 +889,7 @@ const Carriers = (props) => {
                                     component_id: props.componentId
                                 });
                             }
-
-                            console.log(carrier);
+                            
                             getCarrierOrders(carrier);
                         } else {
                             setInitialValues(false);
@@ -891,14 +911,14 @@ const Carriers = (props) => {
 
     const getFactoringCompanyByCode = (e) => {
         let key = e.keyCode || e.which;
-        let selectedCarrier = { ...selectedCarrier };
+        let _selectedCarrier = { ...selectedCarrier };
 
         if (key === 9) {
             if (e.target.value.trim() === '') {
-                selectedCarrier.factoring_company_id = null;
-                selectedCarrier.factoring_company = {};
+                _selectedCarrier.factoring_company_id = null;
+                _selectedCarrier.factoring_company = {};
 
-                setSelectedCarrier(selectedCarrier);
+                setSelectedCarrier(_selectedCarrier);
 
                 validateCarrierForSaving(e);
             } else {
@@ -1188,10 +1208,10 @@ const Carriers = (props) => {
 
     const searchFactoringCompanyBtnClick = () => {
 
-        if ((selectedCarrier.id || 0) === 0) {
-            window.alert('You must select a carrier first!');
-            return;
-        }
+        // if ((selectedCarrier.id || 0) === 0) {
+        //     window.alert('You must select a carrier first!');
+        //     return;
+        // }
 
         let factoringCompanySearch = [
             {
@@ -1237,20 +1257,46 @@ const Carriers = (props) => {
                 componentId={moment().format('x')}
                 customerSearch={factoringCompanySearch}
 
-                callback={(factoringCompany) => {
+                callback={(factoringCompanyId) => {
                     new Promise((resolve, reject) => {
-                        if (factoringCompany) {
-                            setSelectedCarrier(selectedCarrier => {
-                                return {
-                                    ...selectedCarrier,
-                                    factoring_company: factoringCompany,
-                                    factoring_company_id: factoringCompany.id
+                        if (factoringCompanyId) {
+                            if ((selectedCarrier?.id || 0) > 0) {
+                                axios.post(props.serverUrl + '/getFactoringCompanyById', {id: factoringCompanyId}).then(res => {
+                                    setSelectedCarrier(selectedCarrier => {
+                                        return {
+                                            ...selectedCarrier,
+                                            factoring_company: res.data.factoring_company,
+                                            factoring_company_id: res.data.factoring_company.id
+                                        }
+                                    });
+    
+                                    validateCarrierForSaving({ keyCode: 9 });
+    
+                                    resolve('OK');
+                                }).catch(e => {
+
+                                });                                
+                            } else {
+                                let panel = {
+                                    panelName: `${props.panelName}-factoring-company`,
+                                    fixedWidthPercentage: 70,
+                                    component: <FactoringCompany
+                                        panelName={`${props.panelName}-factoring-company`}
+                                        title='Factoring Company'
+                                        tabTimes={11000 + props.tabTimes}
+                                        origin={props.origin}
+                                        openPanel={props.openPanel}
+                                        closePanel={props.closePanel}
+                                        componentId={moment().format('x')}
+
+                                        factoringCompanyId={factoringCompanyId}
+                                        selectedCarrier={selectedCarrier}
+                                    />
                                 }
-                            });
 
-                            validateCarrierForSaving({ keyCode: 9 });
+                                props.openPanel(panel, props.origin);
+                            }
 
-                            resolve('OK');
                         } else {
                             reject('no factoring company');
                         }
@@ -1300,18 +1346,19 @@ const Carriers = (props) => {
     }
 
     const clearFactoringCompanyBtnClick = () => {
-        let selectedCarrier = { ...selectedCarrier };
-        selectedCarrier.factoring_company_id = null;
+        let _selectedCarrier = { ...selectedCarrier };
+        _selectedCarrier.factoring_company_id = null;
+        
         setSelectedCarrier(selectedCarrier => {
             return {
-                ...selectedCarrier,
+                ..._selectedCarrier,
                 factoring_company: {}
             }
         });
 
 
-        if (selectedCarrier.id || 0 > 0) {
-            axios.post(props.serverUrl + '/saveCarrier', selectedCarrier).then(res => {
+        if (_selectedCarrier.id || 0 > 0) {
+            axios.post(props.serverUrl + '/saveCarrier', _selectedCarrier).then(res => {
                 if (res.data.result === 'OK') {
                     setSelectedCarrier(selectedCarrier => {
                         return {
@@ -1584,6 +1631,7 @@ const Carriers = (props) => {
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
                 selectedCustomer={selectedCarrier}
+                isAdmin={props.isAdmin}
             />
         }
 
@@ -1622,6 +1670,7 @@ const Carriers = (props) => {
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
                 selectedCustomer={selectedCarrier}
+                isAdmin={props.isAdmin}
             />
         }
 
@@ -1914,8 +1963,9 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.contact_name || '')
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name
+                                            // ? (selectedCarrier?.contact_name || '')
+                                            ? ''
+                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name                                            
                                     }
                                 />
                             </div>
@@ -1937,7 +1987,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.contact_phone || '')
+                                            // ? (selectedCarrier?.contact_phone || '')
+                                            ? ''
                                             : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
                                                 ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work
                                                 : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
@@ -1978,7 +2029,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.ext || '')
+                                            // ? (selectedCarrier?.ext || '')
+                                            ? ''
                                             : selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
                                     }
                                 />
@@ -1986,8 +2038,28 @@ const Carriers = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}>
+                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedCarrier?.email || '') !== '') {
+                                        setShowCarrierEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedCarrier?.email || '') !== '') {
+                                        setShowCarrierEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowCarrierEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowCarrierEmailCopyBtn(false);
+                                }}
+                            >
                                 <input tabIndex={53 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
+                                    ref={refCarrierEmail}
                                     onKeyDown={validateCarrierForSaving}
                                     onInput={(e) => {
                                         if ((selectedCarrier?.contacts || []).length === 0) {
@@ -2001,7 +2073,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.email || '')
+                                            // ? (selectedCarrier?.email || '')
+                                            ? ''
                                             : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                                 ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_work
                                                 : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
@@ -2020,6 +2093,25 @@ const Carriers = (props) => {
                                         })}>
                                         {selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email}
                                     </div>
+                                }
+
+                                {
+                                    showCarrierEmailCopyBtn &&
+                                    <FontAwesomeIcon style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: 30,
+                                        zIndex: 1,
+                                        cursor: 'pointer',
+                                        transform: 'translateY(-50%)',
+                                        color: '#2bc1ff',
+                                        margin: 0,
+                                        transition: 'ease 0.2s',
+                                        fontSize: '1rem'
+                                    }} icon={faCopy} onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(refCarrierEmail.current.value);
+                                    }} />
                                 }
                             </div>
                         </div>
@@ -2137,7 +2229,14 @@ const Carriers = (props) => {
 
                                             contactSearchCustomer={{
                                                 ...selectedCarrier,
-                                                selectedContact: selectedContact
+                                                selectedContact: {
+                                                    ...selectedContact,
+                                                    address1: (selectedCarrier?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedCarrier?.address1 || '') : (selectedContact?.address1 || ''),
+                                                    address2: (selectedCarrier?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedCarrier?.address2 || '') : (selectedContact?.address2 || ''),
+                                                    city: (selectedCarrier?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedCarrier?.city || '') : (selectedContact?.city || ''),
+                                                    state: (selectedCarrier?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedCarrier?.state || '') : (selectedContact?.state || ''),
+                                                    zip_code: (selectedCarrier?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedCarrier?.zip || '') : (selectedContact?.zip_code || ''),
+                                                }
                                             }}
                                         />
                                     }
@@ -2181,7 +2280,7 @@ const Carriers = (props) => {
                                     props.openPanel(panel, props.origin);
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Add contact</div>
+                                    <div className="mochi-button-base">Add Contact</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                                 <div className="mochi-button" onClick={() => setSelectedContact({})}>
@@ -2623,7 +2722,29 @@ const Carriers = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedContact?.email_work || '') !== '' ||
+                                        (selectedContact?.email_personal || '') !== '' ||
+                                        (selectedContact?.email_other || '') !== '') {
+                                        setShowCarrierContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedContact?.email_work || '') !== '' ||
+                                        (selectedContact?.email_personal || '') !== '' ||
+                                        (selectedContact?.email_other || '') !== '') {
+                                        setShowCarrierContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowCarrierContactEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowCarrierContactEmailCopyBtn(false);
+                                }}>
                                 <div className="select-box-wrapper">
                                     <input tabIndex={84 + props.tabTimes} type="text" placeholder="E-Mail"
                                         style={{
@@ -2846,6 +2967,25 @@ const Carriers = (props) => {
                                             })}>
                                             {selectedContact?.primary_email || ''}
                                         </div>
+                                    }
+
+                                    {
+                                        showCarrierContactEmailCopyBtn &&
+                                        <FontAwesomeIcon style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            right: 30,
+                                            zIndex: 1,
+                                            cursor: 'pointer',
+                                            transform: 'translateY(-50%)',
+                                            color: '#2bc1ff',
+                                            margin: 0,
+                                            transition: 'ease 0.2s',
+                                            fontSize: '1rem'
+                                        }} icon={faCopy} onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(refCarrierContactEmail.current.value);
+                                        }} />
                                     }
 
                                     {
@@ -3219,8 +3359,27 @@ const Carriers = (props) => {
 
                             <div className="form-h-sep"></div>
 
-                            <div className="input-box-container" style={{ flexGrow: 1 }}>
-                                <input tabIndex={95 + props.tabTimes} type="text" placeholder="E-mail" style={{ textTransform: 'lowercase' }}
+                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedDriver?.email || '') !== '') {
+                                        setShowCarrierDriverEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedDriver?.email || '') !== '') {
+                                        setShowCarrierDriverEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowCarrierDriverEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowCarrierDriverEmailCopyBtn(false);
+                                }}>
+                                <input tabIndex={95 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
+                                    ref={refCarrierDriverEmail}
                                     onKeyDown={validateDriverForSaving}
                                     onInput={e => {
                                         setSelectedDriver({ ...selectedDriver, email: e.target.value })
@@ -3229,6 +3388,24 @@ const Carriers = (props) => {
                                         setSelectedDriver({ ...selectedDriver, email: e.target.value })
                                     }}
                                     value={selectedDriver?.email || ''} />
+                                {
+                                    showCarrierDriverEmailCopyBtn &&
+                                    <FontAwesomeIcon style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: 5,
+                                        zIndex: 1,
+                                        cursor: 'pointer',
+                                        transform: 'translateY(-50%)',
+                                        color: '#2bc1ff',
+                                        margin: 0,
+                                        transition: 'ease 0.2s',
+                                        fontSize: '1rem'
+                                    }} icon={faCopy} onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(refCarrierDriverEmail.current.value);
+                                    }} />
+                                }
                             </div>
 
                         </div>
@@ -3656,7 +3833,7 @@ const Carriers = (props) => {
                         }}>
                             <div className="mochi-button">
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">E-mail Driver</div>
+                                <div className="mochi-button-base">E-Mail Driver</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -3677,6 +3854,17 @@ const Carriers = (props) => {
                             <div className="form-title">Mailing Address</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
+                                <div className='mochi-button' onClick={() => {
+                                    if ((selectedCarrier.id || 0) > 0) {
+                                        setShowingACHWiringInfo(true);
+                                    } else {
+                                        window.alert('You must select a carrier first!');
+                                    }
+                                }}>
+                                    <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                    <div className='mochi-button-base'>ACH/Wiring Info</div>
+                                    <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                </div>
                                 <div className="mochi-button" onClick={remitToAddressBtn}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Remit to address is the same</div>
@@ -4399,7 +4587,29 @@ const Carriers = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedCarrier?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                        setShowMailingContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedCarrier?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                        setShowMailingContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowMailingContactEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowMailingContactEmailCopyBtn(false);
+                                }}>
                                 <div className="select-box-wrapper">
                                     <input tabIndex={64 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
                                         ref={refMailingContactEmail}
@@ -4583,6 +4793,25 @@ const Carriers = (props) => {
                                             })}>
                                             {selectedCarrier?.mailing_address?.mailing_contact_primary_email || ''}
                                         </div>
+                                    }
+
+                                    {
+                                        showMailingContactEmailCopyBtn &&
+                                        <FontAwesomeIcon style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            right: 30,
+                                            zIndex: 1,
+                                            cursor: 'pointer',
+                                            transform: 'translateY(-50%)',
+                                            color: '#2bc1ff',
+                                            margin: 0,
+                                            transition: 'ease 0.2s',
+                                            fontSize: '1rem'
+                                        }} icon={faCopy} onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(refMailingContactEmail.current.value);
+                                        }} />
                                     }
 
                                     {
@@ -5780,7 +6009,7 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={72 + props.tabTimes} type="text" placeholder="Contact Name"
-                                    onInput={(e) => {
+                                    onInput={(e) => {                                        
                                         if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
                                             setSelectedCarrier({
                                                 ...selectedCarrier,
@@ -5804,7 +6033,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.contact_name || '')
+                                            // ? (selectedCarrier?.factoring_company?.contact_name || '')
+                                            ? ''
                                             : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).last_name
                                     }
                                 />
@@ -5839,7 +6069,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.contact_phone || '')
+                                            // ? (selectedCarrier?.factoring_company?.contact_phone || '')
+                                            ? ''
                                             : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
                                                 ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
                                                 : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
@@ -5892,7 +6123,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.ext || '')
+                                            // ? (selectedCarrier?.factoring_company?.ext || '')
+                                            ? ''
                                             : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
                                     }
                                 />
@@ -5900,8 +6132,27 @@ const Carriers = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}>
+                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedCarrier?.factoring_company?.email || '') !== '') {
+                                        setShowFactoringCompanyEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedCarrier?.factoring_company?.email || '') !== '') {
+                                        setShowFactoringCompanyEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowFactoringCompanyEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowFactoringCompanyEmailCopyBtn(false);
+                                }}>
                                 <input tabIndex={75 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
+                                    ref={refFactoringCompanyEmail}
                                     onKeyDown={validateFactoringCompanyToSave}
                                     onInput={(e) => {
                                         if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
@@ -5927,7 +6178,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.email || '')
+                                            // ? (selectedCarrier?.factoring_company?.email || '')
+                                            ? ''
                                             : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                                 ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
                                                 : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
@@ -5947,6 +6199,25 @@ const Carriers = (props) => {
                                         })}>
                                         {selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email}
                                     </div>
+                                }
+
+                                {
+                                    showFactoringCompanyEmailCopyBtn &&
+                                    <FontAwesomeIcon style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: 30,
+                                        zIndex: 1,
+                                        cursor: 'pointer',
+                                        transform: 'translateY(-50%)',
+                                        color: '#2bc1ff',
+                                        margin: 0,
+                                        transition: 'ease 0.2s',
+                                        fontSize: '1rem'
+                                    }} icon={faCopy} onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(refFactoringCompanyEmail.current.value);
+                                    }} />
                                 }
                             </div>
                         </div>
@@ -6060,6 +6331,7 @@ const Carriers = (props) => {
                                                         panelName={`${props.panelName}-dispatch`}
                                                         origin={props.origin}
                                                         isOnPanel={true}
+                                                        isAdmin={props.isAdmin}
                                                         openPanel={props.openPanel}
                                                         closePanel={props.closePanel}
                                                         componentId={moment().format('x')}
@@ -6111,15 +6383,59 @@ const Carriers = (props) => {
                             selectedParent={selectedCarrier}
                             setSelectedParent={(notes) => {
                                 setSelectedCarrier({ ...selectedCarrier, notes: notes });
+                                props.setSelectedCarrier({ ...selectedCarrier, notes: notes })
                             }}
                             savingDataUrl='/saveCarrierNote'
-                            deletingDataUrl=''
+                            deletingDataUrl='/deleteCarrierNote'
                             type='note'
-                            isEditable={false}
-                            isDeletable={false}
+                            isEditable={props.isAdmin}
+                            isDeletable={props.isAdmin}
                             isPrintable={true}
                             isAdding={selectedNote.id === 0}
                         />
+                    </animated.div>
+                ))
+            }
+
+            {
+                achWiringInfoTransition((style, item) => item && (
+                    <animated.div
+                        className="ach-wiring-info-main-container"
+                        style={{
+                            ...style,
+                            position: "absolute",
+                            width: "100%",
+                            height: "100%",
+                            top: 0,
+                            left: 0,
+                            backgroundColor: "rgba(0,0,0,0.3)",
+                        }}>
+                        <div
+                            className="ach-wiring-info-wrapper"
+                            style={{
+                                position: "relative",
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}>
+                            <ACHWiringInfo
+                                panelName={`${props.panelName}-ach-wiring-info`}
+                                tabTimes={props.tabTimes}
+                                componentId={moment().format("x")}
+                                openPanel={props.openPanel}
+                                closePanel={props.closePanel}
+                                origin={props.origin}
+                                closeModal={() => {
+                                    setShowingACHWiringInfo(false);
+                                }}
+                                selectedOwner={selectedCarrier}
+                                setSelectedOwner={setSelectedCarrier}
+                                owner='carrier'
+                                savingUrl='/saveCarrierAchWiringInfo'
+                            />
+                        </div>
                     </animated.div>
                 ))
             }
