@@ -1115,7 +1115,15 @@ const Customers = (props) => {
             mailing_address: {}
         });
 
-        validateCustomerForSaving({ keyCode: 9 });
+        if ((selectedCustomer?.id || 0) > 0){
+            axios.post(props.serverUrl + '/deleteCustomerMailingAddress', {
+                customer_id: selectedCustomer.id
+            }).then(res => {
+                if (res.data.result === 'OK'){
+                    console.log('customer mailing address deleted')
+                }
+            })
+        }
         refCustomerMailingCode.current.focus();
     }
 
@@ -6151,6 +6159,7 @@ const Customers = (props) => {
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div className="fields-container-col">
@@ -6631,9 +6640,9 @@ const Customers = (props) => {
                             selectedData={selectedNote}
                             setSelectedData={setSelectedNote}
                             selectedParent={selectedCustomer}
-                            setSelectedParent={(notes) => {
-                                setSelectedCustomer({ ...selectedCustomer, notes: notes });
-                                props.setSelectedCustomer({ ...selectedCustomer, notes: notes })
+                            setSelectedParent={(data) => {
+                                setSelectedCustomer({ ...selectedCustomer, notes: data.notes });
+                                props.setSelectedCustomer({ ...selectedCustomer, notes: data.notes })
                             }}
                             savingDataUrl='/saveCustomerNote'
                             deletingDataUrl='/deleteCustomerNote'
@@ -6653,9 +6662,9 @@ const Customers = (props) => {
                             selectedData={selectedDirection}
                             setSelectedData={setSelectedDirection}
                             selectedParent={selectedCustomer}
-                            setSelectedParent={(directions) => {
-                                setSelectedCustomer({ ...selectedCustomer, directions: directions });
-                                props.setSelectedCustomer({ ...selectedCustomer, directions: directions })
+                            setSelectedParent={(data) => {
+                                setSelectedCustomer({ ...selectedCustomer, directions: data.notes });
+                                props.setSelectedCustomer({ ...selectedCustomer, directions: data.notes })
                             }}
                             savingDataUrl='/saveCustomerDirection'
                             deletingDataUrl='/deleteCustomerDirection'

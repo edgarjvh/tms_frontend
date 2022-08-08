@@ -11937,14 +11937,14 @@ const Invoice = (props) => {
                     selectedData={selectedInternalNote}
                     setSelectedData={setSelectedInternalNote}
                     selectedParent={selectedOrder}
-                    setSelectedParent={(notes) => {
+                    setSelectedParent={(data) => {
                         setSelectedOrder(selectedOrder => {
-                            return { ...selectedOrder, internal_notes: notes }
+                            return { ...selectedOrder, internal_notes: data.notes }
                         });
 
                         props.setSelectedOrder({
                             id: selectedOrder.id,
-                            internal_notes: notes,
+                            internal_notes: data.notes,
                             component_id: props.componentId
                         })
                     }}
@@ -11964,14 +11964,14 @@ const Invoice = (props) => {
                     selectedData={selectedBillingNote}
                     setSelectedData={setSelectedBillingNote}
                     selectedParent={selectedOrder}
-                    setSelectedParent={(notes) => {
+                    setSelectedParent={(data) => {
                         setSelectedOrder(selectedOrder => {
-                            return { ...selectedOrder, billing_notes: notes }
+                            return { ...selectedOrder, billing_notes: data.notes }
                         });
 
                         props.setSelectedOrder({
                             id: selectedOrder.id,
-                            billing_notes: notes,
+                            billing_notes: data.notes,
                             component_id: props.componentId
                         })
                     }}

@@ -490,6 +490,7 @@ function Admin(props) {
         }
 
         if (origin === 'company') {
+            console.log(companySetupPanels);
             if (companySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
                 setCompanySetupPanels(companySetupPanels => [...companySetupPanels, panel]);
             }
@@ -514,6 +515,7 @@ function Admin(props) {
         }
 
         if (origin === 'company') {
+            console.log(panelName, companySetupPanels);
             setCompanySetupPanels(companySetupPanels.filter(panel => panel.panelName !== panelName));
         }
     }
@@ -540,7 +542,7 @@ function Admin(props) {
                                 lineHeight: '1rem'
                             }}>
                                 <div className="user-name" style={{ display: 'flex', alignItems: 'center' }}>
-                                    <span>{(props.user.type === 'employee' ? 'EM' : 'AG') + props.user.id.toString().padStart(4, '0')}</span>
+                                    <span>{props.user.user_code.code}</span>
                                     <span style={{ marginRight: 5, marginLeft: 5 }}>-</span>
                                     <span>{props.user?.first_name || ''} {props.user?.last_name || ''}</span>
                                 </div>

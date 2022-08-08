@@ -7,3 +7,4 @@ export {default as DriverSearch} from './driver-search/DriverSearch';
 export {default as Operators} from './operators/Operators';
 export {default as OperatorSearch} from './operator-search/OperatorSearch';
 export {default as PassModal} from './pass-modal/PassModal';
+export {default as Divisions} from './divisions/Divisions';

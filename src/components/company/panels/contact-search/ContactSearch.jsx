@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import './ContactSearch.css';
 import axios from 'axios';
-import { useTransition, animated } from 'react-spring';
+import {useTransition, animated} from 'react-spring';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
-import { Contacts } from './../../panels';
-import { connect } from 'react-redux';
+import {Contacts} from './../../panels';
+import {connect} from 'react-redux';
 
 import {
     setCompanyOpenedPanels,
@@ -27,9 +27,9 @@ const ContactSearch = (props) => {
     const [contacts, setContacts] = useState([]);
 
     const loadingTransition = useTransition(isLoading, {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: isLoading,
     });
 
@@ -44,6 +44,18 @@ const ContactSearch = (props) => {
                         break;
                     case 'factoring-company':
                         ownerType = 'FactoringCompany';
+                        break;
+                    case 'division':
+                        ownerType = 'Division';
+                        break;
+                    case 'employee':
+                        ownerType = 'Employee';
+                        break;
+                    case 'agent':
+                        ownerType = 'Agent';
+                        break;
+                    case 'owner-operator':
+                        ownerType = 'OwnerOperator';
                         break;
                     default:
                         ownerType = '';
@@ -71,18 +83,34 @@ const ContactSearch = (props) => {
                                     ? c.carrier
                                     : props.suborigin === 'factoring-company'
                                         ? c.factoring_company
-                                        : c.customer),
+                                        : props.suborigin === 'employee'
+                                            ? c.employee
+                                            : props.suborigin === 'agent'
+                                                ? c.agent
+                                                : props.suborigin === 'division'
+                                                    ? c.division
+                                                    : props.suborigin === 'owner-operator'
+                                                        ? c.owner_operator
+                                                        : c.customer),
                             selectedContact: (props.suborigin === 'customer'
                                 ? ((c.customer.contacts || []).find(contact => contact.id === c.id) || {})
                                 : props.suborigin === 'carrier'
                                     ? ((c.carrier.contacts || []).find(contact => contact.id === c.id) || {})
                                     : props.suborigin === 'factoring-company'
                                         ? ((c.factoring_company.contacts || []).find(contact => contact.id === c.id) || {})
-                                        : ((c.customer.contacts || []).find(contact => contact.id === c.id) || {}))
+                                        : props.suborigin === 'employee'
+                                            ? ((c.employee.contacts || []).find(contact => contact.id === c.id) || {})
+                                            : props.suborigin === 'agent'
+                                                ? ((c.agent.contacts || []).find(contact => contact.id === c.id) || {})
+                                                : props.suborigin === 'division'
+                                                    ? ((c.division.contacts || []).find(contact => contact.id === c.id) || {})
+                                                    : props.suborigin === 'owner-operator'
+                                                        ? ((c.owner_operator.contacts || []).find(contact => contact.id === c.id) || {})
+                                                        : ((c.customer.contacts || []).find(contact => contact.id === c.id) || {}))
                         }}
                     />
                 }
-                    
+
                 props.openPanel(panel, props.origin);
             }
             prevent = false;
@@ -109,6 +137,22 @@ const ContactSearch = (props) => {
                 url = '/factoringCompanyContactsSearch';
                 break;
 
+            case 'employee':
+                url = '/employeeContactsSearch';
+                break;
+
+            case 'agent':
+                url = '/agentContactsSearch';
+                break;
+
+            case 'division':
+                url = '/divisionContactsSearch';
+                break;
+
+            case 'owner-operator':
+                url = '/ownerOperatorContactsSearch';
+                break;
+
             default:
                 url = '/customerContactsSearch';
                 break;
@@ -129,19 +173,22 @@ const ContactSearch = (props) => {
     return (
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-            <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="title">{props.title}</div>
+            <div className="side-title">
+                <div>{props.title}</div>
+            </div>
 
             {
                 loadingTransition((style, item) => item &&
-                    <animated.div className='loading-container' style={style} >
+                    <animated.div className='loading-container' style={style}>
                         <div className="loading-container-wrapper">
-                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
                         </div>
                     </animated.div>
                 )
             }
 
-            <div className="input-box-container" style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
+            <div className="input-box-container" style={{marginTop: 20, display: 'flex', alignItems: 'center'}}>
                 {
                     (props.contactSearch.filters || []).map((item, index) => {
 
@@ -158,8 +205,8 @@ const ContactSearch = (props) => {
                                         marginRight: '10px',
                                         cursor: 'default'
                                     }} title={item}>
-                                        <span style={{ fontWeight: 'bold', marginRight: 5 }}>{item.field}: </span>
-                                        <span style={{ whiteSpace: 'nowrap' }}>{item.data}</span>
+                                        <span style={{fontWeight: 'bold', marginRight: 5}}>{item.field}: </span>
+                                        <span style={{whiteSpace: 'nowrap'}}>{item.data}</span>
                                     </div>
                                 )
                             }
@@ -189,7 +236,11 @@ const ContactSearch = (props) => {
                             contacts.length > 0
                                 ? contacts.map((c, i) => {
                                     return (
-                                        <div className="trow" onClick={(e) => { handleClick(e, c) }} onDoubleClick={(e) => { handleDoubleClick(e, c) }} key={i}>
+                                        <div className="trow" onClick={(e) => {
+                                            handleClick(e, c)
+                                        }} onDoubleClick={(e) => {
+                                            handleDoubleClick(e, c)
+                                        }} key={i}>
                                             <div className="tcol first-name">{c.first_name}</div>
                                             <div className="tcol last-name">{c.last_name}</div>
                                             <div className="tcol address1">{c.address1}</div>
@@ -201,7 +252,9 @@ const ContactSearch = (props) => {
                                         </div>
                                     )
                                 })
-                                : <div className="trow"><div className="tcol empty">Nothing to show!</div></div>
+                                : <div className="trow">
+                                    <div className="tcol empty">Nothing to show!</div>
+                                </div>
                         }
                     </div>
                 </div>

@@ -1527,8 +1527,7 @@ const Dispatch = (props) => {
                                     event_time: moment().format("HHmm"),
                                     date: moment().format("MM/DD/YYYY"),
                                     event_date: moment().format("MM/DD/YYYY"),
-                                    agent_id: props.user.type === 'agent' ? props.user.id : null,
-                                    employee_id: props.user.type === 'employee' ? props.user.id : null,
+                                    user_code_id: props.user.user_code.id || null,
                                     event_location: "",
                                     event_notes:
                                         "Assigned Carrier " +
@@ -1912,8 +1911,7 @@ const Dispatch = (props) => {
                                         event_time: moment().format("HHmm"),
                                         date: moment().format("MM/DD/YYYY"),
                                         event_date: moment().format("MM/DD/YYYY"),
-                                        agent_id: props.user.type === 'agent' ? props.user.id : null,
-                                        employee_id: props.user.type === 'employee' ? props.user.id : null,
+                                        user_code_id: props.user.user_code.id || null,
                                         event_location: "",
                                         event_notes:
                                             "Assigned Carrier " +
@@ -3170,7 +3168,7 @@ const Dispatch = (props) => {
     useEffect(() => {
         if (isSavingOrder) {
             let selected_order = { ...selectedOrder } || { order_number: 0 };
-            console.log(selected_order);
+
 
             // check if there's a bill-to-company loaded
             if ((selectedBillToCustomer?.id || 0) === 0) {
@@ -3228,9 +3226,8 @@ const Dispatch = (props) => {
 
             let toSavePickup = (selected_order.pickups || []).find((p) => (p.toSave || false) === true) !== undefined;
 
-            if (!selected_order?.employee_id && !selected_order?.agent_id) {
-                selected_order.employee_id = props.user.type === 'employee' ? props.user.id : null;
-                selected_order.agent_id = props.user.type === 'agent' ? props.user.id : null;
+            if (!selected_order?.user_code) {
+                selected_order.user_code_id = props.user.user_code.id;
             }
 
             setSelectedOrder({ ...selected_order });
@@ -4373,13 +4370,7 @@ const Dispatch = (props) => {
                                             type="text"
                                             readOnly={true}
                                             onChange={(e) => { }}
-                                            value={(selectedOrder?.id || 0) > 0
-                                                ? (selectedOrder?.employee_id || 0) > 0
-                                                    ? 'EM' + selectedOrder.employee_id.toString().padStart(4, '0')
-                                                    : (selectedOrder?.agent_id || 0) > 0
-                                                        ? 'EM' + selectedOrder.agent_id.toString().padStart(4, '0')
-                                                        : ''
-                                                : ''}
+                                            value={selectedOrder?.user_code?.code || ''}
                                         />
                                     </div>
 
@@ -5904,6 +5895,7 @@ const Dispatch = (props) => {
                                         selected_order.trip_number = 0;
                                         selected_order.carrier_id = null;
                                         selected_order.carrier_driver_id = null;
+                                        selected_order.user_code_id = props.user.user_code.id
 
                                         axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                             if (res.data.result === "OK") {
@@ -5924,8 +5916,7 @@ const Dispatch = (props) => {
                                                                     {
                                                                         order_id: res.data.order.id,
                                                                         text: note.text,
-                                                                        user: note.user,
-                                                                        date_time: note.date_time,
+                                                                        user_code_id: props.user.user_code.id,
                                                                     }
                                                                 ).then((res) => {
                                                                     if (index === selected_order.internal_notes.length - 1) {
@@ -5948,8 +5939,7 @@ const Dispatch = (props) => {
                                                                         {
                                                                             order_id: res.data.order.id,
                                                                             text: note.text,
-                                                                            user: note.user,
-                                                                            date_time: note.date_time,
+                                                                            user_code_id: props.user.user_code.id,
                                                                         }
                                                                     ).then((res) => {
                                                                         if (index === selected_order.notes_for_carrier.length - 1) {
@@ -19064,8 +19054,7 @@ const Dispatch = (props) => {
                                             event_time: formatted,
                                             date: moment().format("MM/DD/YYYY"),
                                             event_date: dispatchEventDate,
-                                            agent_id: props.user.type === 'agent' ? props.user.id : null,
-                                            employee_id: props.user.type === 'employee' ? props.user.id : null,
+                                            user_code_id: props.user.user_code.id || null,
                                             event_location: dispatchEventLocation,
                                             event_notes: dispatchEventNotes,
                                             event_type_id: dispatchEvent.id,
@@ -20008,7 +19997,7 @@ const Dispatch = (props) => {
                                     <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
                                         <div style="min-width:15%;max-width:15%;">${item.event_date
                                             }@${item.event_time}</div>
-                                        <div style="min-width:10%;max-width:10%;">${(item?.employee_id || 0) > 0 ? 'EM' + item.employee_id.toString().padStart(4, '0') : (item?.agent_id || 0) > 0 ? 'AG' + item.agent_id.toString().padStart(4, '0') : ''}</div>
+                                        <div style="min-width:10%;max-width:10%;">${item?.user_code?.code || ''}</div>
                                         <div style="min-width:15%;max-width:15%;">${item.event_type.name.toUpperCase()}</div>
                                         <div style="min-width:20%;max-width:20%;">${item.event_location || ""
                                             }</div>
@@ -20054,7 +20043,7 @@ const Dispatch = (props) => {
                                 <div className="order-events-item" key={index}>
                                     <div className="event-date">{item.date}</div>
                                     <div className="event-time">{item.time}</div>
-                                    <div className="event-user-id">{(item?.employee_id || 0) > 0 ? 'EM' + item.employee_id.toString().padStart(4, '0') : (item?.agent_id || 0) > 0 ? 'AG' + item.agent_id.toString().padStart(4, '0') : ''}</div>
+                                    <div className="event-user-id">{item?.user_code?.code || ''}</div>
                                     <div className="event-type">
                                         {item.event_type.name.toUpperCase()}
                                     </div>
@@ -20138,9 +20127,9 @@ const Dispatch = (props) => {
                                 selectedData={selectedNoteForDriver}
                                 setSelectedData={setSelectedNoteForDriver}
                                 selectedParent={selectedOrder}
-                                setSelectedParent={(notes) => {
+                                setSelectedParent={(data) => {
                                     setSelectedOrder((selectedOrder) => {
-                                        return { ...selectedOrder, notes_for_driver: notes };
+                                        return { ...selectedOrder, notes_for_driver: data.notes };
                                     });
                                 }}
                                 savingDataUrl="/saveNotesForDriver"
@@ -20162,9 +20151,9 @@ const Dispatch = (props) => {
                                 selectedData={selectedNoteForCarrier}
                                 setSelectedData={setSelectedNoteForCarrier}
                                 selectedParent={selectedOrder}
-                                setSelectedParent={(notes) => {
+                                setSelectedParent={(data) => {
                                     setSelectedOrder((selectedOrder) => {
-                                        return { ...selectedOrder, notes_for_carrier: notes };
+                                        return { ...selectedOrder, notes_for_carrier: data.notes };
                                     });
                                 }}
                                 savingDataUrl="/saveNotesForCarrier"
@@ -20186,9 +20175,9 @@ const Dispatch = (props) => {
                                 selectedData={selectedInternalNote}
                                 setSelectedData={setSelectedInternalNote}
                                 selectedParent={selectedOrder}
-                                setSelectedParent={(notes) => {
+                                setSelectedParent={(data) => {
                                     setSelectedOrder((selectedOrder) => {
-                                        return { ...selectedOrder, internal_notes: notes };
+                                        return { ...selectedOrder, internal_notes: data.notes };
                                     });
                                 }}
                                 savingDataUrl="/saveInternalNotes"

@@ -45,6 +45,9 @@ const CustomerSearch = (props) => {
                 url = '/factoringCompanySearch';
                 break;
 
+            case 'division':
+                url = '/divisionSearch';
+                break;
             default:
                 url = '/customerSearch';
                 break;
@@ -52,15 +55,8 @@ const CustomerSearch = (props) => {
 
         axios.post(props.serverUrl + url, { search: props.customerSearch }).then(async res => {
             if (res.data.result === 'OK') {
-                setCustomers(
-                    props.suborigin === 'customer'
-                        ? res.data.customers
-                        : props.suborigin === 'carrier'
-                            ? res.data.carriers
-                            : props.suborigin === 'factoring-company'
-                                ? res.data.factoring_companies
-                                : res.data.customers
-                );
+                let {customers, carriers, factoring_companies, divisions, agents, owner_operators, drivers} = res.data;
+                setCustomers(customers || carriers || factoring_companies || divisions || agents || owner_operators || drivers || []);
             }
 
             setIsLoading(false);

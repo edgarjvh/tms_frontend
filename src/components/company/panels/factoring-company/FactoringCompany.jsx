@@ -3838,15 +3838,15 @@ const FactoringCompany = (props) => {
                             selectedData={selectedFactoringCompanyNote}
                             setSelectedData={setSelectedFactoringCompanyNote}
                             selectedParent={selectedFactoringCompany}
-                            setSelectedParent={(notes) => {
-                                setSelectedFactoringCompany({ ...selectedFactoringCompany, notes: notes });
+                            setSelectedParent={(data) => {
+                                setSelectedFactoringCompany({ ...selectedFactoringCompany, notes: data.notes });
 
                                 if ((props.selectedCarrier?.id || 0) > 0 && props.selectedCarrier?.factoring_company?.id === selectedFactoringCompany?.id) {
                                     props.setSelectedCarrier({
                                         id: props.selectedCarrier.id,
                                         factoring_company: {
                                             ...selectedFactoringCompany,
-                                            notes: notes
+                                            notes: data.notes
                                         },
                                         component_id: props.componentId
                                     });

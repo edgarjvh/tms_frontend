@@ -102,6 +102,9 @@ const Documents = (props) => {
             case 'order-billing':
                 getDocumentsUrl = '/getDocumentsByOrderBilling';
                 break;
+            case 'division':
+                getDocumentsUrl = '/getDocumentsByDivision';
+                break;
             default:
                 break;
         }
@@ -116,6 +119,7 @@ const Documents = (props) => {
             factoring_company_id: props.selectedOwner.id,
             order_id: props.selectedOwner.id,
             order_billing_id: props.selectedOwner.id,
+            division_id: props.selectedOwner.id,
         }).then(res => {
             if (res.data.result === 'OK') {
                 setSelectedOwner({
@@ -209,7 +213,8 @@ const Documents = (props) => {
         formData.append("factoring_company_id", selectedOwner.id);
         formData.append("invoice_id", selectedOwner.id);
         formData.append("order_id", selectedOwner.id);
-        formData.append("user_id", selectedOwnerDocument.user_id);
+        formData.append("division_id", selectedOwner.id);
+        formData.append("user_code_id", props.user.user_code.id);
         formData.append("date_entered", selectedOwnerDocument.date_entered);
         formData.append("title", selectedOwnerDocument.title);
         formData.append("subject", selectedOwnerDocument.subject);
@@ -306,6 +311,20 @@ const Documents = (props) => {
                             });
                         }
 
+                        if (props.suborigin === 'division') {
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+
+                            props.setSelectedDivision({
+                                ...selectedOwner,
+                                documents: res.data.documents
+                            });
+                        }
+
                         if (props.suborigin === 'carrier') {
                             setSelectedOwner(selectedOwner => {
                                 return {
@@ -368,7 +387,7 @@ const Documents = (props) => {
 
                         setSelectedOwnerDocument({
                             id: 0,
-                            user_id: Math.floor(Math.random() * (15 - 1)) + 1,
+                            user_code_id: props.user.user_code.id || null,
                             date_entered: moment().format('MM/DD/YYYY')
                         });
 
@@ -447,7 +466,7 @@ const Documents = (props) => {
                 <div className="documents-left-side">
                     <div className="documents-fields-row">
                         <div className="input-box-container">
-                            <input type="text" placeholder="Id" readOnly={true} value={selectedOwnerDocument.user_id || 0} />
+                            <input type="text" placeholder="Id" readOnly={true} value={selectedOwnerDocument.user_code?.code || props.user.user_code.code} />
                         </div>
 
                         <div className="input-box-container" style={{ marginRight: 5 }}>
@@ -477,7 +496,7 @@ const Documents = (props) => {
                         }}>Quick type links:</div>
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -800,6 +819,9 @@ const Documents = (props) => {
                                                 case 'order-billing':
                                                     getDocumentNotesUrl = '/getNotesByOrderBillingDocument';
                                                     break;
+                                                case 'division':
+                                                    getDocumentNotesUrl = '/getNotesByDivisionDocument';
+                                                    break;
                                                 default:
                                                     break;
                                             }
@@ -808,7 +830,7 @@ const Documents = (props) => {
                                                 doc_id: document.id,
                                             }).then(res => {
                                                 if (res.data.result === 'OK') {
-                                                    document.notes = [...res.data.documentNotes]
+                                                    document.notes = [...res.data.notes]
                                                 }
 
                                                 setSelectedOwnerDocument(document);
@@ -840,6 +862,7 @@ const Documents = (props) => {
                                                         agent_id: selectedOwner.id,
                                                         driver_id: selectedOwner.id,
                                                         operator_id: selectedOwner.id,
+                                                        division_id: selectedOwner.id,
                                                     }).then(res => {
                                                         if (res.data.result === 'OK') {
 
@@ -900,6 +923,17 @@ const Documents = (props) => {
                                                                     id: selectedOwner.id,
                                                                     documents: res.data.documents,
                                                                     component_id: props.componentId
+                                                                });
+                                                            }
+
+                                                            if (props.suborigin === 'division') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return { ...selectedOwner, documents: res.data.documents }
+                                                                })
+
+                                                                props.setSelectedDivision({
+                                                                    ...selectedOwner,
+                                                                    documents: res.data.documents
                                                                 });
                                                             }
 
@@ -1094,10 +1128,10 @@ const Documents = (props) => {
                         selectedData={selectedOwnerDocumentNote}
                         setSelectedData={setSelectedOwnerDocumentNote}
                         selectedParent={selectedOwnerDocument}
-                        setSelectedParent={(notes) => {
+                        setSelectedParent={(data) => {
                             setSelectedOwnerDocument({
                                 ...selectedOwnerDocument,
-                                notes: notes
+                                notes: data.notes
                             });
 
                             setSelectedOwnerDocumentNote({});
@@ -1108,7 +1142,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedEmployee.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1121,7 +1155,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedAgent.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1134,7 +1168,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedDriver.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1147,7 +1181,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedOperator.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1160,11 +1194,23 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedCustomer.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
                                         component_id: props.componentId
+                                    });
+                                    break;
+
+                                case 'division':
+                                    props.setSelectedDivision({
+                                        ...selectedOwner,
+                                        documents: selectedOwner.documents.map((document, index) => {
+                                            if (document.id === selectedOwnerDocument.id) {
+                                                document.notes = data.notes;
+                                            }
+                                            return document;
+                                        })
                                     });
                                     break;
 
@@ -1173,7 +1219,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedCarrier.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1186,7 +1232,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedFactoringCompany.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1199,7 +1245,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selected_order.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1212,7 +1258,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         billing_documents: props.selected_order.billing_documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = notes;
+                                                document.notes = data.notes;
                                             }
                                             return document;
                                         }),
@@ -1229,8 +1275,8 @@ const Documents = (props) => {
                         savingDataUrl={savingDocumentNoteUrl}
                         deletingDataUrl=''
                         type='note'
-                        isEditable={false}
-                        isDeletable={false}
+                        isEditable={props.isAdmin}
+                        isDeletable={props.isAdmin}
                         isAdding={selectedOwnerDocumentNote.id === 0} />
                 </animated.div>
             }
@@ -1243,6 +1289,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
         customerOpenedPanels: state.customerReducers.customerOpenedPanels,
         carrierOpenedPanels: state.carrierReducers.carrierOpenedPanels,

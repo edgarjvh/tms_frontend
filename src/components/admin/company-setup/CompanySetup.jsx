@@ -20,7 +20,8 @@ import {
     Drivers,
     DriverSearch,
     Operators,
-    OperatorSearch
+    OperatorSearch,
+    Divisions
 } from './../panels';
 
 import {
@@ -1304,6 +1305,36 @@ function CompanySetup(props) {
                             <div className="form-title">Company</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
+                                <div className="mochi-button" onClick={() => {
+                                    if (selectedCompany?.id === undefined) {
+                                        window.alert('You must select a company first!');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-divisions`,
+                                        component: <Divisions
+                                            title='Divisions'
+                                            tabTimes={832000 + props.tabTimes}
+                                            panelName={`${props.panelName}-divisions`}                                            
+                                            origin={props.origin}
+                                            owner='company'
+                                            isEditingDriver={true}
+                                            openPanel={props.openPanel}
+                                            closePanel={props.closePanel}
+                                            componentId={moment().format('x')}
+                                            selectedCompany={selectedCompany}
+                                            isAdmin={props.isAdmin}
+                                        />
+                                    }
+
+                                    props.openPanel(panel, props.origin);
+                                }}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Divisions</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
                                 {
                                     isEditingCompany
                                         ?

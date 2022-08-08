@@ -35,6 +35,7 @@ function Root(props) {
                     axios.get(props.serverUrl + '/user', {
                         withCredentials: true
                     }).then(res => {
+                        console.log(res.data);
                         props.setUser(res.data);
                     }).catch((error) => {
                         props.setUser({});

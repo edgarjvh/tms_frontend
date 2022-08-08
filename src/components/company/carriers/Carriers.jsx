@@ -6381,9 +6381,9 @@ const Carriers = (props) => {
                             selectedData={selectedNote}
                             setSelectedData={setSelectedNote}
                             selectedParent={selectedCarrier}
-                            setSelectedParent={(notes) => {
-                                setSelectedCarrier({ ...selectedCarrier, notes: notes });
-                                props.setSelectedCarrier({ ...selectedCarrier, notes: notes })
+                            setSelectedParent={(data) => {
+                                setSelectedCarrier({ ...selectedCarrier, notes: data.notes });
+                                props.setSelectedCarrier({ ...selectedCarrier, notes: data.notes })
                             }}
                             savingDataUrl='/saveCarrierNote'
                             deletingDataUrl='/deleteCarrierNote'

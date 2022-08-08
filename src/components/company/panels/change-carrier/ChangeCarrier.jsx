@@ -180,7 +180,7 @@ const ChangeCarrier = (props) => {
                 event_time: moment().format('HHmm'),
                 date: moment().format('MM/DD/YYYY'),
                 event_date: moment().format('MM/DD/YYYY'),
-                user_id: selected_order.ae_number,
+                user_code_id: props.user.user_code.id || null,
                 event_location: '',
                 event_notes: `Changed Carrier from: "Old Carrier (${currentCarrier.code + (currentCarrier.code_number === 0 ? '' : currentCarrier.code_number) + ' - ' + currentCarrier.name})" to "New Carrier (${newCarrier.code + (newCarrier.code_number === 0 ? '' : newCarrier.code_number) + ' - ' + newCarrier.name})"`,
                 event_type_id: 3,
@@ -484,6 +484,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

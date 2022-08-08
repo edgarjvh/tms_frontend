@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import $ from 'jquery';
+import axios from 'axios';
 import './Modal.css';
 import moment from 'moment';
 import {
@@ -23,15 +24,12 @@ const Modal = (props) => {
     }
 
     const saveData = () => {
-        let user = getinitials(2);
-        let date_time = moment().format('YYYY-MM-DD HH:mm:ss');
-
         if ((props.selectedData.text || '').trim() === '') {
             alert('You must type some text!');
             return;
         }
 
-        $.post(props.serverUrl + props.savingDataUrl, {
+        axios.post(props.serverUrl + props.savingDataUrl, {
             id: props.selectedData.id,
             employee_id: props.selectedParent.id,
             agent_id: props.selectedParent.id,
@@ -41,22 +39,26 @@ const Modal = (props) => {
             carrier_id: props.selectedParent.id,
             factoring_company_id: props.selectedParent.id,
             order_id: props.selectedParent.id,
+            division_id: props.selectedParent.id,
             doc_id: props.selectedParent.id,
             text: props.selectedData.text,
-            user: props.isAdding ? user : props.selectedData.user,
-            date_time: props.isAdding ? date_time : props.selectedData.date_time
+            user_code_id: props.user.user_code.id
         }).then(res => {
-            if (res.result === 'OK') {
+            if (res.data.result === 'OK') {
                 props.setSelectedParent(res.data);
                 props.setSelectedData({});
             }
+        }).catch(e => {
+            console.log('error saving note', e);
         });
     }
 
     const deleteData = () => {
         if (window.confirm(`Are you sure to delete this ${props.type}?`)) {
-            $.post(props.serverUrl + props.deletingDataUrl, props.selectedData).then(res => {
-                if (res.result === 'OK') {
+
+
+            axios.post(props.serverUrl + props.deletingDataUrl, props.selectedData).then(res => {
+                if (res.data.result === 'OK') {
                     props.setSelectedParent(res.data);
                     props.setSelectedData({});
                 }
@@ -113,7 +115,7 @@ const Modal = (props) => {
                         value={
                             (isEditing || props.isAdding)
                                 ? props.selectedData.text
-                                : props.selectedData.user + ':' + moment(props.selectedData.date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY:HHmm') + ' ' + props.selectedData.text
+                                : props.selectedData.user_code?.code + ' : ' + moment(props.selectedData.date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY : HHmm') + ' : ' + props.selectedData.text
                         }
                         onChange={onChangeText}
                         style={{
@@ -199,6 +201,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
