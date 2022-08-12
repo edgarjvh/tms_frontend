@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import './CompanySetup.css';
 import classnames from 'classnames';
-import { connect } from 'react-redux';
-import { useTransition, animated } from 'react-spring';
+import {connect} from 'react-redux';
+import {useTransition, animated} from 'react-spring';
 import moment from 'moment';
 import MaskedInput from 'react-text-mask';
 import axios from 'axios';
-import { useDetectClickOutside } from "react-detect-click-outside";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCheck, faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import {useDetectClickOutside} from "react-detect-click-outside";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCaretDown, faCaretRight, faCheck, faPencilAlt, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 
@@ -41,9 +41,9 @@ function CompanySetup(props) {
     const refEmployeeFirstName = useRef();
     const refEmployeePhone = useRef();
     const refEmployeeEmail = useRef();
-    const refAgentFirstName = useRef();
-    const refAgentPhone = useRef();
-    const refAgentEmail = useRef();
+    const refAgentContactFirstName = useRef();
+    const refAgentContactPhone = useRef();
+    const refAgentContactEmail = useRef();
     const refDriverFirstName = useRef();
     const refDriverPhone = useRef();
     const refDriverEmail = useRef();
@@ -57,12 +57,14 @@ function CompanySetup(props) {
     const [showingEmployeeList, setShowingEmployeeList] = useState(true);
     const [employeeSearch, setEmployeeSearch] = useState({});
     const [selectedAgent, setSelectedAgent] = useState({});
+    const [selectedAgentContact, setSelectedAgentContact] = useState({});
     const [showingAgentList, setShowingAgentList] = useState(true);
     const [agentSearch, setAgentSearch] = useState({});
     const [selectedDriver, setSelectedDriver] = useState({});
     const [showingDriverList, setShowingDriverList] = useState(true);
     const [driverSearch, setDriverSearch] = useState({});
     const [selectedOperator, setSelectedOperator] = useState({});
+    const [selectedOperatorContact, setSelectedOperatorContact] = useState({});
     const [showingOperatorList, setShowingOperatorList] = useState(true);
     const [operatorSearch, setOperatorSearch] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -79,42 +81,74 @@ function CompanySetup(props) {
 
     const [employeePhoneItems, setEmployeePhoneItems] = useState([]);
     const [showEmployeePhones, setShowEmployeePhones] = useState(false);
-    const refEmployeePhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowEmployeePhones(false) } });
+    const refEmployeePhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowEmployeePhones(false)
+        }
+    });
     const refEmployeePhonePopupItems = useRef([]);
 
     const [employeeEmailItems, setEmployeeEmailItems] = useState([]);
     const [showEmployeeEmails, setShowEmployeeEmails] = useState(false);
-    const refEmployeeEmailDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowEmployeeEmails(false) } });
+    const refEmployeeEmailDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowEmployeeEmails(false)
+        }
+    });
     const refEmployeeEmailPopupItems = useRef([]);
 
-    const [agentPhoneItems, setAgentPhoneItems] = useState([]);
-    const [showAgentPhones, setShowAgentPhones] = useState(false);
-    const refAgentPhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowAgentPhones(false) } });
-    const refAgentPhonePopupItems = useRef([]);
+    const [agentContactPhoneItems, setAgentContactPhoneItems] = useState([]);
+    const [showAgentContactPhones, setShowAgentContactPhones] = useState(false);
+    const refAgentContactPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowAgentContactPhones(false)
+        }
+    });
+    const refAgentContactPhonePopupItems = useRef([]);
 
-    const [agentEmailItems, setAgentEmailItems] = useState([]);
-    const [showAgentEmails, setShowAgentEmails] = useState(false);
-    const refAgentEmailDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowAgentEmails(false) } });
-    const refAgentEmailPopupItems = useRef([]);
+    const [agentContactEmailItems, setAgentContactEmailItems] = useState([]);
+    const [showAgentContactEmails, setShowAgentContactEmails] = useState(false);
+    const refAgentContactEmailDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowAgentContactEmails(false)
+        }
+    });
+    const refAgentContactEmailPopupItems = useRef([]);
 
     const [driverPhoneItems, setDriverPhoneItems] = useState([]);
     const [showDriverPhones, setShowDriverPhones] = useState(false);
-    const refDriverPhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowDriverPhones(false) } });
+    const refDriverPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowDriverPhones(false)
+        }
+    });
     const refDriverPhonePopupItems = useRef([]);
 
     const [driverEmailItems, setDriverEmailItems] = useState([]);
     const [showDriverEmails, setShowDriverEmails] = useState(false);
-    const refDriverEmailDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowDriverEmails(false) } });
+    const refDriverEmailDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowDriverEmails(false)
+        }
+    });
     const refDriverEmailPopupItems = useRef([]);
 
     const [operatorPhoneItems, setOperatorPhoneItems] = useState([]);
     const [showOperatorPhones, setShowOperatorPhones] = useState(false);
-    const refOperatorPhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowOperatorPhones(false) } });
+    const refOperatorPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowOperatorPhones(false)
+        }
+    });
     const refOperatorPhonePopupItems = useRef([]);
 
     const [operatorEmailItems, setOperatorEmailItems] = useState([]);
     const [showOperatorEmails, setShowOperatorEmails] = useState(false);
-    const refOperatorEmailDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowOperatorEmails(false) } });
+    const refOperatorEmailDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowOperatorEmails(false)
+        }
+    });
     const refOperatorEmailPopupItems = useRef([]);
 
     const setInitialValues = (clearCode = true) => {
@@ -131,77 +165,77 @@ function CompanySetup(props) {
         setAgentSearch({});
         setDriverSearch({});
         setOperatorSearch({});
-        setSelectedCompany({ id: 0, code: clearCode ? '' : selectedCompany?.code });
+        setSelectedCompany({id: 0, code: clearCode ? '' : selectedCompany?.code});
     }
 
     const loadingTransition = useTransition(isLoading, {
-        from: { opacity: 0, display: 'block' },
-        enter: { opacity: 1, display: 'block' },
-        leave: { opacity: 0, display: 'none' },
+        from: {opacity: 0, display: 'block'},
+        enter: {opacity: 1, display: 'block'},
+        leave: {opacity: 0, display: 'none'},
         reverse: isLoading,
     });
 
     const employeePhonesTransition = useTransition(showEmployeePhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showEmployeePhones
     });
 
     const employeeEmailsTransition = useTransition(showEmployeeEmails, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showEmployeeEmails
     });
 
-    const agentPhonesTransition = useTransition(showAgentPhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
-        reverse: showAgentPhones
+    const agentPhonesTransition = useTransition(showAgentContactPhones, {
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
+        reverse: showAgentContactPhones
     });
 
-    const agentEmailsTransition = useTransition(showAgentEmails, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
-        reverse: showAgentEmails
+    const agentEmailsTransition = useTransition(showAgentContactEmails, {
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
+        reverse: showAgentContactEmails
     });
 
     const driverPhonesTransition = useTransition(showDriverPhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showDriverPhones
     });
 
     const driverEmailsTransition = useTransition(showDriverEmails, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showDriverEmails
     });
 
     const operatorPhonesTransition = useTransition(showOperatorPhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showOperatorPhones
     });
 
     const operatorEmailsTransition = useTransition(showOperatorEmails, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showOperatorEmails
     });
 
@@ -400,7 +434,7 @@ function CompanySetup(props) {
 
                     axios.post(props.serverUrl + '/saveCompanyMailingAddress', mailing_address).then(res => {
                         if (res.data.result === 'OK') {
-                            setSelectedCompany({ ...selectedCompany, mailing_address: res.data.mailing_address });
+                            setSelectedCompany({...selectedCompany, mailing_address: res.data.mailing_address});
 
                             props.setSelectedCompany({
                                 ...selectedCompany,
@@ -654,6 +688,14 @@ function CompanySetup(props) {
         }
     }, [isSavingOperator])
 
+    useEffect(() => {
+        if ((selectedAgent?.id || 0) > 0){
+            setSelectedAgentContact((selectedAgent?.contacts || []).find(c => c.is_primary === 1) || {});
+        }else{
+            setSelectedAgentContact({});
+        }
+    }, [selectedAgent])
+
     const validateCompanyForSaving = e => {
         let keyCode = e.keyCode || e.which;
 
@@ -684,7 +726,7 @@ function CompanySetup(props) {
         }
     }
 
-    const validateAgentForSaving = (e) => {
+    const validateAgentContactForSaving = (e) => {
         let keyCode = e.keyCode || e.which;
 
         if (keyCode === 9) {
@@ -741,9 +783,9 @@ function CompanySetup(props) {
         mailing_address.main_fax_number = selectedCompany.main_fax_number;
         mailing_address.website = selectedCompany.website;
 
-        setSelectedCompany({ ...selectedCompany, mailing_address: mailing_address });
+        setSelectedCompany({...selectedCompany, mailing_address: mailing_address});
 
-        validateMailingAddressForSaving({ keyCode: 9 });
+        validateMailingAddressForSaving({keyCode: 9});
     }
 
     const searchCompanyByCode = e => {
@@ -840,7 +882,7 @@ function CompanySetup(props) {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-                employeeSearch={{ search: filters }}
+                employeeSearch={{search: filters}}
 
                 callback={(employee) => {
                     new Promise((resolve, reject) => {
@@ -925,7 +967,7 @@ function CompanySetup(props) {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-                agentSearch={{ search: filters }}
+                agentSearch={{search: filters}}
 
                 callback={(agent) => {
                     new Promise((resolve, reject) => {
@@ -1010,7 +1052,7 @@ function CompanySetup(props) {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-                driverSearch={{ search: filters }}
+                driverSearch={{search: filters}}
 
                 callback={(driver) => {
                     new Promise((resolve, reject) => {
@@ -1095,7 +1137,7 @@ function CompanySetup(props) {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-                operatorSearch={{ search: filters }}
+                operatorSearch={{search: filters}}
 
                 callback={(operator) => {
                     new Promise((resolve, reject) => {
@@ -1144,7 +1186,7 @@ function CompanySetup(props) {
 
             const options = {
                 onUploadProgress: (progressEvent) => {
-                    const { loaded, total } = progressEvent;
+                    const {loaded, total} = progressEvent;
 
                     setProgressUploaded(isNaN(loaded) ? 0 : loaded);
                     setProgressTotal(isNaN(total) ? 0 : total);
@@ -1182,7 +1224,7 @@ function CompanySetup(props) {
     }
 
     const removeCompanyLogo = () => {
-        axios.post(props.serverUrl + '/removeCompanyLogo', { id: selectedCompany?.id }).then(async res => {
+        axios.post(props.serverUrl + '/removeCompanyLogo', {id: selectedCompany?.id}).then(async res => {
             if (res.data.result === "OK") {
                 setSelectedCompany(selectedCompany => {
                     return {
@@ -1217,12 +1259,14 @@ function CompanySetup(props) {
                 <div className="company-logo-container">
 
 
-                    <form encType='multipart/form-data' style={{ display: 'none' }}>
-                        <input type="file" ref={refCompanyInputLogo} accept='image/*' onChange={uploadCompanyLogo} />
+                    <form encType='multipart/form-data' style={{display: 'none'}}>
+                        <input type="file" ref={refCompanyInputLogo} accept='image/*' onChange={uploadCompanyLogo}/>
                     </form>
 
                     <div className="company-logo-wrapper">
-                        <img src={((selectedCompany?.id || 0) > 0 && (selectedCompany?.logo || '') !== '') ? props.serverUrl + '/company-logo/' + selectedCompany.logo : 'img/company-logo-default.png'} alt="" />
+                        <img
+                            src={((selectedCompany?.id || 0) > 0 && (selectedCompany?.logo || '') !== '') ? props.serverUrl + '/company-logo/' + selectedCompany.logo : 'img/company-logo-default.png'}
+                            alt=""/>
                     </div>
                 </div>
 
@@ -1233,11 +1277,13 @@ function CompanySetup(props) {
                             marginRight: 10
                         }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base" style={{ color: 'darkred' }}>Remove Logo</div>
+                            <div className="mochi-button-base" style={{color: 'darkred'}}>Remove Logo</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                     }
-                    <div className="mochi-button" onClick={() => { refCompanyInputLogo.current.click() }}>
+                    <div className="mochi-button" onClick={() => {
+                        refCompanyInputLogo.current.click()
+                    }}>
                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                         <div className="mochi-button-base">Upload Logo</div>
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -1247,52 +1293,54 @@ function CompanySetup(props) {
                 <div className="company-extra-info">
                     <div className="input-box-container">
                         <input tabIndex={47 + props.tabTimes} type="text" placeholder="EIN" id="txt-company-ein"
-                            onInput={e => {
-                                setSelectedCompany({
-                                    ...selectedCompany,
-                                    ein: e.target.value
-                                })
-                            }}
-                            onChange={e => {
-                                setSelectedCompany({
-                                    ...selectedCompany,
-                                    ein: e.target.value
-                                })
-                            }}
-                            value={selectedCompany?.ein || ''} />
+                               onInput={e => {
+                                   setSelectedCompany({
+                                       ...selectedCompany,
+                                       ein: e.target.value
+                                   })
+                               }}
+                               onChange={e => {
+                                   setSelectedCompany({
+                                       ...selectedCompany,
+                                       ein: e.target.value
+                                   })
+                               }}
+                               value={selectedCompany?.ein || ''}/>
                     </div>
                     <div className="input-box-container">
-                        <input tabIndex={48 + props.tabTimes} type="text" placeholder="Zulip Name" id="txt-company-zulip-name"
-                            onInput={e => {
-                                setSelectedCompany({
-                                    ...selectedCompany,
-                                    zulip_name: e.target.value
-                                })
-                            }}
-                            onChange={e => {
-                                setSelectedCompany({
-                                    ...selectedCompany,
-                                    zulip_name: e.target.value
-                                })
-                            }}
-                            value={selectedCompany?.zulip_name || ''} />
+                        <input tabIndex={48 + props.tabTimes} type="text" placeholder="Zulip Name"
+                               id="txt-company-zulip-name"
+                               onInput={e => {
+                                   setSelectedCompany({
+                                       ...selectedCompany,
+                                       zulip_name: e.target.value
+                                   })
+                               }}
+                               onChange={e => {
+                                   setSelectedCompany({
+                                       ...selectedCompany,
+                                       zulip_name: e.target.value
+                                   })
+                               }}
+                               value={selectedCompany?.zulip_name || ''}/>
                     </div>
                     <div className="input-box-container">
-                        <input tabIndex={49 + props.tabTimes} type="text" placeholder="Jitsi Name" id="txt-company-jitsi-name"
-                            onKeyDown={validateCompanyForSaving}
-                            onInput={e => {
-                                setSelectedCompany({
-                                    ...selectedCompany,
-                                    jitsi_name: e.target.value
-                                })
-                            }}
-                            onChange={e => {
-                                setSelectedCompany({
-                                    ...selectedCompany,
-                                    jitsi_name: e.target.value
-                                })
-                            }}
-                            value={selectedCompany?.jitsi_name || ''} />
+                        <input tabIndex={49 + props.tabTimes} type="text" placeholder="Jitsi Name"
+                               id="txt-company-jitsi-name"
+                               onKeyDown={validateCompanyForSaving}
+                               onInput={e => {
+                                   setSelectedCompany({
+                                       ...selectedCompany,
+                                       jitsi_name: e.target.value
+                                   })
+                               }}
+                               onChange={e => {
+                                   setSelectedCompany({
+                                       ...selectedCompany,
+                                       jitsi_name: e.target.value
+                                   })
+                               }}
+                               value={selectedCompany?.jitsi_name || ''}/>
                     </div>
                 </div>
             </div>
@@ -1316,7 +1364,7 @@ function CompanySetup(props) {
                                         component: <Divisions
                                             title='Divisions'
                                             tabTimes={832000 + props.tabTimes}
-                                            panelName={`${props.panelName}-divisions`}                                            
+                                            panelName={`${props.panelName}-divisions`}
                                             origin={props.origin}
                                             owner='company'
                                             isEditingDriver={true}
@@ -1362,146 +1410,148 @@ function CompanySetup(props) {
 
                         <div className="form-row">
                             <div className="input-box-container input-code">
-                                <input tabIndex={1 + props.tabTimes} type="text" placeholder="Code" maxLength="8" id="txt-company-code"
-                                    ref={refCompanyCode}
-                                    readOnly={true}
-                                    onKeyDown={searchCompanyByCode}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            code: e.target.value,
-                                            code_number: 0
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            code: e.target.value,
-                                            code_number: 0
-                                        })
-                                    }}
-                                    value={(selectedCompany.code_number || 0) === 0 ? (selectedCompany.code || '') : selectedCompany.code + selectedCompany.code_number} />
+                                <input tabIndex={1 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
+                                       id="txt-company-code"
+                                       ref={refCompanyCode}
+                                       readOnly={true}
+                                       onKeyDown={searchCompanyByCode}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               code: e.target.value,
+                                               code_number: 0
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               code: e.target.value,
+                                               code_number: 0
+                                           })
+                                       }}
+                                       value={(selectedCompany.code_number || 0) === 0 ? (selectedCompany.code || '') : selectedCompany.code + selectedCompany.code_number}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name"
-                                    ref={refCompanyName}
-                                    readOnly={!isEditingCompany}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            name: e.target.value
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            name: e.target.value
-                                        })
-                                    }}
-                                    value={selectedCompany?.name || ''} />
+                                       ref={refCompanyName}
+                                       readOnly={!isEditingCompany}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               name: e.target.value
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               name: e.target.value
+                                           })
+                                       }}
+                                       value={selectedCompany?.name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1"
-                                    readOnly={!isEditingCompany}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            address1: e.target.value
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            address1: e.target.value
-                                        })
-                                    }}
-                                    value={selectedCompany?.address1 || ''} />
+                                       readOnly={!isEditingCompany}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               address1: e.target.value
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               address1: e.target.value
+                                           })
+                                       }}
+                                       value={selectedCompany?.address1 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2"
-                                    readOnly={!isEditingCompany}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            address2: e.target.value
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            address2: e.target.value
-                                        })
-                                    }}
-                                    value={selectedCompany?.address2 || ''} />
+                                       readOnly={!isEditingCompany}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               address2: e.target.value
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               address2: e.target.value
+                                           })
+                                       }}
+                                       value={selectedCompany?.address2 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={5 + props.tabTimes} type="text" placeholder="City"
-                                    readOnly={!isEditingCompany}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            city: e.target.value
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            city: e.target.value
-                                        })
-                                    }}
-                                    value={selectedCompany?.city || ''} />
+                                       readOnly={!isEditingCompany}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               city: e.target.value
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               city: e.target.value
+                                           })
+                                       }}
+                                       value={selectedCompany?.city || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-state">
-                                <input tabIndex={6 + props.tabTimes} type="text" placeholder="State" maxLength="2" style={{ textTransform: 'uppercase' }}
-                                    readOnly={!isEditingCompany}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            state: e.target.value
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            state: e.target.value
-                                        })
-                                    }}
-                                    value={selectedCompany?.state || ''} />
+                                <input tabIndex={6 + props.tabTimes} type="text" placeholder="State" maxLength="2"
+                                       style={{textTransform: 'uppercase'}}
+                                       readOnly={!isEditingCompany}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               state: e.target.value
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               state: e.target.value
+                                           })
+                                       }}
+                                       value={selectedCompany?.state || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-zip-code">
                                 <input tabIndex={7 + props.tabTimes} type="text" placeholder="Postal Code"
-                                    readOnly={!isEditingCompany}
-                                    onKeyDown={validateCompanyForSaving}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            zip: e.target.value
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            zip: e.target.value
-                                        })
-                                    }}
-                                    value={selectedCompany?.zip || ''} />
+                                       readOnly={!isEditingCompany}
+                                       onKeyDown={validateCompanyForSaving}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               zip: e.target.value
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               zip: e.target.value
+                                           })
+                                       }}
+                                       value={selectedCompany?.zip || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container grow" style={{ position: 'relative' }}>
+                            <div className="input-box-container grow" style={{position: 'relative'}}>
                                 <MaskedInput
                                     tabIndex={8 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
@@ -1524,7 +1574,7 @@ function CompanySetup(props) {
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="input-box-container grow" style={{ position: 'relative' }}>
+                            <div className="input-box-container grow" style={{position: 'relative'}}>
                                 <MaskedInput
                                     tabIndex={9 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
@@ -1549,26 +1599,26 @@ function CompanySetup(props) {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}>
+                            <div className="input-box-container" style={{position: 'relative', flexGrow: 1}}>
                                 <input tabIndex={10 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Website"
-                                    style={{ textTransform: 'lowercase' }}
-                                    readOnly={!isEditingCompany}
-                                    onKeyDown={validateCompanyForSaving}
-                                    onInput={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            website: e.target.value
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany({
-                                            ...selectedCompany,
-                                            website: e.target.value
-                                        })
-                                    }}
-                                    value={selectedCompany?.website || ''}
+                                       type="text"
+                                       placeholder="Website"
+                                       style={{textTransform: 'lowercase'}}
+                                       readOnly={!isEditingCompany}
+                                       onKeyDown={validateCompanyForSaving}
+                                       onInput={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               website: e.target.value
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany({
+                                               ...selectedCompany,
+                                               website: e.target.value
+                                           })
+                                       }}
+                                       value={selectedCompany?.website || ''}
                                 />
                             </div>
                         </div>
@@ -1617,193 +1667,197 @@ function CompanySetup(props) {
 
                         <div className="form-row">
                             <div className="input-box-container input-code">
-                                <input tabIndex={11 + props.tabTimes} type="text" placeholder="Code" maxLength="8" id="txt-mailing-address-code"
-                                    ref={refMailingAddressCode}
-                                    readOnly={true}
-                                    onInput={e => { }}
-                                    onChange={e => { }}
-                                    value={(selectedCompany?.mailing_address?.code || '') + ((selectedCompany?.mailing_address?.code_number || 0) === 0 ? '' : selectedCompany?.mailing_address?.code_number)} />
+                                <input tabIndex={11 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
+                                       id="txt-mailing-address-code"
+                                       ref={refMailingAddressCode}
+                                       readOnly={true}
+                                       onInput={e => {
+                                       }}
+                                       onChange={e => {
+                                       }}
+                                       value={(selectedCompany?.mailing_address?.code || '') + ((selectedCompany?.mailing_address?.code_number || 0) === 0 ? '' : selectedCompany?.mailing_address?.code_number)}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={12 + props.tabTimes} type="text" placeholder="Name"
-                                    readOnly={!isEditingMailingAddress}
-                                    ref={refMailingAddressName}
-                                    onInput={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    name: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    name: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCompany?.mailing_address?.name || ''} />
+                                       readOnly={!isEditingMailingAddress}
+                                       ref={refMailingAddressName}
+                                       onInput={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       name: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       name: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCompany?.mailing_address?.name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={13 + props.tabTimes} type="text" placeholder="Address 1"
-                                    readOnly={!isEditingMailingAddress}
-                                    onInput={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    address1: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    address1: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCompany?.mailing_address?.address1 || ''} />
+                                       readOnly={!isEditingMailingAddress}
+                                       onInput={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       address1: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       address1: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCompany?.mailing_address?.address1 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={14 + props.tabTimes} type="text" placeholder="Address 2"
-                                    readOnly={!isEditingMailingAddress}
-                                    onInput={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    address2: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    address2: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCompany?.mailing_address?.address2 || ''} />
+                                       readOnly={!isEditingMailingAddress}
+                                       onInput={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       address2: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       address2: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCompany?.mailing_address?.address2 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={15 + props.tabTimes} type="text" placeholder="City"
-                                    readOnly={!isEditingMailingAddress}
-                                    onInput={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    city: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    city: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCompany?.mailing_address?.city || ''} />
+                                       readOnly={!isEditingMailingAddress}
+                                       onInput={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       city: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       city: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCompany?.mailing_address?.city || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-state">
-                                <input tabIndex={16 + props.tabTimes} type="text" placeholder="State" maxLength="2" style={{ textTransform: 'uppercase' }}
-                                    readOnly={!isEditingMailingAddress}
-                                    onInput={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    state: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    state: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCompany?.mailing_address?.state || ''} />
+                                <input tabIndex={16 + props.tabTimes} type="text" placeholder="State" maxLength="2"
+                                       style={{textTransform: 'uppercase'}}
+                                       readOnly={!isEditingMailingAddress}
+                                       onInput={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       state: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       state: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCompany?.mailing_address?.state || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-zip-code">
                                 <input tabIndex={17 + props.tabTimes} type="text" placeholder="Postal Code"
-                                    readOnly={!isEditingMailingAddress}
-                                    onKeyDown={validateMailingAddressForSaving}
-                                    onInput={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    zip: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    zip: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCompany?.mailing_address?.zip || ''} />
+                                       readOnly={!isEditingMailingAddress}
+                                       onKeyDown={validateMailingAddressForSaving}
+                                       onInput={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       zip: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       zip: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCompany?.mailing_address?.zip || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container grow" style={{ position: 'relative' }}>
+                            <div className="input-box-container grow" style={{position: 'relative'}}>
                                 <MaskedInput
                                     tabIndex={18 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
@@ -1836,7 +1890,7 @@ function CompanySetup(props) {
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="input-box-container grow" style={{ position: 'relative' }}>
+                            <div className="input-box-container grow" style={{position: 'relative'}}>
                                 <MaskedInput
                                     tabIndex={19 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
@@ -1871,36 +1925,36 @@ function CompanySetup(props) {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}>
+                            <div className="input-box-container" style={{position: 'relative', flexGrow: 1}}>
                                 <input tabIndex={20 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Website"
-                                    style={{ textTransform: 'lowercase' }}
-                                    readOnly={!isEditingMailingAddress}
-                                    onKeyDown={validateMailingAddressForSaving}
-                                    onInput={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    website: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCompany(selectedCompany => {
-                                            return {
-                                                ...selectedCompany,
-                                                mailing_address: {
-                                                    ...(selectedCompany?.mailing_address || {}),
-                                                    website: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCompany?.mailing_address?.website || ''}
+                                       type="text"
+                                       placeholder="Website"
+                                       style={{textTransform: 'lowercase'}}
+                                       readOnly={!isEditingMailingAddress}
+                                       onKeyDown={validateMailingAddressForSaving}
+                                       onInput={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       website: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCompany(selectedCompany => {
+                                               return {
+                                                   ...selectedCompany,
+                                                   mailing_address: {
+                                                       ...(selectedCompany?.mailing_address || {}),
+                                                       website: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCompany?.mailing_address?.website || ''}
                                 />
                             </div>
                         </div>
@@ -1980,7 +2034,7 @@ function CompanySetup(props) {
 
                                             employeeSearchCompany={{
                                                 ...selectedCompany,
-                                                selectedEmployee: { id: 0, company_id: selectedCompany?.id }
+                                                selectedEmployee: {id: 0, company_id: selectedCompany?.id}
                                             }}
                                         />
                                     }
@@ -2006,351 +2060,353 @@ function CompanySetup(props) {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={21 + props.tabTimes} type="text" placeholder="First Name"
-                                    ref={refEmployeeFirstName}
-                                    onInput={e => {
-                                        setSelectedEmployee(selectedEmployee => {
-                                            return {
-                                                ...selectedEmployee,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedEmployee(selectedEmployee => {
-                                            return {
-                                                ...selectedEmployee,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedEmployee?.first_name || ''} />
+                                       ref={refEmployeeFirstName}
+                                       onInput={e => {
+                                           setSelectedEmployee(selectedEmployee => {
+                                               return {
+                                                   ...selectedEmployee,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedEmployee(selectedEmployee => {
+                                               return {
+                                                   ...selectedEmployee,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedEmployee?.first_name || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={22 + props.tabTimes} type="text" placeholder="Last Name"
-                                    onInput={e => {
-                                        setSelectedEmployee(selectedEmployee => {
-                                            return {
-                                                ...selectedEmployee,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedEmployee(selectedEmployee => {
-                                            return {
-                                                ...selectedEmployee,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedEmployee?.last_name || ''} />
+                                       onInput={e => {
+                                           setSelectedEmployee(selectedEmployee => {
+                                               return {
+                                                   ...selectedEmployee,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedEmployee(selectedEmployee => {
+                                               return {
+                                                   ...selectedEmployee,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedEmployee?.last_name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ width: '50%' }}>
+                            <div className="select-box-container" style={{width: '50%'}}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={23 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text"
-                                        placeholder="Phone"
-                                        ref={refEmployeePhone}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={true}
+                                                 type="text"
+                                                 placeholder="Phone"
+                                                 ref={refEmployeePhone}
+                                                 onKeyDown={async e => {
+                                                     let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showEmployeePhones) {
-                                                        let selectedIndex = employeePhoneItems.findIndex(item => item.selected);
+                                                     switch (key) {
+                                                         case 37:
+                                                         case 38: // arrow left | arrow up
+                                                             e.preventDefault();
+                                                             if (showEmployeePhones) {
+                                                                 let selectedIndex = employeePhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (employeePhoneItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === 0) {
+                                                                             item.selected = index === (employeePhoneItems.length - 1);
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex - 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refEmployeePhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (employeePhoneItems.length > 1) {
-                                                            await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedEmployee?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refEmployeePhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (employeePhoneItems.length > 1) {
+                                                                     await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedEmployee?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowEmployeePhones(true);
+                                                                     setShowEmployeePhones(true);
 
-                                                            refEmployeePhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refEmployeePhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showEmployeePhones) {
-                                                        let selectedIndex = employeePhoneItems.findIndex(item => item.selected);
+                                                         case 39:
+                                                         case 40: // arrow right | arrow down
+                                                             e.preventDefault();
+                                                             if (showEmployeePhones) {
+                                                                 let selectedIndex = employeePhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
-                                                                if (selectedIndex === (employeePhoneItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === (employeePhoneItems.length - 1)) {
+                                                                             item.selected = index === 0;
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex + 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refEmployeePhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (employeePhoneItems.length > 1) {
-                                                            await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedEmployee?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refEmployeePhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (employeePhoneItems.length > 1) {
+                                                                     await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedEmployee?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowEmployeePhones(true);
+                                                                     setShowEmployeePhones(true);
 
-                                                            refEmployeePhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refEmployeePhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 27: // escape
-                                                    setShowEmployeePhones(false);
-                                                    break;
+                                                         case 27: // escape
+                                                             setShowEmployeePhones(false);
+                                                             break;
 
-                                                case 13: // enter
-                                                    if (showEmployeePhones && employeePhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                primary_phone: employeePhoneItems[employeePhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 13: // enter
+                                                             if (showEmployeePhones && employeePhoneItems.findIndex(item => item.selected) > -1) {
+                                                                 await setSelectedEmployee(selectedEmployee => {
+                                                                     return {
+                                                                         ...selectedEmployee,
+                                                                         primary_phone: employeePhoneItems[employeePhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateEmployeeForSaving({ keyCode: 9 });
-                                                        setShowEmployeePhones(false);
-                                                        refEmployeePhone.current.inputElement.focus();
-                                                    }
-                                                    break;
+                                                                 validateEmployeeForSaving({keyCode: 9});
+                                                                 setShowEmployeePhones(false);
+                                                                 refEmployeePhone.current.inputElement.focus();
+                                                             }
+                                                             break;
 
-                                                case 9: // tab
-                                                    if (showEmployeePhones) {
-                                                        e.preventDefault();
-                                                        await setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                primary_phone: employeePhoneItems[employeePhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 9: // tab
+                                                             if (showEmployeePhones) {
+                                                                 e.preventDefault();
+                                                                 await setSelectedEmployee(selectedEmployee => {
+                                                                     return {
+                                                                         ...selectedEmployee,
+                                                                         primary_phone: employeePhoneItems[employeePhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateEmployeeForSaving({ keyCode: 9 });
-                                                        setShowEmployeePhones(false);
-                                                        refEmployeePhone.current.inputElement.focus();
-                                                    } else {
-                                                        validateEmployeeForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                                 validateEmployeeForSaving({keyCode: 9});
+                                                                 setShowEmployeePhones(false);
+                                                                 refEmployeePhone.current.inputElement.focus();
+                                                             } else {
+                                                                 validateEmployeeForSaving({keyCode: 9});
+                                                             }
+                                                             break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedEmployee?.id || 0) === 0) {
-                                                setSelectedEmployee(selectedEmployee => {
-                                                    return {
-                                                        ...selectedEmployee,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedEmployee?.primary_phone || '') === '') {
-                                                    setSelectedEmployee(selectedEmployee => {
-                                                        return {
-                                                            ...selectedEmployee,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedEmployee?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedEmployee?.id || 0) === 0) {
-                                                setSelectedEmployee(selectedEmployee => {
-                                                    return {
-                                                        ...selectedEmployee,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedEmployee?.primary_phone || '') === '') {
-                                                    setSelectedEmployee(selectedEmployee => {
-                                                        return {
-                                                            ...selectedEmployee,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedEmployee?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedEmployee(selectedEmployee => {
-                                                                return {
-                                                                    ...selectedEmployee,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedEmployee?.primary_phone || '') === 'work'
-                                                ? (selectedEmployee?.phone_work || '')
-                                                : (selectedEmployee?.primary_phone || '') === 'fax'
-                                                    ? (selectedEmployee?.phone_work_fax || '')
-                                                    : (selectedEmployee?.primary_phone || '') === 'mobile'
-                                                        ? (selectedEmployee?.phone_mobile || '')
-                                                        : (selectedEmployee?.primary_phone || '') === 'direct'
-                                                            ? (selectedEmployee?.phone_direct || '')
-                                                            : (selectedEmployee?.primary_phone || '') === 'other'
-                                                                ? (selectedEmployee?.phone_other || '')
-                                                                : ''
-                                        } />
+                                                         default:
+                                                             break;
+                                                     }
+                                                 }}
+                                                 onInput={e => {
+                                                     if ((selectedEmployee?.id || 0) === 0) {
+                                                         setSelectedEmployee(selectedEmployee => {
+                                                             return {
+                                                                 ...selectedEmployee,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedEmployee?.primary_phone || '') === '') {
+                                                             setSelectedEmployee(selectedEmployee => {
+                                                                 return {
+                                                                     ...selectedEmployee,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedEmployee?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 onChange={e => {
+                                                     if ((selectedEmployee?.id || 0) === 0) {
+                                                         setSelectedEmployee(selectedEmployee => {
+                                                             return {
+                                                                 ...selectedEmployee,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedEmployee?.primary_phone || '') === '') {
+                                                             setSelectedEmployee(selectedEmployee => {
+                                                                 return {
+                                                                     ...selectedEmployee,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedEmployee?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedEmployee(selectedEmployee => {
+                                                                         return {
+                                                                             ...selectedEmployee,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 value={
+                                                     (selectedEmployee?.primary_phone || '') === 'work'
+                                                         ? (selectedEmployee?.phone_work || '')
+                                                         : (selectedEmployee?.primary_phone || '') === 'fax'
+                                                             ? (selectedEmployee?.phone_work_fax || '')
+                                                             : (selectedEmployee?.primary_phone || '') === 'mobile'
+                                                                 ? (selectedEmployee?.phone_mobile || '')
+                                                                 : (selectedEmployee?.primary_phone || '') === 'direct'
+                                                                     ? (selectedEmployee?.phone_direct || '')
+                                                                     : (selectedEmployee?.primary_phone || '') === 'other'
+                                                                         ? (selectedEmployee?.phone_other || '')
+                                                                         : ''
+                                                 }/>
                                     {
                                         (selectedEmployee?.id || 0) > 0 &&
                                         <div
@@ -2364,35 +2420,36 @@ function CompanySetup(props) {
 
                                     {
                                         employeePhoneItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showEmployeePhones) {
-                                                setShowEmployeePhones(false);
-                                            } else {
-                                                if (employeePhoneItems.length > 1) {
-                                                    await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedEmployee?.primary_phone || '')
-                                                        return item;
-                                                    }))
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showEmployeePhones) {
+                                                                 setShowEmployeePhones(false);
+                                                             } else {
+                                                                 if (employeePhoneItems.length > 1) {
+                                                                     await setEmployeePhoneItems(employeePhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedEmployee?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowEmployeePhones(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowEmployeePhones(true);
 
-                                                        refEmployeePhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refEmployeePhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refEmployeePhone.current.inputElement.focus();
-                                        }} />
+                                                             refEmployeePhone.current.inputElement.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -2407,8 +2464,9 @@ function CompanySetup(props) {
                                             }}
                                             ref={refEmployeePhoneDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             employeePhoneItems.map((item, index) => {
@@ -2430,7 +2488,7 @@ function CompanySetup(props) {
                                                                                 }
                                                                             });
 
-                                                                            validateEmployeeForSaving({ keyCode: 9 });
+                                                                            validateEmployeeForSaving({keyCode: 9});
                                                                             setShowEmployeePhones(false);
                                                                             refEmployeePhone.current.inputElement.focus();
                                                                         }}
@@ -2445,18 +2503,20 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.phone
+                                                                                : item.type === 'fax' ? item.phone
+                                                                                    : item.type === 'mobile' ? item.phone
+                                                                                        : item.type === 'direct' ? item.phone
+                                                                                            : item.type === 'other' ? item.phone : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -2470,39 +2530,40 @@ function CompanySetup(props) {
                                 }
                             </div>
                             <div className="form-h-sep"></div>
-                            <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={24 + props.tabTimes} type="text" placeholder="Ext"
-                                        onInput={e => {
-                                            setSelectedEmployee(selectedEmployee => {
-                                                return {
-                                                    ...selectedEmployee,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedEmployee(selectedEmployee => {
-                                                return {
-                                                    ...selectedEmployee,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        value={selectedEmployee?.phone_ext || ''} />
+                                           onInput={e => {
+                                               setSelectedEmployee(selectedEmployee => {
+                                                   return {
+                                                       ...selectedEmployee,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           onChange={e => {
+                                               setSelectedEmployee(selectedEmployee => {
+                                                   return {
+                                                       ...selectedEmployee,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedEmployee?.phone_ext || ''}/>
                                 </div>
                                 <div className="input-toggle-container">
-                                    <input type="checkbox" id={props.panelName + '-cbox-company-employee-primary-admin-btn'}
-                                        onChange={(e) => {
-                                            setSelectedEmployee(selectedEmployee => {
-                                                return {
-                                                    ...selectedEmployee,
-                                                    is_primary_admin: e.target.checked ? 1 : 0
-                                                }
-                                            });
-                                            validateEmployeeForSaving({ keyCode: 9 });
-                                        }}
-                                        checked={(selectedEmployee.is_primary_admin || 0) === 1}
+                                    <input type="checkbox"
+                                           id={props.panelName + '-cbox-company-employee-primary-admin-btn'}
+                                           onChange={(e) => {
+                                               setSelectedEmployee(selectedEmployee => {
+                                                   return {
+                                                       ...selectedEmployee,
+                                                       is_primary_admin: e.target.checked ? 1 : 0
+                                                   }
+                                               });
+                                               validateEmployeeForSaving({keyCode: 9});
+                                           }}
+                                           checked={(selectedEmployee.is_primary_admin || 0) === 1}
                                     />
                                     <label htmlFor={props.panelName + '-cbox-company-employee-primary-admin-btn'}>
                                         <div className="label-text">Primary Admin</div>
@@ -2513,7 +2574,7 @@ function CompanySetup(props) {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input style={{
                                         width: 'calc(100% - 25px)',
@@ -2521,248 +2582,250 @@ function CompanySetup(props) {
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap'
                                     }}
-                                        tabIndex={25 + props.tabTimes}
-                                        type="text"
-                                        placeholder="E-Mail"
-                                        ref={refEmployeeEmail}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={25 + props.tabTimes}
+                                           type="text"
+                                           placeholder="E-Mail"
+                                           ref={refEmployeeEmail}
+                                           onKeyDown={async e => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showEmployeeEmails) {
-                                                        let selectedIndex = employeeEmailItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (showEmployeeEmails) {
+                                                           let selectedIndex = employeeEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (employeeEmailItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (employeeEmailItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refEmployeeEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (employeeEmailItems.length > 1) {
-                                                            await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedEmployee?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refEmployeeEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (employeeEmailItems.length > 1) {
+                                                               await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedEmployee?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowEmployeeEmails(true);
+                                                               setShowEmployeeEmails(true);
 
-                                                            refEmployeeEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refEmployeeEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showEmployeeEmails) {
-                                                        let selectedIndex = employeeEmailItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (showEmployeeEmails) {
+                                                           let selectedIndex = employeeEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
-                                                                if (selectedIndex === (employeeEmailItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === (employeeEmailItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refEmployeeEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (employeeEmailItems.length > 1) {
-                                                            await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedEmployee?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refEmployeeEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (employeeEmailItems.length > 1) {
+                                                               await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedEmployee?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowEmployeeEmails(true);
+                                                               setShowEmployeeEmails(true);
 
-                                                            refEmployeeEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refEmployeeEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setShowEmployeeEmails(false);
-                                                    break;
+                                                   case 27: // escape
+                                                       setShowEmployeeEmails(false);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (showEmployeeEmails && employeeEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                primary_email: employeeEmailItems[employeeEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 13: // enter
+                                                       if (showEmployeeEmails && employeeEmailItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   primary_email: employeeEmailItems[employeeEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateEmployeeForSaving({ keyCode: 9 });
-                                                        setShowEmployeeEmails(false);
-                                                        refEmployeeEmail.current.focus();
-                                                    }
-                                                    break;
+                                                           validateEmployeeForSaving({keyCode: 9});
+                                                           setShowEmployeeEmails(false);
+                                                           refEmployeeEmail.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (showEmployeeEmails) {
-                                                        e.preventDefault();
-                                                        await setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                primary_email: employeeEmailItems[employeeEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 9: // tab
+                                                       if (showEmployeeEmails) {
+                                                           e.preventDefault();
+                                                           await setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   primary_email: employeeEmailItems[employeeEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateEmployeeForSaving({ keyCode: 9 });
-                                                        setShowEmployeeEmails(false);
-                                                        refEmployeeEmail.current.focus();
-                                                    } else {
-                                                        validateEmployeeForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                           validateEmployeeForSaving({keyCode: 9});
+                                                           setShowEmployeeEmails(false);
+                                                           refEmployeeEmail.current.focus();
+                                                       } else {
+                                                           validateEmployeeForSaving({keyCode: 9});
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedEmployee?.primary_email || '') === '') {
-                                                setSelectedEmployee(selectedEmployee => {
-                                                    return {
-                                                        ...selectedEmployee,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedEmployee?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedEmployee?.primary_email || '') === '') {
-                                                setSelectedEmployee(selectedEmployee => {
-                                                    return {
-                                                        ...selectedEmployee,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedEmployee?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedEmployee(selectedEmployee => {
-                                                            return {
-                                                                ...selectedEmployee,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedEmployee?.primary_email || '') === 'work'
-                                                ? (selectedEmployee?.email_work || '')
-                                                : (selectedEmployee?.primary_email || '') === 'personal'
-                                                    ? (selectedEmployee?.email_personal || '')
-                                                    : (selectedEmployee?.primary_email || '') === 'other'
-                                                        ? (selectedEmployee?.email_other || '')
-                                                        : ''
-                                        } />
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onInput={e => {
+                                               if ((selectedEmployee?.primary_email || '') === '') {
+                                                   setSelectedEmployee(selectedEmployee => {
+                                                       return {
+                                                           ...selectedEmployee,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedEmployee?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           onChange={e => {
+                                               if ((selectedEmployee?.primary_email || '') === '') {
+                                                   setSelectedEmployee(selectedEmployee => {
+                                                       return {
+                                                           ...selectedEmployee,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedEmployee?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedEmployee(selectedEmployee => {
+                                                               return {
+                                                                   ...selectedEmployee,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           value={
+                                               (selectedEmployee?.primary_email || '') === 'work'
+                                                   ? (selectedEmployee?.email_work || '')
+                                                   : (selectedEmployee?.primary_email || '') === 'personal'
+                                                       ? (selectedEmployee?.email_personal || '')
+                                                       : (selectedEmployee?.primary_email || '') === 'other'
+                                                           ? (selectedEmployee?.email_other || '')
+                                                           : ''
+                                           }/>
 
                                     {
                                         (selectedEmployee?.id || 0) > 0 &&
@@ -2777,35 +2840,36 @@ function CompanySetup(props) {
 
                                     {
                                         employeeEmailItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showEmployeeEmails) {
-                                                setShowEmployeeEmails(false);
-                                            } else {
-                                                if (employeeEmailItems.length > 1) {
-                                                    await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedEmployee?.primary_email || '')
-                                                        return item;
-                                                    }))
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showEmployeeEmails) {
+                                                                 setShowEmployeeEmails(false);
+                                                             } else {
+                                                                 if (employeeEmailItems.length > 1) {
+                                                                     await setEmployeeEmailItems(employeeEmailItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedEmployee?.primary_email || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowEmployeeEmails(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowEmployeeEmails(true);
 
-                                                        refEmployeeEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refEmployeeEmailPopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refEmployeeEmail.current.focus();
-                                        }} />
+                                                             refEmployeeEmail.current.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -2820,8 +2884,9 @@ function CompanySetup(props) {
                                             }}
                                             ref={refEmployeeEmailDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             employeeEmailItems.map((item, index) => {
@@ -2843,7 +2908,7 @@ function CompanySetup(props) {
                                                                                 }
                                                                             });
 
-                                                                            validateEmployeeForSaving({ keyCode: 9 });
+                                                                            validateEmployeeForSaving({keyCode: 9});
                                                                             setShowEmployeeEmails(false);
                                                                             refEmployeeEmail.current.focus();
                                                                         }}
@@ -2856,16 +2921,18 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.email
+                                                                                : item.type === 'personal' ? item.email
+                                                                                    : item.type === 'other' ? item.email : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -2881,24 +2948,24 @@ function CompanySetup(props) {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={26 + props.tabTimes} type="text" placeholder="Notes"
-                                    onKeyDown={validateEmployeeForSaving}
-                                    onInput={e => {
-                                        setSelectedEmployee(selectedEmployee => {
-                                            return {
-                                                ...selectedEmployee,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedEmployee(selectedEmployee => {
-                                            return {
-                                                ...selectedEmployee,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedEmployee?.notes || ''} />
+                                       onKeyDown={validateEmployeeForSaving}
+                                       onInput={e => {
+                                           setSelectedEmployee(selectedEmployee => {
+                                               return {
+                                                   ...selectedEmployee,
+                                                   notes: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedEmployee(selectedEmployee => {
+                                               return {
+                                                   ...selectedEmployee,
+                                                   notes: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       value={selectedEmployee?.notes || ''}/>
                             </div>
                         </div>
                     </div>
@@ -2937,7 +3004,7 @@ function CompanySetup(props) {
                         </div>
 
                         <div className="form-slider">
-                            <div className="form-slider-wrapper" style={{ left: showingEmployeeList ? 0 : '-100%' }}>
+                            <div className="form-slider-wrapper" style={{left: showingEmployeeList ? 0 : '-100%'}}>
                                 <div className="employee-list-box">
                                     {
                                         (selectedCompany?.employees || []).length > 0 &&
@@ -2955,34 +3022,37 @@ function CompanySetup(props) {
                                         {
                                             (selectedCompany?.employees || []).map((employee, index) => {
                                                 return (
-                                                    <div className="employee-list-item" key={index} onDoubleClick={async () => {
-                                                        let panel = {
-                                                            panelName: `${props.panelName}-employees`,
-                                                            component: <Employees
-                                                                title='Employee'
-                                                                tabTimes={122000 + props.tabTimes}
-                                                                panelName={`${props.panelName}-employees`}
-                                                                savingEmployeeUrl='/saveEmployee'
-                                                                deletingEmployeeUrl='/deleteEmployee'
-                                                                uploadAvatarUrl='/uploadEmployeeAvatar'
-                                                                removeAvatarUrl='/removeEmployeeAvatar'
-                                                                origin={props.origin}
-                                                                owner='company'
-                                                                openPanel={props.openPanel}
-                                                                closePanel={props.closePanel}
-                                                                componentId={moment().format('x')}
+                                                    <div className="employee-list-item" key={index}
+                                                         onDoubleClick={async () => {
+                                                             let panel = {
+                                                                 panelName: `${props.panelName}-employees`,
+                                                                 component: <Employees
+                                                                     title='Employee'
+                                                                     tabTimes={122000 + props.tabTimes}
+                                                                     panelName={`${props.panelName}-employees`}
+                                                                     savingEmployeeUrl='/saveEmployee'
+                                                                     deletingEmployeeUrl='/deleteEmployee'
+                                                                     uploadAvatarUrl='/uploadEmployeeAvatar'
+                                                                     removeAvatarUrl='/removeEmployeeAvatar'
+                                                                     origin={props.origin}
+                                                                     owner='company'
+                                                                     openPanel={props.openPanel}
+                                                                     closePanel={props.closePanel}
+                                                                     componentId={moment().format('x')}
 
-                                                                employeeSearchCompany={{
-                                                                    ...selectedCompany,
-                                                                    selectedEmployee: employee
-                                                                }}
-                                                            />
-                                                        }
+                                                                     employeeSearchCompany={{
+                                                                         ...selectedCompany,
+                                                                         selectedEmployee: employee
+                                                                     }}
+                                                                 />
+                                                             }
 
-                                                        props.openPanel(panel, props.origin);
-                                                    }} onClick={() => setSelectedEmployee(employee)}>
-                                                        <div className="employee-list-col tcol first-name">{employee.first_name}</div>
-                                                        <div className="employee-list-col tcol last-name">{employee.last_name}</div>
+                                                             props.openPanel(panel, props.origin);
+                                                         }} onClick={() => setSelectedEmployee(employee)}>
+                                                        <div
+                                                            className="employee-list-col tcol first-name">{employee.first_name}</div>
+                                                        <div
+                                                            className="employee-list-col tcol last-name">{employee.last_name}</div>
                                                         <div className="employee-list-col tcol phone-work">{
                                                             employee.primary_phone === 'work' ? employee.phone_work
                                                                 : employee.primary_phone === 'fax' ? employee.phone_work_fax
@@ -3000,13 +3070,13 @@ function CompanySetup(props) {
                                                         {
                                                             (employee.id === (selectedEmployee?.id || 0)) &&
                                                             <div className="employee-list-col tcol employee-selected">
-                                                                <FontAwesomeIcon icon={faPencilAlt} />
+                                                                <FontAwesomeIcon icon={faPencilAlt}/>
                                                             </div>
                                                         }
                                                         {
                                                             (employee.is_primary_admin === 1) &&
                                                             <div className="employee-list-col tcol pri">
-                                                                <FontAwesomeIcon icon={faCheck} />
+                                                                <FontAwesomeIcon icon={faCheck}/>
                                                             </div>
                                                         }
                                                     </div>
@@ -3019,64 +3089,103 @@ function CompanySetup(props) {
                                 <div className="employee-search-box">
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="First Name" onChange={e => setEmployeeSearch({ ...employeeSearch, first_name: e.target.value })} value={employeeSearch.first_name || ''} />
+                                            <input type="text" placeholder="First Name"
+                                                   onChange={e => setEmployeeSearch({
+                                                       ...employeeSearch,
+                                                       first_name: e.target.value
+                                                   })} value={employeeSearch.first_name || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Last Name" onFocus={() => { setShowingEmployeeList(false) }} onChange={e => setEmployeeSearch({ ...employeeSearch, last_name: e.target.value })} value={employeeSearch.last_name || ''} />
+                                            <input type="text" placeholder="Last Name" onFocus={() => {
+                                                setShowingEmployeeList(false)
+                                            }} onChange={e => setEmployeeSearch({
+                                                ...employeeSearch,
+                                                last_name: e.target.value
+                                            })} value={employeeSearch.last_name || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 1" onFocus={() => { setShowingEmployeeList(false) }} onChange={e => setEmployeeSearch({ ...employeeSearch, address1: e.target.value })} value={employeeSearch.address1 || ''} />
+                                            <input type="text" placeholder="Address 1" onFocus={() => {
+                                                setShowingEmployeeList(false)
+                                            }} onChange={e => setEmployeeSearch({
+                                                ...employeeSearch,
+                                                address1: e.target.value
+                                            })} value={employeeSearch.address1 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 2" onFocus={() => { setShowingEmployeeList(false) }} onChange={e => setEmployeeSearch({ ...employeeSearch, address2: e.target.value })} value={employeeSearch.address2 || ''} />
+                                            <input type="text" placeholder="Address 2" onFocus={() => {
+                                                setShowingEmployeeList(false)
+                                            }} onChange={e => setEmployeeSearch({
+                                                ...employeeSearch,
+                                                address2: e.target.value
+                                            })} value={employeeSearch.address2 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="City" onFocus={() => { setShowingEmployeeList(false) }} onChange={e => setEmployeeSearch({ ...employeeSearch, city: e.target.value })} value={employeeSearch.city || ''} />
+                                            <input type="text" placeholder="City" onFocus={() => {
+                                                setShowingEmployeeList(false)
+                                            }} onChange={e => setEmployeeSearch({
+                                                ...employeeSearch,
+                                                city: e.target.value
+                                            })} value={employeeSearch.city || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container input-state">
-                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => { setShowingEmployeeList(false) }} onChange={e => setEmployeeSearch({ ...employeeSearch, state: e.target.value })} value={employeeSearch.state || ''} />
+                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => {
+                                                setShowingEmployeeList(false)
+                                            }} onChange={e => setEmployeeSearch({
+                                                ...employeeSearch,
+                                                state: e.target.value
+                                            })} value={employeeSearch.state || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
                                             <MaskedInput
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
-                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => { setShowingEmployeeList(false) }} onChange={e => setEmployeeSearch({ ...employeeSearch, phone: e.target.value })} value={employeeSearch.phone || ''} />
+                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
+                                                setShowingEmployeeList(false)
+                                            }} onChange={e => setEmployeeSearch({
+                                                ...employeeSearch,
+                                                phone: e.target.value
+                                            })} value={employeeSearch.phone || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                                onKeyDown={(e) => {
-                                                    e.preventDefault();
-                                                    let key = e.keyCode || e.which;
+                                            <input type="text" placeholder="E-Mail" style={{textTransform: 'lowercase'}}
+                                                   onKeyDown={(e) => {
+                                                       e.preventDefault();
+                                                       let key = e.keyCode || e.which;
 
-                                                    if (key === 9) {
-                                                        let elems = document.getElementsByTagName('input');
+                                                       if (key === 9) {
+                                                           let elems = document.getElementsByTagName('input');
 
-                                                        for (var i = elems.length; i--;) {
-                                                            if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                elems[i].focus();
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }}
-                                                onFocus={() => { setShowingEmployeeList(false) }}
-                                                onChange={e => setEmployeeSearch({ ...employeeSearch, email: e.target.value })}
-                                                value={employeeSearch.email || ''} />
+                                                           for (var i = elems.length; i--;) {
+                                                               if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
+                                                                   elems[i].focus();
+                                                                   break;
+                                                               }
+                                                           }
+                                                       }
+                                                   }}
+                                                   onFocus={() => {
+                                                       setShowingEmployeeList(false)
+                                                   }}
+                                                   onChange={e => setEmployeeSearch({
+                                                       ...employeeSearch,
+                                                       email: e.target.value
+                                                   })}
+                                                   value={employeeSearch.email || ''}/>
                                         </div>
                                     </div>
                                 </div>
@@ -3109,22 +3218,16 @@ function CompanySetup(props) {
                                         panelName: `${props.panelName}-agents`,
                                         component: <Agents
                                             title='Agent'
-                                            tabTimes={222000 + props.tabTimes}
+                                            tabTimes={222200 + props.tabTimes}
                                             panelName={`${props.panelName}-agents`}
-                                            savingAgentUrl='/saveAgent'
-                                            deletingAgentUrl='/deleteAgent'
-                                            uploadAvatarUrl='/uploadAgentAvatar'
-                                            removeAvatarUrl='/removeAgentAvatar'
                                             origin={props.origin}
-                                            owner='company'
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
                                             componentId={moment().format('x')}
-
-                                            agentSearchCompany={{
-                                                ...selectedCompany,
-                                                selectedAgent: selectedAgent
-                                            }}
+                                            isAdmin={props.isAdmin}
+                                            setSelectedCompany={setSelectedCompany}
+                                            selectedCompany={selectedCompany}
+                                            selectedAgent={selectedAgent}
                                         />
                                     }
 
@@ -3144,23 +3247,15 @@ function CompanySetup(props) {
                                         panelName: `${props.panelName}-agents`,
                                         component: <Agents
                                             title='Agent'
-                                            tabTimes={222000 + props.tabTimes}
+                                            tabTimes={222200 + props.tabTimes}
                                             panelName={`${props.panelName}-agents`}
-                                            savingAgentUrl='/saveAgent'
-                                            deletingAgentUrl='/deleteAgent'
-                                            uploadAvatarUrl='/uploadAgentAvatar'
-                                            removeAvatarUrl='/removeAgentAvatar'
                                             origin={props.origin}
-                                            owner='company'
-                                            isEditingAgent={true}
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
+                                            isAdmin={props.isAdmin}
                                             componentId={moment().format('x')}
-
-                                            agentSearchCompany={{
-                                                ...selectedCompany,
-                                                selectedAgent: { id: 0, company_id: selectedCompany?.id }
-                                            }}
+                                            selectedCompany={selectedCompany}
+                                            setSelectedCompany={setSelectedCompany}
                                         />
                                     }
 
@@ -3172,7 +3267,7 @@ function CompanySetup(props) {
                                 </div>
                                 <div className="mochi-button" onClick={() => {
                                     setSelectedAgent({});
-                                    refAgentFirstName.current.focus();
+                                    refAgentContactFirstName.current.focus();
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
@@ -3185,393 +3280,399 @@ function CompanySetup(props) {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={27 + props.tabTimes} type="text" placeholder="First Name"
-                                    ref={refAgentFirstName}
-                                    onInput={e => {
-                                        setSelectedAgent(selectedAgent => {
-                                            return {
-                                                ...selectedAgent,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedAgent(selectedAgent => {
-                                            return {
-                                                ...selectedAgent,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedAgent?.first_name || ''} />
+                                       readOnly={true}
+                                       ref={refAgentContactFirstName}
+                                       onInput={e => {
+                                           setSelectedAgentContact(selectedAgentContact => {
+                                               return {
+                                                   ...selectedAgentContact,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedAgentContact(selectedAgentContact => {
+                                               return {
+                                                   ...selectedAgentContact,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedAgentContact?.first_name || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={28 + props.tabTimes} type="text" placeholder="Last Name"
-                                    onInput={e => {
-                                        setSelectedAgent(selectedAgent => {
-                                            return {
-                                                ...selectedAgent,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedAgent(selectedAgent => {
-                                            return {
-                                                ...selectedAgent,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedAgent?.last_name || ''} />
+                                       readOnly={true}
+                                       onInput={e => {
+                                           setSelectedAgentContact(selectedAgentContact => {
+                                               return {
+                                                   ...selectedAgentContact,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedAgentContact(selectedAgentContact => {
+                                               return {
+                                                   ...selectedAgentContact,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedAgentContact?.last_name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ width: '50%' }}>
+                            <div className="select-box-container" style={{width: '50%'}}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={29 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text"
-                                        placeholder="Phone"
-                                        ref={refAgentPhone}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={true}
+                                                 type="text"
+                                                 placeholder="Phone"
+                                                 ref={refAgentContactPhone}
+                                                 readOnly={true}
+                                                 onKeyDown={async e => {
+                                                     let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showAgentPhones) {
-                                                        let selectedIndex = agentPhoneItems.findIndex(item => item.selected);
+                                                     switch (key) {
+                                                         case 37:
+                                                         case 38: // arrow left | arrow up
+                                                             e.preventDefault();
+                                                             if (showAgentContactPhones) {
+                                                                 let selectedIndex = agentContactPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setAgentPhoneItems(agentPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setAgentPhoneItems(agentPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (agentPhoneItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === 0) {
+                                                                             item.selected = index === (agentContactPhoneItems.length - 1);
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex - 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refAgentPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (agentPhoneItems.length > 1) {
-                                                            await setAgentPhoneItems(agentPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedAgent?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (agentContactPhoneItems.length > 1) {
+                                                                     await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedAgentContact?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowAgentPhones(true);
+                                                                     setShowAgentContactPhones(true);
 
-                                                            refAgentPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showAgentPhones) {
-                                                        let selectedIndex = agentPhoneItems.findIndex(item => item.selected);
+                                                         case 39:
+                                                         case 40: // arrow right | arrow down
+                                                             e.preventDefault();
+                                                             if (showAgentContactPhones) {
+                                                                 let selectedIndex = agentContactPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setAgentPhoneItems(agentPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setAgentPhoneItems(agentPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === (agentPhoneItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === (agentContactPhoneItems.length - 1)) {
+                                                                             item.selected = index === 0;
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex + 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refAgentPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (agentPhoneItems.length > 1) {
-                                                            await setAgentPhoneItems(agentPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedAgent?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (agentContactPhoneItems.length > 1) {
+                                                                     await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedAgentContact?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowAgentPhones(true);
+                                                                     setShowAgentContactPhones(true);
 
-                                                            refAgentPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 27: // escape
-                                                    setShowAgentPhones(false);
-                                                    break;
+                                                         case 27: // escape
+                                                             setShowAgentContactPhones(false);
+                                                             break;
 
-                                                case 13: // enter
-                                                    if (showAgentPhones && agentPhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                primary_phone: agentPhoneItems[agentPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 13: // enter
+                                                             if (showAgentContactPhones && agentContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                 await setSelectedAgentContact(selectedAgentContact => {
+                                                                     return {
+                                                                         ...selectedAgentContact,
+                                                                         primary_phone: agentContactPhoneItems[agentContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateAgentForSaving({ keyCode: 9 });
-                                                        setShowAgentPhones(false);
-                                                        refAgentPhone.current.inputElement.focus();
-                                                    }
-                                                    break;
+                                                                 validateAgentContactForSaving({keyCode: 9});
+                                                                 setShowAgentContactPhones(false);
+                                                                 refAgentContactPhone.current.inputElement.focus();
+                                                             }
+                                                             break;
 
-                                                case 9: // tab
-                                                    if (showAgentPhones) {
-                                                        e.preventDefault();
-                                                        await setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                primary_phone: agentPhoneItems[agentPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 9: // tab
+                                                             if (showAgentContactPhones) {
+                                                                 e.preventDefault();
+                                                                 await setSelectedAgentContact(selectedAgentContact => {
+                                                                     return {
+                                                                         ...selectedAgentContact,
+                                                                         primary_phone: agentContactPhoneItems[agentContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateAgentForSaving({ keyCode: 9 });
-                                                        setShowAgentPhones(false);
-                                                        refAgentPhone.current.inputElement.focus();
-                                                    } else {
-                                                        validateAgentForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                                 validateAgentContactForSaving({keyCode: 9});
+                                                                 setShowAgentContactPhones(false);
+                                                                 refAgentContactPhone.current.inputElement.focus();
+                                                             } else {
+                                                                 validateAgentContactForSaving({keyCode: 9});
+                                                             }
+                                                             break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedAgent?.id || 0) === 0) {
-                                                setSelectedAgent(selectedAgent => {
-                                                    return {
-                                                        ...selectedAgent,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedAgent?.primary_phone || '') === '') {
-                                                    setSelectedAgent(selectedAgent => {
-                                                        return {
-                                                            ...selectedAgent,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedAgent?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedAgent?.id || 0) === 0) {
-                                                setSelectedAgent(selectedAgent => {
-                                                    return {
-                                                        ...selectedAgent,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedAgent?.primary_phone || '') === '') {
-                                                    setSelectedAgent(selectedAgent => {
-                                                        return {
-                                                            ...selectedAgent,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedAgent?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedAgent?.primary_phone || '') === 'work'
-                                                ? (selectedAgent?.phone_work || '')
-                                                : (selectedAgent?.primary_phone || '') === 'fax'
-                                                    ? (selectedAgent?.phone_work_fax || '')
-                                                    : (selectedAgent?.primary_phone || '') === 'mobile'
-                                                        ? (selectedAgent?.phone_mobile || '')
-                                                        : (selectedAgent?.primary_phone || '') === 'direct'
-                                                            ? (selectedAgent?.phone_direct || '')
-                                                            : (selectedAgent?.primary_phone || '') === 'other'
-                                                                ? (selectedAgent?.phone_other || '')
-                                                                : ''
-                                        } />
+                                                         default:
+                                                             break;
+                                                     }
+                                                 }}
+                                                 onInput={e => {
+                                                     if ((selectedAgentContact?.id || 0) === 0) {
+                                                         setSelectedAgentContact(selectedAgentContact => {
+                                                             return {
+                                                                 ...selectedAgentContact,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedAgentContact?.primary_phone || '') === '') {
+                                                             setSelectedAgentContact(selectedAgentContact => {
+                                                                 return {
+                                                                     ...selectedAgentContact,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedAgentContact?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 onChange={e => {
+                                                     if ((selectedAgentContact?.id || 0) === 0) {
+                                                         setSelectedAgentContact(selectedAgentContact => {
+                                                             return {
+                                                                 ...selectedAgentContact,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedAgentContact?.primary_phone || '') === '') {
+                                                             setSelectedAgentContact(selectedAgentContact => {
+                                                                 return {
+                                                                     ...selectedAgentContact,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedAgentContact?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedAgentContact(selectedAgentContact => {
+                                                                         return {
+                                                                             ...selectedAgentContact,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 value={
+                                                     (selectedAgentContact?.primary_phone || '') === 'work'
+                                                         ? (selectedAgentContact?.phone_work || '')
+                                                         : (selectedAgentContact?.primary_phone || '') === 'fax'
+                                                             ? (selectedAgentContact?.phone_work_fax || '')
+                                                             : (selectedAgentContact?.primary_phone || '') === 'mobile'
+                                                                 ? (selectedAgentContact?.phone_mobile || '')
+                                                                 : (selectedAgentContact?.primary_phone || '') === 'direct'
+                                                                     ? (selectedAgentContact?.phone_direct || '')
+                                                                     : (selectedAgentContact?.primary_phone || '') === 'other'
+                                                                         ? (selectedAgentContact?.phone_other || '')
+                                                                         : ''
+                                                 }/>
                                     {
-                                        (selectedAgent?.id || 0) > 0 &&
+                                        (selectedAgentContact?.id || 0) > 0 &&
                                         <div
                                             className={classnames({
                                                 'selected-company-agent-primary-phone': true,
-                                                'pushed': (agentPhoneItems.length > 1)
+                                                'pushed': (agentContactPhoneItems.length > 1)
                                             })}>
-                                            {selectedAgent?.primary_phone || ''}
+                                            {selectedAgentContact?.primary_phone || ''}
                                         </div>
                                     }
 
                                     {
-                                        agentPhoneItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showAgentPhones) {
-                                                setShowAgentPhones(false);
-                                            } else {
-                                                if (agentPhoneItems.length > 1) {
-                                                    await setAgentPhoneItems(agentPhoneItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedAgent?.primary_phone || '')
-                                                        return item;
-                                                    }))
+                                        agentContactPhoneItems.length > 1 &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showAgentContactPhones) {
+                                                                 setShowAgentContactPhones(false);
+                                                             } else {
+                                                                 if (agentContactPhoneItems.length > 1) {
+                                                                     await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedAgentContact?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowAgentPhones(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowAgentContactPhones(true);
 
-                                                        refAgentPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refAgentPhone.current.inputElement.focus();
-                                        }} />
+                                                             refAgentContactPhone.current.inputElement.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -3584,13 +3685,14 @@ function CompanySetup(props) {
                                                 left: '0',
                                                 display: 'block'
                                             }}
-                                            ref={refAgentPhoneDropDown}
+                                            ref={refAgentContactPhoneDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
-                                                            agentPhoneItems.map((item, index) => {
+                                                            agentContactPhoneItems.map((item, index) => {
                                                                 const mochiItemClasses = classnames({
                                                                     'mochi-item': true,
                                                                     'selected': item.selected
@@ -3602,18 +3704,18 @@ function CompanySetup(props) {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedAgent(selectedAgent => {
+                                                                            await setSelectedAgentContact(selectedAgentContact => {
                                                                                 return {
-                                                                                    ...selectedAgent,
+                                                                                    ...selectedAgentContact,
                                                                                     primary_phone: item.type
                                                                                 }
                                                                             });
 
-                                                                            validateAgentForSaving({ keyCode: 9 });
-                                                                            setShowAgentPhones(false);
-                                                                            refAgentPhone.current.inputElement.focus();
+                                                                            validateAgentContactForSaving({keyCode: 9});
+                                                                            setShowAgentContactPhones(false);
+                                                                            refAgentContactPhone.current.inputElement.focus();
                                                                         }}
-                                                                        ref={ref => refAgentPhonePopupItems.current.push(ref)}
+                                                                        ref={ref => refAgentContactPhonePopupItems.current.push(ref)}
                                                                     >
                                                                         {
                                                                             item.type === 'work' ? `Phone Work `
@@ -3624,18 +3726,20 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.phone
+                                                                                : item.type === 'fax' ? item.phone
+                                                                                    : item.type === 'mobile' ? item.phone
+                                                                                        : item.type === 'direct' ? item.phone
+                                                                                            : item.type === 'other' ? item.phone : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -3649,44 +3753,51 @@ function CompanySetup(props) {
                                 }
                             </div>
                             <div className="form-h-sep"></div>
-                            <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={30 + props.tabTimes} type="text" placeholder="Ext"
-                                        onInput={e => {
-                                            setSelectedAgent(selectedAgent => {
-                                                return {
-                                                    ...selectedAgent,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedAgent(selectedAgent => {
-                                                return {
-                                                    ...selectedAgent,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        value={selectedAgent?.phone_ext || ''} />
+                                           onInput={e => {
+                                               setSelectedAgentContact(selectedAgentContact => {
+                                                   return {
+                                                       ...selectedAgentContact,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           onChange={e => {
+                                               setSelectedAgentContact(selectedAgentContact => {
+                                                   return {
+                                                       ...selectedAgentContact,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedAgentContact?.phone_ext || ''}/>
                                 </div>
                                 <div className="form-h-sep"></div>
-                                <div className="input-box-container grow">
-                                    <input tabIndex={31 + props.tabTimes} type="text" placeholder="Agent Code"
-                                        readOnly={true}
-                                        onInput={e => { }}
-                                        onChange={e => { }}
-                                        value={
-                                            (selectedAgent?.id || 0) > 0
-                                                ? 'AG' + selectedAgent.id.toString().padStart(4, '0')
-                                                : ''
-                                        } />
+
+                                <div className="input-toggle-container">
+                                    <input type="checkbox" id={props.panelName + '-cbox-agent-contacts-primary-btn'}
+                                           style={{pointerEvents: 'none'}}
+                                           onChange={(e) => {
+                                               setSelectedAgentContact({
+                                                   ...selectedAgentContact,
+                                                   is_primary: e.target.checked ? 1 : 0
+                                               });
+                                               validateAgentContactForSaving({keyCode: 9});
+                                           }}
+                                           checked={(selectedAgentContact.is_primary || 0) === 1}/>
+                                    <label htmlFor={props.panelName + '-cbox-agent-contacts-primary-btn'}
+                                           style={{pointerEvents: 'none'}}>
+                                        <div className="label-text">Primary Admin</div>
+                                        <div className="input-toggle-btn"></div>
+                                    </label>
                                 </div>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input style={{
                                         width: 'calc(100% - 25px)',
@@ -3694,291 +3805,295 @@ function CompanySetup(props) {
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap'
                                     }}
-                                        tabIndex={32 + props.tabTimes}
-                                        type="text"
-                                        placeholder="E-Mail"
-                                        ref={refAgentEmail}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={32 + props.tabTimes}
+                                           type="text"
+                                           placeholder="E-Mail"
+                                           ref={refAgentContactEmail}
+                                           readOnly={true}
+                                           onKeyDown={async e => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showAgentEmails) {
-                                                        let selectedIndex = agentEmailItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (showAgentContactEmails) {
+                                                           let selectedIndex = agentContactEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setAgentEmailItems(agentEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setAgentEmailItems(agentEmailItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (agentEmailItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (agentContactEmailItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refAgentEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (agentEmailItems.length > 1) {
-                                                            await setAgentEmailItems(agentEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedAgent?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (agentContactEmailItems.length > 1) {
+                                                               await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedAgentContact?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowAgentEmails(true);
+                                                               setShowAgentContactEmails(true);
 
-                                                            refAgentEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showAgentEmails) {
-                                                        let selectedIndex = agentEmailItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (showAgentContactEmails) {
+                                                           let selectedIndex = agentContactEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setAgentEmailItems(agentEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setAgentEmailItems(agentEmailItems.map((item, index) => {
-                                                                if (selectedIndex === (agentEmailItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === (agentContactEmailItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refAgentEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (agentEmailItems.length > 1) {
-                                                            await setAgentEmailItems(agentEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedAgent?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (agentContactEmailItems.length > 1) {
+                                                               await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedAgentContact?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowAgentEmails(true);
+                                                               setShowAgentContactEmails(true);
 
-                                                            refAgentEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setShowAgentEmails(false);
-                                                    break;
+                                                   case 27: // escape
+                                                       setShowAgentContactEmails(false);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (showAgentEmails && agentEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                primary_email: agentEmailItems[agentEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 13: // enter
+                                                       if (showAgentContactEmails && agentContactEmailItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   primary_email: agentContactEmailItems[agentContactEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateAgentForSaving({ keyCode: 9 });
-                                                        setShowAgentEmails(false);
-                                                        refAgentEmail.current.focus();
-                                                    }
-                                                    break;
+                                                           validateAgentContactForSaving({keyCode: 9});
+                                                           setShowAgentContactEmails(false);
+                                                           refAgentContactEmail.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (showAgentEmails) {
-                                                        e.preventDefault();
-                                                        await setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                primary_email: agentEmailItems[agentEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 9: // tab
+                                                       if (showAgentContactEmails) {
+                                                           e.preventDefault();
+                                                           await setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   primary_email: agentContactEmailItems[agentContactEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateAgentForSaving({ keyCode: 9 });
-                                                        setShowAgentEmails(false);
-                                                        refAgentEmail.current.focus();
-                                                    } else {
-                                                        validateAgentForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                           validateAgentContactForSaving({keyCode: 9});
+                                                           setShowAgentContactEmails(false);
+                                                           refAgentContactEmail.current.focus();
+                                                       } else {
+                                                           validateAgentContactForSaving({keyCode: 9});
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedAgent?.primary_email || '') === '') {
-                                                setSelectedAgent(selectedAgent => {
-                                                    return {
-                                                        ...selectedAgent,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedAgent?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedAgent?.primary_email || '') === '') {
-                                                setSelectedAgent(selectedAgent => {
-                                                    return {
-                                                        ...selectedAgent,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedAgent?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedAgent(selectedAgent => {
-                                                            return {
-                                                                ...selectedAgent,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedAgent?.primary_email || '') === 'work'
-                                                ? (selectedAgent?.email_work || '')
-                                                : (selectedAgent?.primary_email || '') === 'personal'
-                                                    ? (selectedAgent?.email_personal || '')
-                                                    : (selectedAgent?.primary_email || '') === 'other'
-                                                        ? (selectedAgent?.email_other || '')
-                                                        : ''
-                                        } />
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onInput={e => {
+                                               if ((selectedAgentContact?.primary_email || '') === '') {
+                                                   setSelectedAgentContact(selectedAgentContact => {
+                                                       return {
+                                                           ...selectedAgentContact,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedAgentContact?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           onChange={e => {
+                                               if ((selectedAgentContact?.primary_email || '') === '') {
+                                                   setSelectedAgentContact(selectedAgentContact => {
+                                                       return {
+                                                           ...selectedAgentContact,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedAgentContact?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedAgentContact(selectedAgentContact => {
+                                                               return {
+                                                                   ...selectedAgentContact,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           value={
+                                               (selectedAgentContact?.primary_email || '') === 'work'
+                                                   ? (selectedAgentContact?.email_work || '')
+                                                   : (selectedAgentContact?.primary_email || '') === 'personal'
+                                                       ? (selectedAgentContact?.email_personal || '')
+                                                       : (selectedAgentContact?.primary_email || '') === 'other'
+                                                           ? (selectedAgentContact?.email_other || '')
+                                                           : ''
+                                           }/>
 
                                     {
-                                        (selectedAgent?.id || 0) > 0 &&
+                                        (selectedAgentContact?.id || 0) > 0 &&
                                         <div
                                             className={classnames({
                                                 'selected-company-agent-primary-email': true,
-                                                'pushed': (agentEmailItems.length > 1)
+                                                'pushed': (agentContactEmailItems.length > 1)
                                             })}>
-                                            {selectedAgent?.primary_email || ''}
+                                            {selectedAgentContact?.primary_email || ''}
                                         </div>
                                     }
 
                                     {
-                                        agentEmailItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showAgentEmails) {
-                                                setShowAgentEmails(false);
-                                            } else {
-                                                if (agentEmailItems.length > 1) {
-                                                    await setAgentEmailItems(agentEmailItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedAgent?.primary_email || '')
-                                                        return item;
-                                                    }))
+                                        agentContactEmailItems.length > 1 &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showAgentContactEmails) {
+                                                                 setShowAgentContactEmails(false);
+                                                             } else {
+                                                                 if (agentContactEmailItems.length > 1) {
+                                                                     await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedAgentContact?.primary_email || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowAgentEmails(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowAgentContactEmails(true);
 
-                                                        refAgentEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refAgentEmail.current.focus();
-                                        }} />
+                                                             refAgentContactEmail.current.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -3991,13 +4106,14 @@ function CompanySetup(props) {
                                                 left: '0',
                                                 display: 'block'
                                             }}
-                                            ref={refAgentEmailDropDown}
+                                            ref={refAgentContactEmailDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
-                                                            agentEmailItems.map((item, index) => {
+                                                            agentContactEmailItems.map((item, index) => {
                                                                 const mochiItemClasses = classnames({
                                                                     'mochi-item': true,
                                                                     'selected': item.selected
@@ -4009,18 +4125,18 @@ function CompanySetup(props) {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedAgent(selectedAgent => {
+                                                                            await setSelectedAgentContact(selectedAgentContact => {
                                                                                 return {
-                                                                                    ...selectedAgent,
+                                                                                    ...selectedAgentContact,
                                                                                     primary_email: item.type
                                                                                 }
                                                                             });
 
-                                                                            validateAgentForSaving({ keyCode: 9 });
-                                                                            setShowAgentEmails(false);
-                                                                            refAgentEmail.current.focus();
+                                                                            validateAgentContactForSaving({keyCode: 9});
+                                                                            setShowAgentContactEmails(false);
+                                                                            refAgentContactEmail.current.focus();
                                                                         }}
-                                                                        ref={ref => refAgentEmailPopupItems.current.push(ref)}
+                                                                        ref={ref => refAgentContactEmailPopupItems.current.push(ref)}
                                                                     >
                                                                         {
                                                                             item.type === 'work' ? `Email Work `
@@ -4029,16 +4145,18 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.email
+                                                                                : item.type === 'personal' ? item.email
+                                                                                    : item.type === 'other' ? item.email : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -4053,25 +4171,13 @@ function CompanySetup(props) {
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
-                                <input tabIndex={33 + props.tabTimes} type="text" placeholder="Notes"
-                                    onKeyDown={validateAgentForSaving}
-                                    onInput={e => {
-                                        setSelectedAgent(selectedAgent => {
-                                            return {
-                                                ...selectedAgent,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedAgent(selectedAgent => {
-                                            return {
-                                                ...selectedAgent,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedAgent?.notes || ''} />
+                                <input tabIndex={31 + props.tabTimes} type="text" placeholder="Agent Code"
+                                       readOnly={true}
+                                       onInput={e => {
+                                       }}
+                                       onChange={e => {
+                                       }}
+                                       value={selectedAgent?.code || ''}/>
                             </div>
                         </div>
                     </div>
@@ -4110,13 +4216,13 @@ function CompanySetup(props) {
                         </div>
 
                         <div className="form-slider">
-                            <div className="form-slider-wrapper" style={{ left: showingAgentList ? 0 : '-100%' }}>
+                            <div className="form-slider-wrapper" style={{left: showingAgentList ? 0 : '-100%'}}>
                                 <div className="agent-list-box">
                                     {
                                         (selectedCompany?.agents || []).length > 0 &&
                                         <div className="agent-list-header">
-                                            <div className="agent-list-col tcol first-name">First Name</div>
-                                            <div className="agent-list-col tcol last-name">Last Name</div>
+                                            <div className="agent-list-col tcol first-name">Code</div>
+                                            <div className="agent-list-col tcol last-name">Name</div>
                                             <div className="agent-list-col tcol phone-work">Phone</div>
                                             <div className="agent-list-col tcol email-work">E-Mail</div>
                                             <div className="agent-list-col tcol agent-selected"></div>
@@ -4128,58 +4234,63 @@ function CompanySetup(props) {
                                         {
                                             (selectedCompany?.agents || []).map((agent, index) => {
                                                 return (
-                                                    <div className="agent-list-item" key={index} onDoubleClick={async () => {
-                                                        let panel = {
-                                                            panelName: `${props.panelName}-agents`,
-                                                            component: <Agents
-                                                                title='Agent'
-                                                                tabTimes={222000 + props.tabTimes}
-                                                                panelName={`${props.panelName}-agents`}
-                                                                savingAgentUrl='/saveAgent'
-                                                                deletingAgentUrl='/deleteAgent'
-                                                                uploadAvatarUrl='/uploadAgentAvatar'
-                                                                removeAvatarUrl='/removeAgentAvatar'
-                                                                origin={props.origin}
-                                                                owner='company'
-                                                                openPanel={props.openPanel}
-                                                                closePanel={props.closePanel}
-                                                                componentId={moment().format('x')}
+                                                    <div className="agent-list-item" key={index}
+                                                         onDoubleClick={async () => {
+                                                             let panel = {
+                                                                 panelName: `${props.panelName}-agents`,
+                                                                 component: <Agents
+                                                                     title='Agent'
+                                                                     tabTimes={222200 + props.tabTimes}
+                                                                     panelName={`${props.panelName}-agents`}
+                                                                     origin={props.origin}
+                                                                     openPanel={props.openPanel}
+                                                                     closePanel={props.closePanel}
+                                                                     componentId={moment().format('x')}
+                                                                     isAdmin={props.isAdmin}
+                                                                     setSelectedCompany={setSelectedCompany}
+                                                                     selectedCompany={selectedCompany}
+                                                                     selectedAgent={agent}
+                                                                 />
+                                                             }
 
-                                                                agentSearchCompany={{
-                                                                    ...selectedCompany,
-                                                                    selectedAgent: agent
-                                                                }}
-                                                            />
-                                                        }
-
-                                                        props.openPanel(panel, props.origin);
-                                                    }} onClick={() => setSelectedAgent(agent)}>
-                                                        <div className="agent-list-col tcol first-name">{agent.first_name}</div>
-                                                        <div className="agent-list-col tcol last-name">{agent.last_name}</div>
+                                                             props.openPanel(panel, props.origin);
+                                                         }} onClick={() => setSelectedAgent(agent)}>
+                                                        <div
+                                                            className="agent-list-col tcol first-name">{agent?.code || ''}</div>
+                                                        <div
+                                                            className="agent-list-col tcol last-name">{agent?.name}</div>
                                                         <div className="agent-list-col tcol phone-work">{
-                                                            agent.primary_phone === 'work' ? agent.phone_work
-                                                                : agent.primary_phone === 'fax' ? agent.phone_work_fax
-                                                                    : agent.primary_phone === 'mobile' ? agent.phone_mobile
-                                                                        : agent.primary_phone === 'direct' ? agent.phone_direct
-                                                                            : agent.primary_phone === 'other' ? agent.phone_other
+                                                            (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_phone || '') === 'work'
+                                                                ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.phone_work || '')
+                                                                : (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_phone || '') === 'fax'
+                                                                    ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.phone_work_fax || '')
+                                                                    : (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_phone || '') === 'mobile'
+                                                                        ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.phone_mobile || '')
+                                                                        : (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_phone || '') === 'direct'
+                                                                            ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.phone_direct || '')
+                                                                            : (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_phone || '') === 'other'
+                                                                                ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.phone_other || '')
                                                                                 : ''
                                                         }</div>
                                                         <div className="agent-list-col tcol email-work">{
-                                                            agent.primary_email === 'work' ? agent.email_work
-                                                                : agent.primary_email === 'personal' ? agent.email_personal
-                                                                    : agent.primary_email === 'other' ? agent.email_other
+                                                            (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_email || '') === 'work'
+                                                                ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.email_work || '')
+                                                                : (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_email || '') === 'personal'
+                                                                    ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.email_personal || '')
+                                                                    : (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.primary_email || '') === 'other'
+                                                                        ? (((agent?.contacts || []).find(c => c.is_primary === 1) || {})?.email_other || '')
                                                                         : ''
                                                         }</div>
                                                         {
                                                             (agent.id === (selectedAgent?.id || 0)) &&
                                                             <div className="agent-list-col tcol agent-selected">
-                                                                <FontAwesomeIcon icon={faPencilAlt} />
+                                                                <FontAwesomeIcon icon={faPencilAlt}/>
                                                             </div>
                                                         }
                                                         {
                                                             (agent.is_primary_admin === 1) &&
                                                             <div className="agent-list-col tcol pri">
-                                                                <FontAwesomeIcon icon={faCheck} />
+                                                                <FontAwesomeIcon icon={faCheck}/>
                                                             </div>
                                                         }
                                                     </div>
@@ -4192,64 +4303,96 @@ function CompanySetup(props) {
                                 <div className="agent-search-box">
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="First Name" onChange={e => setAgentSearch({ ...agentSearch, first_name: e.target.value })} value={agentSearch.first_name || ''} />
+                                            <input type="text" placeholder="First Name" onChange={e => setAgentSearch({
+                                                ...agentSearch,
+                                                first_name: e.target.value
+                                            })} value={agentSearch.first_name || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Last Name" onFocus={() => { setShowingAgentList(false) }} onChange={e => setAgentSearch({ ...agentSearch, last_name: e.target.value })} value={agentSearch.last_name || ''} />
+                                            <input type="text" placeholder="Last Name" onFocus={() => {
+                                                setShowingAgentList(false)
+                                            }} onChange={e => setAgentSearch({
+                                                ...agentSearch,
+                                                last_name: e.target.value
+                                            })} value={agentSearch.last_name || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 1" onFocus={() => { setShowingAgentList(false) }} onChange={e => setAgentSearch({ ...agentSearch, address1: e.target.value })} value={agentSearch.address1 || ''} />
+                                            <input type="text" placeholder="Address 1" onFocus={() => {
+                                                setShowingAgentList(false)
+                                            }} onChange={e => setAgentSearch({
+                                                ...agentSearch,
+                                                address1: e.target.value
+                                            })} value={agentSearch.address1 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 2" onFocus={() => { setShowingAgentList(false) }} onChange={e => setAgentSearch({ ...agentSearch, address2: e.target.value })} value={agentSearch.address2 || ''} />
+                                            <input type="text" placeholder="Address 2" onFocus={() => {
+                                                setShowingAgentList(false)
+                                            }} onChange={e => setAgentSearch({
+                                                ...agentSearch,
+                                                address2: e.target.value
+                                            })} value={agentSearch.address2 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="City" onFocus={() => { setShowingAgentList(false) }} onChange={e => setAgentSearch({ ...agentSearch, city: e.target.value })} value={agentSearch.city || ''} />
+                                            <input type="text" placeholder="City" onFocus={() => {
+                                                setShowingAgentList(false)
+                                            }} onChange={e => setAgentSearch({...agentSearch, city: e.target.value})}
+                                                   value={agentSearch.city || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container input-state">
-                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => { setShowingAgentList(false) }} onChange={e => setAgentSearch({ ...agentSearch, state: e.target.value })} value={agentSearch.state || ''} />
+                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => {
+                                                setShowingAgentList(false)
+                                            }} onChange={e => setAgentSearch({...agentSearch, state: e.target.value})}
+                                                   value={agentSearch.state || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
                                             <MaskedInput
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
-                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => { setShowingAgentList(false) }} onChange={e => setAgentSearch({ ...agentSearch, phone: e.target.value })} value={agentSearch.phone || ''} />
+                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
+                                                setShowingAgentList(false)
+                                            }} onChange={e => setAgentSearch({...agentSearch, phone: e.target.value})}
+                                                value={agentSearch.phone || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                                onKeyDown={(e) => {
-                                                    e.preventDefault();
-                                                    let key = e.keyCode || e.which;
+                                            <input type="text" placeholder="E-Mail" style={{textTransform: 'lowercase'}}
+                                                   onKeyDown={(e) => {
+                                                       e.preventDefault();
+                                                       let key = e.keyCode || e.which;
 
-                                                    if (key === 9) {
-                                                        let elems = document.getElementsByTagName('input');
+                                                       if (key === 9) {
+                                                           let elems = document.getElementsByTagName('input');
 
-                                                        for (var i = elems.length; i--;) {
-                                                            if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                elems[i].focus();
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }}
-                                                onFocus={() => { setShowingAgentList(false) }}
-                                                onChange={e => setAgentSearch({ ...agentSearch, email: e.target.value })}
-                                                value={agentSearch.email || ''} />
+                                                           for (var i = elems.length; i--;) {
+                                                               if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
+                                                                   elems[i].focus();
+                                                                   break;
+                                                               }
+                                                           }
+                                                       }
+                                                   }}
+                                                   onFocus={() => {
+                                                       setShowingAgentList(false)
+                                                   }}
+                                                   onChange={e => setAgentSearch({
+                                                       ...agentSearch,
+                                                       email: e.target.value
+                                                   })}
+                                                   value={agentSearch.email || ''}/>
                                         </div>
                                     </div>
                                 </div>
@@ -4332,7 +4475,7 @@ function CompanySetup(props) {
 
                                             driverSearchCompany={{
                                                 ...selectedCompany,
-                                                selectedDriver: { id: 0, company_id: selectedCompany?.id }
+                                                selectedDriver: {id: 0, company_id: selectedCompany?.id}
                                             }}
                                         />
                                     }
@@ -4358,351 +4501,353 @@ function CompanySetup(props) {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={34 + props.tabTimes} type="text" placeholder="First Name"
-                                    ref={refDriverFirstName}
-                                    onInput={e => {
-                                        setSelectedDriver(selectedDriver => {
-                                            return {
-                                                ...selectedDriver,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver(selectedDriver => {
-                                            return {
-                                                ...selectedDriver,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedDriver?.first_name || ''} />
+                                       ref={refDriverFirstName}
+                                       onInput={e => {
+                                           setSelectedDriver(selectedDriver => {
+                                               return {
+                                                   ...selectedDriver,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver(selectedDriver => {
+                                               return {
+                                                   ...selectedDriver,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedDriver?.first_name || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={35 + props.tabTimes} type="text" placeholder="Last Name"
-                                    onInput={e => {
-                                        setSelectedDriver(selectedDriver => {
-                                            return {
-                                                ...selectedDriver,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver(selectedDriver => {
-                                            return {
-                                                ...selectedDriver,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedDriver?.last_name || ''} />
+                                       onInput={e => {
+                                           setSelectedDriver(selectedDriver => {
+                                               return {
+                                                   ...selectedDriver,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver(selectedDriver => {
+                                               return {
+                                                   ...selectedDriver,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedDriver?.last_name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ width: '50%' }}>
+                            <div className="select-box-container" style={{width: '50%'}}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={36 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text"
-                                        placeholder="Phone"
-                                        ref={refDriverPhone}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={true}
+                                                 type="text"
+                                                 placeholder="Phone"
+                                                 ref={refDriverPhone}
+                                                 onKeyDown={async e => {
+                                                     let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showDriverPhones) {
-                                                        let selectedIndex = driverPhoneItems.findIndex(item => item.selected);
+                                                     switch (key) {
+                                                         case 37:
+                                                         case 38: // arrow left | arrow up
+                                                             e.preventDefault();
+                                                             if (showDriverPhones) {
+                                                                 let selectedIndex = driverPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (driverPhoneItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === 0) {
+                                                                             item.selected = index === (driverPhoneItems.length - 1);
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex - 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refDriverPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (driverPhoneItems.length > 1) {
-                                                            await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedDriver?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refDriverPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (driverPhoneItems.length > 1) {
+                                                                     await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedDriver?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowDriverPhones(true);
+                                                                     setShowDriverPhones(true);
 
-                                                            refDriverPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refDriverPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showDriverPhones) {
-                                                        let selectedIndex = driverPhoneItems.findIndex(item => item.selected);
+                                                         case 39:
+                                                         case 40: // arrow right | arrow down
+                                                             e.preventDefault();
+                                                             if (showDriverPhones) {
+                                                                 let selectedIndex = driverPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === (driverPhoneItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === (driverPhoneItems.length - 1)) {
+                                                                             item.selected = index === 0;
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex + 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refDriverPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (driverPhoneItems.length > 1) {
-                                                            await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedDriver?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refDriverPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (driverPhoneItems.length > 1) {
+                                                                     await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedDriver?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowDriverPhones(true);
+                                                                     setShowDriverPhones(true);
 
-                                                            refDriverPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refDriverPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 27: // escape
-                                                    setShowDriverPhones(false);
-                                                    break;
+                                                         case 27: // escape
+                                                             setShowDriverPhones(false);
+                                                             break;
 
-                                                case 13: // enter
-                                                    if (showDriverPhones && driverPhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                primary_phone: driverPhoneItems[driverPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 13: // enter
+                                                             if (showDriverPhones && driverPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                 await setSelectedDriver(selectedDriver => {
+                                                                     return {
+                                                                         ...selectedDriver,
+                                                                         primary_phone: driverPhoneItems[driverPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                        setShowDriverPhones(false);
-                                                        refDriverPhone.current.inputElement.focus();
-                                                    }
-                                                    break;
+                                                                 validateDriverForSaving({keyCode: 9});
+                                                                 setShowDriverPhones(false);
+                                                                 refDriverPhone.current.inputElement.focus();
+                                                             }
+                                                             break;
 
-                                                case 9: // tab
-                                                    if (showDriverPhones) {
-                                                        e.preventDefault();
-                                                        await setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                primary_phone: driverPhoneItems[driverPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 9: // tab
+                                                             if (showDriverPhones) {
+                                                                 e.preventDefault();
+                                                                 await setSelectedDriver(selectedDriver => {
+                                                                     return {
+                                                                         ...selectedDriver,
+                                                                         primary_phone: driverPhoneItems[driverPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                        setShowDriverPhones(false);
-                                                        refDriverPhone.current.inputElement.focus();
-                                                    } else {
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                                 validateDriverForSaving({keyCode: 9});
+                                                                 setShowDriverPhones(false);
+                                                                 refDriverPhone.current.inputElement.focus();
+                                                             } else {
+                                                                 validateDriverForSaving({keyCode: 9});
+                                                             }
+                                                             break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedDriver?.id || 0) === 0) {
-                                                setSelectedDriver(selectedDriver => {
-                                                    return {
-                                                        ...selectedDriver,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedDriver?.primary_phone || '') === '') {
-                                                    setSelectedDriver(selectedDriver => {
-                                                        return {
-                                                            ...selectedDriver,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedDriver?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedDriver?.id || 0) === 0) {
-                                                setSelectedDriver(selectedDriver => {
-                                                    return {
-                                                        ...selectedDriver,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedDriver?.primary_phone || '') === '') {
-                                                    setSelectedDriver(selectedDriver => {
-                                                        return {
-                                                            ...selectedDriver,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedDriver?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedDriver?.primary_phone || '') === 'work'
-                                                ? (selectedDriver?.phone_work || '')
-                                                : (selectedDriver?.primary_phone || '') === 'fax'
-                                                    ? (selectedDriver?.phone_work_fax || '')
-                                                    : (selectedDriver?.primary_phone || '') === 'mobile'
-                                                        ? (selectedDriver?.phone_mobile || '')
-                                                        : (selectedDriver?.primary_phone || '') === 'direct'
-                                                            ? (selectedDriver?.phone_direct || '')
-                                                            : (selectedDriver?.primary_phone || '') === 'other'
-                                                                ? (selectedDriver?.phone_other || '')
-                                                                : ''
-                                        } />
+                                                         default:
+                                                             break;
+                                                     }
+                                                 }}
+                                                 onInput={e => {
+                                                     if ((selectedDriver?.id || 0) === 0) {
+                                                         setSelectedDriver(selectedDriver => {
+                                                             return {
+                                                                 ...selectedDriver,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedDriver?.primary_phone || '') === '') {
+                                                             setSelectedDriver(selectedDriver => {
+                                                                 return {
+                                                                     ...selectedDriver,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedDriver?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 onChange={e => {
+                                                     if ((selectedDriver?.id || 0) === 0) {
+                                                         setSelectedDriver(selectedDriver => {
+                                                             return {
+                                                                 ...selectedDriver,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedDriver?.primary_phone || '') === '') {
+                                                             setSelectedDriver(selectedDriver => {
+                                                                 return {
+                                                                     ...selectedDriver,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedDriver?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedDriver(selectedDriver => {
+                                                                         return {
+                                                                             ...selectedDriver,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 value={
+                                                     (selectedDriver?.primary_phone || '') === 'work'
+                                                         ? (selectedDriver?.phone_work || '')
+                                                         : (selectedDriver?.primary_phone || '') === 'fax'
+                                                             ? (selectedDriver?.phone_work_fax || '')
+                                                             : (selectedDriver?.primary_phone || '') === 'mobile'
+                                                                 ? (selectedDriver?.phone_mobile || '')
+                                                                 : (selectedDriver?.primary_phone || '') === 'direct'
+                                                                     ? (selectedDriver?.phone_direct || '')
+                                                                     : (selectedDriver?.primary_phone || '') === 'other'
+                                                                         ? (selectedDriver?.phone_other || '')
+                                                                         : ''
+                                                 }/>
                                     {
                                         (selectedDriver?.id || 0) > 0 &&
                                         <div
@@ -4716,35 +4861,36 @@ function CompanySetup(props) {
 
                                     {
                                         driverPhoneItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showDriverPhones) {
-                                                setShowDriverPhones(false);
-                                            } else {
-                                                if (driverPhoneItems.length > 1) {
-                                                    await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedDriver?.primary_phone || '')
-                                                        return item;
-                                                    }))
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showDriverPhones) {
+                                                                 setShowDriverPhones(false);
+                                                             } else {
+                                                                 if (driverPhoneItems.length > 1) {
+                                                                     await setDriverPhoneItems(driverPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedDriver?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowDriverPhones(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowDriverPhones(true);
 
-                                                        refDriverPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refDriverPhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refDriverPhone.current.inputElement.focus();
-                                        }} />
+                                                             refDriverPhone.current.inputElement.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -4759,8 +4905,9 @@ function CompanySetup(props) {
                                             }}
                                             ref={refDriverPhoneDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             driverPhoneItems.map((item, index) => {
@@ -4782,7 +4929,7 @@ function CompanySetup(props) {
                                                                                 }
                                                                             });
 
-                                                                            validateDriverForSaving({ keyCode: 9 });
+                                                                            validateDriverForSaving({keyCode: 9});
                                                                             setShowDriverPhones(false);
                                                                             refDriverPhone.current.inputElement.focus();
                                                                         }}
@@ -4797,18 +4944,20 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.phone
+                                                                                : item.type === 'fax' ? item.phone
+                                                                                    : item.type === 'mobile' ? item.phone
+                                                                                        : item.type === 'direct' ? item.phone
+                                                                                            : item.type === 'other' ? item.phone : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -4822,44 +4971,46 @@ function CompanySetup(props) {
                                 }
                             </div>
                             <div className="form-h-sep"></div>
-                            <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={37 + props.tabTimes} type="text" placeholder="Ext"
-                                        onInput={e => {
-                                            setSelectedDriver(selectedDriver => {
-                                                return {
-                                                    ...selectedDriver,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedDriver(selectedDriver => {
-                                                return {
-                                                    ...selectedDriver,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        value={selectedDriver?.phone_ext || ''} />
+                                           onInput={e => {
+                                               setSelectedDriver(selectedDriver => {
+                                                   return {
+                                                       ...selectedDriver,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           onChange={e => {
+                                               setSelectedDriver(selectedDriver => {
+                                                   return {
+                                                       ...selectedDriver,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedDriver?.phone_ext || ''}/>
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={38 + props.tabTimes} type="text" placeholder="Driver Code"
-                                        readOnly={true}
-                                        onInput={e => { }}
-                                        onChange={e => { }}
-                                        value={
-                                            (selectedDriver?.id || 0) > 0
-                                                ? 'DV' + selectedDriver.id.toString().padStart(4, '0')
-                                                : ''
-                                        } />
+                                           readOnly={true}
+                                           onInput={e => {
+                                           }}
+                                           onChange={e => {
+                                           }}
+                                           value={
+                                               (selectedDriver?.id || 0) > 0
+                                                   ? 'DV' + selectedDriver.id.toString().padStart(4, '0')
+                                                   : ''
+                                           }/>
                                 </div>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input style={{
                                         width: 'calc(100% - 25px)',
@@ -4867,248 +5018,250 @@ function CompanySetup(props) {
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap'
                                     }}
-                                        tabIndex={39 + props.tabTimes}
-                                        type="text"
-                                        placeholder="E-Mail"
-                                        ref={refDriverEmail}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={39 + props.tabTimes}
+                                           type="text"
+                                           placeholder="E-Mail"
+                                           ref={refDriverEmail}
+                                           onKeyDown={async e => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showDriverEmails) {
-                                                        let selectedIndex = driverEmailItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (showDriverEmails) {
+                                                           let selectedIndex = driverEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverEmailItems(driverEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverEmailItems(driverEmailItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (driverEmailItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setDriverEmailItems(driverEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setDriverEmailItems(driverEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (driverEmailItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refDriverEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (driverEmailItems.length > 1) {
-                                                            await setDriverEmailItems(driverEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedDriver?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refDriverEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (driverEmailItems.length > 1) {
+                                                               await setDriverEmailItems(driverEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedDriver?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowDriverEmails(true);
+                                                               setShowDriverEmails(true);
 
-                                                            refDriverEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refDriverEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showDriverEmails) {
-                                                        let selectedIndex = driverEmailItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (showDriverEmails) {
+                                                           let selectedIndex = driverEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverEmailItems(driverEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverEmailItems(driverEmailItems.map((item, index) => {
-                                                                if (selectedIndex === (driverEmailItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setDriverEmailItems(driverEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setDriverEmailItems(driverEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === (driverEmailItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refDriverEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (driverEmailItems.length > 1) {
-                                                            await setDriverEmailItems(driverEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedDriver?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refDriverEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (driverEmailItems.length > 1) {
+                                                               await setDriverEmailItems(driverEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedDriver?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowDriverEmails(true);
+                                                               setShowDriverEmails(true);
 
-                                                            refDriverEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refDriverEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setShowDriverEmails(false);
-                                                    break;
+                                                   case 27: // escape
+                                                       setShowDriverEmails(false);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (showDriverEmails && driverEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                primary_email: driverEmailItems[driverEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 13: // enter
+                                                       if (showDriverEmails && driverEmailItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   primary_email: driverEmailItems[driverEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                        setShowDriverEmails(false);
-                                                        refDriverEmail.current.focus();
-                                                    }
-                                                    break;
+                                                           validateDriverForSaving({keyCode: 9});
+                                                           setShowDriverEmails(false);
+                                                           refDriverEmail.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (showDriverEmails) {
-                                                        e.preventDefault();
-                                                        await setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                primary_email: driverEmailItems[driverEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 9: // tab
+                                                       if (showDriverEmails) {
+                                                           e.preventDefault();
+                                                           await setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   primary_email: driverEmailItems[driverEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                        setShowDriverEmails(false);
-                                                        refDriverEmail.current.focus();
-                                                    } else {
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                           validateDriverForSaving({keyCode: 9});
+                                                           setShowDriverEmails(false);
+                                                           refDriverEmail.current.focus();
+                                                       } else {
+                                                           validateDriverForSaving({keyCode: 9});
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedDriver?.primary_email || '') === '') {
-                                                setSelectedDriver(selectedDriver => {
-                                                    return {
-                                                        ...selectedDriver,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedDriver?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedDriver?.primary_email || '') === '') {
-                                                setSelectedDriver(selectedDriver => {
-                                                    return {
-                                                        ...selectedDriver,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedDriver?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedDriver(selectedDriver => {
-                                                            return {
-                                                                ...selectedDriver,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedDriver?.primary_email || '') === 'work'
-                                                ? (selectedDriver?.email_work || '')
-                                                : (selectedDriver?.primary_email || '') === 'personal'
-                                                    ? (selectedDriver?.email_personal || '')
-                                                    : (selectedDriver?.primary_email || '') === 'other'
-                                                        ? (selectedDriver?.email_other || '')
-                                                        : ''
-                                        } />
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onInput={e => {
+                                               if ((selectedDriver?.primary_email || '') === '') {
+                                                   setSelectedDriver(selectedDriver => {
+                                                       return {
+                                                           ...selectedDriver,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedDriver?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           onChange={e => {
+                                               if ((selectedDriver?.primary_email || '') === '') {
+                                                   setSelectedDriver(selectedDriver => {
+                                                       return {
+                                                           ...selectedDriver,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedDriver?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedDriver(selectedDriver => {
+                                                               return {
+                                                                   ...selectedDriver,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           value={
+                                               (selectedDriver?.primary_email || '') === 'work'
+                                                   ? (selectedDriver?.email_work || '')
+                                                   : (selectedDriver?.primary_email || '') === 'personal'
+                                                       ? (selectedDriver?.email_personal || '')
+                                                       : (selectedDriver?.primary_email || '') === 'other'
+                                                           ? (selectedDriver?.email_other || '')
+                                                           : ''
+                                           }/>
 
                                     {
                                         (selectedDriver?.id || 0) > 0 &&
@@ -5123,35 +5276,36 @@ function CompanySetup(props) {
 
                                     {
                                         driverEmailItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showDriverEmails) {
-                                                setShowDriverEmails(false);
-                                            } else {
-                                                if (driverEmailItems.length > 1) {
-                                                    await setDriverEmailItems(driverEmailItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedDriver?.primary_email || '')
-                                                        return item;
-                                                    }))
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showDriverEmails) {
+                                                                 setShowDriverEmails(false);
+                                                             } else {
+                                                                 if (driverEmailItems.length > 1) {
+                                                                     await setDriverEmailItems(driverEmailItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedDriver?.primary_email || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowDriverEmails(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowDriverEmails(true);
 
-                                                        refDriverEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refDriverEmailPopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refDriverEmail.current.focus();
-                                        }} />
+                                                             refDriverEmail.current.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -5166,8 +5320,9 @@ function CompanySetup(props) {
                                             }}
                                             ref={refDriverEmailDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             driverEmailItems.map((item, index) => {
@@ -5189,7 +5344,7 @@ function CompanySetup(props) {
                                                                                 }
                                                                             });
 
-                                                                            validateDriverForSaving({ keyCode: 9 });
+                                                                            validateDriverForSaving({keyCode: 9});
                                                                             setShowDriverEmails(false);
                                                                             refDriverEmail.current.focus();
                                                                         }}
@@ -5202,16 +5357,18 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.email
+                                                                                : item.type === 'personal' ? item.email
+                                                                                    : item.type === 'other' ? item.email : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -5227,24 +5384,24 @@ function CompanySetup(props) {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={40 + props.tabTimes} type="text" placeholder="Notes"
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver(selectedDriver => {
-                                            return {
-                                                ...selectedDriver,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver(selectedDriver => {
-                                            return {
-                                                ...selectedDriver,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.notes || ''} />
+                                       onKeyDown={validateDriverForSaving}
+                                       onInput={e => {
+                                           setSelectedDriver(selectedDriver => {
+                                               return {
+                                                   ...selectedDriver,
+                                                   notes: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver(selectedDriver => {
+                                               return {
+                                                   ...selectedDriver,
+                                                   notes: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       value={selectedDriver?.notes || ''}/>
                             </div>
                         </div>
                     </div>
@@ -5283,7 +5440,7 @@ function CompanySetup(props) {
                         </div>
 
                         <div className="form-slider">
-                            <div className="form-slider-wrapper" style={{ left: showingDriverList ? 0 : '-100%' }}>
+                            <div className="form-slider-wrapper" style={{left: showingDriverList ? 0 : '-100%'}}>
                                 <div className="driver-list-box">
                                     {
                                         (selectedCompany?.drivers || []).length > 0 &&
@@ -5301,34 +5458,37 @@ function CompanySetup(props) {
                                         {
                                             (selectedCompany?.drivers || []).map((driver, index) => {
                                                 return (
-                                                    <div className="driver-list-item" key={index} onDoubleClick={async () => {
-                                                        let panel = {
-                                                            panelName: `${props.panelName}-drivers`,
-                                                            component: <Drivers
-                                                                title='Driver'
-                                                                tabTimes={322000 + props.tabTimes}
-                                                                panelName={`${props.panelName}-drivers`}
-                                                                savingDriverUrl='/saveDriver'
-                                                                deletingDriverUrl='/deleteDriver'
-                                                                uploadAvatarUrl='/uploadDriverAvatar'
-                                                                removeAvatarUrl='/removeDriverAvatar'
-                                                                origin={props.origin}
-                                                                owner='company'
-                                                                openPanel={props.openPanel}
-                                                                closePanel={props.closePanel}
-                                                                componentId={moment().format('x')}
+                                                    <div className="driver-list-item" key={index}
+                                                         onDoubleClick={async () => {
+                                                             let panel = {
+                                                                 panelName: `${props.panelName}-drivers`,
+                                                                 component: <Drivers
+                                                                     title='Driver'
+                                                                     tabTimes={322000 + props.tabTimes}
+                                                                     panelName={`${props.panelName}-drivers`}
+                                                                     savingDriverUrl='/saveDriver'
+                                                                     deletingDriverUrl='/deleteDriver'
+                                                                     uploadAvatarUrl='/uploadDriverAvatar'
+                                                                     removeAvatarUrl='/removeDriverAvatar'
+                                                                     origin={props.origin}
+                                                                     owner='company'
+                                                                     openPanel={props.openPanel}
+                                                                     closePanel={props.closePanel}
+                                                                     componentId={moment().format('x')}
 
-                                                                driverSearchCompany={{
-                                                                    ...selectedCompany,
-                                                                    selectedDriver: driver
-                                                                }}
-                                                            />
-                                                        }
+                                                                     driverSearchCompany={{
+                                                                         ...selectedCompany,
+                                                                         selectedDriver: driver
+                                                                     }}
+                                                                 />
+                                                             }
 
-                                                        props.openPanel(panel, props.origin);
-                                                    }} onClick={() => setSelectedDriver(driver)}>
-                                                        <div className="driver-list-col tcol first-name">{driver.first_name}</div>
-                                                        <div className="driver-list-col tcol last-name">{driver.last_name}</div>
+                                                             props.openPanel(panel, props.origin);
+                                                         }} onClick={() => setSelectedDriver(driver)}>
+                                                        <div
+                                                            className="driver-list-col tcol first-name">{driver.first_name}</div>
+                                                        <div
+                                                            className="driver-list-col tcol last-name">{driver.last_name}</div>
                                                         <div className="driver-list-col tcol phone-work">{
                                                             driver.primary_phone === 'work' ? driver.phone_work
                                                                 : driver.primary_phone === 'fax' ? driver.phone_work_fax
@@ -5346,13 +5506,13 @@ function CompanySetup(props) {
                                                         {
                                                             (driver.id === (selectedDriver?.id || 0)) &&
                                                             <div className="driver-list-col tcol driver-selected">
-                                                                <FontAwesomeIcon icon={faPencilAlt} />
+                                                                <FontAwesomeIcon icon={faPencilAlt}/>
                                                             </div>
                                                         }
                                                         {
                                                             (driver.is_primary_admin === 1) &&
                                                             <div className="driver-list-col tcol pri">
-                                                                <FontAwesomeIcon icon={faCheck} />
+                                                                <FontAwesomeIcon icon={faCheck}/>
                                                             </div>
                                                         }
                                                     </div>
@@ -5365,64 +5525,96 @@ function CompanySetup(props) {
                                 <div className="driver-search-box">
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="First Name" onChange={e => setDriverSearch({ ...driverSearch, first_name: e.target.value })} value={driverSearch.first_name || ''} />
+                                            <input type="text" placeholder="First Name" onChange={e => setDriverSearch({
+                                                ...driverSearch,
+                                                first_name: e.target.value
+                                            })} value={driverSearch.first_name || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Last Name" onFocus={() => { setShowingDriverList(false) }} onChange={e => setDriverSearch({ ...driverSearch, last_name: e.target.value })} value={driverSearch.last_name || ''} />
+                                            <input type="text" placeholder="Last Name" onFocus={() => {
+                                                setShowingDriverList(false)
+                                            }} onChange={e => setDriverSearch({
+                                                ...driverSearch,
+                                                last_name: e.target.value
+                                            })} value={driverSearch.last_name || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 1" onFocus={() => { setShowingDriverList(false) }} onChange={e => setDriverSearch({ ...driverSearch, address1: e.target.value })} value={driverSearch.address1 || ''} />
+                                            <input type="text" placeholder="Address 1" onFocus={() => {
+                                                setShowingDriverList(false)
+                                            }} onChange={e => setDriverSearch({
+                                                ...driverSearch,
+                                                address1: e.target.value
+                                            })} value={driverSearch.address1 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 2" onFocus={() => { setShowingDriverList(false) }} onChange={e => setDriverSearch({ ...driverSearch, address2: e.target.value })} value={driverSearch.address2 || ''} />
+                                            <input type="text" placeholder="Address 2" onFocus={() => {
+                                                setShowingDriverList(false)
+                                            }} onChange={e => setDriverSearch({
+                                                ...driverSearch,
+                                                address2: e.target.value
+                                            })} value={driverSearch.address2 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="City" onFocus={() => { setShowingDriverList(false) }} onChange={e => setDriverSearch({ ...driverSearch, city: e.target.value })} value={driverSearch.city || ''} />
+                                            <input type="text" placeholder="City" onFocus={() => {
+                                                setShowingDriverList(false)
+                                            }} onChange={e => setDriverSearch({...driverSearch, city: e.target.value})}
+                                                   value={driverSearch.city || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container input-state">
-                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => { setShowingDriverList(false) }} onChange={e => setDriverSearch({ ...driverSearch, state: e.target.value })} value={driverSearch.state || ''} />
+                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => {
+                                                setShowingDriverList(false)
+                                            }} onChange={e => setDriverSearch({...driverSearch, state: e.target.value})}
+                                                   value={driverSearch.state || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
                                             <MaskedInput
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
-                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => { setShowingDriverList(false) }} onChange={e => setDriverSearch({ ...driverSearch, phone: e.target.value })} value={driverSearch.phone || ''} />
+                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
+                                                setShowingDriverList(false)
+                                            }} onChange={e => setDriverSearch({...driverSearch, phone: e.target.value})}
+                                                value={driverSearch.phone || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                                onKeyDown={(e) => {
-                                                    e.preventDefault();
-                                                    let key = e.keyCode || e.which;
+                                            <input type="text" placeholder="E-Mail" style={{textTransform: 'lowercase'}}
+                                                   onKeyDown={(e) => {
+                                                       e.preventDefault();
+                                                       let key = e.keyCode || e.which;
 
-                                                    if (key === 9) {
-                                                        let elems = document.getElementsByTagName('input');
+                                                       if (key === 9) {
+                                                           let elems = document.getElementsByTagName('input');
 
-                                                        for (var i = elems.length; i--;) {
-                                                            if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                elems[i].focus();
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }}
-                                                onFocus={() => { setShowingDriverList(false) }}
-                                                onChange={e => setDriverSearch({ ...driverSearch, email: e.target.value })}
-                                                value={driverSearch.email || ''} />
+                                                           for (var i = elems.length; i--;) {
+                                                               if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
+                                                                   elems[i].focus();
+                                                                   break;
+                                                               }
+                                                           }
+                                                       }
+                                                   }}
+                                                   onFocus={() => {
+                                                       setShowingDriverList(false)
+                                                   }}
+                                                   onChange={e => setDriverSearch({
+                                                       ...driverSearch,
+                                                       email: e.target.value
+                                                   })}
+                                                   value={driverSearch.email || ''}/>
                                         </div>
                                     </div>
                                 </div>
@@ -5505,7 +5697,7 @@ function CompanySetup(props) {
 
                                             operatorSearchCompany={{
                                                 ...selectedCompany,
-                                                selectedOperator: { id: 0, company_id: selectedCompany?.id }
+                                                selectedOperator: {id: 0, company_id: selectedCompany?.id}
                                             }}
                                         />
                                     }
@@ -5531,351 +5723,353 @@ function CompanySetup(props) {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={41 + props.tabTimes} type="text" placeholder="First Name"
-                                    ref={refOperatorFirstName}
-                                    onInput={e => {
-                                        setSelectedOperator(selectedOperator => {
-                                            return {
-                                                ...selectedOperator,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedOperator(selectedOperator => {
-                                            return {
-                                                ...selectedOperator,
-                                                first_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedOperator?.first_name || ''} />
+                                       ref={refOperatorFirstName}
+                                       onInput={e => {
+                                           setSelectedOperator(selectedOperator => {
+                                               return {
+                                                   ...selectedOperator,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedOperator(selectedOperator => {
+                                               return {
+                                                   ...selectedOperator,
+                                                   first_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedOperator?.first_name || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={42 + props.tabTimes} type="text" placeholder="Last Name"
-                                    onInput={e => {
-                                        setSelectedOperator(selectedOperator => {
-                                            return {
-                                                ...selectedOperator,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedOperator(selectedOperator => {
-                                            return {
-                                                ...selectedOperator,
-                                                last_name: e.target.value
-                                            }
-                                        });
-                                    }}
-                                    value={selectedOperator?.last_name || ''} />
+                                       onInput={e => {
+                                           setSelectedOperator(selectedOperator => {
+                                               return {
+                                                   ...selectedOperator,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       onChange={e => {
+                                           setSelectedOperator(selectedOperator => {
+                                               return {
+                                                   ...selectedOperator,
+                                                   last_name: e.target.value
+                                               }
+                                           });
+                                       }}
+                                       value={selectedOperator?.last_name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ width: '50%' }}>
+                            <div className="select-box-container" style={{width: '50%'}}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={43 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text"
-                                        placeholder="Phone"
-                                        ref={refOperatorPhone}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={true}
+                                                 type="text"
+                                                 placeholder="Phone"
+                                                 ref={refOperatorPhone}
+                                                 onKeyDown={async e => {
+                                                     let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showOperatorPhones) {
-                                                        let selectedIndex = operatorPhoneItems.findIndex(item => item.selected);
+                                                     switch (key) {
+                                                         case 37:
+                                                         case 38: // arrow left | arrow up
+                                                             e.preventDefault();
+                                                             if (showOperatorPhones) {
+                                                                 let selectedIndex = operatorPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (operatorPhoneItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === 0) {
+                                                                             item.selected = index === (operatorPhoneItems.length - 1);
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex - 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refOperatorPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (operatorPhoneItems.length > 1) {
-                                                            await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedOperator?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refOperatorPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (operatorPhoneItems.length > 1) {
+                                                                     await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedOperator?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowOperatorPhones(true);
+                                                                     setShowOperatorPhones(true);
 
-                                                            refOperatorPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refOperatorPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showOperatorPhones) {
-                                                        let selectedIndex = operatorPhoneItems.findIndex(item => item.selected);
+                                                         case 39:
+                                                         case 40: // arrow right | arrow down
+                                                             e.preventDefault();
+                                                             if (showOperatorPhones) {
+                                                                 let selectedIndex = operatorPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === (operatorPhoneItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === (operatorPhoneItems.length - 1)) {
+                                                                             item.selected = index === 0;
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex + 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refOperatorPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (operatorPhoneItems.length > 1) {
-                                                            await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedOperator?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refOperatorPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (operatorPhoneItems.length > 1) {
+                                                                     await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedOperator?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowOperatorPhones(true);
+                                                                     setShowOperatorPhones(true);
 
-                                                            refOperatorPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refOperatorPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 27: // escape
-                                                    setShowOperatorPhones(false);
-                                                    break;
+                                                         case 27: // escape
+                                                             setShowOperatorPhones(false);
+                                                             break;
 
-                                                case 13: // enter
-                                                    if (showOperatorPhones && operatorPhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                primary_phone: operatorPhoneItems[operatorPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 13: // enter
+                                                             if (showOperatorPhones && operatorPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                 await setSelectedOperator(selectedOperator => {
+                                                                     return {
+                                                                         ...selectedOperator,
+                                                                         primary_phone: operatorPhoneItems[operatorPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateOperatorForSaving({ keyCode: 9 });
-                                                        setShowOperatorPhones(false);
-                                                        refOperatorPhone.current.inputElement.focus();
-                                                    }
-                                                    break;
+                                                                 validateOperatorForSaving({keyCode: 9});
+                                                                 setShowOperatorPhones(false);
+                                                                 refOperatorPhone.current.inputElement.focus();
+                                                             }
+                                                             break;
 
-                                                case 9: // tab
-                                                    if (showOperatorPhones) {
-                                                        e.preventDefault();
-                                                        await setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                primary_phone: operatorPhoneItems[operatorPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 9: // tab
+                                                             if (showOperatorPhones) {
+                                                                 e.preventDefault();
+                                                                 await setSelectedOperator(selectedOperator => {
+                                                                     return {
+                                                                         ...selectedOperator,
+                                                                         primary_phone: operatorPhoneItems[operatorPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateOperatorForSaving({ keyCode: 9 });
-                                                        setShowOperatorPhones(false);
-                                                        refOperatorPhone.current.inputElement.focus();
-                                                    } else {
-                                                        validateOperatorForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                                 validateOperatorForSaving({keyCode: 9});
+                                                                 setShowOperatorPhones(false);
+                                                                 refOperatorPhone.current.inputElement.focus();
+                                                             } else {
+                                                                 validateOperatorForSaving({keyCode: 9});
+                                                             }
+                                                             break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedOperator?.id || 0) === 0) {
-                                                setSelectedOperator(selectedOperator => {
-                                                    return {
-                                                        ...selectedOperator,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedOperator?.primary_phone || '') === '') {
-                                                    setSelectedOperator(selectedOperator => {
-                                                        return {
-                                                            ...selectedOperator,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedOperator?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedOperator?.id || 0) === 0) {
-                                                setSelectedOperator(selectedOperator => {
-                                                    return {
-                                                        ...selectedOperator,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                if ((selectedOperator?.primary_phone || '') === '') {
-                                                    setSelectedOperator(selectedOperator => {
-                                                        return {
-                                                            ...selectedOperator,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedOperator?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedOperator?.primary_phone || '') === 'work'
-                                                ? (selectedOperator?.phone_work || '')
-                                                : (selectedOperator?.primary_phone || '') === 'fax'
-                                                    ? (selectedOperator?.phone_work_fax || '')
-                                                    : (selectedOperator?.primary_phone || '') === 'mobile'
-                                                        ? (selectedOperator?.phone_mobile || '')
-                                                        : (selectedOperator?.primary_phone || '') === 'direct'
-                                                            ? (selectedOperator?.phone_direct || '')
-                                                            : (selectedOperator?.primary_phone || '') === 'other'
-                                                                ? (selectedOperator?.phone_other || '')
-                                                                : ''
-                                        } />
+                                                         default:
+                                                             break;
+                                                     }
+                                                 }}
+                                                 onInput={e => {
+                                                     if ((selectedOperator?.id || 0) === 0) {
+                                                         setSelectedOperator(selectedOperator => {
+                                                             return {
+                                                                 ...selectedOperator,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedOperator?.primary_phone || '') === '') {
+                                                             setSelectedOperator(selectedOperator => {
+                                                                 return {
+                                                                     ...selectedOperator,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedOperator?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 onChange={e => {
+                                                     if ((selectedOperator?.id || 0) === 0) {
+                                                         setSelectedOperator(selectedOperator => {
+                                                             return {
+                                                                 ...selectedOperator,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             }
+                                                         });
+                                                     } else {
+                                                         if ((selectedOperator?.primary_phone || '') === '') {
+                                                             setSelectedOperator(selectedOperator => {
+                                                                 return {
+                                                                     ...selectedOperator,
+                                                                     phone_work: e.target.value,
+                                                                     primary_phone: 'work'
+                                                                 }
+                                                             });
+                                                         } else {
+                                                             switch (selectedOperator?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_work: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_work_fax: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_mobile: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_direct: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedOperator(selectedOperator => {
+                                                                         return {
+                                                                             ...selectedOperator,
+                                                                             phone_other: e.target.value
+                                                                         }
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 value={
+                                                     (selectedOperator?.primary_phone || '') === 'work'
+                                                         ? (selectedOperator?.phone_work || '')
+                                                         : (selectedOperator?.primary_phone || '') === 'fax'
+                                                             ? (selectedOperator?.phone_work_fax || '')
+                                                             : (selectedOperator?.primary_phone || '') === 'mobile'
+                                                                 ? (selectedOperator?.phone_mobile || '')
+                                                                 : (selectedOperator?.primary_phone || '') === 'direct'
+                                                                     ? (selectedOperator?.phone_direct || '')
+                                                                     : (selectedOperator?.primary_phone || '') === 'other'
+                                                                         ? (selectedOperator?.phone_other || '')
+                                                                         : ''
+                                                 }/>
                                     {
                                         (selectedOperator?.id || 0) > 0 &&
                                         <div
@@ -5889,35 +6083,36 @@ function CompanySetup(props) {
 
                                     {
                                         operatorPhoneItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showOperatorPhones) {
-                                                setShowOperatorPhones(false);
-                                            } else {
-                                                if (operatorPhoneItems.length > 1) {
-                                                    await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedOperator?.primary_phone || '')
-                                                        return item;
-                                                    }))
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showOperatorPhones) {
+                                                                 setShowOperatorPhones(false);
+                                                             } else {
+                                                                 if (operatorPhoneItems.length > 1) {
+                                                                     await setOperatorPhoneItems(operatorPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedOperator?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowOperatorPhones(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowOperatorPhones(true);
 
-                                                        refOperatorPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refOperatorPhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refOperatorPhone.current.inputElement.focus();
-                                        }} />
+                                                             refOperatorPhone.current.inputElement.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -5932,8 +6127,9 @@ function CompanySetup(props) {
                                             }}
                                             ref={refOperatorPhoneDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             operatorPhoneItems.map((item, index) => {
@@ -5955,7 +6151,7 @@ function CompanySetup(props) {
                                                                                 }
                                                                             });
 
-                                                                            validateOperatorForSaving({ keyCode: 9 });
+                                                                            validateOperatorForSaving({keyCode: 9});
                                                                             setShowOperatorPhones(false);
                                                                             refOperatorPhone.current.inputElement.focus();
                                                                         }}
@@ -5970,18 +6166,20 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.phone
+                                                                                : item.type === 'fax' ? item.phone
+                                                                                    : item.type === 'mobile' ? item.phone
+                                                                                        : item.type === 'direct' ? item.phone
+                                                                                            : item.type === 'other' ? item.phone : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -5995,44 +6193,46 @@ function CompanySetup(props) {
                                 }
                             </div>
                             <div className="form-h-sep"></div>
-                            <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={44 + props.tabTimes} type="text" placeholder="Ext"
-                                        onInput={e => {
-                                            setSelectedOperator(selectedOperator => {
-                                                return {
-                                                    ...selectedOperator,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedOperator(selectedOperator => {
-                                                return {
-                                                    ...selectedOperator,
-                                                    phone_ext: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        value={selectedOperator?.phone_ext || ''} />
+                                           onInput={e => {
+                                               setSelectedOperator(selectedOperator => {
+                                                   return {
+                                                       ...selectedOperator,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           onChange={e => {
+                                               setSelectedOperator(selectedOperator => {
+                                                   return {
+                                                       ...selectedOperator,
+                                                       phone_ext: e.target.value
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedOperator?.phone_ext || ''}/>
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={45 + props.tabTimes} type="text" placeholder="Operator Code"
-                                        readOnly={true}
-                                        onInput={e => { }}
-                                        onChange={e => { }}
-                                        value={
-                                            (selectedOperator?.id || 0) > 0
-                                                ? 'OO' + selectedOperator.id.toString().padStart(4, '0')
-                                                : ''
-                                        } />
+                                           readOnly={true}
+                                           onInput={e => {
+                                           }}
+                                           onChange={e => {
+                                           }}
+                                           value={
+                                               (selectedOperator?.id || 0) > 0
+                                                   ? 'OO' + selectedOperator.id.toString().padStart(4, '0')
+                                                   : ''
+                                           }/>
                                 </div>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input style={{
                                         width: 'calc(100% - 25px)',
@@ -6040,248 +6240,250 @@ function CompanySetup(props) {
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap'
                                     }}
-                                        tabIndex={46 + props.tabTimes}
-                                        type="text"
-                                        placeholder="E-Mail"
-                                        ref={refOperatorEmail}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={46 + props.tabTimes}
+                                           type="text"
+                                           placeholder="E-Mail"
+                                           ref={refOperatorEmail}
+                                           onKeyDown={async e => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showOperatorEmails) {
-                                                        let selectedIndex = operatorEmailItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (showOperatorEmails) {
+                                                           let selectedIndex = operatorEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (operatorEmailItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (operatorEmailItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refOperatorEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (operatorEmailItems.length > 1) {
-                                                            await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedOperator?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refOperatorEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (operatorEmailItems.length > 1) {
+                                                               await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedOperator?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowOperatorEmails(true);
+                                                               setShowOperatorEmails(true);
 
-                                                            refOperatorEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refOperatorEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showOperatorEmails) {
-                                                        let selectedIndex = operatorEmailItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (showOperatorEmails) {
+                                                           let selectedIndex = operatorEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
-                                                                if (selectedIndex === (operatorEmailItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === (operatorEmailItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refOperatorEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (operatorEmailItems.length > 1) {
-                                                            await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedOperator?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refOperatorEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (operatorEmailItems.length > 1) {
+                                                               await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedOperator?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowOperatorEmails(true);
+                                                               setShowOperatorEmails(true);
 
-                                                            refOperatorEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refOperatorEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setShowOperatorEmails(false);
-                                                    break;
+                                                   case 27: // escape
+                                                       setShowOperatorEmails(false);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (showOperatorEmails && operatorEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                primary_email: operatorEmailItems[operatorEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 13: // enter
+                                                       if (showOperatorEmails && operatorEmailItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   primary_email: operatorEmailItems[operatorEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateOperatorForSaving({ keyCode: 9 });
-                                                        setShowOperatorEmails(false);
-                                                        refOperatorEmail.current.focus();
-                                                    }
-                                                    break;
+                                                           validateOperatorForSaving({keyCode: 9});
+                                                           setShowOperatorEmails(false);
+                                                           refOperatorEmail.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (showOperatorEmails) {
-                                                        e.preventDefault();
-                                                        await setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                primary_email: operatorEmailItems[operatorEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 9: // tab
+                                                       if (showOperatorEmails) {
+                                                           e.preventDefault();
+                                                           await setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   primary_email: operatorEmailItems[operatorEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateOperatorForSaving({ keyCode: 9 });
-                                                        setShowOperatorEmails(false);
-                                                        refOperatorEmail.current.focus();
-                                                    } else {
-                                                        validateOperatorForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                           validateOperatorForSaving({keyCode: 9});
+                                                           setShowOperatorEmails(false);
+                                                           refOperatorEmail.current.focus();
+                                                       } else {
+                                                           validateOperatorForSaving({keyCode: 9});
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedOperator?.primary_email || '') === '') {
-                                                setSelectedOperator(selectedOperator => {
-                                                    return {
-                                                        ...selectedOperator,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedOperator?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedOperator?.primary_email || '') === '') {
-                                                setSelectedOperator(selectedOperator => {
-                                                    return {
-                                                        ...selectedOperator,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    }
-                                                });
-                                            } else {
-                                                switch (selectedOperator?.primary_email) {
-                                                    case 'work':
-                                                        setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                email_work: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'personal':
-                                                        setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                email_personal: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 'other':
-                                                        setSelectedOperator(selectedOperator => {
-                                                            return {
-                                                                ...selectedOperator,
-                                                                email_other: e.target.value
-                                                            }
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedOperator?.primary_email || '') === 'work'
-                                                ? (selectedOperator?.email_work || '')
-                                                : (selectedOperator?.primary_email || '') === 'personal'
-                                                    ? (selectedOperator?.email_personal || '')
-                                                    : (selectedOperator?.primary_email || '') === 'other'
-                                                        ? (selectedOperator?.email_other || '')
-                                                        : ''
-                                        } />
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onInput={e => {
+                                               if ((selectedOperator?.primary_email || '') === '') {
+                                                   setSelectedOperator(selectedOperator => {
+                                                       return {
+                                                           ...selectedOperator,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedOperator?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           onChange={e => {
+                                               if ((selectedOperator?.primary_email || '') === '') {
+                                                   setSelectedOperator(selectedOperator => {
+                                                       return {
+                                                           ...selectedOperator,
+                                                           email_work: e.target.value,
+                                                           primary_email: 'work'
+                                                       }
+                                                   });
+                                               } else {
+                                                   switch (selectedOperator?.primary_email) {
+                                                       case 'work':
+                                                           setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   email_work: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'personal':
+                                                           setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   email_personal: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                       case 'other':
+                                                           setSelectedOperator(selectedOperator => {
+                                                               return {
+                                                                   ...selectedOperator,
+                                                                   email_other: e.target.value
+                                                               }
+                                                           });
+                                                           break;
+                                                   }
+                                               }
+                                           }}
+                                           value={
+                                               (selectedOperator?.primary_email || '') === 'work'
+                                                   ? (selectedOperator?.email_work || '')
+                                                   : (selectedOperator?.primary_email || '') === 'personal'
+                                                       ? (selectedOperator?.email_personal || '')
+                                                       : (selectedOperator?.primary_email || '') === 'other'
+                                                           ? (selectedOperator?.email_other || '')
+                                                           : ''
+                                           }/>
 
                                     {
                                         (selectedOperator?.id || 0) > 0 &&
@@ -6296,35 +6498,36 @@ function CompanySetup(props) {
 
                                     {
                                         operatorEmailItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showOperatorEmails) {
-                                                setShowOperatorEmails(false);
-                                            } else {
-                                                if (operatorEmailItems.length > 1) {
-                                                    await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedOperator?.primary_email || '')
-                                                        return item;
-                                                    }))
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showOperatorEmails) {
+                                                                 setShowOperatorEmails(false);
+                                                             } else {
+                                                                 if (operatorEmailItems.length > 1) {
+                                                                     await setOperatorEmailItems(operatorEmailItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedOperator?.primary_email || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowOperatorEmails(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowOperatorEmails(true);
 
-                                                        refOperatorEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refOperatorEmailPopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refOperatorEmail.current.focus();
-                                        }} />
+                                                             refOperatorEmail.current.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -6339,8 +6542,9 @@ function CompanySetup(props) {
                                             }}
                                             ref={refOperatorEmailDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             operatorEmailItems.map((item, index) => {
@@ -6362,7 +6566,7 @@ function CompanySetup(props) {
                                                                                 }
                                                                             });
 
-                                                                            validateOperatorForSaving({ keyCode: 9 });
+                                                                            validateOperatorForSaving({keyCode: 9});
                                                                             setShowOperatorEmails(false);
                                                                             refOperatorEmail.current.focus();
                                                                         }}
@@ -6375,16 +6579,18 @@ function CompanySetup(props) {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.email
+                                                                                : item.type === 'personal' ? item.email
+                                                                                    : item.type === 'other' ? item.email : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -6400,24 +6606,24 @@ function CompanySetup(props) {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={47 + props.tabTimes} type="text" placeholder="Notes"
-                                    onKeyDown={validateOperatorForSaving}
-                                    onInput={e => {
-                                        setSelectedOperator(selectedOperator => {
-                                            return {
-                                                ...selectedOperator,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedOperator(selectedOperator => {
-                                            return {
-                                                ...selectedOperator,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedOperator?.notes || ''} />
+                                       onKeyDown={validateOperatorForSaving}
+                                       onInput={e => {
+                                           setSelectedOperator(selectedOperator => {
+                                               return {
+                                                   ...selectedOperator,
+                                                   notes: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedOperator(selectedOperator => {
+                                               return {
+                                                   ...selectedOperator,
+                                                   notes: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       value={selectedOperator?.notes || ''}/>
                             </div>
                         </div>
                     </div>
@@ -6456,7 +6662,7 @@ function CompanySetup(props) {
                         </div>
 
                         <div className="form-slider">
-                            <div className="form-slider-wrapper" style={{ left: showingOperatorList ? 0 : '-100%' }}>
+                            <div className="form-slider-wrapper" style={{left: showingOperatorList ? 0 : '-100%'}}>
                                 <div className="operator-list-box">
                                     {
                                         (selectedCompany?.operators || []).length > 0 &&
@@ -6474,34 +6680,37 @@ function CompanySetup(props) {
                                         {
                                             (selectedCompany?.operators || []).map((operator, index) => {
                                                 return (
-                                                    <div className="operator-list-item" key={index} onDoubleClick={async () => {
-                                                        let panel = {
-                                                            panelName: `${props.panelName}-operators`,
-                                                            component: <Operators
-                                                                title='Operator'
-                                                                tabTimes={422000 + props.tabTimes}
-                                                                panelName={`${props.panelName}-operators`}
-                                                                savingOperatorUrl='/saveOperator'
-                                                                deletingOperatorUrl='/deleteOperator'
-                                                                uploadAvatarUrl='/uploadOperatorAvatar'
-                                                                removeAvatarUrl='/removeOperatorAvatar'
-                                                                origin={props.origin}
-                                                                owner='company'
-                                                                openPanel={props.openPanel}
-                                                                closePanel={props.closePanel}
-                                                                componentId={moment().format('x')}
+                                                    <div className="operator-list-item" key={index}
+                                                         onDoubleClick={async () => {
+                                                             let panel = {
+                                                                 panelName: `${props.panelName}-operators`,
+                                                                 component: <Operators
+                                                                     title='Operator'
+                                                                     tabTimes={422000 + props.tabTimes}
+                                                                     panelName={`${props.panelName}-operators`}
+                                                                     savingOperatorUrl='/saveOperator'
+                                                                     deletingOperatorUrl='/deleteOperator'
+                                                                     uploadAvatarUrl='/uploadOperatorAvatar'
+                                                                     removeAvatarUrl='/removeOperatorAvatar'
+                                                                     origin={props.origin}
+                                                                     owner='company'
+                                                                     openPanel={props.openPanel}
+                                                                     closePanel={props.closePanel}
+                                                                     componentId={moment().format('x')}
 
-                                                                operatorSearchCompany={{
-                                                                    ...selectedCompany,
-                                                                    selectedOperator: operator
-                                                                }}
-                                                            />
-                                                        }
+                                                                     operatorSearchCompany={{
+                                                                         ...selectedCompany,
+                                                                         selectedOperator: operator
+                                                                     }}
+                                                                 />
+                                                             }
 
-                                                        props.openPanel(panel, props.origin);
-                                                    }} onClick={() => setSelectedOperator(operator)}>
-                                                        <div className="operator-list-col tcol first-name">{operator.first_name}</div>
-                                                        <div className="operator-list-col tcol last-name">{operator.last_name}</div>
+                                                             props.openPanel(panel, props.origin);
+                                                         }} onClick={() => setSelectedOperator(operator)}>
+                                                        <div
+                                                            className="operator-list-col tcol first-name">{operator.first_name}</div>
+                                                        <div
+                                                            className="operator-list-col tcol last-name">{operator.last_name}</div>
                                                         <div className="operator-list-col tcol phone-work">{
                                                             operator.primary_phone === 'work' ? operator.phone_work
                                                                 : operator.primary_phone === 'fax' ? operator.phone_work_fax
@@ -6519,13 +6728,13 @@ function CompanySetup(props) {
                                                         {
                                                             (operator.id === (selectedOperator?.id || 0)) &&
                                                             <div className="operator-list-col tcol operator-selected">
-                                                                <FontAwesomeIcon icon={faPencilAlt} />
+                                                                <FontAwesomeIcon icon={faPencilAlt}/>
                                                             </div>
                                                         }
                                                         {
                                                             (operator.is_primary_admin === 1) &&
                                                             <div className="operator-list-col tcol pri">
-                                                                <FontAwesomeIcon icon={faCheck} />
+                                                                <FontAwesomeIcon icon={faCheck}/>
                                                             </div>
                                                         }
                                                     </div>
@@ -6538,64 +6747,103 @@ function CompanySetup(props) {
                                 <div className="operator-search-box">
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="First Name" onChange={e => setOperatorSearch({ ...operatorSearch, first_name: e.target.value })} value={operatorSearch.first_name || ''} />
+                                            <input type="text" placeholder="First Name"
+                                                   onChange={e => setOperatorSearch({
+                                                       ...operatorSearch,
+                                                       first_name: e.target.value
+                                                   })} value={operatorSearch.first_name || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Last Name" onFocus={() => { setShowingOperatorList(false) }} onChange={e => setOperatorSearch({ ...operatorSearch, last_name: e.target.value })} value={operatorSearch.last_name || ''} />
+                                            <input type="text" placeholder="Last Name" onFocus={() => {
+                                                setShowingOperatorList(false)
+                                            }} onChange={e => setOperatorSearch({
+                                                ...operatorSearch,
+                                                last_name: e.target.value
+                                            })} value={operatorSearch.last_name || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 1" onFocus={() => { setShowingOperatorList(false) }} onChange={e => setOperatorSearch({ ...operatorSearch, address1: e.target.value })} value={operatorSearch.address1 || ''} />
+                                            <input type="text" placeholder="Address 1" onFocus={() => {
+                                                setShowingOperatorList(false)
+                                            }} onChange={e => setOperatorSearch({
+                                                ...operatorSearch,
+                                                address1: e.target.value
+                                            })} value={operatorSearch.address1 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 2" onFocus={() => { setShowingOperatorList(false) }} onChange={e => setOperatorSearch({ ...operatorSearch, address2: e.target.value })} value={operatorSearch.address2 || ''} />
+                                            <input type="text" placeholder="Address 2" onFocus={() => {
+                                                setShowingOperatorList(false)
+                                            }} onChange={e => setOperatorSearch({
+                                                ...operatorSearch,
+                                                address2: e.target.value
+                                            })} value={operatorSearch.address2 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="City" onFocus={() => { setShowingOperatorList(false) }} onChange={e => setOperatorSearch({ ...operatorSearch, city: e.target.value })} value={operatorSearch.city || ''} />
+                                            <input type="text" placeholder="City" onFocus={() => {
+                                                setShowingOperatorList(false)
+                                            }} onChange={e => setOperatorSearch({
+                                                ...operatorSearch,
+                                                city: e.target.value
+                                            })} value={operatorSearch.city || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container input-state">
-                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => { setShowingOperatorList(false) }} onChange={e => setOperatorSearch({ ...operatorSearch, state: e.target.value })} value={operatorSearch.state || ''} />
+                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => {
+                                                setShowingOperatorList(false)
+                                            }} onChange={e => setOperatorSearch({
+                                                ...operatorSearch,
+                                                state: e.target.value
+                                            })} value={operatorSearch.state || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
                                             <MaskedInput
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
-                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => { setShowingOperatorList(false) }} onChange={e => setOperatorSearch({ ...operatorSearch, phone: e.target.value })} value={operatorSearch.phone || ''} />
+                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
+                                                setShowingOperatorList(false)
+                                            }} onChange={e => setOperatorSearch({
+                                                ...operatorSearch,
+                                                phone: e.target.value
+                                            })} value={operatorSearch.phone || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                                onKeyDown={(e) => {
-                                                    e.preventDefault();
-                                                    let key = e.keyCode || e.which;
+                                            <input type="text" placeholder="E-Mail" style={{textTransform: 'lowercase'}}
+                                                   onKeyDown={(e) => {
+                                                       e.preventDefault();
+                                                       let key = e.keyCode || e.which;
 
-                                                    if (key === 9) {
-                                                        let elems = document.getElementsByTagName('input');
+                                                       if (key === 9) {
+                                                           let elems = document.getElementsByTagName('input');
 
-                                                        for (var i = elems.length; i--;) {
-                                                            if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                elems[i].focus();
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }}
-                                                onFocus={() => { setShowingOperatorList(false) }}
-                                                onChange={e => setOperatorSearch({ ...operatorSearch, email: e.target.value })}
-                                                value={operatorSearch.email || ''} />
+                                                           for (var i = elems.length; i--;) {
+                                                               if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
+                                                                   elems[i].focus();
+                                                                   break;
+                                                               }
+                                                           }
+                                                       }
+                                                   }}
+                                                   onFocus={() => {
+                                                       setShowingOperatorList(false)
+                                                   }}
+                                                   onChange={e => setOperatorSearch({
+                                                       ...operatorSearch,
+                                                       email: e.target.value
+                                                   })}
+                                                   value={operatorSearch.email || ''}/>
                                         </div>
                                     </div>
                                 </div>

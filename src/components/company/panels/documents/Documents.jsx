@@ -496,7 +496,7 @@ const Documents = (props) => {
                         }}>Quick type links:</div>
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -511,7 +511,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' && props.origin === 'invoice') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' && props.origin === 'invoice') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -526,7 +526,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing' && props.origin === 'invoice') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing' && props.origin === 'invoice') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -541,7 +541,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -571,7 +571,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -586,7 +586,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -607,16 +607,16 @@ const Documents = (props) => {
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                                     date_entered: moment().format('MM/DD/YYYY'),
-                                    title: 'Signed Broker Contract',
-                                    subject: 'Broker Contract',
-                                    tags: 'Signed Contract|Signed Broker Contract'
+                                    title: props.suborigin === 'company-agent' ? 'Signed Agent Contract' : 'Signed Broker Contract',
+                                    subject: props.suborigin === 'company-agent' ? 'Agent Contract' : 'Broker Contract',
+                                    tags: props.suborigin === 'company-agent' ? 'Signed Contract|Signed Agent Contract' : 'Signed Contract|Signed Broker Contract'
                                 });
                                 refTagInput.current.focus();
                             }}>Signed Contract</div>
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -631,7 +631,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring.company') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring.company') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
@@ -646,7 +646,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
                             <div className={quickTypeLinkClasses} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,

@@ -3230,7 +3230,6 @@ const Customers = (props) => {
                                         ))
                                     }
                                 </div>
-
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">

@@ -31,6 +31,11 @@ import {
     setSelectedFactoringCompany,
     setSelectedFactoringCompanyContact
 } from './../../../../actions';
+import {Documents} from "../index";
+import moment from "moment";
+import {animated, useTransition} from "react-spring";
+
+import {PassModal} from './../../../admin/panels/';
 
 
 const Contacts = (props) => {
@@ -41,13 +46,21 @@ const Contacts = (props) => {
     const [contactSearchCustomer, setContactSearchCustomer] = useState({});
     const [progressUploaded, setProgressUploaded] = useState(0);
     const [progressTotal, setProgressTotal] = useState(0);
-
+    const [newPassword, setNewPassword] = useState('');
 
     var lastLetter = '';
 
     const borderBottomClasses = classnames({
         'field-border-bottom': true,
         'disabled': !isEditingContact
+    });
+
+    const newPasswordTransition = useTransition(newPassword !== '', {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: newPassword !== '',
+        config: { duration: 100 }
     });
 
     useEffect(async () => {
@@ -441,6 +454,17 @@ const Contacts = (props) => {
         });
     }
 
+    const setContactPassword = () => {
+        if (window.confirm('Are you sure you want to proceed?')) {
+            axios.post(props.serverUrl + '/resetAgentContactPassword', { id: (contactSearchCustomer?.selectedContact?.id || 0) }).then(res => {
+                if (res.data.result === 'OK') {
+                    setNewPassword(res.data.newpass);
+                } else {
+                    window.alert('An error occurred while getting a new password');
+                }
+            })
+        }
+    }
     return (
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
@@ -670,7 +694,33 @@ const Contacts = (props) => {
                                         </div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
+
+                                    {
+                                        ((contactSearchCustomer?.selectedContact?.agent_id || 0) > 0) &&
+                                        <div className="mochi-button" onClick={setContactPassword} style={{
+                                            marginLeft: '0.2rem',
+                                            pointerEvents: (contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) ? 'all' : 'none'
+                                        }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base" style={{
+                                                color: (contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) ? 'rgba(138,8,8,1)' : 'rgba(138,8,8,0.5)'
+                                            }}>New Password</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    }
                                 </div>
+
+                                {
+                                   ((contactSearchCustomer?.selectedContact?.agent_id || 0) > 0) &&
+                                    <div className="mochi-button" style={{ margin: '5px 0' }} onClick={() => {
+
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Permissions</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
+
                             </div>
                         </div>
                         <div className="contact-form-fields">
@@ -1211,9 +1261,14 @@ const Contacts = (props) => {
                             <div className="col-contact-splitter">
 
                             </div>
-                            <div className="col-contact-emails">
+                            {
+                                (contactSearchCustomer?.selectedContact?.agent_id || 0) === 0 &&
+
+                                <div className="col-contact-emails">
                                 <div className="col-title">E-mails</div>
-                            </div>
+                                </div>
+                            }
+
                         </div>
                     </div>
 
@@ -1385,6 +1440,21 @@ const Contacts = (props) => {
 
                 </div>
             </div>
+
+            {
+                newPasswordTransition((style, item) => item && (
+                    <animated.div style={{ ...style }}>
+                        <PassModal
+                            title="New Password"
+                            text={newPassword}
+                            close={() => {
+                                setNewPassword('')
+                            }}
+                        />
+                    </animated.div>
+                ))
+            }
+
         </div>
     )
 }
