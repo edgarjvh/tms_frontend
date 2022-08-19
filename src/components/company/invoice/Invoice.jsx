@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { connect } from 'react-redux';
+import React, {useState, useRef, useEffect} from 'react'
+import {connect} from 'react-redux';
 import './Invoice.css';
 import classnames from 'classnames';
 import MaskedInput from 'react-text-mask';
 import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
-import { useDetectClickOutside } from "react-detect-click-outside";
-import { useTransition, animated } from 'react-spring';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCaretDown, faCaretRight, faCalendarAlt} from '@fortawesome/free-solid-svg-icons';
+import {useDetectClickOutside} from "react-detect-click-outside";
+import {useTransition, animated} from 'react-spring';
 import Highlighter from "react-highlight-words";
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
@@ -40,7 +40,7 @@ import {
 } from './../panels';
 
 import ToPrintInvoice from './../panels/invoice/ToPrint';
-import { useReactToPrint } from 'react-to-print';
+import {useReactToPrint} from 'react-to-print';
 
 
 var delayTimer = null;
@@ -59,8 +59,7 @@ const Invoice = (props) => {
     const [selectedBillingNote, setSelectedBillingNote] = useState({});
     const [orderNumber, setOrderNumber] = useState('');
     const [tripNumber, setTripNumber] = useState('');
-    const [selectedPickup, setSelectedPickup] = useState({});
-
+    const [selectedRoute, setSelectedRoute] = useState({});
 
 
     const refPrintInvoice = useRef();
@@ -87,7 +86,11 @@ const Invoice = (props) => {
     const refBillToTotalCharges = useRef();
 
     const [billToRateTypeItems, setBillToRateTypeItems] = useState([]);
-    const refBillToRateTypeDropDown = useDetectClickOutside({ onTriggered: async () => { setBillToRateTypeItems([]) } });
+    const refBillToRateTypeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setBillToRateTypeItems([])
+        }
+    });
     const refBillToRateTypePopupItems = useRef([]);
 
     const [billToPiecesItems, setBillToPiecesItems] = useState([
@@ -105,32 +108,56 @@ const Invoice = (props) => {
         }
     ]);
     const [showBillToPiecesItems, setShowBillToPiecesItems] = useState(false);
-    const refBillToPiecesDropDown = useDetectClickOutside({ onTriggered: async () => { setShowBillToPiecesItems(false) } });
+    const refBillToPiecesDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setShowBillToPiecesItems(false)
+        }
+    });
     const refBillToPiecesPopupItems = useRef([]);
 
     const [billToSubtypeFuelSurchargeItems, setBillToSubtypeFuelSurchargeItems] = useState([]);
     const [showBillToSubtypeFuelSurchargeItems, setShowBillToSubtypeFuelSurchargeItems] = useState(false);
-    const refBillToSubtypeFuelSurchargeDropDown = useDetectClickOutside({ onTriggered: async () => { setBillToSubtypeFuelSurchargeItems([]) } });
+    const refBillToSubtypeFuelSurchargeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setBillToSubtypeFuelSurchargeItems([])
+        }
+    });
     const refBillToSubtypeFuelSurchargePopupItems = useRef([]);
 
     const [billToSubtypeLinehaulItems, setBillToSubtypeLinehaulItems] = useState([]);
     const [showBillToSubtypeLinehaulItems, setShowBillToSubtypeLinehaulItems] = useState(false);
-    const refBillToSubtypeLinehaulDropDown = useDetectClickOutside({ onTriggered: async () => { setBillToSubtypeLinehaulItems([]) } });
+    const refBillToSubtypeLinehaulDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setBillToSubtypeLinehaulItems([])
+        }
+    });
     const refBillToSubtypeLinehaulPopupItems = useRef([]);
 
     const [billToSubtypeLayoverItems, setBillToSubtypeLayoverItems] = useState([]);
     const [showBillToSubtypeLayoverItems, setShowBillToSubtypeLayoverItems] = useState(false);
-    const refBillToSubtypeLayoverDropDown = useDetectClickOutside({ onTriggered: async () => { setBillToSubtypeLayoverItems([]) } });
+    const refBillToSubtypeLayoverDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setBillToSubtypeLayoverItems([])
+        }
+    });
     const refBillToSubtypeLayoverPopupItems = useRef([]);
 
     const [billToSubtypeDetentionItems, setBillToSubtypeDetentionItems] = useState([]);
     const [showBillToSubtypeDetentionItems, setShowBillToSubtypeDetentionItems] = useState(false);
-    const refBillToSubtypeDetentionDropDown = useDetectClickOutside({ onTriggered: async () => { setBillToSubtypeDetentionItems([]) } });
+    const refBillToSubtypeDetentionDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setBillToSubtypeDetentionItems([])
+        }
+    });
     const refBillToSubtypeDetentionPopupItems = useRef([]);
 
     const [billToSubtypeDriverAssistItems, setBillToSubtypeDriverAssistItems] = useState([]);
     const [showBillToSubtypeDriverAssistItems, setShowBillToSubtypeDriverAssistItems] = useState(false);
-    const refBillToSubtypeDriverAssistDropDown = useDetectClickOutside({ onTriggered: async () => { setBillToSubtypeDriverAssistItems([]) } });
+    const refBillToSubtypeDriverAssistDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setBillToSubtypeDriverAssistItems([])
+        }
+    });
     const refBillToSubtypeDriverAssistPopupItems = useRef([]);
 
 
@@ -157,7 +184,11 @@ const Invoice = (props) => {
     const refCarrierTotalCharges = useRef();
 
     const [carrierRateTypeItems, setCarrierRateTypeItems] = useState([]);
-    const refCarrierRateTypeDropDown = useDetectClickOutside({ onTriggered: async () => { setCarrierRateTypeItems([]) } });
+    const refCarrierRateTypeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setCarrierRateTypeItems([])
+        }
+    });
     const refCarrierRateTypePopupItems = useRef([]);
 
     const [carrierPiecesItems, setCarrierPiecesItems] = useState([
@@ -175,32 +206,56 @@ const Invoice = (props) => {
         }
     ]);
     const [showCarrierPiecesItems, setShowCarrierPiecesItems] = useState(false);
-    const refCarrierPiecesDropDown = useDetectClickOutside({ onTriggered: async () => { setShowCarrierPiecesItems(false) } });
+    const refCarrierPiecesDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setShowCarrierPiecesItems(false)
+        }
+    });
     const refCarrierPiecesPopupItems = useRef([]);
 
     const [carrierSubtypeFuelSurchargeItems, setCarrierSubtypeFuelSurchargeItems] = useState([]);
     const [showCarrierSubtypeFuelSurchargeItems, setShowCarrierSubtypeFuelSurchargeItems] = useState(false);
-    const refCarrierSubtypeFuelSurchargeDropDown = useDetectClickOutside({ onTriggered: async () => { setCarrierSubtypeFuelSurchargeItems([]) } });
+    const refCarrierSubtypeFuelSurchargeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setCarrierSubtypeFuelSurchargeItems([])
+        }
+    });
     const refCarrierSubtypeFuelSurchargePopupItems = useRef([]);
 
     const [carrierSubtypeLinehaulItems, setCarrierSubtypeLinehaulItems] = useState([]);
     const [showCarrierSubtypeLinehaulItems, setShowCarrierSubtypeLinehaulItems] = useState(false);
-    const refCarrierSubtypeLinehaulDropDown = useDetectClickOutside({ onTriggered: async () => { setCarrierSubtypeLinehaulItems([]) } });
+    const refCarrierSubtypeLinehaulDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setCarrierSubtypeLinehaulItems([])
+        }
+    });
     const refCarrierSubtypeLinehaulPopupItems = useRef([]);
 
     const [carrierSubtypeLayoverItems, setCarrierSubtypeLayoverItems] = useState([]);
     const [showCarrierSubtypeLayoverItems, setShowCarrierSubtypeLayoverItems] = useState(false);
-    const refCarrierSubtypeLayoverDropDown = useDetectClickOutside({ onTriggered: async () => { setCarrierSubtypeLayoverItems([]) } });
+    const refCarrierSubtypeLayoverDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setCarrierSubtypeLayoverItems([])
+        }
+    });
     const refCarrierSubtypeLayoverPopupItems = useRef([]);
 
     const [carrierSubtypeDetentionItems, setCarrierSubtypeDetentionItems] = useState([]);
     const [showCarrierSubtypeDetentionItems, setShowCarrierSubtypeDetentionItems] = useState(false);
-    const refCarrierSubtypeDetentionDropDown = useDetectClickOutside({ onTriggered: async () => { setCarrierSubtypeDetentionItems([]) } });
+    const refCarrierSubtypeDetentionDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setCarrierSubtypeDetentionItems([])
+        }
+    });
     const refCarrierSubtypeDetentionPopupItems = useRef([]);
 
     const [carrierSubtypeDriverAssistItems, setCarrierSubtypeDriverAssistItems] = useState([]);
     const [showCarrierSubtypeDriverAssistItems, setShowCarrierSubtypeDriverAssistItems] = useState(false);
-    const refCarrierSubtypeDriverAssistDropDown = useDetectClickOutside({ onTriggered: async () => { setCarrierSubtypeDriverAssistItems([]) } });
+    const refCarrierSubtypeDriverAssistDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            setCarrierSubtypeDriverAssistItems([])
+        }
+    });
     const refCarrierSubtypeDriverAssistPopupItems = useRef([]);
 
     const refDateReceived = useRef();
@@ -287,7 +342,7 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (isSavingOrder) {
-            let selected_order = { ...selectedOrder } || { order_number: 0 };
+            let selected_order = {...selectedOrder} || {order_number: 0};
 
             // check if there's a bill-to-company loaded
             if ((selectedBillToCustomer?.id || 0) === 0) {
@@ -331,14 +386,14 @@ const Invoice = (props) => {
 
             axios.post(props.serverUrl + '/saveOrder', selected_order).then(res => {
                 if (res.data.result === 'OK') {
-                    setSelectedOrder({ ...res.data.order });
+                    setSelectedOrder({...res.data.order});
 
                     props.setSelectedOrder({
                         ...res.data.order,
                         component_id: props.componentId
                     });
                 } else {
-                    
+
                 }
 
                 setIsSavingOrder(false);
@@ -358,129 +413,129 @@ const Invoice = (props) => {
     }
 
     const dateReceivedTransition = useTransition(isDateReceivedCalendarShown, {
-        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
         reverse: isDateReceivedCalendarShown,
-        config: { duration: 100 }
+        config: {duration: 100}
     });
 
     const invoiceReceivedDateTransition = useTransition(isInvoiceReceivedDateCalendarShown, {
-        from: { opacity: 0, display: 'block', top: 'calc(100% - 300px)' },
-        enter: { opacity: 1, display: 'block', top: 'calc(100% - 305px)' },
-        leave: { opacity: 0, display: 'none', top: 'calc(100% - 300px)' },
+        from: {opacity: 0, display: 'block', top: 'calc(100% - 300px)'},
+        enter: {opacity: 1, display: 'block', top: 'calc(100% - 305px)'},
+        leave: {opacity: 0, display: 'none', top: 'calc(100% - 300px)'},
         reverse: isInvoiceReceivedDateCalendarShown,
-        config: { duration: 100 }
+        config: {duration: 100}
     });
 
     const datePaidTransition = useTransition(isDatePaidCalendarShown, {
-        from: { opacity: 0, display: 'block', top: 'calc(100% - 300px)' },
-        enter: { opacity: 1, display: 'block', top: 'calc(100% - 305px)' },
-        leave: { opacity: 0, display: 'none', top: 'calc(100% - 300px)' },
+        from: {opacity: 0, display: 'block', top: 'calc(100% - 300px)'},
+        enter: {opacity: 1, display: 'block', top: 'calc(100% - 305px)'},
+        leave: {opacity: 0, display: 'none', top: 'calc(100% - 300px)'},
         reverse: isDatePaidCalendarShown,
-        config: { duration: 100 }
+        config: {duration: 100}
     });
 
     const loadingTransition = useTransition(isLoading, {
-        from: { opacity: 0, display: 'block' },
-        enter: { opacity: 1, display: 'block' },
-        leave: { opacity: 0, display: 'none' },
+        from: {opacity: 0, display: 'block'},
+        enter: {opacity: 1, display: 'block'},
+        leave: {opacity: 0, display: 'none'},
         reverse: isLoading,
     });
 
     const billToRateTypeTransition = useTransition(billToRateTypeItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: billToRateTypeItems.length > 0
     });
 
     const billToPiecesTransition = useTransition(showBillToPiecesItems, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showBillToPiecesItems
     });
 
     const billToSubtypeFuelSurchargeTransition = useTransition(billToSubtypeFuelSurchargeItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: billToSubtypeFuelSurchargeItems.length > 0
     });
 
     const billToSubtypeLayoverTransition = useTransition(billToSubtypeLayoverItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: billToSubtypeLayoverItems.length > 0
     });
 
     const billToSubtypeDetentionTransition = useTransition(billToSubtypeDetentionItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: billToSubtypeDetentionItems.length > 0
     });
 
     const billToSubtypeDriverAssistTransition = useTransition(billToSubtypeDriverAssistItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: billToSubtypeDriverAssistItems.length > 0
     });
 
     const carrierRateTypeTransition = useTransition(carrierRateTypeItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: carrierRateTypeItems.length > 0
     });
 
     const carrierPiecesTransition = useTransition(showCarrierPiecesItems, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showCarrierPiecesItems
     });
 
     const carrierSubtypeFuelSurchargeTransition = useTransition(carrierSubtypeFuelSurchargeItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: carrierSubtypeFuelSurchargeItems.length > 0
     });
 
     const carrierSubtypeLayoverTransition = useTransition(carrierSubtypeLayoverItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: carrierSubtypeLayoverItems.length > 0
     });
 
     const carrierSubtypeDetentionTransition = useTransition(carrierSubtypeDetentionItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: carrierSubtypeDetentionItems.length > 0
     });
 
     const carrierSubtypeDriverAssistTransition = useTransition(carrierSubtypeDriverAssistItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: carrierSubtypeDriverAssistItems.length > 0
     });
 
@@ -612,20 +667,20 @@ const Invoice = (props) => {
         if ((props.order_id || 0) > 0) {
             setIsLoading(true);
 
-            axios.post(props.serverUrl + '/getOrderById', { id: props.order_id }).then(res => {
+            axios.post(props.serverUrl + '/getOrderById', {id: props.order_id}).then(res => {
                 if (res.data.result === 'OK') {
                     let order = JSON.parse(JSON.stringify(res.data.order));
                     setSelectedOrder({});
                     setSelectedOrder(order);
 
-                    setSelectedBillToCustomer({ ...order.bill_to_company });
-                    setSelectedBillToCustomerContact({ ...(order.bill_to_company?.contacts || []).find(c => c.is_primary === 1) });
+                    setSelectedBillToCustomer({...order.bill_to_company});
+                    setSelectedBillToCustomerContact({...(order.bill_to_company?.contacts || []).find(c => c.is_primary === 1)});
 
                     let firstPickupId = (order.routing || []).find(r => r.type === 'pickup')?.pickup_id || 0;
-                    setSelectedPickup((order.pickups || []).find(p => p.id === firstPickupId) || {});
+                    setSelectedRoute((order.pickups || []).find(p => p.id === firstPickupId) || {});
 
-                    setSelectedCarrier({ ...order.carrier });
-                    setSelectedCarrierContact({ ...(order.carrier?.contacts || []).find(c => c.is_primary === 1) });
+                    setSelectedCarrier({...order.carrier});
+                    setSelectedCarrierContact({...(order.carrier?.contacts || []).find(c => c.is_primary === 1)});
                     setSelectedCarrierDriver({
                         ...order.driver,
                         name: (order.driver?.first_name || '') + ((order.driver?.last_name || '').trim() === '' ? '' : ' ' + (order.driver?.last_name || ''))
@@ -678,12 +733,20 @@ const Invoice = (props) => {
 
     const refCarrierChargesRateTypes = useRef();
     const [carrierChargesRateTypeItems, setCarrierChargesRateTypeItems] = useState([]);
-    const refCarrierChargesRateTypeDropDown = useDetectClickOutside({ onTriggered: async () => { await setCarrierChargesRateTypeItems([]) } });
+    const refCarrierChargesRateTypeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setCarrierChargesRateTypeItems([])
+        }
+    });
     const refCarrierChargesRateTypePopupItems = useRef([]);
 
     const refTerms = useRef();
     const [termsItems, setTermsItems] = useState([]);
-    const refTermsDropDown = useDetectClickOutside({ onTriggered: async () => { await setTermsItems([]) } });
+    const refTermsDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setTermsItems([])
+        }
+    });
     const refTermsPopupItems = useRef([]);
 
 
@@ -697,34 +760,42 @@ const Invoice = (props) => {
     const refDriverName = useRef();
 
     const [equipmentItems, setEquipmentItems] = useState([]);
-    const refEquipmentDropDown = useDetectClickOutside({ onTriggered: async () => { await setEquipmentItems([]) } });
+    const refEquipmentDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setEquipmentItems([])
+        }
+    });
     const refEquipmentPopupItems = useRef([]);
 
     const [driverItems, setDriverItems] = useState([]);
-    const refDriverDropDown = useDetectClickOutside({ onTriggered: async () => { await setDriverItems([]) } });
+    const refDriverDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setDriverItems([])
+        }
+    });
     const refDriverPopupItems = useRef([]);
 
     const equipmentTransition = useTransition(equipmentItems.length > 0, {
-        from: { opacity: 0, top: -155 },
-        enter: { opacity: 1, top: -160 },
-        leave: { opacity: 0, top: -155 },
-        config: { duration: 100 },
+        from: {opacity: 0, top: -155},
+        enter: {opacity: 1, top: -160},
+        leave: {opacity: 0, top: -155},
+        config: {duration: 100},
         reverse: equipmentItems.length > 0
     });
 
     const driverTransition = useTransition(driverItems.length > 0, {
-        from: { opacity: 0, top: -155 },
-        enter: { opacity: 1, top: -160 },
-        leave: { opacity: 0, top: -155 },
-        config: { duration: 100 },
+        from: {opacity: 0, top: -155},
+        enter: {opacity: 1, top: -160},
+        leave: {opacity: 0, top: -155},
+        config: {duration: 100},
         reverse: driverItems.length > 0
     });
 
     const termsTransition = useTransition(termsItems.length > 0, {
-        from: { opacity: 0, top: -155 },
-        enter: { opacity: 1, top: -160 },
-        leave: { opacity: 0, top: -155 },
-        config: { duration: 100 },
+        from: {opacity: 0, top: -155},
+        enter: {opacity: 1, top: -160},
+        leave: {opacity: 0, top: -155},
+        config: {duration: 100},
         reverse: termsItems.length > 0
     });
 
@@ -734,17 +805,17 @@ const Invoice = (props) => {
         if (key === 9) {
             if ((selectedOrder.order_number || '') !== '') {
                 setIsLoading(true);
-                axios.post(props.serverUrl + '/getOrderByOrderNumber', { order_number: selectedOrder.order_number }).then(res => {
+                axios.post(props.serverUrl + '/getOrderByOrderNumber', {order_number: selectedOrder.order_number}).then(res => {
                     if (res.data.result === 'OK') {
                         if (res.data.order) {
-                            setSelectedOrder({ ...res.data.order });
+                            setSelectedOrder({...res.data.order});
                             setOrderNumber(res.data.order.order_number);
                             setTripNumber(res.data.order.trip_number);
                             setSelectedBillToCustomer(res.data.order.bill_to_company || {});
                             setSelectedBillToCustomerContact(res.data.order.bill_to_company?.contacts || [].find(c => c.is_primary === 1) || {});
 
                             let firstPickupId = (res.data.order.routing || []).find(r => r.type === 'pickup')?.pickup_id || 0;
-                            setSelectedPickup((res.data.order.pickups || []).find(p => p.id === firstPickupId) || {});
+                            setSelectedRoute((res.data.order.pickups || []).find(p => p.id === firstPickupId) || {});
 
                             setSelectedCarrier(res.data.order.carrier || {});
                             setSelectedCarrierContact(res.data.order.carrier?.contacts || [].find(c => c.is_primary === 1) || {});
@@ -780,17 +851,17 @@ const Invoice = (props) => {
         if (key === 9) {
             if ((selectedOrder.trip_number || '') !== '') {
                 setIsLoading(true);
-                axios.post(props.serverUrl + '/getOrderByTripNumber', { trip_number: selectedOrder.trip_number }).then(res => {
+                axios.post(props.serverUrl + '/getOrderByTripNumber', {trip_number: selectedOrder.trip_number}).then(res => {
                     if (res.data.result === 'OK') {
                         if (res.data.order) {
-                            setSelectedOrder({ ...res.data.order });
+                            setSelectedOrder({...res.data.order});
                             setOrderNumber(res.data.order.order_number);
                             setTripNumber(res.data.order.trip_number);
                             setSelectedBillToCustomer(res.data.order.bill_to_company || {});
                             setSelectedBillToCustomerContact(res.data.order.bill_to_company?.contacts || [].find(c => c.is_primary === 1) || {});
 
                             let firstPickupId = (res.data.order.routing || []).find(r => r.type === 'pickup')?.pickup_id || 0;
-                            setSelectedPickup((res.data.order.pickups || []).find(p => p.id === firstPickupId) || {});
+                            setSelectedRoute((res.data.order.pickups || []).find(p => p.id === firstPickupId) || {});
 
                             setSelectedCarrier(res.data.order.carrier || {});
                             setSelectedCarrierContact(res.data.order.carrier?.contacts || [].find(c => c.is_primary === 1) || {});
@@ -856,7 +927,7 @@ const Invoice = (props) => {
 
             if (selectedBillToCompanyInfo.id === undefined || selectedBillToCompanyInfo.id === -1) {
                 selectedBillToCompanyInfo.id = 0;
-                setSelectedBillToCustomer({ ...selectedBillToCustomer, id: 0 });
+                setSelectedBillToCustomer({...selectedBillToCustomer, id: 0});
             }
 
             if (
@@ -899,7 +970,7 @@ const Invoice = (props) => {
                 axios.post(props.serverUrl + '/saveCustomer', selectedBillToCompanyInfo).then(res => {
                     if (res.data.result === 'OK') {
                         if (selectedBillToCustomer.id === undefined || (selectedBillToCustomer.id || 0) === 0) {
-                            setSelectedBillToCustomer({ ...selectedBillToCustomer, id: res.data.customer.id });
+                            setSelectedBillToCustomer({...selectedBillToCustomer, id: res.data.customer.id});
                         }
 
                         (res.data.customer.contacts || []).map((contact, index) => {
@@ -957,7 +1028,7 @@ const Invoice = (props) => {
 
             axios.post(props.serverUrl + '/saveContact', contact).then(async res => {
                 if (res.data.result === 'OK') {
-                    await setSelectedBillToCustomer({ ...selectedBillToCustomer, contacts: res.data.contacts });
+                    await setSelectedBillToCustomer({...selectedBillToCustomer, contacts: res.data.contacts});
                     await setSelectedBillToCustomerContact(res.data.contact);
                 }
 
@@ -1017,7 +1088,7 @@ const Invoice = (props) => {
                 axios.post(props.serverUrl + '/saveCarrier', selectedInvoiceCarrierInfoCarrier).then(async res => {
                     if (res.data.result === 'OK') {
                         if (selectedCarrier.id === undefined && (selectedCarrier.id || 0) === 0) {
-                            await setSelectedCarrier({ ...selectedCarrier, id: res.data.carrier.id });
+                            await setSelectedCarrier({...selectedCarrier, id: res.data.carrier.id});
                         }
 
                         (res.data.carrier.contacts || []).map(async (contact, index) => {
@@ -1105,7 +1176,7 @@ const Invoice = (props) => {
 
             axios.post(props.serverUrl + '/saveCarrierContact', contact).then(async res => {
                 if (res.data.result === 'OK') {
-                    await setSelectedCarrier({ ...selectedCarrier, contacts: res.data.contacts });
+                    await setSelectedCarrier({...selectedCarrier, contacts: res.data.contacts});
                     await setSelectedCarrierContact(res.data.contact);
                 }
 
@@ -1139,8 +1210,8 @@ const Invoice = (props) => {
                 if ((driver.first_name || '').trim() !== '') {
                     axios.post(props.serverUrl + '/saveCarrierDriver', driver).then(async res => {
                         if (res.data.result === 'OK') {
-                            await setSelectedCarrier({ ...selectedCarrier, drivers: res.data.drivers });
-                            await setSelectedCarrierDriver({ ...selectedCarrierDriver, id: res.data.driver.id });
+                            await setSelectedCarrier({...selectedCarrier, drivers: res.data.drivers});
+                            await setSelectedCarrierDriver({...selectedCarrierDriver, id: res.data.driver.id});
                         }
 
                         await setIsSavingCarrierDriver(false);
@@ -1244,7 +1315,7 @@ const Invoice = (props) => {
                 formattedDate = moment(date.trim(), 'M').format('MM/DD/YYYY');
             }
         } catch (e) {
-            
+
         }
 
         return formattedDate;
@@ -1331,7 +1402,7 @@ const Invoice = (props) => {
                 formattedHour = moment(hour.trim(), 'H:m').format('HHmm');
             }
         } catch (e) {
-            
+
         }
 
         return formattedHour;
@@ -1548,7 +1619,7 @@ const Invoice = (props) => {
 
                         setSelectedBillToRating({});
                         refBillToRateTypes.current.focus();
-                    } else {                        
+                    } else {
                         window.alert('An error occurred while saving');
                         refBillToTotalCharges.current.inputElement.focus();
                     }
@@ -1772,7 +1843,7 @@ const Invoice = (props) => {
 
                         setSelectedCarrierRating({});
                         refCarrierRateTypes.current.focus();
-                    } else {                        
+                    } else {
                         window.alert('An error occurred while saving');
                         refCarrierTotalCharges.current.inputElement.focus();
                     }
@@ -1796,10 +1867,27 @@ const Invoice = (props) => {
                 return false;
             })
         } catch (e) {
-            
+
         }
 
         return pickups;
+    }
+
+    const getDeliveriesOnRouting = () => {
+        let deliveries = [];
+
+        try {
+            (selectedOrder?.routing || []).map((r, i) => {
+                if (r.type === 'delivery') {
+                    deliveries.push(selectedOrder.deliveries.find(d => d.id === r.delivery_id))
+                }
+                return false;
+            })
+        } catch (e) {
+
+        }
+
+        return deliveries;
     }
 
     return (
@@ -1815,9 +1903,9 @@ const Invoice = (props) => {
 
             {
                 loadingTransition((style, item) => item &&
-                    <animated.div className='loading-container' style={style} >
+                    <animated.div className='loading-container' style={style}>
                         <div className="loading-container-wrapper">
-                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
                         </div>
                     </animated.div>
                 )
@@ -1825,7 +1913,7 @@ const Invoice = (props) => {
 
             {
                 (selectedOrder?.id || 0) > 0 &&
-                <div style={{ display: 'none' }}>
+                <div style={{display: 'none'}}>
                     <ToPrintInvoice
                         ref={refPrintInvoice}
                         serverUrl={props.serverUrl}
@@ -1957,7 +2045,7 @@ const Invoice = (props) => {
                                         closePanel={props.closePanel}
                                         componentId={moment().format('x')}
 
-                                        selectedOwner={{ ...selectedOrder }}
+                                        selectedOwner={{...selectedOrder}}
                                         selectedOwnerDocument={{
                                             id: 0,
                                             user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -1994,14 +2082,15 @@ const Invoice = (props) => {
                                         closePanel={props.closePanel}
                                         componentId={moment().format('x')}
                                         selectedCompany={props.selectedCompany}
-                                        selectedOrder={{ ...selectedOrder }}
+                                        selectedOrder={{...selectedOrder}}
                                     />
                                 }
 
                                 props.openPanel(panel, props.origin);
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">{(selectedOrder?.order_invoiced || 0) === 1 ? 'Invoiced' : 'Invoice'}</div>
+                                <div
+                                    className="mochi-button-base">{(selectedOrder?.order_invoiced || 0) === 1 ? 'Invoiced' : 'Invoice'}</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -2024,7 +2113,7 @@ const Invoice = (props) => {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'disabled': (selectedOrder?.id || 0) === 0 || (selectedBillToRating.id || 0) === 0
-                            })} style={{ marginRight: 10 }} onClick={() => {
+                            })} style={{marginRight: 10}} onClick={() => {
                                 if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
                                     if (window.confirm('Are you sure you want to delete this item?')) {
                                         axios.post(props.serverUrl + '/deleteOrderCustomerRating', {
@@ -2064,22 +2153,27 @@ const Invoice = (props) => {
                                 minWidth: '10rem',
                                 maxWidth: '10rem'
                             }}>
-                                <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Total Charges $</div>
+                                <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Total
+                                    Charges $
+                                </div>
                                 <MaskedInput
                                     className={classnames({
                                         'negative-number': (Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number(a.total_charges) + Number(b.total_charges) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))) < 0
+                                            return {total_charges: Number(a.total_charges) + Number(b.total_charges)}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))) < 0
                                     })}
                                     readOnly={true}
-                                    style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                    style={{textAlign: 'right', fontWeight: 'bold'}}
                                     mask={numberMask}
                                     type="text"
                                     guide={false}
                                     value={
-                                        new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number(a.total_charges) + Number(b.total_charges) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')))
+                                        new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
+                                            return {total_charges: Number(a.total_charges) + Number(b.total_charges)}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')))
                                     }
                                 />
                             </div>
@@ -2087,7 +2181,7 @@ const Invoice = (props) => {
                         <div className="bottom-border bottom-border-right"></div>
                     </div>
 
-                    <div className="form-row" style={{ position: 'relative' }}>
+                    <div className="form-row" style={{position: 'relative'}}>
 
                         <div className="select-box-container" style={{ // RATE TYPE
                             width: '7rem',
@@ -2103,266 +2197,268 @@ const Invoice = (props) => {
                                 <input type="text" style={{
                                     textAlign: 'left',
                                 }}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                    })}
-                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                    placeholder='Rate Type'
-                                    ref={refBillToRateTypes}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
+                                       })}
+                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                       placeholder='Rate Type'
+                                       ref={refBillToRateTypes}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (billToRateTypeItems.length > 0) {
-                                                        let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (billToRateTypeItems.length > 0) {
+                                                           let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (billToRateTypeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (billToRateTypeItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToRateTypePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_type?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (billToRateTypeItems.length > 0) {
-                                                        let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (billToRateTypeItems.length > 0) {
+                                                           let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === (billToRateTypeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                   if (selectedIndex === (billToRateTypeItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToRateTypePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_type?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setBillToRateTypeItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setBillToRateTypeItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (billToRateTypeItems.length > 0 && billToRateTypeItems.findIndex(item => item.selected) > -1) {
-                                                        setSelectedBillToRating({
-                                                            ...selectedBillToRating,
-                                                            rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                   case 13: // enter
+                                                       if (billToRateTypeItems.length > 0 && billToRateTypeItems.findIndex(item => item.selected) > -1) {
+                                                           setSelectedBillToRating({
+                                                               ...selectedBillToRating,
+                                                               rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
+                                                               description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                   billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                   ? ''
+                                                                   : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
+                                                               rate_subtype: {},
+                                                               pieces: '',
+                                                               weight: '',
+                                                               feet_required: '',
+                                                               rate: '',
+                                                               days: '',
+                                                               hours: '',
+                                                               total_charges: ''
+                                                           })
 
-                                                        window.setTimeout(() => {
-                                                            setBillToRateTypeItems([]);
-                                                            refBillToDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                           window.setTimeout(() => {
+                                                               setBillToRateTypeItems([]);
+                                                               refBillToDescription.current.focus();
+                                                           }, 0);
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (billToRateTypeItems.length > 0) {
-                                                        e.preventDefault();
-                                                        setSelectedBillToRating({
-                                                            ...selectedBillToRating,
-                                                            rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                   case 9: // tab
+                                                       if (billToRateTypeItems.length > 0) {
+                                                           e.preventDefault();
+                                                           setSelectedBillToRating({
+                                                               ...selectedBillToRating,
+                                                               rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
+                                                               description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                   billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                   ? ''
+                                                                   : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
+                                                               rate_subtype: {},
+                                                               pieces: '',
+                                                               weight: '',
+                                                               feet_required: '',
+                                                               rate: '',
+                                                               days: '',
+                                                               hours: '',
+                                                               total_charges: ''
+                                                           })
 
-                                                        window.setTimeout(() => {
-                                                            setBillToRateTypeItems([]);
-                                                            refBillToDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                           window.setTimeout(() => {
+                                                               setBillToRateTypeItems([]);
+                                                               refBillToDescription.current.focus();
+                                                           }, 0);
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedBillToRating.rate_type?.id || 0) === 0) {
-                                            setSelectedBillToRating({})
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_type: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedBillToRating.rate_type?.id || 0) === 0) {
+                                               setSelectedBillToRating({})
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_type: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToRateTypeItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateTypes', {
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_type?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
-                                            }, 200);
+                                           if (e.target.value.trim() === '') {
+                                               setBillToRateTypeItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateTypes', {
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                               item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedBillToRating.rate_type?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate types', e);
+                                                   })
+                                               }, 200);
 
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_type: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_type: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToRateTypeItems([]);
-                                        } else {
-                                            axios.post(props.serverUrl + '/getRateTypes', {
-                                                name: e.target.value.trim()
-                                            }).then(res => {
-                                                if (res.data.result === 'OK') {
-                                                    setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                        item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                            ? index === 0
-                                                            : item.id === selectedBillToRating.rate_type?.id;
-                                                        return item;
-                                                    }))
-                                                }
-                                            }).catch(e => {
-                                                console.log('error getting rate types', e);
-                                            })
-                                        }
-                                    }}
-                                    value={selectedBillToRating.rate_type?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setBillToRateTypeItems([]);
+                                           } else {
+                                               axios.post(props.serverUrl + '/getRateTypes', {
+                                                   name: e.target.value.trim()
+                                               }).then(res => {
+                                                   if (res.data.result === 'OK') {
+                                                       setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                           item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                               ? index === 0
+                                                               : item.id === selectedBillToRating.rate_type?.id;
+                                                           return item;
+                                                       }))
+                                                   }
+                                               }).catch(e => {
+                                                   console.log('error getting rate types', e);
+                                               })
+                                           }
+                                       }}
+                                       value={selectedBillToRating.rate_type?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
@@ -2424,7 +2520,7 @@ const Invoice = (props) => {
 
                                         refBillToRateTypes.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 billToRateTypeTransition((style, item) => item && (
@@ -2438,8 +2534,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refBillToRateTypeDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         billToRateTypeItems.map((item, index) => {
@@ -2494,7 +2591,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -2514,35 +2612,35 @@ const Invoice = (props) => {
                             marginRight: 2
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Description</div> */}
-                            <input type="text" style={{ textAlign: 'left' }}
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
-                                placeholder='Description'
-                                ref={refBillToDescription}
-                                onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
+                            <input type="text" style={{textAlign: 'left'}}
+                                   readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                   className={classnames({
+                                       'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
+                                   })}
+                                   placeholder='Description'
+                                   ref={refBillToDescription}
+                                   onKeyDown={(e) => {
+                                       let key = e.keyCode || e.which;
 
-                                    if (key === 9) {
-                                        if ((selectedBillToRating?.rate_type?.id || 0) === 0 || (selectedBillToRating?.rate_type?.name || '').toLowerCase() === 'comment') {
-                                            validateCustomerRatingForSaving(e);
-                                        }
-                                    }
-                                }}
-                                onInput={(e) => {
-                                    setSelectedBillToRating({
-                                        ...selectedBillToRating,
-                                        description: e.target.value
-                                    })
-                                }}
-                                onChange={(e) => {
-                                    setSelectedBillToRating({
-                                        ...selectedBillToRating,
-                                        description: e.target.value
-                                    })
-                                }}
-                                value={selectedBillToRating.description || ''}
+                                       if (key === 9) {
+                                           if ((selectedBillToRating?.rate_type?.id || 0) === 0 || (selectedBillToRating?.rate_type?.name || '').toLowerCase() === 'comment') {
+                                               validateCustomerRatingForSaving(e);
+                                           }
+                                       }
+                                   }}
+                                   onInput={(e) => {
+                                       setSelectedBillToRating({
+                                           ...selectedBillToRating,
+                                           description: e.target.value
+                                       })
+                                   }}
+                                   onChange={(e) => {
+                                       setSelectedBillToRating({
+                                           ...selectedBillToRating,
+                                           description: e.target.value
+                                       })
+                                   }}
+                                   value={selectedBillToRating.description || ''}
                             />
                         </div>
 
@@ -2563,7 +2661,7 @@ const Invoice = (props) => {
                                     })}
                                     placeholder='Pieces/Skids'
                                     ref={refBillToPieces}
-                                    style={{ textAlign: 'left' }}
+                                    style={{textAlign: 'left'}}
                                     mask={numberMask}
                                     type="text"
                                     guide={false}
@@ -2707,7 +2805,10 @@ const Invoice = (props) => {
                                         if (e.target.value.includes('.')) {
                                             setSelectedBillToRating({
                                                 ...selectedBillToRating,
-                                                pieces: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                                pieces: new Intl.NumberFormat('en-US', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                }).format(Number(e.target.value.toString().replace(',', '')))
                                             })
                                         }
                                     }}
@@ -2760,7 +2861,7 @@ const Invoice = (props) => {
 
                                             refBillToPieces.current.inputElement.focus();
                                         }
-                                    }} />
+                                    }}/>
                                 }
                             </div>
                             {
@@ -2775,8 +2876,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refBillToPiecesDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         billToPiecesItems.map((item, index) => {
@@ -2818,7 +2920,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -2848,7 +2951,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Weight'
                                 ref={refBillToWeight}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -2864,7 +2967,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedBillToRating({
                                             ...selectedBillToRating,
-                                            weight: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            weight: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -2903,7 +3009,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Feet Required'
                                 ref={refBillToFeetRequired}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -2919,7 +3025,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedBillToRating({
                                             ...selectedBillToRating,
-                                            feet_required: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            feet_required: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -2941,308 +3050,310 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                    })}
-                                    placeholder='Type'
-                                    ref={refBillToSubtypeFuelSurcharge}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
+                                       })}
+                                       placeholder='Type'
+                                       ref={refBillToSubtypeFuelSurcharge}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (billToSubtypeFuelSurchargeItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeFuelSurchargeItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (billToSubtypeFuelSurchargeItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeFuelSurchargeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (billToSubtypeFuelSurchargeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (billToSubtypeFuelSurchargeItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (billToSubtypeFuelSurchargeItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeFuelSurchargeItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (billToSubtypeFuelSurchargeItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeFuelSurchargeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                if (selectedIndex === (billToSubtypeFuelSurchargeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeFuelSurchargeItems(billToSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   if (selectedIndex === (billToSubtypeFuelSurchargeItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setBillToSubtypeFuelSurchargeItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setBillToSubtypeFuelSurchargeItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (billToSubtypeFuelSurchargeItems.length > 0 && billToSubtypeFuelSurchargeItems.findIndex(item => item.selected) > -1) {
-                                                        if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
-                                                            if ((selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
-                                                                window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
-                                                            } else {
-                                                                setSelectedBillToRating({
-                                                                    ...selectedBillToRating,
-                                                                    rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                    percentage: '',
-                                                                    rate: '',
-                                                                    total_charges: ''
-                                                                })
+                                                   case 13: // enter
+                                                       if (billToSubtypeFuelSurchargeItems.length > 0 && billToSubtypeFuelSurchargeItems.findIndex(item => item.selected) > -1) {
+                                                           if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
+                                                               if ((selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
+                                                                   window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
+                                                               } else {
+                                                                   setSelectedBillToRating({
+                                                                       ...selectedBillToRating,
+                                                                       rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                       percentage: '',
+                                                                       rate: '',
+                                                                       total_charges: ''
+                                                                   })
 
-                                                                window.setTimeout(() => {
-                                                                    setBillToSubtypeFuelSurchargeItems([]);
-                                                                    refBillToSubtypeFuelSurchargePercentage.current.inputElement.focus();
-                                                                }, 0);
-                                                            }
-                                                        } else if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                                   window.setTimeout(() => {
+                                                                       setBillToSubtypeFuelSurchargeItems([]);
+                                                                       refBillToSubtypeFuelSurchargePercentage.current.inputElement.focus();
+                                                                   }, 0);
+                                                               }
+                                                           } else if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeFuelSurchargeItems([]);
-                                                                refBillToSubtypeFuelSurchargeRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeFuelSurchargeItems([]);
+                                                                   refBillToSubtypeFuelSurchargeRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeFuelSurchargeItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeFuelSurchargeItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (billToSubtypeFuelSurchargeItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
-                                                            if ((selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
-                                                                window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
-                                                            } else {
-                                                                setSelectedBillToRating({
-                                                                    ...selectedBillToRating,
-                                                                    rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                    percentage: '',
-                                                                    rate: '',
-                                                                    total_charges: ''
-                                                                })
+                                                   case 9: // tab
+                                                       if (billToSubtypeFuelSurchargeItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
+                                                               if ((selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
+                                                                   window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
+                                                               } else {
+                                                                   setSelectedBillToRating({
+                                                                       ...selectedBillToRating,
+                                                                       rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                       percentage: '',
+                                                                       rate: '',
+                                                                       total_charges: ''
+                                                                   })
 
-                                                                window.setTimeout(() => {
-                                                                    setBillToSubtypeFuelSurchargeItems([]);
-                                                                    refBillToSubtypeFuelSurchargePercentage.current.inputElement.focus();
-                                                                }, 0);
-                                                            }
-                                                        } else if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                                   window.setTimeout(() => {
+                                                                       setBillToSubtypeFuelSurchargeItems([]);
+                                                                       refBillToSubtypeFuelSurchargePercentage.current.inputElement.focus();
+                                                                   }, 0);
+                                                               }
+                                                           } else if ((billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeFuelSurchargeItems([]);
-                                                                refBillToSubtypeFuelSurchargeRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeFuelSurchargeItems([]);
+                                                                   refBillToSubtypeFuelSurchargeRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeFuelSurchargeItems[billToSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeFuelSurchargeItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeFuelSurchargeItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'fuel surcharge') {
-                                            if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedBillToRating({
-                                                    ...selectedBillToRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'fuel surcharge') {
+                                               if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedBillToRating({
+                                                       ...selectedBillToRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToSubtypeFuelSurchargeItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedBillToRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setBillToSubtypeFuelSurchargeItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setBillToSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedBillToRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
@@ -3279,7 +3390,7 @@ const Invoice = (props) => {
 
                                         refBillToSubtypeFuelSurcharge.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 billToSubtypeFuelSurchargeTransition((style, item) => item && (
@@ -3293,8 +3404,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refBillToSubtypeFuelSurchargeDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         billToSubtypeFuelSurchargeItems.map((item, index) => {
@@ -3371,7 +3483,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -3402,7 +3515,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Percentage %'
                                 ref={refBillToSubtypeFuelSurchargePercentage}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -3418,7 +3531,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedBillToRating({
                                             ...selectedBillToRating,
-                                            percentage: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            percentage: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -3450,7 +3566,7 @@ const Invoice = (props) => {
                                     'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
                                 })}
                                 placeholder='Linehaul $'
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -3475,7 +3591,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeFuelSurchargeRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -3490,7 +3606,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedBillToRating({
                                         ...selectedBillToRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -3520,7 +3639,7 @@ const Invoice = (props) => {
                                     'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
                                 })}
                                 placeholder='Miles'
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -3544,7 +3663,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeLinehaulRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -3559,7 +3678,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedBillToRating({
                                         ...selectedBillToRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -3568,7 +3690,10 @@ const Invoice = (props) => {
                                     setSelectedBillToRating({
                                         ...selectedBillToRating,
                                         rate: e.target.value,
-                                        total_charges: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.replace(',', '')) * miles)
+                                        total_charges: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.replace(',', '')) * miles)
                                     })
                                 }}
                             />
@@ -3589,7 +3714,7 @@ const Invoice = (props) => {
                                     'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
                                 })}
                                 placeholder='Miles'
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -3606,274 +3731,276 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                    })}
-                                    placeholder='Type'
-                                    ref={refBillToSubtypeLayover}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
+                                       })}
+                                       placeholder='Type'
+                                       ref={refBillToSubtypeLayover}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (billToSubtypeLayoverItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeLayoverItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (billToSubtypeLayoverItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeLayoverItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (billToSubtypeLayoverItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (billToSubtypeLayoverItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (billToSubtypeLayoverItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeLayoverItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (billToSubtypeLayoverItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeLayoverItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
-                                                                if (selectedIndex === (billToSubtypeLayoverItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeLayoverItems(billToSubtypeLayoverItems.map((item, index) => {
+                                                                   if (selectedIndex === (billToSubtypeLayoverItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setBillToSubtypeLayoverItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setBillToSubtypeLayoverItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (billToSubtypeLayoverItems.length > 0 && billToSubtypeLayoverItems.findIndex(item => item.selected) > -1) {
-                                                        if ((billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 13: // enter
+                                                       if (billToSubtypeLayoverItems.length > 0 && billToSubtypeLayoverItems.findIndex(item => item.selected) > -1) {
+                                                           if ((billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeLayoverItems([]);
-                                                                refBillToSubtypeLayoverRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeLayoverItems([]);
+                                                                   refBillToSubtypeLayoverRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeLayoverItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeLayoverItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (billToSubtypeLayoverItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 9: // tab
+                                                       if (billToSubtypeLayoverItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeLayoverItems([]);
-                                                                refBillToSubtypeLayoverRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeLayoverItems([]);
+                                                                   refBillToSubtypeLayoverRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeLayoverItems[billToSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeLayoverItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeLayoverItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
-                                            if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedBillToRating({
-                                                    ...selectedBillToRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
+                                               if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedBillToRating({
+                                                       ...selectedBillToRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToSubtypeLayoverItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           if (e.target.value.trim() === '') {
+                                               setBillToSubtypeLayoverItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setBillToSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedBillToRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToSubtypeLayoverItems([]);
-                                        }
-                                    }}
-                                    value={selectedBillToRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setBillToSubtypeLayoverItems([]);
+                                           }
+                                       }}
+                                       value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
@@ -3910,7 +4037,7 @@ const Invoice = (props) => {
 
                                         refBillToSubtypeLayover.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 billToSubtypeLayoverTransition((style, item) => item && (
@@ -3924,8 +4051,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refBillToSubtypeLayoverDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         billToSubtypeLayoverItems.map((item, index) => {
@@ -3983,7 +4111,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -4013,7 +4142,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeLayoverRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -4028,7 +4157,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedBillToRating({
                                         ...selectedBillToRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -4059,7 +4191,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Days'
                                 ref={refBillToSubtypeLayoverDays}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -4075,7 +4207,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedBillToRating({
                                             ...selectedBillToRating,
-                                            days: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            days: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -4100,274 +4235,276 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                    })}
-                                    placeholder='Type'
-                                    ref={refBillToSubtypeDetention}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
+                                       })}
+                                       placeholder='Type'
+                                       ref={refBillToSubtypeDetention}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (billToSubtypeDetentionItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeDetentionItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (billToSubtypeDetentionItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeDetentionItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (billToSubtypeDetentionItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (billToSubtypeDetentionItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (billToSubtypeDetentionItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeDetentionItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (billToSubtypeDetentionItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeDetentionItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
-                                                                if (selectedIndex === (billToSubtypeDetentionItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeDetentionItems(billToSubtypeDetentionItems.map((item, index) => {
+                                                                   if (selectedIndex === (billToSubtypeDetentionItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setBillToSubtypeDetentionItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setBillToSubtypeDetentionItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (billToSubtypeDetentionItems.length > 0 && billToSubtypeDetentionItems.findIndex(item => item.selected) > -1) {
-                                                        if ((billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 13: // enter
+                                                       if (billToSubtypeDetentionItems.length > 0 && billToSubtypeDetentionItems.findIndex(item => item.selected) > -1) {
+                                                           if ((billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDetentionItems([]);
-                                                                refBillToSubtypeDetentionRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDetentionItems([]);
+                                                                   refBillToSubtypeDetentionRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDetentionItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDetentionItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (billToSubtypeDetentionItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 9: // tab
+                                                       if (billToSubtypeDetentionItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDetentionItems([]);
-                                                                refBillToSubtypeDetentionRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDetentionItems([]);
+                                                                   refBillToSubtypeDetentionRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDetentionItems[billToSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDetentionItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDetentionItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
-                                            if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedBillToRating({
-                                                    ...selectedBillToRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
+                                               if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedBillToRating({
+                                                       ...selectedBillToRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToSubtypeDetentionItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           if (e.target.value.trim() === '') {
+                                               setBillToSubtypeDetentionItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setBillToSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedBillToRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToSubtypeDetentionItems([]);
-                                        }
-                                    }}
-                                    value={selectedBillToRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setBillToSubtypeDetentionItems([]);
+                                           }
+                                       }}
+                                       value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
@@ -4404,7 +4541,7 @@ const Invoice = (props) => {
 
                                         refBillToSubtypeDetention.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 billToSubtypeDetentionTransition((style, item) => item && (
@@ -4418,8 +4555,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refBillToSubtypeDetentionDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         billToSubtypeDetentionItems.map((item, index) => {
@@ -4477,7 +4615,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -4507,7 +4646,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeDetentionRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -4522,7 +4661,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedBillToRating({
                                         ...selectedBillToRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -4553,7 +4695,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Hours'
                                 ref={refBillToSubtypeDetentionHours}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -4569,7 +4711,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedBillToRating({
                                             ...selectedBillToRating,
-                                            hours: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            hours: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -4594,274 +4739,276 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                    })}
-                                    placeholder='Type'
-                                    ref={refBillToSubtypeDriverAssist}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
+                                       })}
+                                       placeholder='Type'
+                                       ref={refBillToSubtypeDriverAssist}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (billToSubtypeDriverAssistItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeDriverAssistItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (billToSubtypeDriverAssistItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeDriverAssistItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (billToSubtypeDriverAssistItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (billToSubtypeDriverAssistItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (billToSubtypeDriverAssistItems.length > 0) {
-                                                        let selectedIndex = billToSubtypeDriverAssistItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (billToSubtypeDriverAssistItems.length > 0) {
+                                                           let selectedIndex = billToSubtypeDriverAssistItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
-                                                                if (selectedIndex === (billToSubtypeDriverAssistItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setBillToSubtypeDriverAssistItems(billToSubtypeDriverAssistItems.map((item, index) => {
+                                                                   if (selectedIndex === (billToSubtypeDriverAssistItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                            name: (selectedBillToRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                               name: (selectedBillToRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setBillToSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedBillToRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refBillToSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setBillToSubtypeDriverAssistItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setBillToSubtypeDriverAssistItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (billToSubtypeDriverAssistItems.length > 0 && billToSubtypeDriverAssistItems.findIndex(item => item.selected) > -1) {
-                                                        if ((billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 13: // enter
+                                                       if (billToSubtypeDriverAssistItems.length > 0 && billToSubtypeDriverAssistItems.findIndex(item => item.selected) > -1) {
+                                                           if ((billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDriverAssistItems([]);
-                                                                refBillToSubtypeDriverAssistRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDriverAssistItems([]);
+                                                                   refBillToSubtypeDriverAssistRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDriverAssistItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDriverAssistItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (billToSubtypeDriverAssistItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 9: // tab
+                                                       if (billToSubtypeDriverAssistItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDriverAssistItems([]);
-                                                                refBillToSubtypeDriverAssistRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedBillToRating({
-                                                                ...selectedBillToRating,
-                                                                rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDriverAssistItems([]);
+                                                                   refBillToSubtypeDriverAssistRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedBillToRating({
+                                                                   ...selectedBillToRating,
+                                                                   rate_subtype: billToSubtypeDriverAssistItems[billToSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setBillToSubtypeDriverAssistItems([]);
-                                                                refBillToTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setBillToSubtypeDriverAssistItems([]);
+                                                                   refBillToTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
-                                            if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedBillToRating({
-                                                    ...selectedBillToRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
+                                               if ((selectedBillToRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedBillToRating({
+                                                       ...selectedBillToRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToSubtypeDriverAssistItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedBillToRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedBillToRating({
-                                            ...selectedBillToRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           if (e.target.value.trim() === '') {
+                                               setBillToSubtypeDriverAssistItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedBillToRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setBillToSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedBillToRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedBillToRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToRating({
+                                               ...selectedBillToRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setBillToSubtypeDriverAssistItems([]);
-                                        }
-                                    }}
-                                    value={selectedBillToRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setBillToSubtypeDriverAssistItems([]);
+                                           }
+                                       }}
+                                       value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
@@ -4898,7 +5045,7 @@ const Invoice = (props) => {
 
                                         refBillToSubtypeDriverAssist.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 billToSubtypeDriverAssistTransition((style, item) => item && (
@@ -4912,8 +5059,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refBillToSubtypeDriverAssistDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         billToSubtypeDriverAssistItems.map((item, index) => {
@@ -4971,7 +5119,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -5001,7 +5150,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeDriverAssistRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -5016,7 +5165,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedBillToRating({
                                         ...selectedBillToRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -5047,7 +5199,7 @@ const Invoice = (props) => {
                                 })}
                                 placeholder='Hours'
                                 ref={refBillToSubtypeDriverAssistHours}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -5063,7 +5215,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedBillToRating({
                                             ...selectedBillToRating,
-                                            hours: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            hours: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -5126,14 +5281,20 @@ const Invoice = (props) => {
                                     if (e.target.value.toString() !== '') {
                                         setSelectedBillToRating({
                                             ...selectedBillToRating,
-                                            total_charges: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            total_charges: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
                                 onInput={(e) => {
                                     setSelectedBillToRating({
                                         ...selectedBillToRating,
-                                        total_charges: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        total_charges: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -5148,8 +5309,9 @@ const Invoice = (props) => {
                     </div>
 
                     <div className="form-v-sep"></div>
-                    <div className="form-row" style={{ flexGrow: 1, padding: '5px 5px 15px 5px' }}>
-                        <div className="form-portal" style={{ flexGrow: 1, border: '1px solid rgba(0,0,0,0.1)', borderRadius: 5 }}>
+                    <div className="form-row" style={{flexGrow: 1, padding: '5px 5px 15px 5px'}}>
+                        <div className="form-portal"
+                             style={{flexGrow: 1, border: '1px solid rgba(0,0,0,0.1)', borderRadius: 5}}>
                             {
                                 (selectedOrder?.order_customer_ratings || []).length > 0 &&
                                 <div className="rating-header">
@@ -5233,12 +5395,18 @@ const Invoice = (props) => {
                                                 'selected': rating.id === (selectedBillToRating.id || 0)
                                             })} key={index} onClick={() => {
                                                 if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                                    const { rate, linehaul, total_charges } = rating;
+                                                    const {rate, linehaul, total_charges} = rating;
 
                                                     setSelectedBillToRating({
                                                         ...rating,
-                                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(rate)),
-                                                        total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(total_charges)) : ''
+                                                        rate: new Intl.NumberFormat('en-US', {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        }).format(Number(rate)),
+                                                        total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        }).format(Number(total_charges)) : ''
                                                     });
                                                 }
                                             }}>
@@ -5305,7 +5473,8 @@ const Invoice = (props) => {
                                                         (selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'layover') !== undefined ||
                                                         (selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'detention') !== undefined ||
                                                         (selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'driver assist') !== undefined) &&
-                                                    <div className="tcol subtype">{rating.rate_subtype?.name || ''}</div>
+                                                    <div
+                                                        className="tcol subtype">{rating.rate_subtype?.name || ''}</div>
                                                 }
 
                                                 {
@@ -5328,7 +5497,8 @@ const Invoice = (props) => {
                                                 {
                                                     ((selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'fuel surcharge' && (r.subtype || '').toLowerCase() === 'miles') !== undefined ||
                                                         (selectedOrder?.order_customer_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul' && (r.subtype || '').toLowerCase() === 'miles') !== undefined) &&
-                                                    <div className="tcol miles">{(rating.subtype || '').toLowerCase() === 'miles' ? (selectedOrder?.miles || 0) > 0 ? (selectedOrder.miles / 1609.34).toFixed(0) : '' : ''}</div>
+                                                    <div
+                                                        className="tcol miles">{(rating.subtype || '').toLowerCase() === 'miles' ? (selectedOrder?.miles || 0) > 0 ? (selectedOrder.miles / 1609.34).toFixed(0) : '' : ''}</div>
                                                 }
 
                                                 {
@@ -5425,7 +5595,7 @@ const Invoice = (props) => {
                     </div>
                 </div>
 
-                <div className="form-bordered-box" style={{ borderRight: 0, borderBottom: 0, boxShadow: 'none' }}>
+                <div className="form-bordered-box" style={{borderRight: 0, borderBottom: 0, boxShadow: 'none'}}>
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
                         <div className="form-title">Carrier Charges</div>
@@ -5558,7 +5728,7 @@ const Invoice = (props) => {
                                         closePanel={props.closePanel}
                                         componentId={moment().format('x')}
 
-                                        selectedOwner={{ ...selectedOrder }}
+                                        selectedOwner={{...selectedOrder}}
                                         selectedOwnerDocument={{
                                             id: 0,
                                             user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -5649,7 +5819,8 @@ const Invoice = (props) => {
                                 }
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">{(selectedOrder?.invoice_carrier_approved || 0) === 1 ? 'Approved' : 'Approve'}</div>
+                                <div
+                                    className="mochi-button-base">{(selectedOrder?.invoice_carrier_approved || 0) === 1 ? 'Approved' : 'Approve'}</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -5669,121 +5840,131 @@ const Invoice = (props) => {
                     <div className="form-footer">
                         <div className="bottom-border bottom-border-left"></div>
                         <div className="form-buttons">
-                            <div className="input-box-container" style={{ width: '8rem', marginRight: 5 }}>
-                                <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>GP $</div>
+                            <div className="input-box-container" style={{width: '8rem', marginRight: 5}}>
+                                <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>GP $
+                                </div>
                                 <MaskedInput
                                     className={classnames({
                                         'negative-number': (Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))) < 0
+                                            return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))) < 0
                                     })}
                                     readOnly={true}
-                                    style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                    style={{textAlign: 'right', fontWeight: 'bold'}}
                                     mask={numberMask}
                                     type="text"
                                     guide={false}
                                     value={
-                                        new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')))
+                                        new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
+                                            return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')))
                                     }
                                 />
                             </div>
-                            <div className="input-box-container" style={{ width: '8rem', marginRight: 5 }}>
-                                <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>NP $</div>
+                            <div className="input-box-container" style={{width: '8rem', marginRight: 5}}>
+                                <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>NP $
+                                </div>
                                 <MaskedInput
                                     className={classnames({
                                         'negative-number': (Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))) < 0
+                                            return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                            return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))) < 0
                                     })}
                                     readOnly={true}
-                                    style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                    style={{textAlign: 'right', fontWeight: 'bold'}}
                                     mask={numberMask}
                                     type="text"
                                     guide={false}
                                     value={
-                                        new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')))
+                                        new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
+                                            return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                            return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')))
                                     }
                                 />
                             </div>
-                            <div className="input-box-container" style={{ width: '8rem' }}>
-                                <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Profit %</div>
+                            <div className="input-box-container" style={{width: '8rem'}}>
+                                <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Profit
+                                    %
+                                </div>
                                 <NumberFormat
                                     className={classnames({
                                         'negative-number': ((
                                             Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                            }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) > 0
+                                                return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                            }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) > 0
                                             ||
                                             Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                                return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                            }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) > 0
+                                                return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                            }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) > 0
                                         )
                                             ?
                                             (
                                                 (
                                                     Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))
                                                 )
                                                 * 100
                                             )
                                             /
                                             (
                                                 Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                    return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) > 0
+                                                    return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) > 0
                                                     ? Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))
                                                     : Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))
                                             )
                                             : 0) < 0
                                     })}
-                                    style={{ textAlign: 'right', fontWeight: 'bold', width: '100%', fontSize: '0.75rem' }}
+                                    style={{textAlign: 'right', fontWeight: 'bold', width: '100%', fontSize: '0.75rem'}}
                                     value={
                                         (
                                             Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                            }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) > 0
+                                                return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                            }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) > 0
                                             ||
                                             Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                                return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                            }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) > 0
+                                                return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                            }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) > 0
                                         )
                                             ?
                                             (
                                                 (
                                                     Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) - Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))
                                                 )
                                                 * 100
                                             )
                                             /
                                             (
                                                 Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                    return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')) > 0
+                                                    return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')) > 0
                                                     ? Number(((selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))
                                                     : Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                                        return { total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', '')) }
-                                                    }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))
+                                                        return {total_charges: Number((a.total_charges || '').toString().replace(',', '')) + Number((b.total_charges || '').toString().replace(',', ''))}
+                                                    }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))
                                             )
                                             : 0
                                     }
@@ -5804,7 +5985,7 @@ const Invoice = (props) => {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'disabled': (selectedOrder?.id || 0) === 0 || (selectedCarrierRating.id || 0) === 0
-                            })} style={{ marginRight: 10 }} onClick={() => {
+                            })} style={{marginRight: 10}} onClick={() => {
                                 if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
                                     if (window.confirm('Are you sure you want to delete this item?')) {
                                         axios.post(props.serverUrl + '/deleteOrderCarrierRating', {
@@ -5844,22 +6025,27 @@ const Invoice = (props) => {
                                 minWidth: '11rem',
                                 maxWidth: '11rem'
                             }}>
-                                <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Total Payments $</div>
+                                <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Total
+                                    Payments $
+                                </div>
                                 <MaskedInput
                                     className={classnames({
                                         'negative-number': (Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number(a.total_charges) + Number(b.total_charges) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', ''))) < 0
+                                            return {total_charges: Number(a.total_charges) + Number(b.total_charges)}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', ''))) < 0
                                     })}
                                     readOnly={true}
-                                    style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                    style={{textAlign: 'right', fontWeight: 'bold'}}
                                     mask={numberMask}
                                     type="text"
                                     guide={false}
                                     value={
-                                        new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
-                                            return { total_charges: Number(a.total_charges) + Number(b.total_charges) }
-                                        }, { total_charges: '' })?.total_charges || '').toString().replace(',', '')))
+                                        new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                            return {total_charges: Number(a.total_charges) + Number(b.total_charges)}
+                                        }, {total_charges: ''})?.total_charges || '').toString().replace(',', '')))
                                     }
                                 />
                             </div>
@@ -5867,7 +6053,7 @@ const Invoice = (props) => {
                         <div className="bottom-border bottom-border-right"></div>
                     </div>
 
-                    <div className="form-row" style={{ position: 'relative' }}>
+                    <div className="form-row" style={{position: 'relative'}}>
 
                         <div className="select-box-container" style={{ // RATE TYPE
                             width: '7rem',
@@ -5880,267 +6066,269 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                    })}
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
-                                    placeholder='Rate Type'
-                                    ref={refCarrierRateTypes}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
+                                       })}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       placeholder='Rate Type'
+                                       ref={refCarrierRateTypes}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (carrierRateTypeItems.length > 0) {
-                                                        let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (carrierRateTypeItems.length > 0) {
+                                                           let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierRateTypeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (carrierRateTypeItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_type?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (carrierRateTypeItems.length > 0) {
-                                                        let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (carrierRateTypeItems.length > 0) {
+                                                           let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierRateTypeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                   if (selectedIndex === (carrierRateTypeItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_type?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setCarrierRateTypeItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setCarrierRateTypeItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (carrierRateTypeItems.length > 0 && carrierRateTypeItems.findIndex(item => item.selected) > -1) {
-                                                        setSelectedCarrierRating({
-                                                            ...selectedCarrierRating,
-                                                            rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                   case 13: // enter
+                                                       if (carrierRateTypeItems.length > 0 && carrierRateTypeItems.findIndex(item => item.selected) > -1) {
+                                                           setSelectedCarrierRating({
+                                                               ...selectedCarrierRating,
+                                                               rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
+                                                               description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                   carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                   ? ''
+                                                                   : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
+                                                               rate_subtype: {},
+                                                               pieces: '',
+                                                               weight: '',
+                                                               feet_required: '',
+                                                               rate: '',
+                                                               days: '',
+                                                               hours: '',
+                                                               total_charges: ''
+                                                           })
 
-                                                        window.setTimeout(() => {
-                                                            setCarrierRateTypeItems([]);
-                                                            refCarrierDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                           window.setTimeout(() => {
+                                                               setCarrierRateTypeItems([]);
+                                                               refCarrierDescription.current.focus();
+                                                           }, 0);
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (carrierRateTypeItems.length > 0) {
-                                                        e.preventDefault();
-                                                        setSelectedCarrierRating({
-                                                            ...selectedCarrierRating,
-                                                            rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                   case 9: // tab
+                                                       if (carrierRateTypeItems.length > 0) {
+                                                           e.preventDefault();
+                                                           setSelectedCarrierRating({
+                                                               ...selectedCarrierRating,
+                                                               rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
+                                                               description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                   carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                   ? ''
+                                                                   : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
+                                                               rate_subtype: {},
+                                                               pieces: '',
+                                                               weight: '',
+                                                               feet_required: '',
+                                                               rate: '',
+                                                               days: '',
+                                                               hours: '',
+                                                               total_charges: ''
+                                                           })
 
-                                                        window.setTimeout(() => {
-                                                            setCarrierRateTypeItems([]);
-                                                            refCarrierDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                           window.setTimeout(() => {
+                                                               setCarrierRateTypeItems([]);
+                                                               refCarrierDescription.current.focus();
+                                                           }, 0);
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedCarrierRating.rate_type?.id || 0) === 0) {
-                                            setSelectedCarrierRating({})
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_type: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedCarrierRating.rate_type?.id || 0) === 0) {
+                                               setSelectedCarrierRating({})
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_type: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierRateTypeItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateTypes', {
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_type?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
-                                            }, 200);
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierRateTypeItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateTypes', {
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                               item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedCarrierRating.rate_type?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate types', e);
+                                                   })
+                                               }, 200);
 
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_type: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_type: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierRateTypeItems([]);
-                                        } else {
-                                            axios.post(props.serverUrl + '/getRateTypes', {
-                                                name: e.target.value.trim()
-                                            }).then(res => {
-                                                if (res.data.result === 'OK') {
-                                                    setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                        item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                            ? index === 0
-                                                            : item.id === selectedCarrierRating.rate_type?.id;
-                                                        return item;
-                                                    }))
-                                                }
-                                            }).catch(e => {
-                                                console.log('error getting rate types', e);
-                                            })
-                                        }
-                                    }}
-                                    value={selectedCarrierRating.rate_type?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierRateTypeItems([]);
+                                           } else {
+                                               axios.post(props.serverUrl + '/getRateTypes', {
+                                                   name: e.target.value.trim()
+                                               }).then(res => {
+                                                   if (res.data.result === 'OK') {
+                                                       setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                           item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                               ? index === 0
+                                                               : item.id === selectedCarrierRating.rate_type?.id;
+                                                           return item;
+                                                       }))
+                                                   }
+                                               }).catch(e => {
+                                                   console.log('error getting rate types', e);
+                                               })
+                                           }
+                                       }}
+                                       value={selectedCarrierRating.rate_type?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
@@ -6202,7 +6390,7 @@ const Invoice = (props) => {
 
                                         refCarrierRateTypes.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 carrierRateTypeTransition((style, item) => item && (
@@ -6217,8 +6405,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refCarrierRateTypeDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical above right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical above right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         carrierRateTypeItems.map((item, index) => {
@@ -6273,7 +6462,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -6293,35 +6483,35 @@ const Invoice = (props) => {
                             marginRight: 2
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Description</div> */}
-                            <input type="text" style={{ textAlign: 'left' }}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
-                                placeholder='Description'
-                                ref={refCarrierDescription}
-                                onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
+                            <input type="text" style={{textAlign: 'left'}}
+                                   className={classnames({
+                                       'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
+                                   })}
+                                   readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                   placeholder='Description'
+                                   ref={refCarrierDescription}
+                                   onKeyDown={(e) => {
+                                       let key = e.keyCode || e.which;
 
-                                    if (key === 9) {
-                                        if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
-                                            validateCarrierRatingForSaving(e);
-                                        }
-                                    }
-                                }}
-                                onInput={(e) => {
-                                    setSelectedCarrierRating({
-                                        ...selectedCarrierRating,
-                                        description: e.target.value
-                                    })
-                                }}
-                                onChange={(e) => {
-                                    setSelectedCarrierRating({
-                                        ...selectedCarrierRating,
-                                        description: e.target.value
-                                    })
-                                }}
-                                value={selectedCarrierRating.description || ''}
+                                       if (key === 9) {
+                                           if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
+                                               validateCarrierRatingForSaving(e);
+                                           }
+                                       }
+                                   }}
+                                   onInput={(e) => {
+                                       setSelectedCarrierRating({
+                                           ...selectedCarrierRating,
+                                           description: e.target.value
+                                       })
+                                   }}
+                                   onChange={(e) => {
+                                       setSelectedCarrierRating({
+                                           ...selectedCarrierRating,
+                                           description: e.target.value
+                                       })
+                                   }}
+                                   value={selectedCarrierRating.description || ''}
                             />
                         </div>
 
@@ -6342,7 +6532,7 @@ const Invoice = (props) => {
                                     readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                     placeholder='Pieces/Skids'
                                     ref={refCarrierPieces}
-                                    style={{ textAlign: 'left' }}
+                                    style={{textAlign: 'left'}}
                                     mask={numberMask}
                                     type="text"
                                     guide={false}
@@ -6486,7 +6676,10 @@ const Invoice = (props) => {
                                         if (e.target.value.includes('.')) {
                                             setSelectedCarrierRating({
                                                 ...selectedCarrierRating,
-                                                pieces: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                                pieces: new Intl.NumberFormat('en-US', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                }).format(Number(e.target.value.toString().replace(',', '')))
                                             })
                                         }
                                     }}
@@ -6539,7 +6732,7 @@ const Invoice = (props) => {
 
                                             refCarrierPieces.current.inputElement.focus();
                                         }
-                                    }} />
+                                    }}/>
                                 }
                             </div>
                             {
@@ -6554,8 +6747,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refCarrierPiecesDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         carrierPiecesItems.map((item, index) => {
@@ -6597,7 +6791,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -6627,7 +6822,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Weight'
                                 ref={refCarrierWeight}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -6643,7 +6838,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedCarrierRating({
                                             ...selectedCarrierRating,
-                                            weight: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            weight: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -6682,7 +6880,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Feet Required'
                                 ref={refCarrierFeetRequired}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -6698,7 +6896,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedCarrierRating({
                                             ...selectedCarrierRating,
-                                            feet_required: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            feet_required: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -6720,308 +6921,310 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                    })}
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
-                                    placeholder='Type'
-                                    ref={refCarrierSubtypeFuelSurcharge}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
+                                       })}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       placeholder='Type'
+                                       ref={refCarrierSubtypeFuelSurcharge}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeFuelSurchargeItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeFuelSurchargeItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierSubtypeFuelSurchargeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (carrierSubtypeFuelSurchargeItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeFuelSurchargeItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeFuelSurchargeItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierSubtypeFuelSurchargeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeFuelSurchargeItems(carrierSubtypeFuelSurchargeItems.map((item, index) => {
+                                                                   if (selectedIndex === (carrierSubtypeFuelSurchargeItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeFuelSurchargePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setCarrierSubtypeFuelSurchargeItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setCarrierSubtypeFuelSurchargeItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (carrierSubtypeFuelSurchargeItems.length > 0 && carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected) > -1) {
-                                                        if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
-                                                            if ((selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
-                                                                window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
-                                                            } else {
-                                                                setSelectedCarrierRating({
-                                                                    ...selectedCarrierRating,
-                                                                    rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                    percentage: '',
-                                                                    rate: '',
-                                                                    total_charges: ''
-                                                                })
+                                                   case 13: // enter
+                                                       if (carrierSubtypeFuelSurchargeItems.length > 0 && carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected) > -1) {
+                                                           if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
+                                                               if ((selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
+                                                                   window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
+                                                               } else {
+                                                                   setSelectedCarrierRating({
+                                                                       ...selectedCarrierRating,
+                                                                       rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                       percentage: '',
+                                                                       rate: '',
+                                                                       total_charges: ''
+                                                                   })
 
-                                                                window.setTimeout(() => {
-                                                                    setCarrierSubtypeFuelSurchargeItems([]);
-                                                                    refCarrierSubtypeFuelSurchargePercentage.current.inputElement.focus();
-                                                                }, 0);
-                                                            }
-                                                        } else if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                                   window.setTimeout(() => {
+                                                                       setCarrierSubtypeFuelSurchargeItems([]);
+                                                                       refCarrierSubtypeFuelSurchargePercentage.current.inputElement.focus();
+                                                                   }, 0);
+                                                               }
+                                                           } else if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeFuelSurchargeItems([]);
-                                                                refCarrierSubtypeFuelSurchargeRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeFuelSurchargeItems([]);
+                                                                   refCarrierSubtypeFuelSurchargeRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeFuelSurchargeItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeFuelSurchargeItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (carrierSubtypeFuelSurchargeItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
-                                                            if ((selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
-                                                                window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
-                                                            } else {
-                                                                setSelectedCarrierRating({
-                                                                    ...selectedCarrierRating,
-                                                                    rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                    percentage: '',
-                                                                    rate: '',
-                                                                    total_charges: ''
-                                                                })
+                                                   case 9: // tab
+                                                       if (carrierSubtypeFuelSurchargeItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'percentage') {
+                                                               if ((selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul') === undefined) {
+                                                                   window.alert('You must enter in a Linehaul Charge before you can enter in the Fuel Surcharge');
+                                                               } else {
+                                                                   setSelectedCarrierRating({
+                                                                       ...selectedCarrierRating,
+                                                                       rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                       percentage: '',
+                                                                       rate: '',
+                                                                       total_charges: ''
+                                                                   })
 
-                                                                window.setTimeout(() => {
-                                                                    setCarrierSubtypeFuelSurchargeItems([]);
-                                                                    refCarrierSubtypeFuelSurchargePercentage.current.inputElement.focus();
-                                                                }, 0);
-                                                            }
-                                                        } else if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                                   window.setTimeout(() => {
+                                                                       setCarrierSubtypeFuelSurchargeItems([]);
+                                                                       refCarrierSubtypeFuelSurchargePercentage.current.inputElement.focus();
+                                                                   }, 0);
+                                                               }
+                                                           } else if ((carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'miles') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeFuelSurchargeItems([]);
-                                                                refCarrierSubtypeFuelSurchargeRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
-                                                                percentage: '',
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeFuelSurchargeItems([]);
+                                                                   refCarrierSubtypeFuelSurchargeRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeFuelSurchargeItems[carrierSubtypeFuelSurchargeItems.findIndex(item => item.selected)],
+                                                                   percentage: '',
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeFuelSurchargeItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeFuelSurchargeItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'fuel surcharge') {
-                                            if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedCarrierRating({
-                                                    ...selectedCarrierRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'fuel surcharge') {
+                                               if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedCarrierRating({
+                                                       ...selectedCarrierRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierSubtypeFuelSurchargeItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedCarrierRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierSubtypeFuelSurchargeItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setCarrierSubtypeFuelSurchargeItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCarrierRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
@@ -7058,7 +7261,7 @@ const Invoice = (props) => {
 
                                         refCarrierSubtypeFuelSurcharge.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 carrierSubtypeFuelSurchargeTransition((style, item) => item && (
@@ -7072,8 +7275,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refCarrierSubtypeFuelSurchargeDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         carrierSubtypeFuelSurchargeItems.map((item, index) => {
@@ -7150,7 +7354,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -7181,7 +7386,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Percentage %'
                                 ref={refCarrierSubtypeFuelSurchargePercentage}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7197,7 +7402,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedCarrierRating({
                                             ...selectedCarrierRating,
-                                            percentage: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            percentage: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -7229,7 +7437,7 @@ const Invoice = (props) => {
                                 })}
                                 readOnly={true}
                                 placeholder='Linehaul $'
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7254,7 +7462,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeFuelSurchargeRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7269,7 +7477,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedCarrierRating({
                                         ...selectedCarrierRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -7299,7 +7510,7 @@ const Invoice = (props) => {
                                 })}
                                 readOnly={true}
                                 placeholder='Miles'
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7323,7 +7534,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeLinehaulRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7338,7 +7549,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedCarrierRating({
                                         ...selectedCarrierRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -7347,7 +7561,10 @@ const Invoice = (props) => {
                                     setSelectedCarrierRating({
                                         ...selectedCarrierRating,
                                         rate: e.target.value,
-                                        total_charges: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.replace(',', '')) * miles)
+                                        total_charges: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.replace(',', '')) * miles)
                                     })
                                 }}
                             />
@@ -7368,7 +7585,7 @@ const Invoice = (props) => {
                                 })}
                                 readOnly={true}
                                 placeholder='Miles'
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7385,274 +7602,276 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                    })}
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
-                                    placeholder='Type'
-                                    ref={refCarrierSubtypeLayover}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
+                                       })}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       placeholder='Type'
+                                       ref={refCarrierSubtypeLayover}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeLayoverItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeLayoverItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeLayoverItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeLayoverItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierSubtypeLayoverItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (carrierSubtypeLayoverItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeLayoverItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeLayoverItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeLayoverItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeLayoverItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierSubtypeLayoverItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeLayoverItems(carrierSubtypeLayoverItems.map((item, index) => {
+                                                                   if (selectedIndex === (carrierSubtypeLayoverItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeLayoverPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setCarrierSubtypeLayoverItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setCarrierSubtypeLayoverItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (carrierSubtypeLayoverItems.length > 0 && carrierSubtypeLayoverItems.findIndex(item => item.selected) > -1) {
-                                                        if ((carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 13: // enter
+                                                       if (carrierSubtypeLayoverItems.length > 0 && carrierSubtypeLayoverItems.findIndex(item => item.selected) > -1) {
+                                                           if ((carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeLayoverItems([]);
-                                                                refCarrierSubtypeLayoverRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeLayoverItems([]);
+                                                                   refCarrierSubtypeLayoverRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeLayoverItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeLayoverItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (carrierSubtypeLayoverItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 9: // tab
+                                                       if (carrierSubtypeLayoverItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'days') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeLayoverItems([]);
-                                                                refCarrierSubtypeLayoverRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeLayoverItems([]);
+                                                                   refCarrierSubtypeLayoverRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeLayoverItems[carrierSubtypeLayoverItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeLayoverItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeLayoverItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
-                                            if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedCarrierRating({
-                                                    ...selectedCarrierRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
+                                               if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedCarrierRating({
+                                                       ...selectedCarrierRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierSubtypeLayoverItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierSubtypeLayoverItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setCarrierSubtypeLayoverItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierSubtypeLayoverItems([]);
-                                        }
-                                    }}
-                                    value={selectedCarrierRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierSubtypeLayoverItems([]);
+                                           }
+                                       }}
+                                       value={selectedCarrierRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
@@ -7689,7 +7908,7 @@ const Invoice = (props) => {
 
                                         refCarrierSubtypeLayover.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 carrierSubtypeLayoverTransition((style, item) => item && (
@@ -7703,8 +7922,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refCarrierSubtypeLayoverDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         carrierSubtypeLayoverItems.map((item, index) => {
@@ -7762,7 +7982,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -7792,7 +8013,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeLayoverRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7807,7 +8028,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedCarrierRating({
                                         ...selectedCarrierRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -7838,7 +8062,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Days'
                                 ref={refCarrierSubtypeLayoverDays}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -7854,7 +8078,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedCarrierRating({
                                             ...selectedCarrierRating,
-                                            days: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            days: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -7879,274 +8106,276 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                    })}
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
-                                    placeholder='Type'
-                                    ref={refCarrierSubtypeDetention}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
+                                       })}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       placeholder='Type'
+                                       ref={refCarrierSubtypeDetention}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeDetentionItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeDetentionItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeDetentionItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeDetentionItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierSubtypeDetentionItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (carrierSubtypeDetentionItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeDetentionItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeDetentionItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeDetentionItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeDetentionItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierSubtypeDetentionItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeDetentionItems(carrierSubtypeDetentionItems.map((item, index) => {
+                                                                   if (selectedIndex === (carrierSubtypeDetentionItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeDetentionPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setCarrierSubtypeDetentionItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setCarrierSubtypeDetentionItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (carrierSubtypeDetentionItems.length > 0 && carrierSubtypeDetentionItems.findIndex(item => item.selected) > -1) {
-                                                        if ((carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 13: // enter
+                                                       if (carrierSubtypeDetentionItems.length > 0 && carrierSubtypeDetentionItems.findIndex(item => item.selected) > -1) {
+                                                           if ((carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDetentionItems([]);
-                                                                refCarrierSubtypeDetentionRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDetentionItems([]);
+                                                                   refCarrierSubtypeDetentionRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDetentionItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDetentionItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (carrierSubtypeDetentionItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 9: // tab
+                                                       if (carrierSubtypeDetentionItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDetentionItems([]);
-                                                                refCarrierSubtypeDetentionRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDetentionItems([]);
+                                                                   refCarrierSubtypeDetentionRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDetentionItems[carrierSubtypeDetentionItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDetentionItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDetentionItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
-                                            if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedCarrierRating({
-                                                    ...selectedCarrierRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
+                                               if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedCarrierRating({
+                                                       ...selectedCarrierRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierSubtypeDetentionItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierSubtypeDetentionItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setCarrierSubtypeDetentionItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierSubtypeDetentionItems([]);
-                                        }
-                                    }}
-                                    value={selectedCarrierRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierSubtypeDetentionItems([]);
+                                           }
+                                       }}
+                                       value={selectedCarrierRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
@@ -8183,7 +8412,7 @@ const Invoice = (props) => {
 
                                         refCarrierSubtypeDetention.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 carrierSubtypeDetentionTransition((style, item) => item && (
@@ -8197,8 +8426,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refCarrierSubtypeDetentionDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         carrierSubtypeDetentionItems.map((item, index) => {
@@ -8256,7 +8486,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -8286,7 +8517,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeDetentionRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -8301,7 +8532,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedCarrierRating({
                                         ...selectedCarrierRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -8332,7 +8566,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Hours'
                                 ref={refCarrierSubtypeDetentionHours}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -8348,7 +8582,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedCarrierRating({
                                             ...selectedCarrierRating,
-                                            hours: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            hours: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -8373,274 +8610,276 @@ const Invoice = (props) => {
                         }}>
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
-                                <input type="text" style={{ textAlign: 'left' }}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                    })}
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
-                                    placeholder='Type'
-                                    ref={refCarrierSubtypeDriverAssist}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                <input type="text" style={{textAlign: 'left'}}
+                                       className={classnames({
+                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
+                                       })}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       placeholder='Type'
+                                       ref={refCarrierSubtypeDriverAssist}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeDriverAssistItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeDriverAssistItems.findIndex(item => item.selected);
+                                           if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeDriverAssistItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeDriverAssistItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierSubtypeDriverAssistItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (carrierSubtypeDriverAssistItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (carrierSubtypeDriverAssistItems.length > 0) {
-                                                        let selectedIndex = carrierSubtypeDriverAssistItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (carrierSubtypeDriverAssistItems.length > 0) {
+                                                           let selectedIndex = carrierSubtypeDriverAssistItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierSubtypeDriverAssistItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setCarrierSubtypeDriverAssistItems(carrierSubtypeDriverAssistItems.map((item, index) => {
+                                                                   if (selectedIndex === (carrierSubtypeDriverAssistItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1);
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                            rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                            name: (selectedCarrierRating.rate_subtype?.name || '')
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                                    return item;
-                                                                }))
+                                                           refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                               rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                               name: (selectedCarrierRating.rate_subtype?.name || '')
+                                                           }).then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setCarrierSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
+                                                                       item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                                       return item;
+                                                                   }))
 
-                                                                refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        });
-                                                    }
-                                                    break;
+                                                                   refCarrierSubtypeDriverAssistPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting rate types', e);
+                                                           });
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setCarrierSubtypeDriverAssistItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setCarrierSubtypeDriverAssistItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (carrierSubtypeDriverAssistItems.length > 0 && carrierSubtypeDriverAssistItems.findIndex(item => item.selected) > -1) {
-                                                        if ((carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 13: // enter
+                                                       if (carrierSubtypeDriverAssistItems.length > 0 && carrierSubtypeDriverAssistItems.findIndex(item => item.selected) > -1) {
+                                                           if ((carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDriverAssistItems([]);
-                                                                refCarrierSubtypeDriverAssistRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDriverAssistItems([]);
+                                                                   refCarrierSubtypeDriverAssistRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDriverAssistItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDriverAssistItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (carrierSubtypeDriverAssistItems.length > 0) {
-                                                        e.preventDefault();
-                                                        if ((carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                   case 9: // tab
+                                                       if (carrierSubtypeDriverAssistItems.length > 0) {
+                                                           e.preventDefault();
+                                                           if ((carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)].name || '').toLowerCase() === 'hours') {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDriverAssistItems([]);
-                                                                refCarrierSubtypeDriverAssistRate.current.inputElement.focus();
-                                                            }, 0);
-                                                        } else {
-                                                            setSelectedCarrierRating({
-                                                                ...selectedCarrierRating,
-                                                                rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
-                                                                rate: '',
-                                                                total_charges: ''
-                                                            })
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDriverAssistItems([]);
+                                                                   refCarrierSubtypeDriverAssistRate.current.inputElement.focus();
+                                                               }, 0);
+                                                           } else {
+                                                               setSelectedCarrierRating({
+                                                                   ...selectedCarrierRating,
+                                                                   rate_subtype: carrierSubtypeDriverAssistItems[carrierSubtypeDriverAssistItems.findIndex(item => item.selected)],
+                                                                   rate: '',
+                                                                   total_charges: ''
+                                                               })
 
-                                                            window.setTimeout(() => {
-                                                                setCarrierSubtypeDriverAssistItems([]);
-                                                                refCarrierTotalCharges.current.inputElement.focus();
-                                                            }, 0);
-                                                        }
-                                                    }
-                                                    break;
+                                                               window.setTimeout(() => {
+                                                                   setCarrierSubtypeDriverAssistItems([]);
+                                                                   refCarrierTotalCharges.current.inputElement.focus();
+                                                               }, 0);
+                                                           }
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
-                                            if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
-                                                setSelectedCarrierRating({
-                                                    ...selectedCarrierRating,
-                                                    rate_subtype: {},
-                                                    percentage: '',
-                                                    rate: '',
-                                                    total_charges: ''
-                                                })
-                                            }
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                                   default:
+                                                       break;
+                                               }
+                                           }
+                                       }}
+                                       onBlur={() => {
+                                           if ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
+                                               if ((selectedCarrierRating.rate_subtype?.id || 0) === 0) {
+                                                   setSelectedCarrierRating({
+                                                       ...selectedCarrierRating,
+                                                       rate_subtype: {},
+                                                       percentage: '',
+                                                       rate: '',
+                                                       total_charges: ''
+                                                   })
+                                               }
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        clearTimeout(delayTimer);
+                                           clearTimeout(delayTimer);
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierSubtypeDriverAssistItems([]);
-                                            delayTimer = null;
-                                        } else {
-                                            delayTimer = window.setTimeout(() => {
-                                                axios.post(props.serverUrl + '/getRateSubtypes', {
-                                                    rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (e.target.value.trim() === '') {
-                                                        return;
-                                                    }
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_subtype?.id;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate subtypes', e);
-                                                })
-                                            }, 200);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedCarrierRating({
-                                            ...selectedCarrierRating,
-                                            rate_subtype: {
-                                                id: 0,
-                                                name: e.target.value
-                                            }
-                                        })
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierSubtypeDriverAssistItems([]);
+                                               delayTimer = null;
+                                           } else {
+                                               delayTimer = window.setTimeout(() => {
+                                                   axios.post(props.serverUrl + '/getRateSubtypes', {
+                                                       rate_type_id: (selectedCarrierRating.rate_type?.id || 0),
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (e.target.value.trim() === '') {
+                                                           return;
+                                                       }
+                                                       if (res.data.result === 'OK') {
+                                                           setCarrierSubtypeDriverAssistItems(res.data.rate_subtypes.map((item, index) => {
+                                                               item.selected = (selectedCarrierRating.rate_subtype?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedCarrierRating.rate_subtype?.id;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting rate subtypes', e);
+                                                   })
+                                               }, 200);
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrierRating({
+                                               ...selectedCarrierRating,
+                                               rate_subtype: {
+                                                   id: 0,
+                                                   name: e.target.value
+                                               }
+                                           })
 
-                                        if (e.target.value.trim() === '') {
-                                            setCarrierSubtypeDriverAssistItems([]);
-                                        }
-                                    }}
-                                    value={selectedCarrierRating.rate_subtype?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setCarrierSubtypeDriverAssistItems([]);
+                                           }
+                                       }}
+                                       value={selectedCarrierRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
@@ -8677,7 +8916,7 @@ const Invoice = (props) => {
 
                                         refCarrierSubtypeDriverAssist.current.focus();
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 carrierSubtypeDriverAssistTransition((style, item) => item && (
@@ -8691,8 +8930,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refCarrierSubtypeDriverAssistDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         carrierSubtypeDriverAssistItems.map((item, index) => {
@@ -8750,7 +8990,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -8780,7 +9021,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeDriverAssistRate}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -8795,7 +9036,10 @@ const Invoice = (props) => {
                                 onBlur={(e) => {
                                     setSelectedCarrierRating({
                                         ...selectedCarrierRating,
-                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        rate: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -8826,7 +9070,7 @@ const Invoice = (props) => {
                                 readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
                                 placeholder='Hours'
                                 ref={refCarrierSubtypeDriverAssistHours}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -8842,7 +9086,10 @@ const Invoice = (props) => {
                                     if (e.target.value.includes('.')) {
                                         setSelectedCarrierRating({
                                             ...selectedCarrierRating,
-                                            hours: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            hours: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
@@ -8883,7 +9130,7 @@ const Invoice = (props) => {
                                 }
                                 placeholder='Total Charges $'
                                 ref={refCarrierTotalCharges}
-                                style={{ textAlign: 'left' }}
+                                style={{textAlign: 'left'}}
                                 mask={numberMask}
                                 type="text"
                                 guide={false}
@@ -8902,14 +9149,20 @@ const Invoice = (props) => {
                                     if (e.target.value.toString() !== '') {
                                         setSelectedCarrierRating({
                                             ...selectedCarrierRating,
-                                            total_charges: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                            total_charges: new Intl.NumberFormat('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }).format(Number(e.target.value.toString().replace(',', '')))
                                         })
                                     }
                                 }}
                                 onInput={(e) => {
                                     setSelectedCarrierRating({
                                         ...selectedCarrierRating,
-                                        total_charges: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                        total_charges: new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(e.target.value.toString().replace(',', '')))
                                     })
                                 }}
                                 onChange={(e) => {
@@ -8924,8 +9177,9 @@ const Invoice = (props) => {
                     </div>
 
                     <div className="form-v-sep"></div>
-                    <div className="form-row" style={{ flexGrow: 1, padding: '5px 5px 15px 5px' }}>
-                        <div className="form-portal" style={{ flexGrow: 1, border: '1px solid rgba(0,0,0,0.1)', borderRadius: 5 }}>
+                    <div className="form-row" style={{flexGrow: 1, padding: '5px 5px 15px 5px'}}>
+                        <div className="form-portal"
+                             style={{flexGrow: 1, border: '1px solid rgba(0,0,0,0.1)', borderRadius: 5}}>
                             {
                                 (selectedOrder?.order_carrier_ratings || []).length > 0 &&
                                 <div className="rating-header">
@@ -9009,12 +9263,18 @@ const Invoice = (props) => {
                                                 'selected': rating.id === (selectedCarrierRating.id || 0)
                                             })} key={index} onClick={() => {
                                                 if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                                    const { rate, linehaul, total_charges } = rating;
+                                                    const {rate, linehaul, total_charges} = rating;
 
                                                     setSelectedCarrierRating({
                                                         ...rating,
-                                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(rate)),
-                                                        total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(total_charges)) : ''
+                                                        rate: new Intl.NumberFormat('en-US', {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        }).format(Number(rate)),
+                                                        total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        }).format(Number(total_charges)) : ''
                                                     });
                                                 }
                                             }}>
@@ -9081,7 +9341,8 @@ const Invoice = (props) => {
                                                         (selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'layover') !== undefined ||
                                                         (selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'detention') !== undefined ||
                                                         (selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'driver assist') !== undefined) &&
-                                                    <div className="tcol subtype">{rating.rate_subtype?.name || ''}</div>
+                                                    <div
+                                                        className="tcol subtype">{rating.rate_subtype?.name || ''}</div>
                                                 }
 
                                                 {
@@ -9104,7 +9365,8 @@ const Invoice = (props) => {
                                                 {
                                                     ((selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'fuel surcharge' && (r.subtype || '').toLowerCase() === 'miles') !== undefined ||
                                                         (selectedOrder?.order_carrier_ratings || []).find(r => (r.rate_type?.name || '').toLowerCase() === 'linehaul' && (r.subtype || '').toLowerCase() === 'miles') !== undefined) &&
-                                                    <div className="tcol miles">{(rating.subtype || '').toLowerCase() === 'miles' ? (selectedOrder?.miles || 0) > 0 ? (selectedOrder.miles / 1609.34).toFixed(0) : '' : ''}</div>
+                                                    <div
+                                                        className="tcol miles">{(rating.subtype || '').toLowerCase() === 'miles' ? (selectedOrder?.miles || 0) > 0 ? (selectedOrder.miles / 1609.34).toFixed(0) : '' : ''}</div>
                                                 }
 
                                                 {
@@ -9218,7 +9480,7 @@ const Invoice = (props) => {
                     justifyContent: 'center'
                 }}>
 
-                    <div className="mochi-button" style={{ justifyContent: 'center' }} onClick={() => {
+                    <div className="mochi-button" style={{justifyContent: 'center'}} onClick={() => {
                         setSelectedOrder({});
                         setOrderNumber('');
                         setTripNumber('');
@@ -9227,59 +9489,68 @@ const Invoice = (props) => {
                         setSelectedCarrier({});
                         setSelectedCarrierContact({});
                         setSelectedCarrierDriver({});
-                        setSelectedPickup({});
+                        setSelectedRoute({});
 
                         refOrderNumber.current.focus({
                             preventScroll: true
                         });
                     }}>
-                        <div className="mochi-button-decorator mochi-button-decorator-left" style={{ fontSize: '0.9rem' }}>(</div>
-                        <div className="mochi-button-base" style={{ fontSize: '0.9rem' }}>Clear</div>
-                        <div className="mochi-button-decorator mochi-button-decorator-right" style={{ fontSize: '0.9rem' }}>)</div>
+                        <div className="mochi-button-decorator mochi-button-decorator-left"
+                             style={{fontSize: '0.9rem'}}>(
+                        </div>
+                        <div className="mochi-button-base" style={{fontSize: '0.9rem'}}>Clear</div>
+                        <div className="mochi-button-decorator mochi-button-decorator-right"
+                             style={{fontSize: '0.9rem'}}>)
+                        </div>
                     </div>
 
-                    <div className="input-box-container" style={{ width: '10rem', marginTop: -4 }}>
-                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Order Number:</div>
-                        <input style={{ textAlign: 'right', fontWeight: 'bold' }} tabIndex={1 + props.tabTimes} type="text"
-                            ref={refOrderNumber}
-                            onKeyDown={getOrderByOrderNumber}
-                            onChange={(e) => {
-                                setSelectedOrder(selectedOrder => {
-                                    return {
-                                        ...selectedOrder,
-                                        order_number: e.target.value
-                                    }
-                                })
-                            }}
-                            value={selectedOrder?.order_number || ''}
+                    <div className="input-box-container" style={{width: '10rem', marginTop: -4}}>
+                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Order
+                            Number:
+                        </div>
+                        <input style={{textAlign: 'right', fontWeight: 'bold'}} tabIndex={1 + props.tabTimes}
+                               type="text"
+                               ref={refOrderNumber}
+                               onKeyDown={getOrderByOrderNumber}
+                               onChange={(e) => {
+                                   setSelectedOrder(selectedOrder => {
+                                       return {
+                                           ...selectedOrder,
+                                           order_number: e.target.value
+                                       }
+                                   })
+                               }}
+                               value={selectedOrder?.order_number || ''}
                         />
                     </div>
 
-                    <div className="input-box-container" style={{ width: '10rem' }}>
-                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Trip Number:</div>
-                        <input style={{ textAlign: 'right', fontWeight: 'bold' }} tabIndex={2 + props.tabTimes} type="text"
-                            onKeyDown={getOrderByTripNumber}
-                            onChange={(e) => {
-                                setSelectedOrder(selectedOrder => {
-                                    return {
-                                        ...selectedOrder,
-                                        trip_number: e.target.value
-                                    }
-                                })
-                            }}
-                            value={
-                                (selectedOrder.trip_number || '') === ''
-                                    ? ''
-                                    : (
-                                        selectedOrder.trip_number === 0
-                                            ? ''
-                                            : (
-                                                (selectedCarrier.id || 0) === 0
-                                                    ? ''
-                                                    : selectedOrder.trip_number
-                                            )
-                                    )
-                            }
+                    <div className="input-box-container" style={{width: '10rem'}}>
+                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Trip Number:
+                        </div>
+                        <input style={{textAlign: 'right', fontWeight: 'bold'}} tabIndex={2 + props.tabTimes}
+                               type="text"
+                               onKeyDown={getOrderByTripNumber}
+                               onChange={(e) => {
+                                   setSelectedOrder(selectedOrder => {
+                                       return {
+                                           ...selectedOrder,
+                                           trip_number: e.target.value
+                                       }
+                                   })
+                               }}
+                               value={
+                                   (selectedOrder.trip_number || '') === ''
+                                       ? ''
+                                       : (
+                                           selectedOrder.trip_number === 0
+                                               ? ''
+                                               : (
+                                                   (selectedCarrier.id || 0) === 0
+                                                       ? ''
+                                                       : selectedOrder.trip_number
+                                               )
+                                       )
+                               }
                         />
                     </div>
 
@@ -9319,7 +9590,7 @@ const Invoice = (props) => {
                                             closePanel={props.closePanel}
                                             componentId={moment().format('x')}
 
-                                            selectedOwner={{ ...selectedOrder }}
+                                            selectedOwner={{...selectedOrder}}
                                             selectedOwnerDocument={{
                                                 id: 0,
                                                 user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -9380,7 +9651,7 @@ const Invoice = (props) => {
                                                     closePanel={props.closePanel}
                                                     componentId={moment().format('x')}
 
-                                                    selectedOwner={{ ...selectedOrder }}
+                                                    selectedOwner={{...selectedOrder}}
                                                     selectedOwnerDocument={document}
                                                     savingDocumentUrl='/saveOrderBillingDocument'
                                                     deletingDocumentUrl='/deleteOrderBillingDocument'
@@ -9391,7 +9662,7 @@ const Invoice = (props) => {
 
                                             props.openPanel(panel, props.origin);
                                         }}
-                                            title={`User ID: ${document.user_id}  Date Entered: ${document.date_entered}  Subject: ${document.subject}`}
+                                             title={`User ID: ${document.user_id}  Date Entered: ${document.date_entered}  Subject: ${document.subject}`}
                                         >
                                             <div className="item-info">
                                                 <span className={docIconClasses}></span>
@@ -9433,7 +9704,7 @@ const Invoice = (props) => {
                                             closePanel={props.closePanel}
                                             componentId={moment().format('x')}
 
-                                            selectedOwner={{ ...selectedOrder }}
+                                            selectedOwner={{...selectedOrder}}
                                             selectedOwnerDocument={{
                                                 id: 0,
                                                 user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -9494,7 +9765,7 @@ const Invoice = (props) => {
                                                     closePanel={props.closePanel}
                                                     componentId={moment().format('x')}
 
-                                                    selectedOwner={{ ...selectedOrder }}
+                                                    selectedOwner={{...selectedOrder}}
                                                     selectedOwnerDocument={document}
                                                     savingDocumentUrl='/saveOrderDocument'
                                                     deletingDocumentUrl='/deleteOrderDocument'
@@ -9505,7 +9776,7 @@ const Invoice = (props) => {
 
                                             props.openPanel(panel, props.origin);
                                         }}
-                                            title={`User ID: ${document.user_id}  Date Entered: ${document.date_entered}  Subject: ${document.subject}`}
+                                             title={`User ID: ${document.user_id}  Date Entered: ${document.date_entered}  Subject: ${document.subject}`}
                                         >
                                             <div className="item-info">
                                                 <span className={docIconClasses}></span>
@@ -9536,7 +9807,7 @@ const Invoice = (props) => {
                     gridGap: '0.5rem',
                     paddingBottom: '0.45rem'
                 }}>
-                    <div className='form-bordered-box' style={{ minWidth: '100%', maxWidth: '100%', marginRight: 10 }}>
+                    <div className='form-bordered-box' style={{minWidth: '100%', maxWidth: '100%', marginRight: 10}}>
                         <div className='form-header'>
                             <div className='top-border top-border-left'></div>
                             <div className='form-title'>Bill To</div>
@@ -9579,19 +9850,27 @@ const Invoice = (props) => {
                         <div className="form-row">
                             <div className="input-box-container input-code">
                                 <input tabIndex={6 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                    readOnly={true}
-                                    onInput={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, code: e.target.value }) }}
-                                    onChange={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, code: e.target.value }) }}
-                                    value={selectedBillToCustomer.code || ''}
+                                       readOnly={true}
+                                       onInput={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, code: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, code: e.target.value})
+                                       }}
+                                       value={selectedBillToCustomer.code || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={7 + props.tabTimes} type="text" placeholder="Name"
                                     // onKeyDown={validateBillToCompanyInfoForSaving}
-                                    onInput={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, name: e.target.value }) }}
-                                    onChange={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, name: e.target.value }) }}
-                                    value={selectedBillToCustomer.name || ''}
+                                       onInput={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, name: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, name: e.target.value})
+                                       }}
+                                       value={selectedBillToCustomer.name || ''}
                                 />
                             </div>
                         </div>
@@ -9600,9 +9879,19 @@ const Invoice = (props) => {
                             <div className="input-box-container grow">
                                 <input tabIndex={8 + props.tabTimes} type="text" placeholder="Address 1"
                                     // onKeyDown={validateBillToCompanyInfoForSaving}
-                                    onInput={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, address1: e.target.value }) }}
-                                    onChange={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, address1: e.target.value }) }}
-                                    value={selectedBillToCustomer.address1 || ''}
+                                       onInput={(e) => {
+                                           setSelectedBillToCustomer({
+                                               ...selectedBillToCustomer,
+                                               address1: e.target.value
+                                           })
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToCustomer({
+                                               ...selectedBillToCustomer,
+                                               address1: e.target.value
+                                           })
+                                       }}
+                                       value={selectedBillToCustomer.address1 || ''}
                                 />
                             </div>
                         </div>
@@ -9611,9 +9900,19 @@ const Invoice = (props) => {
                             <div className="input-box-container grow">
                                 <input tabIndex={9 + props.tabTimes} type="text" placeholder="Address 2"
                                     // onKeyDown={validateBillToCompanyInfoForSaving}
-                                    onInput={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, address2: e.target.value }) }}
-                                    onChange={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, address2: e.target.value }) }}
-                                    value={selectedBillToCustomer.address2 || ''}
+                                       onInput={(e) => {
+                                           setSelectedBillToCustomer({
+                                               ...selectedBillToCustomer,
+                                               address2: e.target.value
+                                           })
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToCustomer({
+                                               ...selectedBillToCustomer,
+                                               address2: e.target.value
+                                           })
+                                       }}
+                                       value={selectedBillToCustomer.address2 || ''}
                                 />
                             </div>
                         </div>
@@ -9622,27 +9921,39 @@ const Invoice = (props) => {
                             <div className="input-box-container grow">
                                 <input tabIndex={10 + props.tabTimes} type="text" placeholder="City"
                                     // onKeyDown={validateBillToCompanyInfoForSaving}
-                                    onInput={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, city: e.target.value }) }}
-                                    onChange={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, city: e.target.value }) }}
-                                    value={selectedBillToCustomer.city || ''}
+                                       onInput={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, city: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, city: e.target.value})
+                                       }}
+                                       value={selectedBillToCustomer.city || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-state">
                                 <input tabIndex={11 + props.tabTimes} type="text" placeholder="State" maxLength="2"
                                     // onKeyDown={validateBillToCompanyInfoForSaving}
-                                    onInput={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, state: e.target.value }) }}
-                                    onChange={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, state: e.target.value }) }}
-                                    value={selectedBillToCustomer.state || ''}
+                                       onInput={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, state: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, state: e.target.value})
+                                       }}
+                                       value={selectedBillToCustomer.state || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-zip-code">
                                 <input tabIndex={12 + props.tabTimes} type="text" placeholder="Postal Code"
-                                    onKeyDown={validateBillToCompanyInfoForSaving}
-                                    onInput={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, zip: e.target.value }) }}
-                                    onChange={(e) => { setSelectedBillToCustomer({ ...selectedBillToCustomer, zip: e.target.value }) }}
-                                    value={selectedBillToCustomer.zip || ''}
+                                       onKeyDown={validateBillToCompanyInfoForSaving}
+                                       onInput={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, zip: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedBillToCustomer({...selectedBillToCustomer, zip: e.target.value})
+                                       }}
+                                       value={selectedBillToCustomer.zip || ''}
                                 />
                             </div>
                         </div>
@@ -9650,94 +9961,106 @@ const Invoice = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={13 + props.tabTimes} type="text" placeholder="Contact Name"
-                                    onKeyDown={validateBillToCompanyContactForSaving}
-                                    onChange={(e) => {
-                                        // let splitted = e.target.value.split(' ');
-                                        // let first_name = splitted[0];
+                                       onKeyDown={validateBillToCompanyContactForSaving}
+                                       onChange={(e) => {
+                                           // let splitted = e.target.value.split(' ');
+                                           // let first_name = splitted[0];
 
-                                        // if (splitted.length > 1) {
-                                        //     first_name += ' ';
-                                        // }
+                                           // if (splitted.length > 1) {
+                                           //     first_name += ' ';
+                                           // }
 
 
-                                        // let last_name = '';
+                                           // let last_name = '';
 
-                                        // splitted.map((item, index) => {
-                                        //     if (index > 0) {
-                                        //         last_name += item;
-                                        //     }
-                                        //     return true;
-                                        // })
+                                           // splitted.map((item, index) => {
+                                           //     if (index > 0) {
+                                           //         last_name += item;
+                                           //     }
+                                           //     return true;
+                                           // })
 
-                                        // setSelectedBillToCustomerContact({ ...selectedBillToCustomerContact, first_name: first_name, last_name: last_name });
+                                           // setSelectedBillToCustomerContact({ ...selectedBillToCustomerContact, first_name: first_name, last_name: last_name });
 
-                                        if ((selectedBillToCustomer?.contacts || []).length === 0) {
-                                            setSelectedBillToCustomer({ ...selectedBillToCustomer, contact_name: e.target.value })
-                                        }
-                                    }}
+                                           if ((selectedBillToCustomer?.contacts || []).length === 0) {
+                                               setSelectedBillToCustomer({
+                                                   ...selectedBillToCustomer,
+                                                   contact_name: e.target.value
+                                               })
+                                           }
+                                       }}
 
-                                    onInput={(e) => {
-                                        // let splitted = e.target.value.split(' ');
-                                        // let first_name = splitted[0];
+                                       onInput={(e) => {
+                                           // let splitted = e.target.value.split(' ');
+                                           // let first_name = splitted[0];
 
-                                        // if (splitted.length > 1) {
-                                        //     first_name += ' ';
-                                        // }
+                                           // if (splitted.length > 1) {
+                                           //     first_name += ' ';
+                                           // }
 
-                                        // let last_name = '';
+                                           // let last_name = '';
 
-                                        // splitted.map((item, index) => {
-                                        //     if (index > 0) {
-                                        //         last_name += item;
-                                        //     }
-                                        //     return true;
-                                        // })
+                                           // splitted.map((item, index) => {
+                                           //     if (index > 0) {
+                                           //         last_name += item;
+                                           //     }
+                                           //     return true;
+                                           // })
 
-                                        // setSelectedBillToCustomerContact({ ...selectedBillToCustomerContact, first_name: first_name, last_name: last_name });
+                                           // setSelectedBillToCustomerContact({ ...selectedBillToCustomerContact, first_name: first_name, last_name: last_name });
 
-                                        if ((selectedBillToCustomer?.contacts || []).length === 0) {
-                                            setSelectedBillToCustomer({ ...selectedBillToCustomer, contact_name: e.target.value })
-                                        }
-                                    }}
+                                           if ((selectedBillToCustomer?.contacts || []).length === 0) {
+                                               setSelectedBillToCustomer({
+                                                   ...selectedBillToCustomer,
+                                                   contact_name: e.target.value
+                                               })
+                                           }
+                                       }}
 
-                                    value={
-                                        (selectedBillToCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedBillToCustomer?.contact_name || '')
-                                            : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).last_name
-                                    } />
+                                       value={
+                                           (selectedBillToCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedBillToCustomer?.contact_name || '')
+                                               : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).last_name
+                                       }/>
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="input-box-container input-phone" style={{ position: 'relative' }}>
+                            <div className="input-box-container input-phone" style={{position: 'relative'}}>
                                 <MaskedInput tabIndex={14 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text" placeholder="Contact Phone"
+                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={true}
+                                             type="text" placeholder="Contact Phone"
                                     // onKeyDown={validateBillToCompanyContactForSaving}
-                                    onInput={(e) => {
-                                        if ((selectedBillToCustomer?.contacts || []).length === 0) {
-                                            setSelectedBillToCustomer({ ...selectedBillToCustomer, contact_phone: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedBillToCustomer?.contacts || []).length === 0) {
-                                            setSelectedBillToCustomer({ ...selectedBillToCustomer, contact_phone: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedBillToCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedBillToCustomer?.contact_phone || '')
-                                            : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
-                                                ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_work
-                                                : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
-                                                    ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                                    : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
-                                                        ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                                        : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
-                                                            ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_direct
-                                                            : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
-                                                                ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_other
-                                                                : ''
-                                    }
+                                             onInput={(e) => {
+                                                 if ((selectedBillToCustomer?.contacts || []).length === 0) {
+                                                     setSelectedBillToCustomer({
+                                                         ...selectedBillToCustomer,
+                                                         contact_phone: e.target.value
+                                                     })
+                                                 }
+                                             }}
+                                             onChange={(e) => {
+                                                 if ((selectedBillToCustomer?.contacts || []).length === 0) {
+                                                     setSelectedBillToCustomer({
+                                                         ...selectedBillToCustomer,
+                                                         contact_phone: e.target.value
+                                                     })
+                                                 }
+                                             }}
+                                             value={
+                                                 (selectedBillToCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                                     ? (selectedBillToCustomer?.contact_phone || '')
+                                                     : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
+                                                         ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_work
+                                                         : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
+                                                             ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_work_fax
+                                                             : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
+                                                                 ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_mobile
+                                                                 : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
+                                                                     ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_direct
+                                                                     : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
+                                                                         ? selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_other
+                                                                         : ''
+                                             }
                                 />
 
                                 {
@@ -9754,52 +10077,72 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input tabIndex={15 + props.tabTimes} type="text" placeholder="Ext"
-                                    onKeyDown={validateBillToCompanyContactForSaving}
-                                    onInput={(e) => {
-                                        if ((selectedBillToCustomer?.contacts || []).length === 0) {
-                                            setSelectedBillToCustomer({ ...selectedBillToCustomer, ext: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedBillToCustomer?.contacts || []).length === 0) {
-                                            setSelectedBillToCustomer({ ...selectedBillToCustomer, ext: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedBillToCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedBillToCustomer?.ext || '')
-                                            : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_ext
-                                    }
+                                       onKeyDown={validateBillToCompanyContactForSaving}
+                                       onInput={(e) => {
+                                           if ((selectedBillToCustomer?.contacts || []).length === 0) {
+                                               setSelectedBillToCustomer({
+                                                   ...selectedBillToCustomer,
+                                                   ext: e.target.value
+                                               })
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedBillToCustomer?.contacts || []).length === 0) {
+                                               setSelectedBillToCustomer({
+                                                   ...selectedBillToCustomer,
+                                                   ext: e.target.value
+                                               })
+                                           }
+                                       }}
+                                       value={
+                                           (selectedBillToCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedBillToCustomer?.ext || '')
+                                               : selectedBillToCustomer?.contacts.find(c => c.is_primary === 1).phone_ext
+                                       }
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className='form-bordered-box' style={{ border: 0, boxShadow: 'none', padding: '0 5px' }}>
-                        <div className="form-row" style={{ marginBottom: 2 }}>
+                    <div className='form-bordered-box' style={{border: 0, boxShadow: 'none', padding: '0 5px'}}>
+                        <div className="form-row" style={{marginBottom: 2}}>
                             {
                                 [
                                     ...getPickupsOnRouting(),
-                                    ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined)
+                                    ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined),
+                                    ...getDeliveriesOnRouting(),
+                                    ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
                                 ].length > 0 ?
                                     [
                                         ...getPickupsOnRouting(),
-                                        ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined)
-                                    ].map((pickup, index) => {
+                                        ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined),
+                                        ...getDeliveriesOnRouting(),
+                                        ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
+                                    ].map((route, index) => {
                                         let classes = classnames({
                                             'order-pickup': true,
-                                            'selected': selectedPickup?.id === pickup.id
+                                            'selected': selectedRoute?.id === route.id
                                         })
 
                                         return (
                                             <div className={classes} key={index} onClick={() => {
-                                                setSelectedPickup(pickup);
+                                                setSelectedRoute(route);
                                             }}>
-                                                PU {index + 1}
+                                                {route.type === 'pickup' ? 'PU' : 'Delivery'} {
+                                                    route.type === 'pickup'
+                                                        ? ([
+                                                        ...getPickupsOnRouting(),
+                                                        ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined)
+                                                    ].map(x => x.id).indexOf(route.id)) + 1
+                                                        : ([
+                                                        ...getDeliveriesOnRouting(),
+                                                        ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
+                                                    ].map(x => x.id).indexOf(route.id)) + 1
+                                                }
                                             </div>
                                         )
                                     })
-                                    : <div className='order-pickup' style={{ pointerEvents: 'none' }}>PU 0</div>
+                                    : <div className='order-pickup' style={{pointerEvents: 'none'}}>PU 0</div>
                             }
                         </div>
                         <div className="form-row" style={{
@@ -9808,16 +10151,16 @@ const Invoice = (props) => {
                             gridGap: 5
                         }}>
                             <div className='selected-pickup-number'>
-                                <span>BOL Numbers:</span> <span>{selectedPickup?.bol_numbers || ''}</span>
+                                <span>BOL Numbers:</span> <span>{selectedRoute?.bol_numbers || ''}</span>
                             </div>
                             <div className='selected-pickup-number'>
-                                <span>Ref Numbers:</span> <span>{selectedPickup?.ref_numbers || ''}</span>
+                                <span>Ref Numbers:</span> <span>{selectedRoute?.ref_numbers || ''}</span>
                             </div>
                             <div className='selected-pickup-number'>
-                                <span>PO Numbers:</span> <span>{selectedPickup?.po_numbers || ''}</span>
+                                <span>PO Numbers:</span> <span>{selectedRoute?.po_numbers || ''}</span>
                             </div>
                             <div className='selected-pickup-number'>
-                                <span>Seal Number:</span> <span>{selectedPickup?.seal_number || ''}</span>
+                                <span>Seal Number:</span> <span>{selectedRoute?.seal_number || ''}</span>
                             </div>
                         </div>
                     </div>
@@ -9838,7 +10181,7 @@ const Invoice = (props) => {
                                             window.alert('You must select an order first!');
                                             return;
                                         }
-                                        setSelectedInternalNote({ id: 0 });
+                                        setSelectedInternalNote({id: 0});
                                     }}>
                                         <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                         <div className='mochi-button-base'>Add note</div>
@@ -9853,7 +10196,8 @@ const Invoice = (props) => {
                                     {
                                         (selectedOrder?.internal_notes || []).map((note, index) => {
                                             return (
-                                                <div className="internal-notes-item" key={index} onClick={() => setSelectedInternalNote(note)}>
+                                                <div className="internal-notes-item" key={index}
+                                                     onClick={() => setSelectedInternalNote(note)}>
                                                     {note.text}
                                                 </div>
                                             )
@@ -9876,7 +10220,7 @@ const Invoice = (props) => {
                                             window.alert('You must select an order first!');
                                             return;
                                         }
-                                        setSelectedBillingNote({ id: 0 });
+                                        setSelectedBillingNote({id: 0});
                                     }}>
                                         <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                         <div className='mochi-button-base'>Add note</div>
@@ -9891,7 +10235,8 @@ const Invoice = (props) => {
                                     {
                                         (selectedOrder?.billing_notes || []).map((note, index) => {
                                             return (
-                                                <div className="internal-notes-item" key={index} onClick={() => setSelectedBillingNote(note)}>
+                                                <div className="internal-notes-item" key={index}
+                                                     onClick={() => setSelectedBillingNote(note)}>
                                                     {note.text}
                                                 </div>
                                             )
@@ -9903,7 +10248,7 @@ const Invoice = (props) => {
 
                     </div>
 
-                    <div className='form-bordered-box' style={{ minWidth: '100%', maxWidth: '100%', marginRight: 10 }}>
+                    <div className='form-bordered-box' style={{minWidth: '100%', maxWidth: '100%', marginRight: 10}}>
                         <div className='form-header'>
                             <div className='top-border top-border-left'></div>
                             <div className='form-title'>Carrier</div>
@@ -9947,57 +10292,62 @@ const Invoice = (props) => {
                         <div className="form-row">
                             <div className="input-box-container input-code">
                                 <input tabIndex={50 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                    readOnly={true}
-                                    onInput={e => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            code: e.target.value,
-                                            code_number: 0
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            code: e.target.value,
-                                            code_number: 0
-                                        })
-                                    }}
-                                    value={(selectedCarrier.code_number || 0) === 0 ? (selectedCarrier.code || '') : selectedCarrier.code + selectedCarrier.code_number}
+                                       readOnly={true}
+                                       onInput={e => {
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               code: e.target.value,
+                                               code_number: 0
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               code: e.target.value,
+                                               code_number: 0
+                                           })
+                                       }}
+                                       value={(selectedCarrier.code_number || 0) === 0 ? (selectedCarrier.code || '') : selectedCarrier.code + selectedCarrier.code_number}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={51 + props.tabTimes} type="text" placeholder="Name"
-                                    onKeyDown={validateCarrierInfoForSaving}
-                                    onInput={(e) => { setSelectedCarrier({ ...selectedCarrier, name: e.target.value }) }}
-                                    onChange={(e) => { setSelectedCarrier({ ...selectedCarrier, name: e.target.value }) }}
-                                    value={selectedCarrier?.name || ''}
+                                       onKeyDown={validateCarrierInfoForSaving}
+                                       onInput={(e) => {
+                                           setSelectedCarrier({...selectedCarrier, name: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrier({...selectedCarrier, name: e.target.value})
+                                       }}
+                                       value={selectedCarrier?.name || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className={insuranceStatusClasses()} style={{ width: '7rem' }}>
-                                <input type="text" placeholder="Insurance" readOnly={true} />
+                            <div className={insuranceStatusClasses()} style={{width: '7rem'}}>
+                                <input type="text" placeholder="Insurance" readOnly={true}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={52 + props.tabTimes} type="text" placeholder="Carrier Load - Starting City State - Destination City State"
-                                    readOnly={true}
-                                    value={
-                                        ((selectedOrder?.routing || []).length >= 2 && (selectedOrder?.carrier?.id || 0) > 0)
-                                            ? selectedOrder.routing[0].type === 'pickup'
-                                                ? ((selectedOrder.pickups.find(p => p.id === selectedOrder.routing[0].pickup_id).customer?.city || '') + ', ' + (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[0].pickup_id).customer?.state || '') +
-                                                    ' - ' + (selectedOrder.routing[selectedOrder.routing.length - 1].type === 'pickup'
-                                                        ? (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.state || '') :
-                                                        (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.state || '')))
+                                <input tabIndex={52 + props.tabTimes} type="text"
+                                       placeholder="Carrier Load - Starting City State - Destination City State"
+                                       readOnly={true}
+                                       value={
+                                           ((selectedOrder?.routing || []).length >= 2 && (selectedOrder?.carrier?.id || 0) > 0)
+                                               ? selectedOrder.routing[0].type === 'pickup'
+                                                   ? ((selectedOrder.pickups.find(p => p.id === selectedOrder.routing[0].pickup_id).customer?.city || '') + ', ' + (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[0].pickup_id).customer?.state || '') +
+                                                       ' - ' + (selectedOrder.routing[selectedOrder.routing.length - 1].type === 'pickup'
+                                                           ? (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.state || '') :
+                                                           (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.state || '')))
 
-                                                : ((selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[0].delivery_id).customer?.city || '') + ', ' + (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[0].delivery_id).customer?.state || '') +
-                                                    ' - ' + (selectedOrder.routing[selectedOrder.routing.length - 1].type === 'pickup'
-                                                        ? (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.state || '') :
-                                                        (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.state || '')))
-                                            : ''
-                                    }
+                                                   : ((selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[0].delivery_id).customer?.city || '') + ', ' + (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[0].delivery_id).customer?.state || '') +
+                                                       ' - ' + (selectedOrder.routing[selectedOrder.routing.length - 1].type === 'pickup'
+                                                           ? (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (selectedOrder.pickups.find(p => p.id === selectedOrder.routing[selectedOrder.routing.length - 1].pickup_id).customer?.state || '') :
+                                                           (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (selectedOrder.deliveries.find(d => d.id === selectedOrder.routing[selectedOrder.routing.length - 1].delivery_id).customer?.state || '')))
+                                               : ''
+                                       }
                                 />
                             </div>
                         </div>
@@ -10008,24 +10358,30 @@ const Invoice = (props) => {
                                 minWidth: '7.5rem'
                             }}>
                                 <input tabIndex={53 + props.tabTimes} type="text" placeholder="Contact Name"
-                                    onKeyDown={validateCarrierContactForSaving}
+                                       onKeyDown={validateCarrierContactForSaving}
 
-                                    onChange={(e) => {
-                                        if ((selectedCarrierContact?.contacts || []).length === 0) {
-                                            setSelectedCarrierContact({ ...selectedCarrierContact, contact_name: e.target.value })
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        if ((selectedCarrierContact?.contacts || []).length === 0) {
-                                            setSelectedCarrierContact({ ...selectedCarrierContact, contact_name: e.target.value })
-                                        }
-                                    }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrierContact?.contacts || []).length === 0) {
+                                               setSelectedCarrierContact({
+                                                   ...selectedCarrierContact,
+                                                   contact_name: e.target.value
+                                               })
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           if ((selectedCarrierContact?.contacts || []).length === 0) {
+                                               setSelectedCarrierContact({
+                                                   ...selectedCarrierContact,
+                                                   contact_name: e.target.value
+                                               })
+                                           }
+                                       }}
 
-                                    value={
-                                        (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.contact_name || '')
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name
-                                    }
+                                       value={
+                                           (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.contact_name || '')
+                                               : selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name
+                                       }
                                 />
                             </div>
                             <div className="form-h-sep"></div>
@@ -10035,289 +10391,297 @@ const Invoice = (props) => {
                                 minWidth: '7.5rem'
                             }}>
                                 <MaskedInput tabIndex={54 + props.tabTimes}
-                                    title={capitalize(((selectedCarrier?.contacts || []).find(c => c.is_primary === 1)?.primary_phone || ''))}
-                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text" placeholder="Contact Phone"
-                                    onKeyDown={validateCarrierContactForSaving}
+                                             title={capitalize(((selectedCarrier?.contacts || []).find(c => c.is_primary === 1)?.primary_phone || ''))}
+                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={true}
+                                             type="text" placeholder="Contact Phone"
+                                             onKeyDown={validateCarrierContactForSaving}
                                     // onInput={(e) => { setSelectedCarrierContact({ ...selectedCarrierContact, phone_work: e.target.value }) }}
                                     // onChange={(e) => { setSelectedCarrierContact({ ...selectedCarrierContact, phone_work: e.target.value }) }}
                                     // value={selectedCarrierContact.phone_work || ''}
 
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, contact_phone: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, contact_phone: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.contact_phone || '')
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
-                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work
-                                                : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
-                                                    ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                                    : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
-                                                        ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                                        : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
-                                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_direct
-                                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
-                                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_other
-                                                                : ''
-                                    }
+                                             onInput={(e) => {
+                                                 if ((selectedCarrier?.contacts || []).length === 0) {
+                                                     setSelectedCarrier({
+                                                         ...selectedCarrier,
+                                                         contact_phone: e.target.value
+                                                     })
+                                                 }
+                                             }}
+                                             onChange={(e) => {
+                                                 if ((selectedCarrier?.contacts || []).length === 0) {
+                                                     setSelectedCarrier({
+                                                         ...selectedCarrier,
+                                                         contact_phone: e.target.value
+                                                     })
+                                                 }
+                                             }}
+                                             value={
+                                                 (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                                     ? (selectedCarrier?.contact_phone || '')
+                                                     : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
+                                                         ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work
+                                                         : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
+                                                             ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work_fax
+                                                             : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
+                                                                 ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_mobile
+                                                                 : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
+                                                                     ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_direct
+                                                                     : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
+                                                                         ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_other
+                                                                         : ''
+                                             }
                                 />
 
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input tabIndex={55 + props.tabTimes} type="text" placeholder="Ext"
-                                    onKeyDown={validateCarrierContactForSaving}
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, ext: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, ext: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.ext || '')
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
-                                    }
+                                       onKeyDown={validateCarrierContactForSaving}
+                                       onInput={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, ext: e.target.value})
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, ext: e.target.value})
+                                           }
+                                       }}
+                                       value={
+                                           (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.ext || '')
+                                               : selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
+                                       }
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="select-box-container" style={{ width: '9rem', position: 'relative' }}>
+                            <div className="select-box-container" style={{width: '9rem', position: 'relative'}}>
                                 <div className="select-box-wrapper">
                                     <input type="text"
-                                        tabIndex={56 + props.tabTimes}
-                                        placeholder="Equipment"
-                                        ref={refEquipment}
-                                        onKeyDown={(e) => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={56 + props.tabTimes}
+                                           placeholder="Equipment"
+                                           ref={refEquipment}
+                                           onKeyDown={(e) => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (equipmentItems.length > 0) {
-                                                        let selectedIndex = equipmentItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (equipmentItems.length > 0) {
+                                                           let selectedIndex = equipmentItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (equipmentItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setEquipmentItems(equipmentItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setEquipmentItems(equipmentItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (equipmentItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getEquipments').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setEquipmentItems(res.data.equipments.map((item, index) => {
-                                                                    item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierDriver.equipment.id
-                                                                    return item;
-                                                                }))
+                                                           refEquipmentPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getEquipments').then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setEquipmentItems(res.data.equipments.map((item, index) => {
+                                                                       item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierDriver.equipment.id
+                                                                       return item;
+                                                                   }))
 
-                                                                refEquipmentPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting equipments', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refEquipmentPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting equipments', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (equipmentItems.length > 0) {
-                                                        let selectedIndex = equipmentItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (equipmentItems.length > 0) {
+                                                           let selectedIndex = equipmentItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                if (selectedIndex === (equipmentItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               setEquipmentItems(equipmentItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               setEquipmentItems(equipmentItems.map((item, index) => {
+                                                                   if (selectedIndex === (equipmentItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getEquipments').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setEquipmentItems(res.data.equipments.map((item, index) => {
-                                                                    item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierDriver.equipment.id
-                                                                    return item;
-                                                                }))
+                                                           refEquipmentPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getEquipments').then(res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   setEquipmentItems(res.data.equipments.map((item, index) => {
+                                                                       item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedCarrierDriver.equipment.id
+                                                                       return item;
+                                                                   }))
 
-                                                                refEquipmentPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting equipments', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refEquipmentPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(e => {
+                                                               console.log('error getting equipments', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setEquipmentItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setEquipmentItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
-                                                        if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
-                                                            setSelectedOrder(selectedOrder => {
-                                                                return {
-                                                                    ...selectedOrder,
-                                                                    equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
-                                                                    equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
-                                                                }
-                                                            });
+                                                   case 13: // enter
+                                                       if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
+                                                           if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
+                                                               setSelectedOrder(selectedOrder => {
+                                                                   return {
+                                                                       ...selectedOrder,
+                                                                       equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
+                                                                       equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
+                                                                   }
+                                                               });
 
-                                                            // validateOrderForSaving({ keyCode: 9 });
-                                                            setEquipmentItems([]);
-                                                            refDriverName.current.focus();
-                                                        }
-                                                    }
-                                                    break;
+                                                               // validateOrderForSaving({ keyCode: 9 });
+                                                               setEquipmentItems([]);
+                                                               refDriverName.current.focus();
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (equipmentItems.length > 0) {
-                                                        e.preventDefault();
-                                                        setSelectedOrder(selectedOrder => {
-                                                            return {
-                                                                ...selectedOrder,
-                                                                equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
-                                                                equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
-                                                            }
-                                                        });
+                                                   case 9: // tab
+                                                       if (equipmentItems.length > 0) {
+                                                           e.preventDefault();
+                                                           setSelectedOrder(selectedOrder => {
+                                                               return {
+                                                                   ...selectedOrder,
+                                                                   equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
+                                                                   equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
+                                                               }
+                                                           });
 
-                                                        // validateOrderForSaving({ keyCode: 9 });
-                                                        setEquipmentItems([]);
-                                                        refDriverName.current.focus();
-                                                    }
-                                                    break;
+                                                           // validateOrderForSaving({ keyCode: 9 });
+                                                           setEquipmentItems([]);
+                                                           refDriverName.current.focus();
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onBlur={() => {
-                                            if ((selectedOrder?.equipment?.id || 0) === 0) {
-                                                setSelectedOrder(selectedOrder => {
-                                                    return {
-                                                        ...selectedOrder,
-                                                        equipment_id: null,
-                                                        equipment: {}
-                                                    }
-                                                });
-                                            }
-                                        }}
-                                        onInput={(e) => {
-                                            let equipment = selectedOrder?.equipment || {};
-                                            equipment.id = 0;
-                                            equipment.name = e.target.value;
-                                            setSelectedOrder(selectedOrder => {
-                                                return {
-                                                    ...selectedOrder,
-                                                    equipment: equipment,
-                                                    equipment_id: equipment.id
-                                                }
-                                            });
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onBlur={() => {
+                                               if ((selectedOrder?.equipment?.id || 0) === 0) {
+                                                   setSelectedOrder(selectedOrder => {
+                                                       return {
+                                                           ...selectedOrder,
+                                                           equipment_id: null,
+                                                           equipment: {}
+                                                       }
+                                                   });
+                                               }
+                                           }}
+                                           onInput={(e) => {
+                                               let equipment = selectedOrder?.equipment || {};
+                                               equipment.id = 0;
+                                               equipment.name = e.target.value;
+                                               setSelectedOrder(selectedOrder => {
+                                                   return {
+                                                       ...selectedOrder,
+                                                       equipment: equipment,
+                                                       equipment_id: equipment.id
+                                                   }
+                                               });
 
-                                            if (e.target.value.trim() === '') {
-                                                setEquipmentItems([]);
-                                            } else {
-                                                axios.post(props.serverUrl + '/getEquipments', {
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setEquipmentItems(res.data.equipments.map((item, index) => {
-                                                            item.selected = (selectedOrder?.equipment?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedOrder.equipment.id
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting equipments', e);
-                                                })
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            let equipment = selectedOrder?.equipment || {};
-                                            equipment.id = 0;
-                                            equipment.name = e.target.value;
-                                            setSelectedOrder(selectedOrder => {
-                                                return {
-                                                    ...selectedOrder,
-                                                    equipment: equipment,
-                                                    equipment_id: equipment.id
-                                                }
-                                            });
-                                        }}
-                                        value={selectedOrder?.equipment?.name || ''}
+                                               if (e.target.value.trim() === '') {
+                                                   setEquipmentItems([]);
+                                               } else {
+                                                   axios.post(props.serverUrl + '/getEquipments', {
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (res.data.result === 'OK') {
+                                                           setEquipmentItems(res.data.equipments.map((item, index) => {
+                                                               item.selected = (selectedOrder?.equipment?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedOrder.equipment.id
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(e => {
+                                                       console.log('error getting equipments', e);
+                                                   })
+                                               }
+                                           }}
+                                           onChange={(e) => {
+                                               let equipment = selectedOrder?.equipment || {};
+                                               equipment.id = 0;
+                                               equipment.name = e.target.value;
+                                               setSelectedOrder(selectedOrder => {
+                                                   return {
+                                                       ...selectedOrder,
+                                                       equipment: equipment,
+                                                       equipment_id: equipment.id
+                                                   }
+                                               });
+                                           }}
+                                           value={selectedOrder?.equipment?.name || ''}
                                     />
                                     <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                         if (equipmentItems.length > 0) {
@@ -10377,7 +10741,7 @@ const Invoice = (props) => {
                                         }
 
                                         refEquipment.current.focus();
-                                    }} />
+                                    }}/>
                                 </div>
                                 {
                                     equipmentTransition((style, item) => item && (
@@ -10391,8 +10755,9 @@ const Invoice = (props) => {
                                             }}
                                             ref={refEquipmentDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical above" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical above"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             equipmentItems.map((item, index) => {
@@ -10436,7 +10801,9 @@ const Invoice = (props) => {
                                                                         }
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -10458,248 +10825,258 @@ const Invoice = (props) => {
                             }}>
                                 <div className="select-box-wrapper">
                                     <input type="text"
-                                        tabIndex={57 + props.tabTimes}
-                                        placeholder="Driver Name"
-                                        ref={refDriverName}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={57 + props.tabTimes}
+                                           placeholder="Driver Name"
+                                           ref={refDriverName}
+                                           onKeyDown={async (e) => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (driverItems.length > 0) {
-                                                        let selectedIndex = driverItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (driverItems.length > 0) {
+                                                           let selectedIndex = driverItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverItems(driverItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverItems(driverItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (driverItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setDriverItems(driverItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setDriverItems(driverItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (driverItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refDriverPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if ((selectedCarrier?.id || 0) > 0) {
-                                                            axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                                carrier_id: selectedCarrier.id
-                                                            }).then(async res => {
-                                                                if (res.data.result === 'OK') {
-                                                                    if (res.data.count > 1) {
-                                                                        await setDriverItems(res.data.drivers.map((item, index) => {
-                                                                            item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                                                ? index === 0
-                                                                                : item.id === selectedCarrierDriver.id
-                                                                            return item;
-                                                                        }))
+                                                           refDriverPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if ((selectedCarrier?.id || 0) > 0) {
+                                                               axios.post(props.serverUrl + '/getDriversByCarrierId', {
+                                                                   carrier_id: selectedCarrier.id
+                                                               }).then(async res => {
+                                                                   if (res.data.result === 'OK') {
+                                                                       if (res.data.count > 1) {
+                                                                           await setDriverItems(res.data.drivers.map((item, index) => {
+                                                                               item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                                                                   ? index === 0
+                                                                                   : item.id === selectedCarrierDriver.id
+                                                                               return item;
+                                                                           }))
 
-                                                                        refDriverPopupItems.current.map((r, i) => {
-                                                                            if (r && r.classList.contains('selected')) {
-                                                                                r.scrollIntoView({
-                                                                                    behavior: 'auto',
-                                                                                    block: 'center',
-                                                                                    inline: 'nearest'
-                                                                                })
-                                                                            }
-                                                                            return true;
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }).catch(async e => {
-                                                                console.log('error getting carrier drivers', e);
-                                                            })
-                                                        }
-                                                    }
-                                                    break;
+                                                                           refDriverPopupItems.current.map((r, i) => {
+                                                                               if (r && r.classList.contains('selected')) {
+                                                                                   r.scrollIntoView({
+                                                                                       behavior: 'auto',
+                                                                                       block: 'center',
+                                                                                       inline: 'nearest'
+                                                                                   })
+                                                                               }
+                                                                               return true;
+                                                                           });
+                                                                       }
+                                                                   }
+                                                               }).catch(async e => {
+                                                                   console.log('error getting carrier drivers', e);
+                                                               })
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (driverItems.length > 0) {
-                                                        let selectedIndex = driverItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (driverItems.length > 0) {
+                                                           let selectedIndex = driverItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverItems(driverItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverItems(driverItems.map((item, index) => {
-                                                                if (selectedIndex === (driverItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setDriverItems(driverItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setDriverItems(driverItems.map((item, index) => {
+                                                                   if (selectedIndex === (driverItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refDriverPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if ((selectedCarrier?.id || 0) > 0) {
-                                                            axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                                carrier_id: selectedCarrier.id
-                                                            }).then(async res => {
-                                                                if (res.data.result === 'OK') {
-                                                                    if (res.data.count > 1) {
-                                                                        await setDriverItems(res.data.drivers.map((item, index) => {
-                                                                            item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                                                ? index === 0
-                                                                                : item.id === selectedCarrierDriver.id
-                                                                            return item;
-                                                                        }))
+                                                           refDriverPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if ((selectedCarrier?.id || 0) > 0) {
+                                                               axios.post(props.serverUrl + '/getDriversByCarrierId', {
+                                                                   carrier_id: selectedCarrier.id
+                                                               }).then(async res => {
+                                                                   if (res.data.result === 'OK') {
+                                                                       if (res.data.count > 1) {
+                                                                           await setDriverItems(res.data.drivers.map((item, index) => {
+                                                                               item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                                                                   ? index === 0
+                                                                                   : item.id === selectedCarrierDriver.id
+                                                                               return item;
+                                                                           }))
 
-                                                                        refDriverPopupItems.current.map((r, i) => {
-                                                                            if (r && r.classList.contains('selected')) {
-                                                                                r.scrollIntoView({
-                                                                                    behavior: 'auto',
-                                                                                    block: 'center',
-                                                                                    inline: 'nearest'
-                                                                                })
-                                                                            }
-                                                                            return true;
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }).catch(async e => {
-                                                                console.log('error getting carrier drivers', e);
-                                                            })
-                                                        }
-                                                    }
-                                                    break;
+                                                                           refDriverPopupItems.current.map((r, i) => {
+                                                                               if (r && r.classList.contains('selected')) {
+                                                                                   r.scrollIntoView({
+                                                                                       behavior: 'auto',
+                                                                                       block: 'center',
+                                                                                       inline: 'nearest'
+                                                                                   })
+                                                                               }
+                                                                               return true;
+                                                                           });
+                                                                       }
+                                                                   }
+                                                               }).catch(async e => {
+                                                                   console.log('error getting carrier drivers', e);
+                                                               })
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setDriverItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setDriverItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (driverItems.length > 0 && driverItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
+                                                   case 13: // enter
+                                                       if (driverItems.length > 0 && driverItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
 
-                                                        await setSelectedOrder({
-                                                            ...selectedOrder,
-                                                            carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
-                                                        })
+                                                           await setSelectedOrder({
+                                                               ...selectedOrder,
+                                                               carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
+                                                           })
 
-                                                        // validateOrderForSaving({ keyCode: 9 });
-                                                        setDriverItems([]);
-                                                        refDriverName.current.focus();
-                                                    }
-                                                    break;
+                                                           // validateOrderForSaving({ keyCode: 9 });
+                                                           setDriverItems([]);
+                                                           refDriverName.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (driverItems.length > 0) {
-                                                        e.preventDefault();
-                                                        await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
+                                                   case 9: // tab
+                                                       if (driverItems.length > 0) {
+                                                           e.preventDefault();
+                                                           await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
 
-                                                        await setSelectedOrder({
-                                                            ...selectedOrder,
-                                                            carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
-                                                        })
+                                                           await setSelectedOrder({
+                                                               ...selectedOrder,
+                                                               carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
+                                                           })
 
-                                                        // validateOrderForSaving({ keyCode: 9 });
-                                                        setDriverItems([]);
-                                                        refDriverName.current.focus();
-                                                    }
-                                                    break;
+                                                           // validateOrderForSaving({ keyCode: 9 });
+                                                           setDriverItems([]);
+                                                           refDriverName.current.focus();
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onBlur={async (e) => {
-                                            if ((selectedCarrierDriver?.id || 0) === 0) {
-                                                await setSelectedCarrierDriver({});
-                                                await setSelectedOrder({
-                                                    ...selectedOrder,
-                                                    carrier_driver_id: 0
-                                                })
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onBlur={async (e) => {
+                                               if ((selectedCarrierDriver?.id || 0) === 0) {
+                                                   await setSelectedCarrierDriver({});
+                                                   await setSelectedOrder({
+                                                       ...selectedOrder,
+                                                       carrier_driver_id: 0
+                                                   })
 
-                                                // validateOrderForSaving({ keyCode: 9 });
-                                            }
-                                        }}
-                                        onInput={async (e) => {
-                                            let driver = selectedCarrierDriver || {};
-                                            driver.id = 0;
+                                                   // validateOrderForSaving({ keyCode: 9 });
+                                               }
+                                           }}
+                                           onInput={async (e) => {
+                                               let driver = selectedCarrierDriver || {};
+                                               driver.id = 0;
 
-                                            if (e.target.value === '') {
-                                                driver = {};
-                                                await setSelectedCarrierDriver({ ...driver });
-                                                setDriverItems([]);
-                                            } else {
-                                                let splitted = e.target.value.split(' ');
-                                                let first_name = splitted[0];
+                                               if (e.target.value === '') {
+                                                   driver = {};
+                                                   await setSelectedCarrierDriver({...driver});
+                                                   setDriverItems([]);
+                                               } else {
+                                                   let splitted = e.target.value.split(' ');
+                                                   let first_name = splitted[0];
 
-                                                if (splitted.length > 1) {
-                                                    first_name += ' ';
-                                                }
+                                                   if (splitted.length > 1) {
+                                                       first_name += ' ';
+                                                   }
 
-                                                let last_name = '';
+                                                   let last_name = '';
 
-                                                splitted.map((item, index) => {
-                                                    if (index > 0) {
-                                                        last_name += item;
-                                                    }
-                                                    return true;
-                                                })
+                                                   splitted.map((item, index) => {
+                                                       if (index > 0) {
+                                                           last_name += item;
+                                                       }
+                                                       return true;
+                                                   })
 
-                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });                                                
-                                            }
-                                        }}
-                                        onChange={async (e) => {
-                                            let driver = selectedCarrierDriver || {};
-                                            driver.id = 0;
+                                                   setSelectedCarrierDriver({
+                                                       ...driver,
+                                                       first_name: first_name,
+                                                       last_name: last_name
+                                                   });
+                                               }
+                                           }}
+                                           onChange={async (e) => {
+                                               let driver = selectedCarrierDriver || {};
+                                               driver.id = 0;
 
-                                            if (e.target.value === '') {
-                                                driver = {};
-                                                setSelectedCarrierDriver({ ...driver });
-                                                setDriverItems([]);
-                                            } else {
-                                                let splitted = e.target.value.split(' ');
-                                                let first_name = splitted[0];
+                                               if (e.target.value === '') {
+                                                   driver = {};
+                                                   setSelectedCarrierDriver({...driver});
+                                                   setDriverItems([]);
+                                               } else {
+                                                   let splitted = e.target.value.split(' ');
+                                                   let first_name = splitted[0];
 
-                                                if (splitted.length > 1) {
-                                                    first_name += ' ';
-                                                }
+                                                   if (splitted.length > 1) {
+                                                       first_name += ' ';
+                                                   }
 
-                                                let last_name = '';
+                                                   let last_name = '';
 
-                                                splitted.map((item, index) => {
-                                                    if (index > 0) {
-                                                        last_name += item;
-                                                    }
-                                                    return true;
-                                                })
+                                                   splitted.map((item, index) => {
+                                                       if (index > 0) {
+                                                           last_name += item;
+                                                       }
+                                                       return true;
+                                                   })
 
-                                                setSelectedCarrierDriver({ ...driver, first_name: first_name, last_name: last_name });                                                
-                                            }
-                                        }}
-                                        value={(selectedCarrierDriver?.first_name || '') + ((selectedCarrierDriver?.last_name || '').trim() === '' ? '' : ' ' + selectedCarrierDriver?.last_name)}
+                                                   setSelectedCarrierDriver({
+                                                       ...driver,
+                                                       first_name: first_name,
+                                                       last_name: last_name
+                                                   });
+                                               }
+                                           }}
+                                           value={(selectedCarrierDriver?.first_name || '') + ((selectedCarrierDriver?.last_name || '').trim() === '' ? '' : ' ' + selectedCarrierDriver?.last_name)}
                                     />
                                     {
                                         (selectedCarrier?.drivers || []).length > 1 &&
@@ -10742,7 +11119,7 @@ const Invoice = (props) => {
                                                     refDriverName.current.focus();
                                                 }, 0)
                                             }
-                                        }} />
+                                        }}/>
                                     }
                                 </div>
                                 {
@@ -10757,8 +11134,9 @@ const Invoice = (props) => {
                                             }}
                                             ref={refDriverDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical above" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical above"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             driverItems.map((item, index) => {
@@ -10800,7 +11178,9 @@ const Invoice = (props) => {
                                                                         }
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -10820,31 +11200,49 @@ const Invoice = (props) => {
                                 minWidth: '7.5rem'
                             }}>
                                 <MaskedInput tabIndex={58 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text" placeholder="Driver Phone"
-                                    onKeyDown={validateCarrierDriverForSaving}
-                                    onInput={(e) => { setSelectedCarrierDriver({ ...selectedCarrierDriver, phone: e.target.value }) }}
-                                    onChange={(e) => { setSelectedCarrierDriver({ ...selectedCarrierDriver, phone: e.target.value }) }}
-                                    value={selectedCarrierDriver.phone || ''}
+                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={true}
+                                             type="text" placeholder="Driver Phone"
+                                             onKeyDown={validateCarrierDriverForSaving}
+                                             onInput={(e) => {
+                                                 setSelectedCarrierDriver({
+                                                     ...selectedCarrierDriver,
+                                                     phone: e.target.value
+                                                 })
+                                             }}
+                                             onChange={(e) => {
+                                                 setSelectedCarrierDriver({
+                                                     ...selectedCarrierDriver,
+                                                     phone: e.target.value
+                                                 })
+                                             }}
+                                             value={selectedCarrierDriver.phone || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container">
                                 <input tabIndex={59 + props.tabTimes} type="text" placeholder="Unit Number"
-                                    onKeyDown={validateCarrierDriverForSaving}
-                                    onInput={(e) => { setSelectedCarrierDriver({ ...selectedCarrierDriver, truck: e.target.value }) }}
-                                    onChange={(e) => { setSelectedCarrierDriver({ ...selectedCarrierDriver, truck: e.target.value }) }}
-                                    value={selectedCarrierDriver.truck || ''}
+                                       onKeyDown={validateCarrierDriverForSaving}
+                                       onInput={(e) => {
+                                           setSelectedCarrierDriver({...selectedCarrierDriver, truck: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrierDriver({...selectedCarrierDriver, truck: e.target.value})
+                                       }}
+                                       value={selectedCarrierDriver.truck || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container">
                                 <input tabIndex={60 + props.tabTimes} type="text" placeholder="Trailer Number"
-                                    onKeyDown={validateCarrierDriverForSaving}
-                                    onInput={(e) => { setSelectedCarrierDriver({ ...selectedCarrierDriver, trailer: e.target.value }) }}
-                                    onChange={(e) => { setSelectedCarrierDriver({ ...selectedCarrierDriver, trailer: e.target.value }) }}
-                                    value={selectedCarrierDriver.trailer || ''}
+                                       onKeyDown={validateCarrierDriverForSaving}
+                                       onInput={(e) => {
+                                           setSelectedCarrierDriver({...selectedCarrierDriver, trailer: e.target.value})
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrierDriver({...selectedCarrierDriver, trailer: e.target.value})
+                                       }}
+                                       value={selectedCarrierDriver.trailer || ''}
                                 />
                             </div>
                         </div>
@@ -10857,7 +11255,7 @@ const Invoice = (props) => {
                             alignItems: 'flex-end',
                             marginTop: 21
                         }}>
-                            <div className='mochi-button' style={{ fontSize: '1rem' }}>
+                            <div className='mochi-button' style={{fontSize: '1rem'}}>
                                 <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                 <div className='mochi-button-base'>E-mail Rate Confirmation To Carrier</div>
                                 <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
@@ -10883,187 +11281,190 @@ const Invoice = (props) => {
                         <div className={classnames({
                             'mochi-button': true,
                             'disabled': (selectedOrder?.order_invoiced || 0) === 0
-                        })} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => {
-                            if ((selectedOrder?.id || 0) === 0) {
-                                window.alert('You must load an order first!');
-                                refOrderNumber.current.focus();
-                                return;
-                            }
+                        })} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}
+                             onClick={() => {
+                                 if ((selectedOrder?.id || 0) === 0) {
+                                     window.alert('You must load an order first!');
+                                     refOrderNumber.current.focus();
+                                     return;
+                                 }
 
-                            if ((selectedOrder?.order_invoiced || 0) === 0) {
-                                window.alert('You must approve the customer invoice first!');
-                                refOrderNumber.current.focus();
-                                return;
-                            }
+                                 if ((selectedOrder?.order_invoiced || 0) === 0) {
+                                     window.alert('You must approve the customer invoice first!');
+                                     refOrderNumber.current.focus();
+                                     return;
+                                 }
 
-                            handlePrint();
-                        }}>
+                                 handlePrint();
+                             }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base" style={{ fontSize: '1.2rem' }}>Print Invoice</div>
+                            <div className="mochi-button-base" style={{fontSize: '1.2rem'}}>Print Invoice</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
-                        <div className="mochi-button" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="mochi-button"
+                             style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base" style={{ fontSize: '1.2rem' }}>E-Mail Invoice</div>
+                            <div className="mochi-button-base" style={{fontSize: '1.2rem'}}>E-Mail Invoice</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
-                        <div className="mochi-button" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="mochi-button"
+                             style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base" style={{ fontSize: '1.2rem' }}>Batch Billing</div>
+                            <div className="mochi-button-base" style={{fontSize: '1.2rem'}}>Batch Billing</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                         <div>
-                            <div className="input-box-container grow" style={{ marginBottom: 2 }}>
+                            <div className="input-box-container grow" style={{marginBottom: 2}}>
                                 <input type="text" placeholder="Check Number"
-                                    tabIndex={73 + props.tabTimes}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                       tabIndex={73 + props.tabTimes}
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if (key === 9) {
-                                            validateOrderForSaving(e);
-                                        }
-                                    }}
-                                    onInput={(e) => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                customer_check_number: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                customer_check_number: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedOrder?.customer_check_number || ''}
+                                           if (key === 9) {
+                                               validateOrderForSaving(e);
+                                           }
+                                       }}
+                                       onInput={(e) => {
+                                           setSelectedOrder(selectedOrder => {
+                                               return {
+                                                   ...selectedOrder,
+                                                   customer_check_number: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedOrder(selectedOrder => {
+                                               return {
+                                                   ...selectedOrder,
+                                                   customer_check_number: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       value={selectedOrder?.customer_check_number || ''}
                                 />
                             </div>
 
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={74 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={false}
-                                        type="text" placeholder="Date Received"
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                                 mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={false}
+                                                 type="text" placeholder="Date Received"
+                                                 onKeyDown={async (e) => {
+                                                     let key = e.keyCode || e.which;
 
-                                            if (key >= 37 && key <= 40) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedDateReceived(event_date);
+                                                     if (key >= 37 && key <= 40) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedDateReceived(event_date);
 
-                                                if (isDateReceivedCalendarShown) {
-                                                    e.preventDefault();
+                                                         if (isDateReceivedCalendarShown) {
+                                                             e.preventDefault();
 
-                                                    if (key === 37) { // left - minus 1
-                                                        setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(1, 'day'));
-                                                    }
+                                                             if (key === 37) { // left - minus 1
+                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(1, 'day'));
+                                                             }
 
-                                                    if (key === 38) { // up - minus 7
-                                                        setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(7, 'day'));
-                                                    }
+                                                             if (key === 38) { // up - minus 7
+                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(7, 'day'));
+                                                             }
 
-                                                    if (key === 39) { // right - plus 1
-                                                        setPreSelectedDateReceived(preSelectedDateReceived.clone().add(1, 'day'));
-                                                    }
+                                                             if (key === 39) { // right - plus 1
+                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().add(1, 'day'));
+                                                             }
 
-                                                    if (key === 40) { // down - plus 7
-                                                        setPreSelectedDateReceived(preSelectedDateReceived.clone().add(7, 'day'));
-                                                    }
-                                                } else {
-                                                    await setIsDateReceivedCalendarShown(true);
-                                                }
-                                            }
+                                                             if (key === 40) { // down - plus 7
+                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().add(7, 'day'));
+                                                             }
+                                                         } else {
+                                                             await setIsDateReceivedCalendarShown(true);
+                                                         }
+                                                     }
 
-                                            if (key === 13) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedDateReceived(event_date);
+                                                     if (key === 13) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedDateReceived(event_date);
 
-                                                if (isDateReceivedCalendarShown) {
-                                                    event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
+                                                         if (isDateReceivedCalendarShown) {
+                                                             event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
 
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            customer_date_received: event_date
-                                                        }
-                                                    })
+                                                             await setSelectedOrder(selectedOrder => {
+                                                                 return {
+                                                                     ...selectedOrder,
+                                                                     customer_date_received: event_date
+                                                                 }
+                                                             })
 
-                                                    await validateOrderForSaving({ keyCode: 9 });
+                                                             await validateOrderForSaving({keyCode: 9});
 
-                                                    await setIsDateReceivedCalendarShown(false);
-                                                }
-                                            }
+                                                             await setIsDateReceivedCalendarShown(false);
+                                                         }
+                                                     }
 
-                                            if (key === 9) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedDateReceived(event_date);
+                                                     if (key === 9) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedDateReceived(event_date);
 
-                                                if (isDateReceivedCalendarShown) {
-                                                    event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
+                                                         if (isDateReceivedCalendarShown) {
+                                                             event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
 
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            customer_date_received: event_date
-                                                        }
-                                                    })
+                                                             await setSelectedOrder(selectedOrder => {
+                                                                 return {
+                                                                     ...selectedOrder,
+                                                                     customer_date_received: event_date
+                                                                 }
+                                                             })
 
-                                                    await validateOrderForSaving({ keyCode: 9 });
+                                                             await validateOrderForSaving({keyCode: 9});
 
-                                                    await setIsDateReceivedCalendarShown(false);
-                                                } else {
-                                                    if (e.target.value.trim() === '') {
-                                                        await setSelectedOrder(selectedOrder => {
-                                                            return {
-                                                                ...selectedOrder,
-                                                                customer_date_received: null
-                                                            }
-                                                        })
+                                                             await setIsDateReceivedCalendarShown(false);
+                                                         } else {
+                                                             if (e.target.value.trim() === '') {
+                                                                 await setSelectedOrder(selectedOrder => {
+                                                                     return {
+                                                                         ...selectedOrder,
+                                                                         customer_date_received: null
+                                                                     }
+                                                                 })
 
-                                                        await validateOrderForSaving({ keyCode: 9 });
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onBlur={e => {
-                                            setSelectedOrder(selectedOrder => {
-                                                return {
-                                                    ...selectedOrder,
-                                                    customer_date_received: getFormattedDates(selectedOrder?.customer_date_received)
-                                                }
-                                            })
-                                        }}
-                                        onInput={e => {
-                                            setSelectedOrder(selectedOrder => {
-                                                return {
-                                                    ...selectedOrder,
-                                                    customer_date_received: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedOrder(selectedOrder => {
-                                                return {
-                                                    ...selectedOrder,
-                                                    customer_date_received: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        value={selectedOrder?.customer_date_received || ''}
-                                        ref={refDateReceived}
+                                                                 await validateOrderForSaving({keyCode: 9});
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 onBlur={e => {
+                                                     setSelectedOrder(selectedOrder => {
+                                                         return {
+                                                             ...selectedOrder,
+                                                             customer_date_received: getFormattedDates(selectedOrder?.customer_date_received)
+                                                         }
+                                                     })
+                                                 }}
+                                                 onInput={e => {
+                                                     setSelectedOrder(selectedOrder => {
+                                                         return {
+                                                             ...selectedOrder,
+                                                             customer_date_received: e.target.value
+                                                         }
+                                                     })
+                                                 }}
+                                                 onChange={e => {
+                                                     setSelectedOrder(selectedOrder => {
+                                                         return {
+                                                             ...selectedOrder,
+                                                             customer_date_received: e.target.value
+                                                         }
+                                                     })
+                                                 }}
+                                                 value={selectedOrder?.customer_date_received || ''}
+                                                 ref={refDateReceived}
                                     />
 
-                                    <FontAwesomeIcon className="dropdown-button calendar date-received-calendar" icon={faCalendarAlt} onClick={(e) => {
+                                    <FontAwesomeIcon className="dropdown-button calendar date-received-calendar"
+                                                     icon={faCalendarAlt} onClick={(e) => {
                                         if (isDateReceivedCalendarShown) {
                                             setIsDateReceivedCalendarShown(false);
                                         } else {
                                             // e.stopPropagation();
-
 
 
                                             new Promise((resolve, reject) => {
@@ -11078,11 +11479,11 @@ const Invoice = (props) => {
                                                 setIsDateReceivedCalendarShown(true);
                                                 refDateReceived.current.inputElement.focus();
                                             }).catch(e => {
-                                               
+
                                             });
 
                                         }
-                                    }} />
+                                    }}/>
                                 </div>
                                 {
                                     dateReceivedTransition((style, item) => item && (
@@ -11096,8 +11497,9 @@ const Invoice = (props) => {
                                             }}
                                             ref={refDateReceivedCalendarDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below left" style={{ height: 275 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below left"
+                                                 style={{height: 275}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         <Calendar
                                                             value={moment((selectedOrder?.customer_date_received || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.customer_date_received || '').trim()
@@ -11114,10 +11516,12 @@ const Invoice = (props) => {
 
                                                                     resolve('OK')
                                                                 }).then(response => {
-                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                    validateOrderForSaving({keyCode: 9});
                                                                 })
                                                             }}
-                                                            closeCalendar={() => { setIsDateReceivedCalendarShown(false); }}
+                                                            closeCalendar={() => {
+                                                                setIsDateReceivedCalendarShown(false);
+                                                            }}
                                                             preDay={preSelectedDateReceived}
                                                             onChangePreDay={(preDay) => {
                                                                 setPreSelectedDateReceived(preDay);
@@ -11139,123 +11543,124 @@ const Invoice = (props) => {
                         gridTemplateColumns: '1fr',
                         gridGap: 2
                     }}>
-                        <div className="select-box-container" style={{ flexGrow: 1 }}>
+                        <div className="select-box-container" style={{flexGrow: 1}}>
                             <div className="select-box-wrapper">
                                 <MaskedInput tabIndex={75 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={false}
-                                    type="text" placeholder="Invoice Rec'd Date"
-                                    onKeyDown={async (e) => {
-                                        let key = e.keyCode || e.which;
+                                             mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={false}
+                                             type="text" placeholder="Invoice Rec'd Date"
+                                             onKeyDown={async (e) => {
+                                                 let key = e.keyCode || e.which;
 
-                                        if (key >= 37 && key <= 40) {
-                                            let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                            await setPreSelectedInvoiceReceivedDate(event_date);
+                                                 if (key >= 37 && key <= 40) {
+                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                     await setPreSelectedInvoiceReceivedDate(event_date);
 
-                                            if (isInvoiceReceivedDateCalendarShown) {
-                                                e.preventDefault();
+                                                     if (isInvoiceReceivedDateCalendarShown) {
+                                                         e.preventDefault();
 
-                                                if (key === 37) { // left - minus 1
-                                                    setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(1, 'day'));
-                                                }
+                                                         if (key === 37) { // left - minus 1
+                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(1, 'day'));
+                                                         }
 
-                                                if (key === 38) { // up - minus 7
-                                                    setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(7, 'day'));
-                                                }
+                                                         if (key === 38) { // up - minus 7
+                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(7, 'day'));
+                                                         }
 
-                                                if (key === 39) { // right - plus 1
-                                                    setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(1, 'day'));
-                                                }
+                                                         if (key === 39) { // right - plus 1
+                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(1, 'day'));
+                                                         }
 
-                                                if (key === 40) { // down - plus 7
-                                                    setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(7, 'day'));
-                                                }
-                                            } else {
-                                                await setIsInvoiceReceivedDateCalendarShown(true);
-                                            }
-                                        }
+                                                         if (key === 40) { // down - plus 7
+                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(7, 'day'));
+                                                         }
+                                                     } else {
+                                                         await setIsInvoiceReceivedDateCalendarShown(true);
+                                                     }
+                                                 }
 
-                                        if (key === 13) {
-                                            let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                            await setPreSelectedInvoiceReceivedDate(event_date);
+                                                 if (key === 13) {
+                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                     await setPreSelectedInvoiceReceivedDate(event_date);
 
-                                            if (isInvoiceReceivedDateCalendarShown) {
-                                                event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
+                                                     if (isInvoiceReceivedDateCalendarShown) {
+                                                         event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
 
-                                                await setSelectedOrder(selectedOrder => {
-                                                    return {
-                                                        ...selectedOrder,
-                                                        invoice_received_date: event_date
-                                                    }
-                                                })
+                                                         await setSelectedOrder(selectedOrder => {
+                                                             return {
+                                                                 ...selectedOrder,
+                                                                 invoice_received_date: event_date
+                                                             }
+                                                         })
 
-                                                await validateOrderForSaving({ keyCode: 9 });
+                                                         await validateOrderForSaving({keyCode: 9});
 
-                                                await setIsInvoiceReceivedDateCalendarShown(false);
-                                            }
-                                        }
+                                                         await setIsInvoiceReceivedDateCalendarShown(false);
+                                                     }
+                                                 }
 
-                                        if (key === 9) {
-                                            let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                            await setPreSelectedInvoiceReceivedDate(event_date);
+                                                 if (key === 9) {
+                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                     await setPreSelectedInvoiceReceivedDate(event_date);
 
-                                            if (isInvoiceReceivedDateCalendarShown) {
-                                                event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
+                                                     if (isInvoiceReceivedDateCalendarShown) {
+                                                         event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
 
-                                                await setSelectedOrder(selectedOrder => {
-                                                    return {
-                                                        ...selectedOrder,
-                                                        invoice_received_date: event_date
-                                                    }
-                                                })
+                                                         await setSelectedOrder(selectedOrder => {
+                                                             return {
+                                                                 ...selectedOrder,
+                                                                 invoice_received_date: event_date
+                                                             }
+                                                         })
 
-                                                await validateOrderForSaving({ keyCode: 9 });
+                                                         await validateOrderForSaving({keyCode: 9});
 
-                                                await setIsInvoiceReceivedDateCalendarShown(false);
-                                            } else {
-                                                if (e.target.value.trim() === '') {
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            invoice_received_date: null
-                                                        }
-                                                    })
+                                                         await setIsInvoiceReceivedDateCalendarShown(false);
+                                                     } else {
+                                                         if (e.target.value.trim() === '') {
+                                                             await setSelectedOrder(selectedOrder => {
+                                                                 return {
+                                                                     ...selectedOrder,
+                                                                     invoice_received_date: null
+                                                                 }
+                                                             })
 
-                                                    await validateOrderForSaving({ keyCode: 9 });
-                                                }
-                                            }
-                                        }
+                                                             await validateOrderForSaving({keyCode: 9});
+                                                         }
+                                                     }
+                                                 }
 
-                                    }}
-                                    onBlur={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_received_date: getFormattedDates(selectedOrder?.invoice_received_date)
-                                            }
-                                        })
-                                    }}
-                                    onInput={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_received_date: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_received_date: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedOrder?.invoice_received_date || ''}
-                                    ref={refInvoiceReceivedDate}
+                                             }}
+                                             onBlur={e => {
+                                                 setSelectedOrder(selectedOrder => {
+                                                     return {
+                                                         ...selectedOrder,
+                                                         invoice_received_date: getFormattedDates(selectedOrder?.invoice_received_date)
+                                                     }
+                                                 })
+                                             }}
+                                             onInput={e => {
+                                                 setSelectedOrder(selectedOrder => {
+                                                     return {
+                                                         ...selectedOrder,
+                                                         invoice_received_date: e.target.value
+                                                     }
+                                                 })
+                                             }}
+                                             onChange={e => {
+                                                 setSelectedOrder(selectedOrder => {
+                                                     return {
+                                                         ...selectedOrder,
+                                                         invoice_received_date: e.target.value
+                                                     }
+                                                 })
+                                             }}
+                                             value={selectedOrder?.invoice_received_date || ''}
+                                             ref={refInvoiceReceivedDate}
                                 />
 
-                                <FontAwesomeIcon className="dropdown-button calendar invoice-received-date-calendar" icon={faCalendarAlt} onClick={(e) => {
+                                <FontAwesomeIcon className="dropdown-button calendar invoice-received-date-calendar"
+                                                 icon={faCalendarAlt} onClick={(e) => {
                                     if (isInvoiceReceivedDateCalendarShown) {
                                         setIsInvoiceReceivedDateCalendarShown(false);
                                     } else {
@@ -11271,10 +11676,10 @@ const Invoice = (props) => {
                                             setIsInvoiceReceivedDateCalendarShown(true);
                                             refInvoiceReceivedDate.current.inputElement.focus();
                                         }).catch(e => {
-                                            
+
                                         });
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 invoiceReceivedDateTransition((style, item) => item && (
@@ -11288,8 +11693,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refInvoiceReceivedDateCalendarDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical above left" style={{ height: 275 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical above left"
+                                             style={{height: 275}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     <Calendar
                                                         value={moment((selectedOrder?.invoice_received_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_received_date || '').trim()
@@ -11306,10 +11712,12 @@ const Invoice = (props) => {
 
                                                                 resolve('OK')
                                                             }).then(response => {
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                validateOrderForSaving({keyCode: 9});
                                                             })
                                                         }}
-                                                        closeCalendar={() => { setIsInvoiceReceivedDateCalendarShown(false); }}
+                                                        closeCalendar={() => {
+                                                            setIsInvoiceReceivedDateCalendarShown(false);
+                                                        }}
                                                         preDay={preSelectedInvoiceReceivedDate}
                                                         onChangePreDay={(preDay) => {
                                                             setPreSelectedInvoiceReceivedDate(preDay);
@@ -11324,255 +11732,257 @@ const Invoice = (props) => {
                         </div>
                         <div className="input-box-container">
                             <input type="text" placeholder="Invoice Number"
-                                tabIndex={76 + props.tabTimes}
-                                onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
+                                   tabIndex={76 + props.tabTimes}
+                                   onKeyDown={(e) => {
+                                       let key = e.keyCode || e.which;
 
-                                    if (key === 9) {
-                                        validateOrderForSaving(e);
-                                    }
-                                }}
-                                onInput={(e) => {
-                                    setSelectedOrder(selectedOrder => {
-                                        return {
-                                            ...selectedOrder,
-                                            invoice_number: e.target.value
-                                        }
-                                    })
-                                }}
-                                onChange={(e) => {
-                                    setSelectedOrder(selectedOrder => {
-                                        return {
-                                            ...selectedOrder,
-                                            invoice_number: e.target.value
-                                        }
-                                    })
-                                }}
-                                value={selectedOrder?.invoice_number || ''}
+                                       if (key === 9) {
+                                           validateOrderForSaving(e);
+                                       }
+                                   }}
+                                   onInput={(e) => {
+                                       setSelectedOrder(selectedOrder => {
+                                           return {
+                                               ...selectedOrder,
+                                               invoice_number: e.target.value
+                                           }
+                                       })
+                                   }}
+                                   onChange={(e) => {
+                                       setSelectedOrder(selectedOrder => {
+                                           return {
+                                               ...selectedOrder,
+                                               invoice_number: e.target.value
+                                           }
+                                       })
+                                   }}
+                                   value={selectedOrder?.invoice_number || ''}
                             />
                         </div>
-                        <div className="select-box-container" style={{ position: 'relative' }}>
+                        <div className="select-box-container" style={{position: 'relative'}}>
                             <div className="select-box-wrapper">
                                 <input type="text" placeholder="Terms"
-                                    tabIndex={77 + props.tabTimes}
-                                    ref={refTerms}
-                                    onKeyDown={async (e) => {
-                                        let key = e.keyCode || e.which;
+                                       tabIndex={77 + props.tabTimes}
+                                       ref={refTerms}
+                                       onKeyDown={async (e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        switch (key) {
-                                            case 37: case 38: // arrow left | arrow up
-                                                e.preventDefault();
-                                                if (termsItems.length > 0) {
-                                                    let selectedIndex = termsItems.findIndex(item => item.selected);
+                                           switch (key) {
+                                               case 37:
+                                               case 38: // arrow left | arrow up
+                                                   e.preventDefault();
+                                                   if (termsItems.length > 0) {
+                                                       let selectedIndex = termsItems.findIndex(item => item.selected);
 
-                                                    if (selectedIndex === -1) {
-                                                        await setTermsItems(termsItems.map((item, index) => {
-                                                            item.selected = index === 0;
-                                                            return item;
-                                                        }))
-                                                    } else {
-                                                        await setTermsItems(termsItems.map((item, index) => {
-                                                            if (selectedIndex === 0) {
-                                                                item.selected = index === (termsItems.length - 1);
-                                                            } else {
-                                                                item.selected = index === (selectedIndex - 1)
-                                                            }
-                                                            return item;
-                                                        }))
-                                                    }
+                                                       if (selectedIndex === -1) {
+                                                           await setTermsItems(termsItems.map((item, index) => {
+                                                               item.selected = index === 0;
+                                                               return item;
+                                                           }))
+                                                       } else {
+                                                           await setTermsItems(termsItems.map((item, index) => {
+                                                               if (selectedIndex === 0) {
+                                                                   item.selected = index === (termsItems.length - 1);
+                                                               } else {
+                                                                   item.selected = index === (selectedIndex - 1)
+                                                               }
+                                                               return item;
+                                                           }))
+                                                       }
 
-                                                    refTermsPopupItems.current.map((r, i) => {
-                                                        if (r && r.classList.contains('selected')) {
-                                                            r.scrollIntoView({
-                                                                behavior: 'auto',
-                                                                block: 'center',
-                                                                inline: 'nearest'
-                                                            })
-                                                        }
-                                                        return true;
-                                                    });
-                                                } else {
-                                                    axios.post(props.serverUrl + '/getTerms').then(async res => {
-                                                        if (res.data.result === 'OK') {
-                                                            await setTermsItems(res.data.terms.map((item, index) => {
-                                                                item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                                    ? index === 0
-                                                                    : item.id === selectedOrder?.term?.id
-                                                                return item;
-                                                            }))
+                                                       refTermsPopupItems.current.map((r, i) => {
+                                                           if (r && r.classList.contains('selected')) {
+                                                               r.scrollIntoView({
+                                                                   behavior: 'auto',
+                                                                   block: 'center',
+                                                                   inline: 'nearest'
+                                                               })
+                                                           }
+                                                           return true;
+                                                       });
+                                                   } else {
+                                                       axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                           if (res.data.result === 'OK') {
+                                                               await setTermsItems(res.data.terms.map((item, index) => {
+                                                                   item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                       ? index === 0
+                                                                       : item.id === selectedOrder?.term?.id
+                                                                   return item;
+                                                               }))
 
-                                                            refTermsPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }).catch(async e => {
-                                                        console.log('error getting terms', e);
-                                                    })
-                                                }
-                                                break;
+                                                               refTermsPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }).catch(async e => {
+                                                           console.log('error getting terms', e);
+                                                       })
+                                                   }
+                                                   break;
 
-                                            case 39: case 40: // arrow right | arrow down
-                                                e.preventDefault();
-                                                if (termsItems.length > 0) {
-                                                    let selectedIndex = termsItems.findIndex(item => item.selected);
+                                               case 39:
+                                               case 40: // arrow right | arrow down
+                                                   e.preventDefault();
+                                                   if (termsItems.length > 0) {
+                                                       let selectedIndex = termsItems.findIndex(item => item.selected);
 
-                                                    if (selectedIndex === -1) {
-                                                        await setTermsItems(termsItems.map((item, index) => {
-                                                            item.selected = index === 0;
-                                                            return item;
-                                                        }))
-                                                    } else {
-                                                        await setTermsItems(termsItems.map((item, index) => {
-                                                            if (selectedIndex === (termsItems.length - 1)) {
-                                                                item.selected = index === 0;
-                                                            } else {
-                                                                item.selected = index === (selectedIndex + 1)
-                                                            }
-                                                            return item;
-                                                        }))
-                                                    }
+                                                       if (selectedIndex === -1) {
+                                                           await setTermsItems(termsItems.map((item, index) => {
+                                                               item.selected = index === 0;
+                                                               return item;
+                                                           }))
+                                                       } else {
+                                                           await setTermsItems(termsItems.map((item, index) => {
+                                                               if (selectedIndex === (termsItems.length - 1)) {
+                                                                   item.selected = index === 0;
+                                                               } else {
+                                                                   item.selected = index === (selectedIndex + 1)
+                                                               }
+                                                               return item;
+                                                           }))
+                                                       }
 
-                                                    refTermsPopupItems.current.map((r, i) => {
-                                                        if (r && r.classList.contains('selected')) {
-                                                            r.scrollIntoView({
-                                                                behavior: 'auto',
-                                                                block: 'center',
-                                                                inline: 'nearest'
-                                                            })
-                                                        }
-                                                        return true;
-                                                    });
-                                                } else {
-                                                    axios.post(props.serverUrl + '/getTerms').then(async res => {
-                                                        if (res.data.result === 'OK') {
-                                                            await setTermsItems(res.data.terms.map((item, index) => {
-                                                                item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                                    ? index === 0
-                                                                    : item.id === selectedOrder?.term?.id
-                                                                return item;
-                                                            }))
+                                                       refTermsPopupItems.current.map((r, i) => {
+                                                           if (r && r.classList.contains('selected')) {
+                                                               r.scrollIntoView({
+                                                                   behavior: 'auto',
+                                                                   block: 'center',
+                                                                   inline: 'nearest'
+                                                               })
+                                                           }
+                                                           return true;
+                                                       });
+                                                   } else {
+                                                       axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                           if (res.data.result === 'OK') {
+                                                               await setTermsItems(res.data.terms.map((item, index) => {
+                                                                   item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                       ? index === 0
+                                                                       : item.id === selectedOrder?.term?.id
+                                                                   return item;
+                                                               }))
 
-                                                            refTermsPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }).catch(async e => {
-                                                        console.log('error getting terms', e);
-                                                    })
-                                                }
-                                                break;
+                                                               refTermsPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }).catch(async e => {
+                                                           console.log('error getting terms', e);
+                                                       })
+                                                   }
+                                                   break;
 
-                                            case 27: // escape
-                                                setTermsItems([]);
-                                                break;
+                                               case 27: // escape
+                                                   setTermsItems([]);
+                                                   break;
 
-                                            case 13: // enter
-                                                if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
-                                                    setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            term: termsItems[termsItems.findIndex(item => item.selected)],
-                                                            term_id: termsItems[termsItems.findIndex(item => item.selected)].id
-                                                        }
-                                                    })
+                                               case 13: // enter
+                                                   if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
+                                                       setSelectedOrder(selectedOrder => {
+                                                           return {
+                                                               ...selectedOrder,
+                                                               term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                               term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                           }
+                                                       })
 
-                                                    validateOrderForSaving({ keyCode: 9 });
-                                                    setTermsItems([]);
-                                                    refTerms.current.focus();
-                                                }
-                                                break;
+                                                       validateOrderForSaving({keyCode: 9});
+                                                       setTermsItems([]);
+                                                       refTerms.current.focus();
+                                                   }
+                                                   break;
 
-                                            case 9: // tab
-                                                if (termsItems.length > 0) {
-                                                    e.preventDefault();
-                                                    setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            term: termsItems[termsItems.findIndex(item => item.selected)],
-                                                            term_id: termsItems[termsItems.findIndex(item => item.selected)].id
-                                                        }
-                                                    })
+                                               case 9: // tab
+                                                   if (termsItems.length > 0) {
+                                                       e.preventDefault();
+                                                       setSelectedOrder(selectedOrder => {
+                                                           return {
+                                                               ...selectedOrder,
+                                                               term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                               term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                           }
+                                                       })
 
-                                                    validateOrderForSaving({ keyCode: 9 });
-                                                    setTermsItems([]);
-                                                    refTerms.current.focus();
-                                                }
-                                                break;
+                                                       validateOrderForSaving({keyCode: 9});
+                                                       setTermsItems([]);
+                                                       refTerms.current.focus();
+                                                   }
+                                                   break;
 
-                                            default:
-                                                break;
-                                        }
-                                    }}
-                                    onBlur={async () => {
-                                        if ((selectedOrder?.term?.id || 0) === 0) {
-                                            await setTerm({});
-                                        }
-                                    }}
-                                    onInput={async (e) => {
-                                        await setTerm({
-                                            id: 0,
-                                            name: e.target.value
-                                        });
+                                               default:
+                                                   break;
+                                           }
+                                       }}
+                                       onBlur={async () => {
+                                           if ((selectedOrder?.term?.id || 0) === 0) {
+                                               await setTerm({});
+                                           }
+                                       }}
+                                       onInput={async (e) => {
+                                           await setTerm({
+                                               id: 0,
+                                               name: e.target.value
+                                           });
 
-                                        if (e.target.value.trim() === '') {
-                                            setTermsItems([]);
-                                        } else {
-                                            axios.post(props.serverUrl + '/getTerms', {
-                                                name: e.target.value.trim()
-                                            }).then(async res => {
-                                                if (res.data.result === 'OK') {
-                                                    await setTermsItems(res.data.terms.map((item, index) => {
-                                                        item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                            ? index === 0
-                                                            : item.id === selectedOrder?.term?.id
-                                                        return item;
-                                                    }))
-                                                }
-                                            }).catch(async e => {
-                                                console.log('error getting terms', e);
-                                            })
-                                        }
-                                    }}
-                                    onChange={async (e) => {
-                                        await setTerm({
-                                            id: 0,
-                                            name: e.target.value
-                                        });
+                                           if (e.target.value.trim() === '') {
+                                               setTermsItems([]);
+                                           } else {
+                                               axios.post(props.serverUrl + '/getTerms', {
+                                                   name: e.target.value.trim()
+                                               }).then(async res => {
+                                                   if (res.data.result === 'OK') {
+                                                       await setTermsItems(res.data.terms.map((item, index) => {
+                                                           item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                               ? index === 0
+                                                               : item.id === selectedOrder?.term?.id
+                                                           return item;
+                                                       }))
+                                                   }
+                                               }).catch(async e => {
+                                                   console.log('error getting terms', e);
+                                               })
+                                           }
+                                       }}
+                                       onChange={async (e) => {
+                                           await setTerm({
+                                               id: 0,
+                                               name: e.target.value
+                                           });
 
-                                        if (e.target.value.trim() === '') {
-                                            setTermsItems([]);
-                                        } else {
-                                            axios.post(props.serverUrl + '/getTerms', {
-                                                name: e.target.value.trim()
-                                            }).then(async res => {
-                                                if (res.data.result === 'OK') {
-                                                    await setTermsItems(res.data.terms.map((item, index) => {
-                                                        item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                            ? index === 0
-                                                            : item.id === selectedOrder?.term?.id
-                                                        return item;
-                                                    }))
-                                                }
-                                            }).catch(async e => {
-                                                console.log('error getting terms', e);
-                                            })
-                                        }
-                                    }}
-                                    value={selectedOrder?.term?.name || ''}
+                                           if (e.target.value.trim() === '') {
+                                               setTermsItems([]);
+                                           } else {
+                                               axios.post(props.serverUrl + '/getTerms', {
+                                                   name: e.target.value.trim()
+                                               }).then(async res => {
+                                                   if (res.data.result === 'OK') {
+                                                       await setTermsItems(res.data.terms.map((item, index) => {
+                                                           item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                               ? index === 0
+                                                               : item.id === selectedOrder?.term?.id
+                                                           return item;
+                                                       }))
+                                                   }
+                                               }).catch(async e => {
+                                                   console.log('error getting terms', e);
+                                               })
+                                           }
+                                       }}
+                                       value={selectedOrder?.term?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={(e) => {
                                     if (termsItems.length > 0) {
@@ -11632,7 +12042,7 @@ const Invoice = (props) => {
                                     }
 
                                     refTerms.current.focus();
-                                }} />
+                                }}/>
                             </div>
                             {
                                 termsTransition((style, item) => item && (
@@ -11646,8 +12056,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refTermsDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical above left" style={{ height: 150 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical above left"
+                                             style={{height: 150}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     {
                                                         termsItems.map((item, index) => {
@@ -11673,7 +12084,7 @@ const Invoice = (props) => {
                                                                             }
                                                                         })
 
-                                                                        validateOrderForSaving({ keyCode: 9 });
+                                                                        validateOrderForSaving({keyCode: 9});
                                                                         setTermsItems([]);
                                                                         refTerms.current.focus();
                                                                     }}
@@ -11691,7 +12102,8 @@ const Invoice = (props) => {
                                                                     }
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                                         icon={faCaretRight}/>
                                                                     }
                                                                 </div>
                                                             )
@@ -11706,133 +12118,134 @@ const Invoice = (props) => {
                         </div>
                         <div className="input-box-container">
                             <input type="text" placeholder="Pay By Date"
-                                readOnly={true}
-                                value={
-                                    moment((selectedOrder?.invoice_received_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_received_date || '').trim()
-                                        ? (selectedOrder?.term?.id || 0) > 0
-                                            ? moment(selectedOrder.invoice_received_date, 'MM/DD/YYYY').add(selectedOrder.term.value, 'days').format('MM/DD/YYYY')
-                                            : ''
-                                        : ''
-                                }
+                                   readOnly={true}
+                                   value={
+                                       moment((selectedOrder?.invoice_received_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_received_date || '').trim()
+                                           ? (selectedOrder?.term?.id || 0) > 0
+                                               ? moment(selectedOrder.invoice_received_date, 'MM/DD/YYYY').add(selectedOrder.term.value, 'days').format('MM/DD/YYYY')
+                                               : ''
+                                           : ''
+                                   }
                             />
                         </div>
-                        <div className="select-box-container" style={{ flexGrow: 1 }}>
+                        <div className="select-box-container" style={{flexGrow: 1}}>
                             <div className="select-box-wrapper">
                                 <MaskedInput tabIndex={78 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={false}
-                                    type="text" placeholder="Date Paid"
-                                    onKeyDown={async (e) => {
-                                        let key = e.keyCode || e.which;
+                                             mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={false}
+                                             type="text" placeholder="Date Paid"
+                                             onKeyDown={async (e) => {
+                                                 let key = e.keyCode || e.which;
 
-                                        if (key >= 37 && key <= 40) {
-                                            let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                            await setPreSelectedDatePaid(event_date);
+                                                 if (key >= 37 && key <= 40) {
+                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                     await setPreSelectedDatePaid(event_date);
 
-                                            if (isDatePaidCalendarShown) {
-                                                e.preventDefault();
+                                                     if (isDatePaidCalendarShown) {
+                                                         e.preventDefault();
 
-                                                if (key === 37) { // left - minus 1
-                                                    setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(1, 'day'));
-                                                }
+                                                         if (key === 37) { // left - minus 1
+                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(1, 'day'));
+                                                         }
 
-                                                if (key === 38) { // up - minus 7
-                                                    setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(7, 'day'));
-                                                }
+                                                         if (key === 38) { // up - minus 7
+                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(7, 'day'));
+                                                         }
 
-                                                if (key === 39) { // right - plus 1
-                                                    setPreSelectedDatePaid(preSelectedDatePaid.clone().add(1, 'day'));
-                                                }
+                                                         if (key === 39) { // right - plus 1
+                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().add(1, 'day'));
+                                                         }
 
-                                                if (key === 40) { // down - plus 7
-                                                    setPreSelectedDatePaid(preSelectedDatePaid.clone().add(7, 'day'));
-                                                }
-                                            } else {
-                                                await setIsDatePaidCalendarShown(true);
-                                            }
-                                        }
+                                                         if (key === 40) { // down - plus 7
+                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().add(7, 'day'));
+                                                         }
+                                                     } else {
+                                                         await setIsDatePaidCalendarShown(true);
+                                                     }
+                                                 }
 
-                                        if (key === 13) {
-                                            let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                            await setPreSelectedDatePaid(event_date);
+                                                 if (key === 13) {
+                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                     await setPreSelectedDatePaid(event_date);
 
-                                            if (isDatePaidCalendarShown) {
-                                                event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
+                                                     if (isDatePaidCalendarShown) {
+                                                         event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
 
-                                                await setSelectedOrder(selectedOrder => {
-                                                    return {
-                                                        ...selectedOrder,
-                                                        invoice_date_paid: event_date
-                                                    }
-                                                })
+                                                         await setSelectedOrder(selectedOrder => {
+                                                             return {
+                                                                 ...selectedOrder,
+                                                                 invoice_date_paid: event_date
+                                                             }
+                                                         })
 
-                                                await validateOrderForSaving({ keyCode: 9 });
+                                                         await validateOrderForSaving({keyCode: 9});
 
-                                                await setIsDatePaidCalendarShown(false);
-                                            }
-                                        }
+                                                         await setIsDatePaidCalendarShown(false);
+                                                     }
+                                                 }
 
-                                        if (key === 9) {
-                                            let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                            await setPreSelectedDatePaid(event_date);
+                                                 if (key === 9) {
+                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                     await setPreSelectedDatePaid(event_date);
 
-                                            if (isDatePaidCalendarShown) {
-                                                event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
+                                                     if (isDatePaidCalendarShown) {
+                                                         event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
 
-                                                await setSelectedOrder(selectedOrder => {
-                                                    return {
-                                                        ...selectedOrder,
-                                                        invoice_date_paid: event_date
-                                                    }
-                                                })
+                                                         await setSelectedOrder(selectedOrder => {
+                                                             return {
+                                                                 ...selectedOrder,
+                                                                 invoice_date_paid: event_date
+                                                             }
+                                                         })
 
-                                                await validateOrderForSaving({ keyCode: 9 });
+                                                         await validateOrderForSaving({keyCode: 9});
 
-                                                await setIsDatePaidCalendarShown(false);
-                                            } else {
-                                                if (e.target.value.trim() === '') {
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            invoice_date_paid: null
-                                                        }
-                                                    })
+                                                         await setIsDatePaidCalendarShown(false);
+                                                     } else {
+                                                         if (e.target.value.trim() === '') {
+                                                             await setSelectedOrder(selectedOrder => {
+                                                                 return {
+                                                                     ...selectedOrder,
+                                                                     invoice_date_paid: null
+                                                                 }
+                                                             })
 
-                                                    await validateOrderForSaving({ keyCode: 9 });
-                                                }
-                                            }
-                                        }
+                                                             await validateOrderForSaving({keyCode: 9});
+                                                         }
+                                                     }
+                                                 }
 
-                                    }}
-                                    onBlur={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_date_paid: getFormattedDates(selectedOrder?.invoice_date_paid)
-                                            }
-                                        })
-                                    }}
-                                    onInput={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_date_paid: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_date_paid: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedOrder?.invoice_date_paid || ''}
-                                    ref={refDatePaid}
+                                             }}
+                                             onBlur={e => {
+                                                 setSelectedOrder(selectedOrder => {
+                                                     return {
+                                                         ...selectedOrder,
+                                                         invoice_date_paid: getFormattedDates(selectedOrder?.invoice_date_paid)
+                                                     }
+                                                 })
+                                             }}
+                                             onInput={e => {
+                                                 setSelectedOrder(selectedOrder => {
+                                                     return {
+                                                         ...selectedOrder,
+                                                         invoice_date_paid: e.target.value
+                                                     }
+                                                 })
+                                             }}
+                                             onChange={e => {
+                                                 setSelectedOrder(selectedOrder => {
+                                                     return {
+                                                         ...selectedOrder,
+                                                         invoice_date_paid: e.target.value
+                                                     }
+                                                 })
+                                             }}
+                                             value={selectedOrder?.invoice_date_paid || ''}
+                                             ref={refDatePaid}
                                 />
 
-                                <FontAwesomeIcon className="dropdown-button calendar date-paid-calendar" icon={faCalendarAlt} onClick={(e) => {
+                                <FontAwesomeIcon className="dropdown-button calendar date-paid-calendar"
+                                                 icon={faCalendarAlt} onClick={(e) => {
                                     if (isDatePaidCalendarShown) {
                                         setIsDatePaidCalendarShown(false);
                                     } else {
@@ -11848,10 +12261,10 @@ const Invoice = (props) => {
                                             setIsDatePaidCalendarShown(true);
                                             refDatePaid.current.inputElement.focus();
                                         }).catch(e => {
-                                           
+
                                         });
                                     }
-                                }} />
+                                }}/>
                             </div>
                             {
                                 datePaidTransition((style, item) => item && (
@@ -11865,8 +12278,9 @@ const Invoice = (props) => {
                                         }}
                                         ref={refDatePaidCalendarDropDown}
                                     >
-                                        <div className="mochi-contextual-popup vertical above left" style={{ height: 275 }}>
-                                            <div className="mochi-contextual-popup-content" >
+                                        <div className="mochi-contextual-popup vertical above left"
+                                             style={{height: 275}}>
+                                            <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
                                                     <Calendar
                                                         value={moment((selectedOrder?.invoice_date_paid || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_date_paid || '').trim()
@@ -11880,9 +12294,11 @@ const Invoice = (props) => {
                                                                 }
                                                             });
 
-                                                            validateOrderForSaving({ keyCode: 9 });
+                                                            validateOrderForSaving({keyCode: 9});
                                                         }}
-                                                        closeCalendar={() => { setIsDatePaidCalendarShown(false); }}
+                                                        closeCalendar={() => {
+                                                            setIsDatePaidCalendarShown(false);
+                                                        }}
                                                         preDay={preSelectedDatePaid}
                                                         onChangePreDay={(preDay) => {
                                                             setPreSelectedDatePaid(preDay);
@@ -11897,34 +12313,34 @@ const Invoice = (props) => {
                         </div>
                         <div className="input-box-container">
                             <input type="text" placeholder="Check Number"
-                                tabIndex={79 + props.tabTimes}
-                                onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
+                                   tabIndex={79 + props.tabTimes}
+                                   onKeyDown={(e) => {
+                                       let key = e.keyCode || e.which;
 
-                                    if (key === 9) {
-                                        e.preventDefault();
-                                        validateOrderForSaving(e);
+                                       if (key === 9) {
+                                           e.preventDefault();
+                                           validateOrderForSaving(e);
 
-                                        refOrderNumber.current.focus();
-                                    }
-                                }}
-                                onInput={(e) => {
-                                    setSelectedOrder(selectedOrder => {
-                                        return {
-                                            ...selectedOrder,
-                                            carrier_check_number: e.target.value
-                                        }
-                                    })
-                                }}
-                                onChange={(e) => {
-                                    setSelectedOrder(selectedOrder => {
-                                        return {
-                                            ...selectedOrder,
-                                            carrier_check_number: e.target.value
-                                        }
-                                    })
-                                }}
-                                value={selectedOrder?.carrier_check_number || ''}
+                                           refOrderNumber.current.focus();
+                                       }
+                                   }}
+                                   onInput={(e) => {
+                                       setSelectedOrder(selectedOrder => {
+                                           return {
+                                               ...selectedOrder,
+                                               carrier_check_number: e.target.value
+                                           }
+                                       })
+                                   }}
+                                   onChange={(e) => {
+                                       setSelectedOrder(selectedOrder => {
+                                           return {
+                                               ...selectedOrder,
+                                               carrier_check_number: e.target.value
+                                           }
+                                       })
+                                   }}
+                                   value={selectedOrder?.carrier_check_number || ''}
                             />
                         </div>
                     </div>
@@ -11939,7 +12355,7 @@ const Invoice = (props) => {
                     selectedParent={selectedOrder}
                     setSelectedParent={(data) => {
                         setSelectedOrder(selectedOrder => {
-                            return { ...selectedOrder, internal_notes: data.notes }
+                            return {...selectedOrder, internal_notes: data.notes}
                         });
 
                         props.setSelectedOrder({
@@ -11966,7 +12382,7 @@ const Invoice = (props) => {
                     selectedParent={selectedOrder}
                     setSelectedParent={(data) => {
                         setSelectedOrder(selectedOrder => {
-                            return { ...selectedOrder, billing_notes: data.notes }
+                            return {...selectedOrder, billing_notes: data.notes}
                         });
 
                         props.setSelectedOrder({

@@ -4990,15 +4990,15 @@ const Agents = (props) => {
                                                         marginRight: 5
                                                     }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
                                                     ? order.routing[0].type === 'pickup'
-                                                        ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).agent?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).agent?.state || '') +
+                                                        ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
                                                             ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).agent?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).agent?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).agent?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).agent?.state || '')))
+                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
 
-                                                        : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).agent?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).agent?.state || '') +
+                                                        : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
                                                             ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).agent?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).agent?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).agent?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).agent?.state || '')))
+                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
                                                     : ''}
                                                 </div>
                                             )
@@ -5037,55 +5037,100 @@ const Agents = (props) => {
                                 </div>
 
                                 <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <label htmlFor="" style={{fontSize: '0.7rem'}}>Agent Pay Brokerage</label>
+                                    <div className="input-box-container grow">
+                                        <input tabIndex={35 + props.tabTimes} type="number" placeholder="Agent Pay Brokerage" min={0}
+                                               onKeyDown={(e) => {
+                                                   let key = e.keyCode ||e.which;
 
-                                    <div className="input-toggle-container" style={{minWidth: '3rem', maxWidth: '3rem'}}>
-                                        <input type="checkbox"
-                                               id={props.panelName + '-cbox-agent-pay-brokerage-primary-btn'}
-                                               onChange={(e) => {
-                                                   setSelectedAgent(selectedAgent =>{
+                                                   if (key === 9){
+                                                       saveAgent(e);
+                                                   }
+                                               }}
+                                               onInput={(e) => {
+                                                   setSelectedAgent(selectedAgent => {
                                                        return {
                                                            ...selectedAgent,
-                                                           agent_pay_brokerage: e.target.checked ? 1 : 0
+                                                           agent_pay_brokerage: e.target.value
                                                        }
-                                                   });
-
-                                                   saveAgent({keyCode: 9});
+                                                   })
                                                }}
-                                               checked={(selectedAgent?.agent_pay_brokerage || 0) === 1}/>
-                                        <label htmlFor={props.panelName + '-cbox-agent-pay-brokerage-primary-btn'}>
-                                            <div className="label-text">{(selectedAgent?.agent_pay_brokerage || 0) === 1 ? 'Yes' : 'No'}</div>
-                                            <div className="input-toggle-btn"></div>
-                                        </label>
+                                               onChange={e => {
+                                                   setSelectedAgent(selectedAgent => {
+                                                       return {
+                                                           ...selectedAgent,
+                                                           agent_pay_brokerage: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               value={selectedAgent?.agent_pay_brokerage || ''}/>
                                     </div>
                                 </div>
 
                                 <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <label htmlFor="" style={{fontSize: '0.7rem'}}>Agent Pay Company Trucks</label>
+                                    <div className="input-box-container grow">
+                                        <input tabIndex={36 + props.tabTimes} type="number" placeholder="Agent Pay Company Trucks" min={0}
+                                               onKeyDown={(e) => {
+                                                   let key = e.keyCode ||e.which;
 
-                                    <div className="input-toggle-container" style={{minWidth: '3rem', maxWidth: '3rem'}}>
-                                        <input type="checkbox"
-                                               id={props.panelName + '-cbox-agent-pay-company-trucks-primary-btn'}
-                                               onChange={(e) => {
-                                                   setSelectedAgent(selectedAgent =>{
+                                                   if (key === 9){
+                                                       saveAgent(e);
+                                                   }
+                                               }}
+                                               onInput={(e) => {
+                                                   setSelectedAgent(selectedAgent => {
                                                        return {
                                                            ...selectedAgent,
-                                                           agent_pay_company_trucks: e.target.checked ? 1 : 0
+                                                           agent_pay_company_trucks: e.target.value
                                                        }
-                                                   });
-
-                                                   saveAgent({keyCode: 9});
+                                                   })
                                                }}
-                                               checked={(selectedAgent?.agent_pay_company_trucks || 0) === 1}/>
-                                        <label htmlFor={props.panelName + '-cbox-agent-pay-company-trucks-primary-btn'}>
-                                            <div className="label-text">{(selectedAgent?.agent_pay_company_trucks || 0) === 1 ? 'Yes' : 'No'}</div>
-                                            <div className="input-toggle-btn"></div>
-                                        </label>
+                                               onChange={e => {
+                                                   setSelectedAgent(selectedAgent => {
+                                                       return {
+                                                           ...selectedAgent,
+                                                           agent_pay_company_trucks: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               value={selectedAgent?.agent_pay_company_trucks || ''}/>
                                     </div>
                                 </div>
 
                                 <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <label htmlFor="" style={{fontSize: '0.7rem'}}>Does Agent Own Units</label>
+                                    <div className='input-box-container grow' style={{
+                                        backgroundColor: (selectedAgent?.agent_own_units || 0) === 0 ? 'rgba(0,0,0,0.05)' : 'white'
+                                    }}>
+                                        <input tabIndex={37 + props.tabTimes} type="number" placeholder="Agent Pay Own Trucks" min={3}
+                                               readOnly={(selectedAgent?.agent_own_units || 0) === 0}
+                                               onKeyDown={(e) => {
+                                                   let key = e.keyCode ||e.which;
+
+                                                   if (key === 9){
+                                                       saveAgent(e);
+                                                   }
+                                               }}
+                                               onInput={(e) => {
+                                                   setSelectedAgent(selectedAgent => {
+                                                       return {
+                                                           ...selectedAgent,
+                                                           agent_pay_own_trucks: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               onChange={e => {
+                                                   setSelectedAgent(selectedAgent => {
+                                                       return {
+                                                           ...selectedAgent,
+                                                           agent_pay_own_trucks: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               value={selectedAgent?.agent_pay_own_trucks || ''}/>
+                                    </div>
+                                </div>
+
+                                <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <label htmlFor="" style={{fontSize: '0.7rem'}}>Does Agent Own Units?</label>
 
                                     <div className="input-toggle-container" style={{minWidth: '3rem', maxWidth: '3rem'}}>
                                         <input type="checkbox"
@@ -5094,8 +5139,7 @@ const Agents = (props) => {
                                                    setSelectedAgent(selectedAgent =>{
                                                        return {
                                                            ...selectedAgent,
-                                                           agent_own_units: e.target.checked ? 1 : 0,
-                                                           agent_pay_own_trucks: e.target.checked ? (selectedAgent?.agent_pay_own_trucks || 0) : 0
+                                                           agent_own_units: e.target.checked ? 1 : 0
                                                        }
                                                    });
 
@@ -5104,32 +5148,6 @@ const Agents = (props) => {
                                                checked={(selectedAgent?.agent_own_units || 0) === 1}/>
                                         <label htmlFor={props.panelName + '-cbox-does-agent-own-units-primary-btn'}>
                                             <div className="label-text">{(selectedAgent?.agent_own_units || 0) === 1 ? 'Yes' : 'No'}</div>
-                                            <div className="input-toggle-btn"></div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <label htmlFor="" style={{fontSize: '0.7rem'}}>Agent Pay Own Trucks</label>
-
-                                    <div className="input-toggle-container" style={{minWidth: '3rem', maxWidth: '3rem'}}>
-                                        <input type="checkbox"
-                                               id={props.panelName + '-cbox-agent-pay-own-trucks-primary-btn'}
-                                               onChange={(e) => {
-                                                   if ((selectedAgent?.agent_own_units || 0) === 1){
-                                                       setSelectedAgent(selectedAgent =>{
-                                                           return {
-                                                               ...selectedAgent,
-                                                               agent_pay_own_trucks: e.target.checked ? 1 : 0
-                                                           }
-                                                       });
-
-                                                       saveAgent({keyCode: 9});
-                                                   }
-                                               }}
-                                               checked={(selectedAgent?.agent_own_units || 0) === 1 && (selectedAgent?.agent_pay_own_trucks || 0) === 1}/>
-                                        <label htmlFor={props.panelName + '-cbox-agent-pay-own-trucks-primary-btn'}>
-                                            <div className="label-text">{(selectedAgent?.agent_pay_own_trucks || 0) === 1 ? 'Yes' : 'No'}</div>
                                             <div className="input-toggle-btn"></div>
                                         </label>
                                     </div>
@@ -5154,7 +5172,7 @@ const Agents = (props) => {
                                 </div>
 
                                 <div className="input-box-container ">
-                                    <input tabIndex={35 + props.tabTimes} type="text" placeholder="Open"
+                                    <input tabIndex={38 + props.tabTimes} type="text" placeholder="Open"
                                            onBlur={(e) => {
                                                saveHours(e, 'hours open')
                                            }}
@@ -5173,7 +5191,7 @@ const Agents = (props) => {
                                 </div>
 
                                 <div className="input-box-container ">
-                                    <input tabIndex={36 + props.tabTimes} type="text" placeholder="Close"
+                                    <input tabIndex={39 + props.tabTimes} type="text" placeholder="Close"
                                            onBlur={(e) => {
                                                saveHours(e, 'hours close')
                                            }}
@@ -5192,7 +5210,7 @@ const Agents = (props) => {
                                 </div>
 
                                 <div className="input-box-container ">
-                                    <input tabIndex={37 + props.tabTimes} type="text" placeholder="Open"
+                                    <input tabIndex={40 + props.tabTimes} type="text" placeholder="Open"
                                            onBlur={(e) => {
                                                saveHours(e, 'hours open 2')
                                            }}
@@ -5211,7 +5229,7 @@ const Agents = (props) => {
                                 </div>
 
                                 <div className="input-box-container ">
-                                    <input tabIndex={38 + props.tabTimes} type="text" placeholder="Close"
+                                    <input tabIndex={41 + props.tabTimes} type="text" placeholder="Close"
                                            onKeyDown={(e) => {
                                                let key = e.keyCode || e.which;
 

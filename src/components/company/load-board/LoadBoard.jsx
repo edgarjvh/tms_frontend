@@ -303,7 +303,9 @@ const LoadBoard = (props) => {
                         } else {
                             setIsLoading(true);
 
-                            axios.post(props.serverUrl + '/getOrders').then(async res => {
+                            axios.post(props.serverUrl + '/getOrders', {
+                                user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+                            }).then(async res => {
                                 if (res.data.result === 'OK') {
                                     setOrders(res.data.orders.map(item => item));
 
@@ -402,7 +404,9 @@ const LoadBoard = (props) => {
     useEffect(() => {
         setIsLoading(true);
 
-        axios.post(props.serverUrl + '/getOrders').then(async res => {
+        axios.post(props.serverUrl + '/getOrders', {
+            user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+        }).then(async res => {
             if (res.data.result === 'OK') {
                 setOrders(res.data.orders.map(item => item));
 
@@ -560,7 +564,9 @@ const LoadBoard = (props) => {
         if (!isLoading) {
             setIsLoading(true);
 
-            axios.post(props.serverUrl + '/getOrders').then(async res => {
+            axios.post(props.serverUrl + '/getOrders', {
+                user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+            }).then(async res => {
                 if (res.data.result === 'OK') {
                     setOrders(res.data.orders.map(item => item));
 
@@ -2447,6 +2453,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

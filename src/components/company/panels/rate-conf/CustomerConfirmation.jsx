@@ -64,25 +64,28 @@ export default class CustomerConfirmation extends Component {
                         <div style={{
                             ...this.styleFlexRow
                         }}>
-                            <span style={{ ...this.styleFieldName, marginRight: 10 }}>ATTN:</span> <span style={{ ...this.styleFieldDataBold }}>
-                                {this.props.selectedCustomerInfoContact?.first_name || ''} {this.props.selectedCustomerInfoContact?.last_name || ''}
+                            <span style={{ ...this.styleFieldName, marginRight: 10 }}>
+                                {/*ATTN:*/}
+                            </span>
+                            <span style={{ ...this.styleFieldDataBold }}>
+                                {/*{this.props.selectedCustomerInfoContact?.first_name || ''} {this.props.selectedCustomerInfoContact?.last_name || ''}*/}
                             </span>
                         </div>
                         <div style={{
                             ...this.styleFlexRow,
                             marginBottom: '1.5rem'
                         }}>
-                            <span style={{ ...this.styleFieldName, marginRight: 10 }}>E-mail:</span> <span style={{ ...this.styleFieldDataBold }}>
-                                {
-                                    (this.props.selectedCustomerInfoContact?.primary_email || 'work') === 'work'
-                                        ? this.props.selectedCustomerInfoContact?.email_work || ''
-                                        : (this.props.selectedCustomerInfoContact?.primary_email || 'work') === 'personal'
-                                            ? this.props.selectedCustomerInfoContact?.email_personal || ''
-                                            : (this.props.selectedCustomerInfoContact?.primary_email || 'work') === 'other'
-                                                ? this.props.selectedCustomerInfoContact?.email_other || ''
-                                                : ''
-                                }
-                            </span>
+                            {/*<span style={{ ...this.styleFieldName, marginRight: 10 }}>E-mail:</span> <span style={{ ...this.styleFieldDataBold }}>*/}
+                            {/*    {*/}
+                            {/*        (this.props.selectedCustomerInfoContact?.primary_email || 'work') === 'work'*/}
+                            {/*            ? this.props.selectedCustomerInfoContact?.email_work || ''*/}
+                            {/*            : (this.props.selectedCustomerInfoContact?.primary_email || 'work') === 'personal'*/}
+                            {/*                ? this.props.selectedCustomerInfoContact?.email_personal || ''*/}
+                            {/*                : (this.props.selectedCustomerInfoContact?.primary_email || 'work') === 'other'*/}
+                            {/*                    ? this.props.selectedCustomerInfoContact?.email_other || ''*/}
+                            {/*                    : ''*/}
+                            {/*    }*/}
+                            {/*</span>*/}
                         </div>
 
                         <div style={{ ...this.styleFieldName, textAlign: 'center', fontSize: '1rem' }}>
@@ -223,6 +226,46 @@ export default class CustomerConfirmation extends Component {
                                                     <div style={{ ...this.styleFieldName, width: '6.5rem' }}>SEAL Number:</div>
                                                     <div style={{ ...this.styleFieldData }}>
                                                         {pickup.seal_number}
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            {
+                                                route.type === 'delivery' &&
+                                                <div style={{ ...this.styleFlexRow }}>
+                                                    <div style={{ ...this.styleFieldName, width: '6.5rem' }}>BOL Numbers:</div>
+                                                    <div style={{ ...this.styleFieldData }}>
+                                                        {delivery.bol_numbers}
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            {
+                                                route.type === 'delivery' &&
+                                                <div style={{ ...this.styleFlexRow }}>
+                                                    <div style={{ ...this.styleFieldName, width: '6.5rem' }}>PO Numbers:</div>
+                                                    <div style={{ ...this.styleFieldData }}>
+                                                        {delivery.po_numbers}
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            {
+                                                route.type === 'delivery' &&
+                                                <div style={{ ...this.styleFlexRow }}>
+                                                    <div style={{ ...this.styleFieldName, width: '6.5rem' }}>REF Numbers:</div>
+                                                    <div style={{ ...this.styleFieldData }}>
+                                                        {delivery.ref_numbers}
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            {
+                                                route.type === 'delivery' &&
+                                                <div style={{ ...this.styleFlexRow }}>
+                                                    <div style={{ ...this.styleFieldName, width: '6.5rem' }}>SEAL Number:</div>
+                                                    <div style={{ ...this.styleFieldData }}>
+                                                        {delivery.seal_number}
                                                     </div>
                                                 </div>
                                             }

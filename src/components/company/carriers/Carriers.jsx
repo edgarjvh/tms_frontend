@@ -1198,10 +1198,14 @@ const Carriers = (props) => {
         let keyCode = e.keyCode || e.which;
 
         if (keyCode === 9) {
-            if ((selectedCarrier.id || 0) > 0) {
-                if (!isSavingFactoringCompany) {
-                    setIsSavingFactoringCompany(true);
-                }
+            // if ((selectedCarrier.id || 0) > 0) {
+            //     if (!isSavingFactoringCompany) {
+            //         setIsSavingFactoringCompany(true);
+            //     }
+            // }
+
+            if (!isSavingFactoringCompany) {
+                setIsSavingFactoringCompany(true);
             }
         }
     }
@@ -6009,7 +6013,7 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={72 + props.tabTimes} type="text" placeholder="Contact Name"
-                                    onInput={(e) => {                                        
+                                    onInput={(e) => {
                                         if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
                                             setSelectedCarrier({
                                                 ...selectedCarrier,
@@ -6033,8 +6037,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.factoring_company?.contact_name || '')
-                                            ? ''
+                                            ? (selectedCarrier?.factoring_company?.contact_name || '')
+                                            // ? ''
                                             : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).last_name
                                     }
                                 />
@@ -6069,8 +6073,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.factoring_company?.contact_phone || '')
-                                            ? ''
+                                            ? (selectedCarrier?.factoring_company?.contact_phone || '')
+                                            // ? ''
                                             : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
                                                 ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
                                                 : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
@@ -6123,8 +6127,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.factoring_company?.ext || '')
-                                            ? ''
+                                            ? (selectedCarrier?.factoring_company?.ext || '')
+                                            // ? ''
                                             : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
                                     }
                                 />
@@ -6178,8 +6182,8 @@ const Carriers = (props) => {
                                     }}
                                     value={
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.factoring_company?.email || '')
-                                            ? ''
+                                            ? (selectedCarrier?.factoring_company?.email || '')
+                                            // ? ''
                                             : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                                 ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
                                                 : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'

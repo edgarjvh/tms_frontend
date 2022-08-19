@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { connect } from "react-redux";
+import React, {useState, useRef, useEffect} from "react";
+import {connect} from "react-redux";
 import classnames from "classnames";
 import "./Dispatch.css";
 import MaskedInput from "react-text-mask";
@@ -9,14 +9,14 @@ import moment from "moment";
 import "react-multi-carousel/lib/styles.css";
 import "loaders.css";
 import NumberFormat from "react-number-format";
-import { useTransition, animated } from "react-spring";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretRight, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
-import { useDetectClickOutside } from "react-detect-click-outside";
-import SwiperCore, { Navigation } from "swiper";
-import { Swiper, SwiperSlide } from "swiper/react";
+import {useTransition, animated} from "react-spring";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCaretDown, faCaretRight, faCalendarAlt} from "@fortawesome/free-solid-svg-icons";
+import {useDetectClickOutside} from "react-detect-click-outside";
+import SwiperCore, {Navigation} from "swiper";
+import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/swiper-bundle.css";
-import { Calendar, RatingScreen } from "./../panels";
+import {Calendar, RatingScreen} from "./../panels";
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import {
@@ -81,6 +81,9 @@ const Dispatch = (props) => {
     const [shipperBolNumber, setShipperBolNumber] = useState("");
     const [shipperPoNumber, setShipperPoNumber] = useState("");
     const [shipperRefNumber, setShipperRefNumber] = useState("");
+    const [consigneeBolNumber, setConsigneeBolNumber] = useState("");
+    const [consigneePoNumber, setConsigneePoNumber] = useState("");
+    const [consigneeRefNumber, setConsigneeRefNumber] = useState("");
     const [mileageLoaderVisible, setMileageLoaderVisible] = useState(false);
     const [isShowingShipperSecondPage, setIsShowingShipperSecondPage] = useState(false);
     const [isShowingConsigneeSecondPage, setIsShowingConsigneeSecondPage] = useState(false);
@@ -100,17 +103,17 @@ const Dispatch = (props) => {
         if ((props.order_id || 0) > 0) {
             setIsLoading(true);
 
-            axios.post(props.serverUrl + "/getOrderById", { id: props.order_id }).then((res) => {
+            axios.post(props.serverUrl + "/getOrderById", {id: props.order_id}).then((res) => {
                 if (res.data.result === "OK") {
                     let order = JSON.parse(JSON.stringify(res.data.order));
                     setSelectedOrder({});
                     setSelectedOrder(order);
 
-                    setSelectedBillToCustomer({ ...order.bill_to_company });
-                    setSelectedBillToCustomerContact({ ...(order.bill_to_company?.contacts || []).find((c) => c.is_primary === 1), });
+                    setSelectedBillToCustomer({...order.bill_to_company});
+                    setSelectedBillToCustomerContact({...(order.bill_to_company?.contacts || []).find((c) => c.is_primary === 1),});
 
                     let pickup_id = (order.routing || []).find((r) => r.type === "pickup")?.pickup_id || 0;
-                    let pickup = { ...((order.pickups || []).find((p) => p.id === pickup_id) || (order.pickups || [])[0]), };
+                    let pickup = {...((order.pickups || []).find((p) => p.id === pickup_id) || (order.pickups || [])[0]),};
 
                     setSelectedShipperCustomer(pickup.id === undefined
                         ? {}
@@ -157,11 +160,11 @@ const Dispatch = (props) => {
                         ...(delivery.contacts || []).find((c) => c.is_primary === 1),
                     });
 
-                    setSelectedCarrier({ ...order.carrier });
+                    setSelectedCarrier({...order.carrier});
                     setSelectedCarrierContact(order.carrier
                         ? order.carrier_contact_id
-                            ? { ...((order.carrier?.contacts || []).find((c) => c.id === order.carrier_contact_id) || {}) }
-                            : { ...(order.carrier?.contacts || []).find((c) => c.is_primary === 1) }
+                            ? {...((order.carrier?.contacts || []).find((c) => c.id === order.carrier_contact_id) || {})}
+                            : {...(order.carrier?.contacts || []).find((c) => c.is_primary === 1)}
                         : {});
                     setSelectedCarrierDriver({
                         ...order.driver,
@@ -418,10 +421,26 @@ const Dispatch = (props) => {
     const [isDeliveryDate1CalendarShown, setIsDeliveryDate1CalendarShown] = useState(false);
     const [isDeliveryDate2CalendarShown, setIsDeliveryDate2CalendarShown] = useState(false);
 
-    const refPickupDate1CalendarDropDown = useDetectClickOutside({ onTriggered: async () => { await setIsPickupDate1CalendarShown(false); }, });
-    const refPickupDate2CalendarDropDown = useDetectClickOutside({ onTriggered: async () => { await setIsPickupDate2CalendarShown(false); }, });
-    const refDeliveryDate1CalendarDropDown = useDetectClickOutside({ onTriggered: async () => { await setIsDeliveryDate1CalendarShown(false); }, });
-    const refDeliveryDate2CalendarDropDown = useDetectClickOutside({ onTriggered: async () => { await setIsDeliveryDate2CalendarShown(false); }, });
+    const refPickupDate1CalendarDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setIsPickupDate1CalendarShown(false);
+        },
+    });
+    const refPickupDate2CalendarDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setIsPickupDate2CalendarShown(false);
+        },
+    });
+    const refDeliveryDate1CalendarDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setIsDeliveryDate1CalendarShown(false);
+        },
+    });
+    const refDeliveryDate2CalendarDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setIsDeliveryDate2CalendarShown(false);
+        },
+    });
 
     const refPickupDate1 = useRef();
     const refPickupDate2 = useRef();
@@ -441,7 +460,11 @@ const Dispatch = (props) => {
     const refEventDate = useRef();
     const [isDispatchEventDateCalendarShown, setIsDispatchEventDateCalendarShown] = useState(false);
     const [preSelectedDispatchEventDate, setPreSelectedDispatchEventDate] = useState(moment());
-    const refDispatchEventDateCalendarDropDown = useDetectClickOutside({ onTriggered: () => { setIsDispatchEventDateCalendarShown(false); } });
+    const refDispatchEventDateCalendarDropDown = useDetectClickOutside({
+        onTriggered: () => {
+            setIsDispatchEventDateCalendarShown(false);
+        }
+    });
 
     const [selectedOrderEvent, setSelectedOrderEvent] = useState({});
     const H = window.H;
@@ -455,6 +478,10 @@ const Dispatch = (props) => {
     const refBolNumbers = useRef();
     const refPoNumbers = useRef();
     const refRefNumbers = useRef();
+
+    const refDeliveryBolNumbers = useRef();
+    const refDeliveryPoNumbers = useRef();
+    const refDeliveryRefNumbers = useRef();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isSavingOrder, setIsSavingOrder] = useState(false);
@@ -485,22 +512,42 @@ const Dispatch = (props) => {
     const refEventTime = useRef();
 
     const [divisionItems, setDivisionItems] = useState([]);
-    const refDivisionDropDown = useDetectClickOutside({ onTriggered: async () => { await setDivisionItems([]); }, });
+    const refDivisionDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setDivisionItems([]);
+        },
+    });
     const refDivisionPopupItems = useRef([]);
 
     const [loadTypeItems, setLoadTypeItems] = useState([]);
-    const refLoadTypeDropDown = useDetectClickOutside({ onTriggered: async () => { await setLoadTypeItems([]); }, });
+    const refLoadTypeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setLoadTypeItems([]);
+        },
+    });
     const refLoadTypePopupItems = useRef([]);
 
     const [templateItems, setTemplateItems] = useState([]);
-    const refTemplateDropDown = useDetectClickOutside({ onTriggered: async () => { await setTemplateItems([]); }, });
+    const refTemplateDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setTemplateItems([]);
+        },
+    });
     const refTemplatePopupItems = useRef([]);
 
     const [equipmentItems, setEquipmentItems] = useState([]);
-    const refEquipmentDropDown = useDetectClickOutside({ onTriggered: async () => { await setEquipmentItems([]); }, });
+    const refEquipmentDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setEquipmentItems([]);
+        },
+    });
     const refEquipmentPopupItems = useRef([]);
 
-    const refDriverDropDown = useDetectClickOutside({ onTriggered: async () => { await setDriverItems([]); }, });
+    const refDriverDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setDriverItems([]);
+        },
+    });
     const refDriverPopupItems = useRef([]);
 
     const refBillToCompanyCode = useRef();
@@ -514,195 +561,207 @@ const Dispatch = (props) => {
     const [dispatchEventSecondPageItems, setDispatchEventSecondPageItems] = useState([]);
     const [showDispatchEventItems, setShowDispatchEventItems] = useState(false);
     const [showDispatchEventSecondPageItems, setShowDispatchEventSecondPageItems,] = useState(false);
-    const refDispatchEventDropDown = useDetectClickOutside({ onTriggered: () => { setDispatchEventItems([]); }, });
+    const refDispatchEventDropDown = useDetectClickOutside({
+        onTriggered: () => {
+            setDispatchEventItems([]);
+        },
+    });
     const refDispatchEventPopupItems = useRef([]);
     const refDispatchEventSecondPagePopupItems = useRef([]);
 
     const refCarrierContactName = useRef();
     const [carrierContactNameItems, setCarrierContactNameItems] = useState([]);
     const [showCarrierContactNames, setShowCarrierContactNames] = useState(false);
-    const refCarrierContactNameDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowCarrierContactNames(false) } });
+    const refCarrierContactNameDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowCarrierContactNames(false)
+        }
+    });
     const refCarrierContactNamePopupItems = useRef([]);
 
     const refCarrierContactPhone = useRef();
     const [carrierContactPhoneItems, setCarrierContactPhoneItems] = useState([]);
     const [showCarrierContactPhones, setShowCarrierContactPhones] = useState(false);
-    const refCarrierContactPhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowCarrierContactPhones(false) } });
+    const refCarrierContactPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowCarrierContactPhones(false)
+        }
+    });
     const refCarrierContactPhonePopupItems = useRef([]);
 
     const loadingTransition = useTransition(isLoading, {
-        from: { opacity: 0, display: "block" },
-        enter: { opacity: 1, display: "block" },
-        leave: { opacity: 0, display: "none" },
+        from: {opacity: 0, display: "block"},
+        enter: {opacity: 1, display: "block"},
+        leave: {opacity: 0, display: "none"},
         reverse: isLoading,
     });
 
     const carrierContactNamesTransition = useTransition(showCarrierContactNames, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showCarrierContactNames
     });
 
     const carrierContactPhonesTransition = useTransition(showCarrierContactPhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showCarrierContactPhones
     });
 
     const divisionTransition = useTransition(divisionItems.length > 0, {
-        from: { opacity: 0, top: "calc(100% + 7px)" },
-        enter: { opacity: 1, top: "calc(100% + 12px)" },
-        leave: { opacity: 0, top: "calc(100% + 7px)" },
-        config: { duration: 100 },
+        from: {opacity: 0, top: "calc(100% + 7px)"},
+        enter: {opacity: 1, top: "calc(100% + 12px)"},
+        leave: {opacity: 0, top: "calc(100% + 7px)"},
+        config: {duration: 100},
         reverse: divisionItems.length > 0,
     });
 
     const loadTypeTransition = useTransition(loadTypeItems.length > 0, {
-        from: { opacity: 0, top: "calc(100% + 7px)" },
-        enter: { opacity: 1, top: "calc(100% + 12px)" },
-        leave: { opacity: 0, top: "calc(100% + 7px)" },
-        config: { duration: 100 },
+        from: {opacity: 0, top: "calc(100% + 7px)"},
+        enter: {opacity: 1, top: "calc(100% + 12px)"},
+        leave: {opacity: 0, top: "calc(100% + 7px)"},
+        config: {duration: 100},
         reverse: loadTypeItems.length > 0,
     });
 
     const templateTransition = useTransition(templateItems.length > 0, {
-        from: { opacity: 0, top: "calc(100% + 7px)" },
-        enter: { opacity: 1, top: "calc(100% + 12px)" },
-        leave: { opacity: 0, top: "calc(100% + 7px)" },
-        config: { duration: 100 },
+        from: {opacity: 0, top: "calc(100% + 7px)"},
+        enter: {opacity: 1, top: "calc(100% + 12px)"},
+        leave: {opacity: 0, top: "calc(100% + 7px)"},
+        config: {duration: 100},
         reverse: templateItems.length > 0,
     });
 
     const equipmentTransition = useTransition(equipmentItems.length > 0, {
-        from: { opacity: 0, top: "calc(100% + 7px)" },
-        enter: { opacity: 1, top: "calc(100% + 12px)" },
-        leave: { opacity: 0, top: "calc(100% + 7px)" },
-        config: { duration: 100 },
+        from: {opacity: 0, top: "calc(100% + 7px)"},
+        enter: {opacity: 1, top: "calc(100% + 12px)"},
+        leave: {opacity: 0, top: "calc(100% + 7px)"},
+        config: {duration: 100},
         reverse: equipmentItems.length > 0,
     });
 
     const driverTransition = useTransition(driverItems.length > 0, {
-        from: { opacity: 0, top: "calc(100% + 7px)" },
-        enter: { opacity: 1, top: "calc(100% + 12px)" },
-        leave: { opacity: 0, top: "calc(100% + 7px)" },
-        config: { duration: 100 },
+        from: {opacity: 0, top: "calc(100% + 7px)"},
+        enter: {opacity: 1, top: "calc(100% + 12px)"},
+        leave: {opacity: 0, top: "calc(100% + 7px)"},
+        config: {duration: 100},
         reverse: driverItems.length > 0,
     });
 
     const shipperFirstPageTransition = useTransition(!isShowingShipperSecondPage, {
-        from: { opacity: 0, left: "0%", width: "0%" },
-        enter: { opacity: 1, left: "0%", width: "100%" },
-        leave: { opacity: 0, left: "0%", width: "0%" },
-        config: { duration: 300 },
+        from: {opacity: 0, left: "0%", width: "0%"},
+        enter: {opacity: 1, left: "0%", width: "100%"},
+        leave: {opacity: 0, left: "0%", width: "0%"},
+        config: {duration: 300},
         reverse: !isShowingShipperSecondPage,
     });
 
     const shipperSecondPageTransition = useTransition(isShowingShipperSecondPage, {
-        from: { opacity: 0, left: "100%", width: "0%" },
-        enter: { opacity: 1, left: "0%", width: "100%" },
-        leave: { opacity: 0, left: "100%", width: "0%" },
-        config: { duration: 300 },
+        from: {opacity: 0, left: "100%", width: "0%"},
+        enter: {opacity: 1, left: "0%", width: "100%"},
+        leave: {opacity: 0, left: "100%", width: "0%"},
+        config: {duration: 300},
         reverse: isShowingShipperSecondPage,
     });
 
     const consigneeFirstPageTransition = useTransition(!isShowingConsigneeSecondPage, {
-        from: { opacity: 0, left: "0%", width: "0%" },
-        enter: { opacity: 1, left: "0%", width: "100%" },
-        leave: { opacity: 0, left: "0%", width: "0%" },
-        config: { duration: 300 },
+        from: {opacity: 0, left: "0%", width: "0%"},
+        enter: {opacity: 1, left: "0%", width: "100%"},
+        leave: {opacity: 0, left: "0%", width: "0%"},
+        config: {duration: 300},
         reverse: !isShowingConsigneeSecondPage,
     });
 
     const consigneeSecondPageTransition = useTransition(isShowingConsigneeSecondPage, {
-        from: { opacity: 0, left: "100%", width: "0%" },
-        enter: { opacity: 1, left: "0%", width: "100%" },
-        leave: { opacity: 0, left: "100%", width: "0%" },
-        config: { duration: 300 },
+        from: {opacity: 0, left: "100%", width: "0%"},
+        enter: {opacity: 1, left: "0%", width: "100%"},
+        leave: {opacity: 0, left: "100%", width: "0%"},
+        config: {duration: 300},
         reverse: isShowingConsigneeSecondPage,
     });
 
     const puDate1Transition = useTransition(isPickupDate1CalendarShown, {
-        from: { opacity: 0, display: "block", top: "calc(100% + 7px)" },
-        enter: { opacity: 1, display: "block", top: "calc(100% + 12px)" },
-        leave: { opacity: 0, display: "none", top: "calc(100% + 7px)" },
+        from: {opacity: 0, display: "block", top: "calc(100% + 7px)"},
+        enter: {opacity: 1, display: "block", top: "calc(100% + 12px)"},
+        leave: {opacity: 0, display: "none", top: "calc(100% + 7px)"},
         reverse: isPickupDate1CalendarShown,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const puDate2Transition = useTransition(isPickupDate2CalendarShown, {
-        from: { opacity: 0, display: "block", top: "calc(100% + 7px)" },
-        enter: { opacity: 1, display: "block", top: "calc(100% + 12px)" },
-        leave: { opacity: 0, display: "none", top: "calc(100% + 7px)" },
+        from: {opacity: 0, display: "block", top: "calc(100% + 7px)"},
+        enter: {opacity: 1, display: "block", top: "calc(100% + 12px)"},
+        leave: {opacity: 0, display: "none", top: "calc(100% + 7px)"},
         reverse: isPickupDate2CalendarShown,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const deliveryDate1Transition = useTransition(isDeliveryDate1CalendarShown, {
-        from: { opacity: 0, display: "block", top: "calc(100% + 7px)" },
-        enter: { opacity: 1, display: "block", top: "calc(100% + 12px)" },
-        leave: { opacity: 0, display: "none", top: "calc(100% + 7px)" },
+        from: {opacity: 0, display: "block", top: "calc(100% + 7px)"},
+        enter: {opacity: 1, display: "block", top: "calc(100% + 12px)"},
+        leave: {opacity: 0, display: "none", top: "calc(100% + 7px)"},
         reverse: isDeliveryDate1CalendarShown,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const deliveryDate2Transition = useTransition(isDeliveryDate2CalendarShown, {
-        from: { opacity: 0, display: "block", top: "calc(100% + 7px)" },
-        enter: { opacity: 1, display: "block", top: "calc(100% + 12px)" },
-        leave: { opacity: 0, display: "none", top: "calc(100% + 7px)" },
+        from: {opacity: 0, display: "block", top: "calc(100% + 7px)"},
+        enter: {opacity: 1, display: "block", top: "calc(100% + 12px)"},
+        leave: {opacity: 0, display: "none", top: "calc(100% + 7px)"},
         reverse: isDeliveryDate2CalendarShown,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const eventTransition = useTransition(dispatchEventItems.length > 0, {
-        from: { opacity: 0, top: "calc(100% + 7px)" },
-        enter: { opacity: 1, top: "calc(100% + 12px)" },
-        leave: { opacity: 0, top: "calc(100% + 7px)" },
-        config: { duration: 100 },
+        from: {opacity: 0, top: "calc(100% + 7px)"},
+        enter: {opacity: 1, top: "calc(100% + 12px)"},
+        leave: {opacity: 0, top: "calc(100% + 7px)"},
+        config: {duration: 100},
         reverse: dispatchEventItems.length > 0,
     });
 
     const dateEventTransition = useTransition(isDispatchEventDateCalendarShown, {
-        from: { opacity: 0, display: "block", top: "calc(100% + 7px)" },
-        enter: { opacity: 1, display: "block", top: "calc(100% + 12px)" },
-        leave: { opacity: 0, display: "none", top: "calc(100% + 7px)" },
+        from: {opacity: 0, display: "block", top: "calc(100% + 7px)"},
+        enter: {opacity: 1, display: "block", top: "calc(100% + 12px)"},
+        leave: {opacity: 0, display: "none", top: "calc(100% + 7px)"},
         reverse: isDispatchEventDateCalendarShown,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const changeCarrierTransition = useTransition(showingChangeCarrier, {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: showingChangeCarrier,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const noteForDriverTransition = useTransition(selectedNoteForDriver?.id !== undefined, {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: selectedNoteForDriver?.id !== undefined,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const noteForCarrierTransition = useTransition(selectedNoteForCarrier?.id !== undefined, {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: selectedNoteForCarrier?.id !== undefined,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     const internalNoteTransition = useTransition(selectedInternalNote?.id !== undefined, {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: selectedInternalNote?.id !== undefined,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
     useEffect(() => {
@@ -714,11 +773,31 @@ const Dispatch = (props) => {
 
     useEffect(async () => {
         let phones = [];
-        (selectedCarrierContact?.phone_work || '') !== '' && phones.push({ id: 1, type: 'work', phone: selectedCarrierContact.phone_work });
-        (selectedCarrierContact?.phone_work_fax || '') !== '' && phones.push({ id: 2, type: 'fax', phone: selectedCarrierContact.phone_work_fax });
-        (selectedCarrierContact?.phone_mobile || '') !== '' && phones.push({ id: 3, type: 'mobile', phone: selectedCarrierContact.phone_mobile });
-        (selectedCarrierContact?.phone_direct || '') !== '' && phones.push({ id: 4, type: 'direct', phone: selectedCarrierContact.phone_direct });
-        (selectedCarrierContact?.phone_other || '') !== '' && phones.push({ id: 5, type: 'other', phone: selectedCarrierContact.phone_other });
+        (selectedCarrierContact?.phone_work || '') !== '' && phones.push({
+            id: 1,
+            type: 'work',
+            phone: selectedCarrierContact.phone_work
+        });
+        (selectedCarrierContact?.phone_work_fax || '') !== '' && phones.push({
+            id: 2,
+            type: 'fax',
+            phone: selectedCarrierContact.phone_work_fax
+        });
+        (selectedCarrierContact?.phone_mobile || '') !== '' && phones.push({
+            id: 3,
+            type: 'mobile',
+            phone: selectedCarrierContact.phone_mobile
+        });
+        (selectedCarrierContact?.phone_direct || '') !== '' && phones.push({
+            id: 4,
+            type: 'direct',
+            phone: selectedCarrierContact.phone_direct
+        });
+        (selectedCarrierContact?.phone_other || '') !== '' && phones.push({
+            id: 5,
+            type: 'other',
+            phone: selectedCarrierContact.phone_other
+        });
 
         await setCarrierContactPhoneItems(phones);
     }, [
@@ -782,14 +861,14 @@ const Dispatch = (props) => {
                                 ) || {}
                             );
 
-                            let selected_order = { ...selectedOrder } || {
+                            let selected_order = {...selectedOrder} || {
                                 order_number: 0,
                             };
                             selected_order.bill_to_customer_id = res.data.customers[0].id;
 
                             setSelectedOrder(selected_order);
 
-                            validateOrderForSaving({ keyCode: 9 });
+                            validateOrderForSaving({keyCode: 9});
                         } else {
                             setSelectedBillToCustomer({});
                             setSelectedBillToCustomerContact({});
@@ -929,7 +1008,7 @@ const Dispatch = (props) => {
                                                             ),
                                                         });
 
-                                                        validateOrderForSaving({ keyCode: 9 });
+                                                        validateOrderForSaving({keyCode: 9});
                                                     }
 
                                                     refPickupDate1.current.inputElement.focus();
@@ -971,13 +1050,13 @@ const Dispatch = (props) => {
                     setSelectedConsigneeCustomer({});
                     setSelectedConsigneeCustomerContact({});
                     setSelectedOrder((selectedOrder) => {
-                        return { ...selectedOrder, deliveries: [] };
+                        return {...selectedOrder, deliveries: []};
                     });
                     return;
                 }
 
                 setIsLoading(true);
-                axios.post(props.serverUrl + "/customers", { code: e.target.value.toLowerCase() }).then(async (res) => {
+                axios.post(props.serverUrl + "/customers", {code: e.target.value.toLowerCase()}).then(async (res) => {
                     if (res.data.result === "OK") {
                         if (res.data.customers.length > 0) {
                             let delivery_id = -1;
@@ -992,8 +1071,8 @@ const Dispatch = (props) => {
                                         d.customer = res.data.customers[0];
                                         d.customer_id = res.data.customers[0].id;
 
-                                        let consignee = { ...res.data.customers[0] };
-                                        consignee = { ...consignee, ...d };
+                                        let consignee = {...res.data.customers[0]};
+                                        consignee = {...consignee, ...d};
                                         consignee.customer = {};
                                         consignee.delivery_id = d.id;
 
@@ -1093,7 +1172,7 @@ const Dispatch = (props) => {
                                     {}
                                 );
 
-                                let selected_order = { ...selectedOrder } || {
+                                let selected_order = {...selectedOrder} || {
                                     order_number: 0,
                                 };
                                 selected_order.bill_to_customer_id = customer.id;
@@ -1101,7 +1180,7 @@ const Dispatch = (props) => {
                                 setSelectedOrder(selected_order);
 
                                 setIsLoading(true);
-                                validateOrderForSaving({ keyCode: 9 });
+                                validateOrderForSaving({keyCode: 9});
                                 refShipperCompanyCode.current.focus();
 
                                 resolve("OK");
@@ -1222,7 +1301,7 @@ const Dispatch = (props) => {
                                                 pickups: [
                                                     {
                                                         id: 0,
-                                                        customer: { ...customer },
+                                                        customer: {...customer},
                                                         customer_id: customer.id,
                                                     },
                                                 ],
@@ -1306,7 +1385,7 @@ const Dispatch = (props) => {
                                                             };
                                                         });
 
-                                                        validateOrderForSaving({ keyCode: 9 });
+                                                        validateOrderForSaving({keyCode: 9});
                                                     }
 
                                                     setIsShowingShipperSecondPage(true);
@@ -1354,7 +1433,7 @@ const Dispatch = (props) => {
             setSelectedConsigneeCustomer({});
             setSelectedConsigneeCustomerContact({});
             setSelectedOrder((selectedOrder) => {
-                return { ...selectedOrder, deliveries: [] };
+                return {...selectedOrder, deliveries: []};
             });
             return;
         }
@@ -1418,8 +1497,8 @@ const Dispatch = (props) => {
                                             d.customer = customer;
                                             d.customer_id = customer.id;
 
-                                            let consignee = { ...customer };
-                                            consignee = { ...consignee, ...d };
+                                            let consignee = {...customer};
+                                            consignee = {...consignee, ...d};
                                             consignee.customer = {};
                                             consignee.delivery_id = d.id;
 
@@ -1484,7 +1563,7 @@ const Dispatch = (props) => {
                     return;
                 }
 
-                axios.post(props.serverUrl + "/carriers", { code: e.target.value.toLowerCase() }).then((res) => {
+                axios.post(props.serverUrl + "/carriers", {code: e.target.value.toLowerCase()}).then((res) => {
                     if (res.data.result === "OK") {
                         if (res.data.carriers.length > 0) {
                             setSelectedCarrier(res.data.carriers[0]);
@@ -1498,7 +1577,7 @@ const Dispatch = (props) => {
 
                             setSelectedCarrierInsurance({});
 
-                            let selected_order = { ...selectedOrder } || {
+                            let selected_order = {...selectedOrder} || {
                                 order_number: 0,
                             };
 
@@ -1871,7 +1950,7 @@ const Dispatch = (props) => {
                     callback={(carrier) => {
                         new Promise((resolve, reject) => {
                             if (carrier) {
-                                setSelectedCarrier({ ...carrier });
+                                setSelectedCarrier({...carrier});
                                 let carrierPrimaryContact = (carrier.contacts || []).find((c) => c.is_primary === 1) || {};
 
                                 if ((carrierPrimaryContact?.id || 0) > 0) {
@@ -1882,7 +1961,7 @@ const Dispatch = (props) => {
 
                                 setSelectedCarrierInsurance({});
 
-                                let selected_order = { ...selectedOrder } || {
+                                let selected_order = {...selectedOrder} || {
                                     order_number: 0,
                                 };
 
@@ -1961,7 +2040,7 @@ const Dispatch = (props) => {
                                             setIsLoading(true);
                                             axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                                 if (res.data.result === "OK") {
-                                                    setSelectedOrder({ ...res.data.order });
+                                                    setSelectedOrder({...res.data.order});
 
                                                     props.setSelectedOrder({
                                                         ...res.data.order,
@@ -2021,7 +2100,7 @@ const Dispatch = (props) => {
 
                 if (selectedBillToCompanyInfo.id === undefined || selectedBillToCompanyInfo.id === -1) {
                     selectedBillToCompanyInfo.id = 0;
-                    setSelectedBillToCustomer({ ...selectedBillToCustomer, id: 0 });
+                    setSelectedBillToCustomer({...selectedBillToCustomer, id: 0});
                 }
 
                 if ((selectedBillToCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A") !== "" &&
@@ -2112,13 +2191,13 @@ const Dispatch = (props) => {
                                             ...selectedOrder,
                                             pickups: selectedOrder.pickups.map((p, i) => {
                                                 if ((p.customer?.id || 0) === res.data.customer.id) {
-                                                    p.customer = { ...res.data.customer };
+                                                    p.customer = {...res.data.customer};
                                                 }
                                                 return p;
                                             }),
                                             deliveries: selectedOrder.deliveries.map((d, i) => {
                                                 if ((d.customer?.id || 0) === res.data.customer.id) {
-                                                    d.customer = { ...res.data.customer };
+                                                    d.customer = {...res.data.customer};
                                                 }
                                                 return d;
                                             }),
@@ -2134,13 +2213,13 @@ const Dispatch = (props) => {
                                         ...selectedOrder,
                                         pickups: selectedOrder.pickups.map((p, i) => {
                                             if ((p.customer?.id || 0) === res.data.customer.id) {
-                                                p.customer = { ...res.data.customer };
+                                                p.customer = {...res.data.customer};
                                             }
                                             return p;
                                         }),
                                         deliveries: selectedOrder.deliveries.map((d, i) => {
                                             if ((d.customer?.id || 0) === res.data.customer.id) {
-                                                d.customer = { ...res.data.customer };
+                                                d.customer = {...res.data.customer};
                                             }
                                             return d;
                                         }),
@@ -2225,7 +2304,7 @@ const Dispatch = (props) => {
 
             if (selectedShipperCompanyInfo.id === undefined || selectedShipperCompanyInfo.id === -1) {
                 selectedShipperCompanyInfo.id = 0;
-                setSelectedShipperCustomer({ ...selectedShipperCustomer, id: 0 });
+                setSelectedShipperCustomer({...selectedShipperCustomer, id: 0});
             }
 
             if ((selectedShipperCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A") !== "" &&
@@ -2284,13 +2363,13 @@ const Dispatch = (props) => {
                                     ...selectedOrder,
                                     pickups: selectedOrder.pickups.map((p, i) => {
                                         if ((p.id || 0) === 0) {
-                                            p.customer = { ...res.data.customer };
+                                            p.customer = {...res.data.customer};
                                         }
                                         return p;
                                     }),
                                     deliveries: selectedOrder.deliveries.map((d, i) => {
                                         if (d.id === res.data.customer.id) {
-                                            d.customer = { ...res.data.customer };
+                                            d.customer = {...res.data.customer};
                                         }
                                         return d;
                                     }),
@@ -2302,13 +2381,13 @@ const Dispatch = (props) => {
                                     ...selectedOrder,
                                     pickups: selectedOrder.pickups.map((p, i) => {
                                         if (p.id === res.data.customer.id) {
-                                            p.customer = { ...res.data.customer };
+                                            p.customer = {...res.data.customer};
                                         }
                                         return p;
                                     }),
                                     deliveries: selectedOrder.deliveries.map((d, i) => {
                                         if (d.id === res.data.customer.id) {
-                                            d.customer = { ...res.data.customer };
+                                            d.customer = {...res.data.customer};
                                         }
                                         return d;
                                     }),
@@ -2358,13 +2437,13 @@ const Dispatch = (props) => {
                             ...selectedOrder,
                             pickups: selectedOrder.pickups.map((p, i) => {
                                 if (p.id === res.data.customer.id) {
-                                    p.customer = { ...res.data.customer };
+                                    p.customer = {...res.data.customer};
                                 }
                                 return p;
                             }),
                             deliveries: selectedOrder.deliveries.map((d, i) => {
                                 if (d.id === res.data.customer.id) {
-                                    d.customer = { ...res.data.customer };
+                                    d.customer = {...res.data.customer};
                                 }
                                 return d;
                             }),
@@ -2392,7 +2471,7 @@ const Dispatch = (props) => {
                             if ((selected_order?.id || 0) > 0) {
                                 selected_order.pickups = selected_order.pickups || [].map((p, i) => {
                                     if ((p.customer?.id || 0) === res.data.customer.id) {
-                                        p.customer = { ...res.data.customer };
+                                        p.customer = {...res.data.customer};
                                     }
 
                                     return p;
@@ -2590,7 +2669,7 @@ const Dispatch = (props) => {
 
             if (selectedConsigneeCompanyInfo.id === undefined || selectedConsigneeCompanyInfo.id === -1) {
                 selectedConsigneeCompanyInfo.id = 0;
-                setSelectedConsigneeCustomer({ ...selectedConsigneeCustomer, id: 0 });
+                setSelectedConsigneeCustomer({...selectedConsigneeCustomer, id: 0});
             }
 
             if ((selectedConsigneeCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A") !== "" &&
@@ -2648,13 +2727,13 @@ const Dispatch = (props) => {
                                     ...selectedOrder,
                                     deliveries: selectedOrder.deliveries.map((d, i) => {
                                         if ((d.id || 0) === 0) {
-                                            d.customer = { ...res.data.customer };
+                                            d.customer = {...res.data.customer};
                                         }
                                         return d;
                                     }),
                                     pickups: selectedOrder.pickups.map((p, i) => {
                                         if (p.id === res.data.customer.id) {
-                                            p.customer = { ...res.data.customer };
+                                            p.customer = {...res.data.customer};
                                         }
                                         return p;
                                     }),
@@ -2666,13 +2745,13 @@ const Dispatch = (props) => {
                                     ...selectedOrder,
                                     pickups: selectedOrder.pickups.map((p, i) => {
                                         if (p.id === res.data.customer.id) {
-                                            p.customer = { ...res.data.customer };
+                                            p.customer = {...res.data.customer};
                                         }
                                         return p;
                                     }),
                                     deliveries: selectedOrder.deliveries.map((d, i) => {
                                         if (d.id === res.data.customer.id) {
-                                            d.customer = { ...res.data.customer };
+                                            d.customer = {...res.data.customer};
                                         }
                                         return d;
                                     }),
@@ -2709,13 +2788,13 @@ const Dispatch = (props) => {
                             ...selectedOrder,
                             pickups: selectedOrder.pickups.map((p, i) => {
                                 if (p.id === res.data.customer.id) {
-                                    p.customer = { ...res.data.customer };
+                                    p.customer = {...res.data.customer};
                                 }
                                 return p;
                             }),
                             deliveries: selectedOrder.deliveries.map((d, i) => {
                                 if (d.id === res.data.customer.id) {
-                                    d.customer = { ...res.data.customer };
+                                    d.customer = {...res.data.customer};
                                 }
                                 return d;
                             }),
@@ -2749,7 +2828,7 @@ const Dispatch = (props) => {
                             if ((selected_order?.id || 0) > 0) {
                                 selected_order.deliveries = (selected_order.deliveries || []).map((d, i) => {
                                     if ((d.customer?.id || 0) === res.data.customer.id) {
-                                        d.customer = { ...res.data.customer };
+                                        d.customer = {...res.data.customer};
                                     }
 
                                     return d;
@@ -2855,9 +2934,9 @@ const Dispatch = (props) => {
                                                     setSelectedOrder({
                                                         ...selected_order,
                                                         order_customer_ratings:
-                                                            res.data.order.order_customer_ratings,
+                                                        res.data.order.order_customer_ratings,
                                                         order_carrier_ratings:
-                                                            res.data.order.order_carrier_ratings,
+                                                        res.data.order.order_carrier_ratings,
                                                     });
 
                                                     props.setSelectedOrder({
@@ -2988,7 +3067,7 @@ const Dispatch = (props) => {
                                 if (selectedCarrier.id === undefined &&
                                     (selectedCarrier.id || 0) === 0) {
                                     setSelectedCarrier((selectedCarrier) => {
-                                        return { ...selectedCarrier, id: res.data.carrier.id };
+                                        return {...selectedCarrier, id: res.data.carrier.id};
                                     });
                                 }
 
@@ -3095,9 +3174,9 @@ const Dispatch = (props) => {
                     axios.post(props.serverUrl + "/saveCarrierDriver", driver).then((res) => {
                         if (res.data.result === "OK") {
                             setSelectedCarrier((selectedCarrier) => {
-                                return { ...selectedCarrier, drivers: res.data.drivers };
+                                return {...selectedCarrier, drivers: res.data.drivers};
                             });
-                            setSelectedCarrierDriver({ ...driver, id: res.data.driver.id });
+                            setSelectedCarrierDriver({...driver, id: res.data.driver.id});
 
                             props.setSelectedCarrier({
                                 ...selectedCarrier,
@@ -3167,7 +3246,7 @@ const Dispatch = (props) => {
 
     useEffect(() => {
         if (isSavingOrder) {
-            let selected_order = { ...selectedOrder } || { order_number: 0 };
+            let selected_order = {...selectedOrder} || {order_number: 0};
 
 
             // check if there's a bill-to-company loaded
@@ -3230,12 +3309,12 @@ const Dispatch = (props) => {
                 selected_order.user_code_id = props.user.user_code.id;
             }
 
-            setSelectedOrder({ ...selected_order });
+            setSelectedOrder({...selected_order});
 
             if (!isCreatingTemplate && !isEditingTemplate) {
                 axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
                     if (res.data.result === "OK") {
-                        setSelectedOrder({ ...res.data.order });
+                        setSelectedOrder({...res.data.order});
 
                         props.setSelectedOrder({
                             ...res.data.order,
@@ -3561,6 +3640,10 @@ const Dispatch = (props) => {
                             delivery_date2: delivery.delivery_date2 || "",
                             delivery_time1: delivery.delivery_time1 || "",
                             delivery_time2: delivery.delivery_time2 || "",
+                            bol_numbers: delivery.bol_numbers || "",
+                            po_numbers: delivery.po_numbers || "",
+                            ref_numbers: delivery.ref_numbers || "",
+                            seal_number: delivery.seal_number || "",
                             special_instructions: delivery.special_instructions || "",
                             type: "delivery",
                         }).then((res) => {
@@ -3835,7 +3918,7 @@ const Dispatch = (props) => {
                         setSelectedOrder(order);
                         // await setTempRouting(order.routing);
 
-                        setSelectedBillToCustomer({ ...order.bill_to_company });
+                        setSelectedBillToCustomer({...order.bill_to_company});
                         setSelectedBillToCustomerContact({
                             ...(order.bill_to_company?.contacts || []).find(
                                 (c) => c.is_primary === 1
@@ -3871,7 +3954,7 @@ const Dispatch = (props) => {
                         });
 
                         let delivery_id = (order.routing || []).find((r) => r.type === "delivery")?.delivery_id || 0;
-                        let delivery = { ...((order.deliveries || []).find((d) => d.id === delivery_id) || (order.deliveries || [])[0]), };
+                        let delivery = {...((order.deliveries || []).find((d) => d.id === delivery_id) || (order.deliveries || [])[0]),};
 
                         setSelectedConsigneeCustomer(
                             delivery.id === undefined
@@ -3883,18 +3966,22 @@ const Dispatch = (props) => {
                                     delivery_date2: delivery.delivery_date2,
                                     delivery_time1: delivery.delivery_time1,
                                     delivery_time2: delivery.delivery_time2,
+                                    bol_numbers: delivery.bol_numbers,
+                                    po_numbers: delivery.po_numbers,
+                                    ref_numbers: delivery.ref_numbers,
+                                    seal_number: delivery.seal_number,
                                     special_instructions: delivery.special_instructions,
                                     type: delivery.type,
                                 }
                         );
-                        setSelectedConsigneeCustomerContact({ ...(delivery.contacts || []).find((c) => c.is_primary === 1), });
+                        setSelectedConsigneeCustomerContact({...(delivery.contacts || []).find((c) => c.is_primary === 1),});
 
-                        setSelectedCarrier({ ...order.carrier });
+                        setSelectedCarrier({...order.carrier});
 
                         setSelectedCarrierContact(order.carrier
                             ? order.carrier_contact_id
-                                ? { ...((order.carrier?.contacts || []).find((c) => c.id === order.carrier_contact_id) || {}) }
-                                : { ...(order.carrier?.contacts || []).find((c) => c.is_primary === 1) }
+                                ? {...((order.carrier?.contacts || []).find((c) => c.id === order.carrier_contact_id) || {})}
+                                : {...(order.carrier?.contacts || []).find((c) => c.is_primary === 1)}
                             : {});
 
                         setSelectedCarrierDriver({
@@ -3936,7 +4023,7 @@ const Dispatch = (props) => {
                             setSelectedOrder(order);
                             // await setTempRouting(order.routing);
 
-                            setSelectedBillToCustomer({ ...order.bill_to_company });
+                            setSelectedBillToCustomer({...order.bill_to_company});
 
                             setSelectedBillToCustomerContact({
                                 ...(order.bill_to_company?.contacts || []).find(
@@ -3994,6 +4081,10 @@ const Dispatch = (props) => {
                                         delivery_date2: delivery.pu_date2,
                                         delivery_time1: delivery.pu_time1,
                                         delivery_time2: delivery.pu_time2,
+                                        bol_numbers: delivery.bol_numbers,
+                                        po_numbers: delivery.po_numbers,
+                                        ref_numbers: delivery.ref_numbers,
+                                        seal_number: delivery.seal_number,
                                         special_instructions: delivery.special_instructions,
                                         type: delivery.type,
                                     }
@@ -4003,7 +4094,7 @@ const Dispatch = (props) => {
                                 ...(delivery.contacts || []).find((c) => c.is_primary === 1),
                             });
 
-                            setSelectedCarrier({ ...order.carrier });
+                            setSelectedCarrier({...order.carrier});
                             setSelectedCarrierContact({
                                 ...(order.carrier?.contacts || []).find(
                                     (c) => c.is_primary === 1
@@ -4091,7 +4182,7 @@ const Dispatch = (props) => {
                 return pu;
             });
 
-            await setSelectedOrder({ ...selectedOrder, pickups: pickups });
+            await setSelectedOrder({...selectedOrder, pickups: pickups});
             await setShipperBolNumber("");
             refBolNumbers.current.focus();
 
@@ -4158,7 +4249,7 @@ const Dispatch = (props) => {
                 return pu;
             });
 
-            await setSelectedOrder({ ...selectedOrder, pickups: pickups });
+            await setSelectedOrder({...selectedOrder, pickups: pickups});
             await setShipperPoNumber("");
             refPoNumbers.current.focus();
 
@@ -4225,11 +4316,208 @@ const Dispatch = (props) => {
                 return pu;
             });
 
-            await setSelectedOrder({ ...selectedOrder, pickups: pickups });
+            await setSelectedOrder({...selectedOrder, pickups: pickups});
             await setShipperRefNumber("");
             refRefNumbers.current.focus();
 
             setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
+        }
+    };
+
+    const deliveryBolNumbersOnKeydown = async (e) => {
+        let keyCode = e.keyCode || e.which;
+
+        if (keyCode === 32) {
+            e.preventDefault();
+
+            await setSelectedConsigneeCustomer({
+                ...selectedConsigneeCustomer,
+                bol_numbers: ((selectedConsigneeCustomer?.bol_numbers || "") + " " + consigneeBolNumber).trim(),
+            });
+
+            await setSelectedOrder({
+                ...selectedOrder,
+                deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                    if (delivery.id === selectedConsigneeCustomer.delivery_id) {
+                        delivery.bol_numbers = (
+                            (selectedConsigneeCustomer?.bol_numbers || "") +
+                            " " +
+                            consigneeBolNumber
+                        ).trim();
+                    }
+                    return delivery;
+                }),
+            });
+            await setConsigneeBolNumber("");
+            refDeliveryBolNumbers.current.focus();
+
+            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+        }
+        if (keyCode === 9) {
+            if (consigneeBolNumber || "" !== "") {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            await setSelectedConsigneeCustomer({
+                ...selectedConsigneeCustomer,
+                bol_numbers: (
+                    (selectedConsigneeCustomer?.bol_numbers || "") +
+                    " " +
+                    consigneeBolNumber
+                ).trim(),
+            });
+
+            let deliveries = (selectedOrder?.deliveries || []).map((delivery, i) => {
+                if (delivery.id === selectedConsigneeCustomer.delivery_id) {
+                    delivery.bol_numbers = (
+                        (selectedConsigneeCustomer?.bol_numbers || "") +
+                        " " +
+                        consigneeBolNumber
+                    ).trim();
+                }
+                return delivery;
+            });
+
+            await setSelectedOrder({...selectedOrder, deliveries: deliveries});
+            await setConsigneeBolNumber("");
+            refDeliveryBolNumbers.current.focus();
+
+            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+        }
+    };
+
+    const deliveryPoNumbersOnKeydown = async (e) => {
+        let keyCode = e.keyCode || e.which;
+
+        if (keyCode === 32) {
+            e.preventDefault();
+
+            await setSelectedConsigneeCustomer({
+                ...selectedConsigneeCustomer,
+                po_numbers: (
+                    (selectedConsigneeCustomer?.po_numbers || "") +
+                    " " +
+                    consigneePoNumber
+                ).trim(),
+            });
+
+            await setSelectedOrder({
+                ...selectedOrder,
+                deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                    if (delivery.id === selectedConsigneeCustomer.delivery_id) {
+                        delivery.po_numbers = (
+                            (selectedConsigneeCustomer?.po_numbers || "") +
+                            " " +
+                            consigneePoNumber
+                        ).trim();
+                    }
+                    return delivery;
+                }),
+            });
+            await setConsigneePoNumber("");
+            refDeliveryPoNumbers.current.focus();
+
+            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+        }
+        if (keyCode === 9) {
+            if (consigneePoNumber || "" !== "") {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            await setSelectedConsigneeCustomer({
+                ...selectedConsigneeCustomer,
+                po_numbers: (
+                    (selectedConsigneeCustomer?.po_numbers || "") +
+                    " " +
+                    consigneePoNumber
+                ).trim(),
+            });
+
+            let deliveries = (selectedOrder?.deliveries || []).map((delivery, i) => {
+                if (delivery.id === selectedConsigneeCustomer.delivery_id) {
+                    delivery.po_numbers = (
+                        (selectedConsigneeCustomer?.po_numbers || "") +
+                        " " +
+                        consigneePoNumber
+                    ).trim();
+                }
+                return delivery;
+            });
+
+            await setSelectedOrder({...selectedOrder, deliveries: deliveries});
+            await setConsigneePoNumber("");
+            refDeliveryPoNumbers.current.focus();
+
+            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+        }
+    };
+
+    const deliveryRefNumbersOnKeydown = async (e) => {
+        let keyCode = e.keyCode || e.which;
+
+        if (keyCode === 32) {
+            e.preventDefault();
+
+            await setSelectedConsigneeCustomer({
+                ...selectedConsigneeCustomer,
+                ref_numbers: (
+                    (selectedConsigneeCustomer?.ref_numbers || "") +
+                    " " +
+                    consigneeRefNumber
+                ).trim(),
+            });
+
+            await setSelectedOrder({
+                ...selectedOrder,
+                deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                    if (delivery.id === selectedConsigneeCustomer.delivery_id) {
+                        delivery.ref_numbers = (
+                            (selectedConsigneeCustomer?.ref_numbers || "") +
+                            " " +
+                            consigneeRefNumber
+                        ).trim();
+                    }
+                    return delivery;
+                }),
+            });
+            await setConsigneeRefNumber("");
+            refDeliveryRefNumbers.current.focus();
+
+            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+        }
+        if (keyCode === 9) {
+            if (consigneeRefNumber || "" !== "") {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            await setSelectedConsigneeCustomer({
+                ...selectedConsigneeCustomer,
+                ref_numbers: (
+                    (selectedConsigneeCustomer?.ref_numbers || "") +
+                    " " +
+                    consigneeRefNumber
+                ).trim(),
+            });
+
+            let deliveries = (selectedOrder?.deliveries || []).map((delivery, i) => {
+                if (delivery.id === selectedConsigneeCustomer.delivery_id) {
+                    delivery.ref_numbers = (
+                        (selectedConsigneeCustomer?.ref_numbers || "") +
+                        " " +
+                        consigneeRefNumber
+                    ).trim();
+                }
+                return delivery;
+            });
+
+            await setSelectedOrder({...selectedOrder, deliveries: deliveries});
+            await setConsigneeRefNumber("");
+            refDeliveryRefNumbers.current.focus();
+
+            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
         }
     };
 
@@ -4343,19 +4631,19 @@ const Dispatch = (props) => {
                             alignItems: "center",
                         }}
                     >
-                        <div style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
+                        <div style={{minWidth: "38%", maxWidth: "38%", marginRight: 10}}>
                             <div className="form-borderless-box">
                                 <div
                                     className="form-row"
-                                    style={{ display: "flex", justifyContent: "space-between" }}
+                                    style={{display: "flex", justifyContent: "space-between"}}
                                 >
                                     <div className="input-box-container"
-                                        style={{
-                                            width: "9rem",
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                        }}
+                                         style={{
+                                             width: "9rem",
+                                             display: "flex",
+                                             justifyContent: "space-between",
+                                             alignItems: "center",
+                                         }}
                                     >
                                         <div style={{
                                             fontSize: "0.7rem",
@@ -4366,10 +4654,11 @@ const Dispatch = (props) => {
                                             A/E Number:
                                         </div>
                                         <input
-                                            style={{ textAlign: "right", fontWeight: "bold" }}
+                                            style={{textAlign: "right", fontWeight: "bold"}}
                                             type="text"
                                             readOnly={true}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={selectedOrder?.user_code?.code || ''}
                                         />
                                     </div>
@@ -4393,7 +4682,7 @@ const Dispatch = (props) => {
                                             Order Number
                                         </div>
                                         <input
-                                            style={{ textAlign: "right", fontWeight: "bold" }}
+                                            style={{textAlign: "right", fontWeight: "bold"}}
                                             tabIndex={1 + props.tabTimes}
                                             type="text"
                                             ref={refOrderNumber}
@@ -4427,7 +4716,7 @@ const Dispatch = (props) => {
                                             Trip Number
                                         </div>
                                         <input
-                                            style={{ textAlign: "right", fontWeight: "bold" }}
+                                            style={{textAlign: "right", fontWeight: "bold"}}
                                             tabIndex={2 + props.tabTimes}
                                             type="text"
                                             onKeyDown={getOrderByTripNumber}
@@ -4458,13 +4747,13 @@ const Dispatch = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
+                        <div style={{minWidth: "38%", maxWidth: "38%", marginRight: 10}}>
                             <div className="form-borderless-box">
                                 <div
                                     className="form-row"
-                                    style={{ display: "flex", justifyContent: "space-between" }}
+                                    style={{display: "flex", justifyContent: "space-between"}}
                                 >
-                                    <div className="select-box-container" style={{ width: "9rem" }}>
+                                    <div className="select-box-container" style={{width: "9rem"}}>
 
                                         <div className="select-box-wrapper">
                                             <input
@@ -4476,7 +4765,8 @@ const Dispatch = (props) => {
                                                     let key = e.keyCode || e.which;
 
                                                     switch (key) {
-                                                        case 37: case 38: // arrow left | arrow up
+                                                        case 37:
+                                                        case 38: // arrow left | arrow up
                                                             e.preventDefault();
                                                             if (divisionItems.length > 0) {
                                                                 let selectedIndex = divisionItems.findIndex((item) => item.selected);
@@ -4638,19 +4928,19 @@ const Dispatch = (props) => {
                                                                     ...selectedOrder,
                                                                     division:
                                                                         divisionItems[
-                                                                        divisionItems.findIndex(
-                                                                            (item) => item.selected
-                                                                        )
-                                                                        ],
-                                                                    division_id:
-                                                                        divisionItems[
                                                                             divisionItems.findIndex(
                                                                                 (item) => item.selected
                                                                             )
+                                                                            ],
+                                                                    division_id:
+                                                                    divisionItems[
+                                                                        divisionItems.findIndex(
+                                                                            (item) => item.selected
+                                                                        )
                                                                         ].id,
                                                                 });
 
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                validateOrderForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
                                                                 refDivision.current.focus();
                                                             }
@@ -4663,18 +4953,18 @@ const Dispatch = (props) => {
                                                                     ...selectedOrder,
                                                                     division:
                                                                         divisionItems[
-                                                                        divisionItems.findIndex(
-                                                                            (item) => item.selected
-                                                                        )
-                                                                        ],
-                                                                    division_id:
-                                                                        divisionItems[
                                                                             divisionItems.findIndex(
                                                                                 (item) => item.selected
                                                                             )
+                                                                            ],
+                                                                    division_id:
+                                                                    divisionItems[
+                                                                        divisionItems.findIndex(
+                                                                            (item) => item.selected
+                                                                        )
                                                                         ].id,
                                                                 });
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                validateOrderForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
                                                                 refDivision.current.focus();
                                                             }
@@ -4761,7 +5051,7 @@ const Dispatch = (props) => {
                                                                             res.data.divisions.map((item, index) => {
                                                                                 item.selected =
                                                                                     (selectedOrder?.division?.id || 0) ===
-                                                                                        0
+                                                                                    0
                                                                                         ? index === 0
                                                                                         : item.id ===
                                                                                         selectedOrder.division.id;
@@ -4798,7 +5088,7 @@ const Dispatch = (props) => {
                                                                             res.data.divisions.map((item, index) => {
                                                                                 item.selected =
                                                                                     (selectedOrder?.division?.id || 0) ===
-                                                                                        0
+                                                                                    0
                                                                                         ? index === 0
                                                                                         : item.id ===
                                                                                         selectedOrder.division.id;
@@ -4849,7 +5139,7 @@ const Dispatch = (props) => {
                                                     >
                                                         <div
                                                             className="mochi-contextual-popup vertical below"
-                                                            style={{ height: 150 }}
+                                                            style={{height: 150}}
                                                         >
                                                             <div className="mochi-contextual-popup-content">
                                                                 <div className="mochi-contextual-popup-wrapper">
@@ -4861,9 +5151,9 @@ const Dispatch = (props) => {
 
                                                                         const searchValue =
                                                                             (selectedOrder?.division?.id || 0) ===
-                                                                                0 &&
-                                                                                (selectedOrder?.division?.name || "") !==
-                                                                                ""
+                                                                            0 &&
+                                                                            (selectedOrder?.division?.name || "") !==
+                                                                            ""
                                                                                 ? selectedOrder?.division?.name
                                                                                 : undefined;
 
@@ -4922,7 +5212,7 @@ const Dispatch = (props) => {
 
                                     <div
                                         className="select-box-container"
-                                        style={{ width: "9rem" }}
+                                        style={{width: "9rem"}}
                                     >
                                         <div className="select-box-wrapper">
                                             <input
@@ -5115,18 +5405,18 @@ const Dispatch = (props) => {
                                                                     ...selectedOrder,
                                                                     load_type:
                                                                         loadTypeItems[
-                                                                        loadTypeItems.findIndex(
-                                                                            (item) => item.selected
-                                                                        )
-                                                                        ],
-                                                                    load_type_id:
-                                                                        loadTypeItems[
                                                                             loadTypeItems.findIndex(
                                                                                 (item) => item.selected
                                                                             )
+                                                                            ],
+                                                                    load_type_id:
+                                                                    loadTypeItems[
+                                                                        loadTypeItems.findIndex(
+                                                                            (item) => item.selected
+                                                                        )
                                                                         ].id,
                                                                 });
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                validateOrderForSaving({keyCode: 9});
                                                                 setLoadTypeItems([]);
                                                                 refLoadType.current.focus();
                                                             }
@@ -5139,18 +5429,18 @@ const Dispatch = (props) => {
                                                                     ...selectedOrder,
                                                                     load_type:
                                                                         loadTypeItems[
-                                                                        loadTypeItems.findIndex(
-                                                                            (item) => item.selected
-                                                                        )
-                                                                        ],
-                                                                    load_type_id:
-                                                                        loadTypeItems[
                                                                             loadTypeItems.findIndex(
                                                                                 (item) => item.selected
                                                                             )
+                                                                            ],
+                                                                    load_type_id:
+                                                                    loadTypeItems[
+                                                                        loadTypeItems.findIndex(
+                                                                            (item) => item.selected
+                                                                        )
                                                                         ].id,
                                                                 });
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                validateOrderForSaving({keyCode: 9});
                                                                 setLoadTypeItems([]);
                                                                 refLoadType.current.focus();
                                                             }
@@ -5191,7 +5481,7 @@ const Dispatch = (props) => {
                                                                         res.data.load_types.map((item, index) => {
                                                                             item.selected =
                                                                                 (selectedOrder?.load_type?.id || 0) ===
-                                                                                    0
+                                                                                0
                                                                                     ? index === 0
                                                                                     : item.id ===
                                                                                     selectedOrder.load_type.id;
@@ -5326,7 +5616,7 @@ const Dispatch = (props) => {
                                                     >
                                                         <div
                                                             className="mochi-contextual-popup vertical below"
-                                                            style={{ height: 150 }}
+                                                            style={{height: 150}}
                                                         >
                                                             <div className="mochi-contextual-popup-content">
                                                                 <div className="mochi-contextual-popup-wrapper">
@@ -5338,9 +5628,9 @@ const Dispatch = (props) => {
 
                                                                         const searchValue =
                                                                             (selectedOrder?.load_type?.id || 0) ===
-                                                                                0 &&
-                                                                                (selectedOrder?.load_type?.name || "") !==
-                                                                                ""
+                                                                            0 &&
+                                                                            (selectedOrder?.load_type?.name || "") !==
+                                                                            ""
                                                                                 ? selectedOrder?.load_type?.name
                                                                                 : undefined;
 
@@ -5399,7 +5689,7 @@ const Dispatch = (props) => {
 
                                     <div
                                         className="select-box-container"
-                                        style={{ width: "9rem" }}
+                                        style={{width: "9rem"}}
                                     >
                                         <div className="select-box-wrapper">
                                             <input
@@ -5592,18 +5882,18 @@ const Dispatch = (props) => {
                                                                     ...selectedOrder,
                                                                     template:
                                                                         templateItems[
-                                                                        templateItems.findIndex(
-                                                                            (item) => item.selected
-                                                                        )
-                                                                        ],
-                                                                    template_id:
-                                                                        templateItems[
                                                                             templateItems.findIndex(
                                                                                 (item) => item.selected
                                                                             )
+                                                                            ],
+                                                                    template_id:
+                                                                    templateItems[
+                                                                        templateItems.findIndex(
+                                                                            (item) => item.selected
+                                                                        )
                                                                         ].id,
                                                                 });
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                validateOrderForSaving({keyCode: 9});
                                                                 setTemplateItems([]);
                                                                 refTemplate.current.focus();
                                                             }
@@ -5616,18 +5906,18 @@ const Dispatch = (props) => {
                                                                     ...selectedOrder,
                                                                     template:
                                                                         templateItems[
-                                                                        templateItems.findIndex(
-                                                                            (item) => item.selected
-                                                                        )
-                                                                        ],
-                                                                    template_id:
-                                                                        templateItems[
                                                                             templateItems.findIndex(
                                                                                 (item) => item.selected
                                                                             )
+                                                                            ],
+                                                                    template_id:
+                                                                    templateItems[
+                                                                        templateItems.findIndex(
+                                                                            (item) => item.selected
+                                                                        )
                                                                         ].id,
                                                                 });
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                validateOrderForSaving({keyCode: 9});
                                                                 setTemplateItems([]);
                                                                 refTemplate.current.focus();
                                                             }
@@ -5714,7 +6004,7 @@ const Dispatch = (props) => {
                                                                             res.data.templates.map((item, index) => {
                                                                                 item.selected =
                                                                                     (selectedOrder?.template?.id || 0) ===
-                                                                                        0
+                                                                                    0
                                                                                         ? index === 0
                                                                                         : item.id ===
                                                                                         selectedOrder.template.id;
@@ -5751,7 +6041,7 @@ const Dispatch = (props) => {
                                                                             res.data.templates.map((item, index) => {
                                                                                 item.selected =
                                                                                     (selectedOrder?.template?.id || 0) ===
-                                                                                        0
+                                                                                    0
                                                                                         ? index === 0
                                                                                         : item.id ===
                                                                                         selectedOrder.template.id;
@@ -5760,15 +6050,15 @@ const Dispatch = (props) => {
                                                                         );
 
                                                                         refTemplatePopupItems.current.map((r, i) => {
-                                                                            if (r && r.classList.contains("selected")) {
-                                                                                r.scrollIntoView({
-                                                                                    behavior: "auto",
-                                                                                    block: "center",
-                                                                                    inline: "nearest",
-                                                                                });
+                                                                                if (r && r.classList.contains("selected")) {
+                                                                                    r.scrollIntoView({
+                                                                                        behavior: "auto",
+                                                                                        block: "center",
+                                                                                        inline: "nearest",
+                                                                                    });
+                                                                                }
+                                                                                return true;
                                                                             }
-                                                                            return true;
-                                                                        }
                                                                         );
                                                                     }
                                                                 })
@@ -5795,7 +6085,8 @@ const Dispatch = (props) => {
                                                         }}
                                                         ref={refTemplateDropDown}
                                                     >
-                                                        <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
+                                                        <div className="mochi-contextual-popup vertical below"
+                                                             style={{height: 150}}>
                                                             <div className="mochi-contextual-popup-content">
                                                                 <div className="mochi-contextual-popup-wrapper">
                                                                     {templateItems.map((item, index) => {
@@ -5863,7 +6154,7 @@ const Dispatch = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div style={{ flexGrow: 1 }}>
+                        <div style={{flexGrow: 1}}>
                             <div className="form-borderless-box" style={{
                                 display: "flex",
                                 flexDirection: "row",
@@ -5877,7 +6168,7 @@ const Dispatch = (props) => {
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
 
-                                <div className="mochi-button" style={{ marginLeft: 5 }} onClick={() => {
+                                <div className="mochi-button" style={{marginLeft: 5}} onClick={() => {
                                     if ((selectedOrder?.id || 0) === 0) {
                                         window.alert("You must create or load an order first!");
                                         return;
@@ -5899,7 +6190,7 @@ const Dispatch = (props) => {
 
                                         axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                             if (res.data.result === "OK") {
-                                                await setSelectedOrder({ ...res.data.order });
+                                                await setSelectedOrder({...res.data.order});
                                                 await props.setSelectedOrder({
                                                     ...res.data.order,
                                                     component_id: props.componentId,
@@ -5969,7 +6260,7 @@ const Dispatch = (props) => {
                                                                             weight_unit: rating.weight_unit,
                                                                             feet_required: rating.feet_required,
                                                                             feet_required_unit:
-                                                                                rating.feet_required_unit,
+                                                                            rating.feet_required_unit,
                                                                             rate: rating.rate,
                                                                             percentage: rating.percentage,
                                                                             days: rating.days,
@@ -6034,6 +6325,10 @@ const Dispatch = (props) => {
                                                                                         delivery_date2: "",
                                                                                         delivery_time1: "",
                                                                                         delivery_time2: "",
+                                                                                        bol_numbers: delivery.bol_numbers || "",
+                                                                                        po_numbers: delivery.po_numbers || "",
+                                                                                        ref_numbers: delivery.ref_numbers || "",
+                                                                                        seal_number: delivery.seal_number || "",
                                                                                         special_instructions: delivery.special_instructions || "",
                                                                                         type: "delivery",
                                                                                     }
@@ -6186,7 +6481,8 @@ const Dispatch = (props) => {
 
                                 {
                                     (props.isAdmin || false) &&
-                                    <div className="mochi-button" style={{ marginLeft: 5 }} onClick={importOrdersBtnClick}>
+                                    <div className="mochi-button" style={{marginLeft: 5}}
+                                         onClick={importOrdersBtnClick}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Import</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -6208,8 +6504,8 @@ const Dispatch = (props) => {
                     >
                         <div
                             className="form-bordered-box"
-                            style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}
-                        // onKeyDown={validateOrderForSaving}
+                            style={{minWidth: "38%", maxWidth: "38%", marginRight: 10}}
+                            // onKeyDown={validateOrderForSaving}
                         >
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
@@ -6546,7 +6842,7 @@ const Dispatch = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div
                                     className="input-box-container input-phone"
-                                    style={{ position: "relative" }}
+                                    style={{position: "relative"}}
                                 >
                                     <MaskedInput
                                         tabIndex={14 + props.tabTimes}
@@ -6630,19 +6926,19 @@ const Dispatch = (props) => {
                                     {(selectedBillToCustomer?.contacts || []).find(
                                         (c) => c.is_primary === 1
                                     ) !== undefined && (
-                                            <div
-                                                className={classnames({
-                                                    "selected-customer-contact-primary-phone": true,
-                                                    pushed: false,
-                                                })}
-                                            >
-                                                {
-                                                    selectedBillToCustomer?.contacts.find(
-                                                        (c) => c.is_primary === 1
-                                                    ).primary_phone
-                                                }
-                                            </div>
-                                        )}
+                                        <div
+                                            className={classnames({
+                                                "selected-customer-contact-primary-phone": true,
+                                                pushed: false,
+                                            })}
+                                        >
+                                            {
+                                                selectedBillToCustomer?.contacts.find(
+                                                    (c) => c.is_primary === 1
+                                                ).primary_phone
+                                            }
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-phone-ext">
@@ -6685,14 +6981,14 @@ const Dispatch = (props) => {
                             </div>
                         </div>
 
-                        <div className="form-bordered-box" style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
+                        <div className="form-bordered-box" style={{minWidth: "38%", maxWidth: "38%", marginRight: 10}}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
                                 <div className="form-title">Carrier</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
                                     {(selectedCarrier?.id || 0) === 0 && (
-                                        <div className="mochi-button" onClick={searchCarrierBtnClick} >
+                                        <div className="mochi-button" onClick={searchCarrierBtnClick}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Search</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -6728,7 +7024,7 @@ const Dispatch = (props) => {
                                         props.openPanel(panel, props.origin);
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Carrier info</div>
+                                        <div className="mochi-button-base">Carrier Info</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                 </div>
@@ -6738,7 +7034,7 @@ const Dispatch = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container input-code">
                                     <input
-                                        tabIndex={50 + props.tabTimes}
+                                        tabIndex={54 + props.tabTimes}
                                         type="text"
                                         placeholder="Code"
                                         maxLength="8"
@@ -6768,7 +7064,7 @@ const Dispatch = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input
-                                        tabIndex={51 + props.tabTimes}
+                                        tabIndex={55 + props.tabTimes}
                                         type="text"
                                         placeholder="Name"
                                         onKeyDown={validateCarrierInfoForSaving}
@@ -6788,24 +7084,21 @@ const Dispatch = (props) => {
                                     />
                                 </div>
                                 <div className="form-h-sep"></div>
-                                <div
-                                    className={insuranceStatusClasses()}
-                                    style={{ width: "7rem" }}
-                                >
-                                    <input type="text" placeholder="Insurance" readOnly={true} />
+                                <div className={insuranceStatusClasses()} style={{width: "7rem"}}>
+                                    <input type="text" placeholder="Insurance" readOnly={true}/>
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input
-                                        tabIndex={52 + props.tabTimes}
+                                        tabIndex={56 + props.tabTimes}
                                         type="text"
                                         placeholder="Carrier Load - Starting City State - Destination City State"
                                         readOnly={true}
                                         value={
                                             (selectedOrder?.routing || []).length >= 2 &&
-                                                (selectedOrder?.carrier?.id || 0) > 0
+                                            (selectedOrder?.carrier?.id || 0) > 0
                                                 ? selectedOrder.routing[0].type === "pickup"
                                                     ? (selectedOrder.pickups.find((p) => p.id === selectedOrder.routing[0].pickup_id)?.customer?.city || "") +
                                                     ", " +
@@ -6839,7 +7132,7 @@ const Dispatch = (props) => {
                                 <div className="select-box-container grow">
                                     <div className="select-box-wrapper">
                                         <input
-                                            tabIndex={53 + props.tabTimes}
+                                            tabIndex={57 + props.tabTimes}
                                             type="text"
                                             placeholder="Contact Name"
                                             ref={refCarrierContactName}
@@ -6847,7 +7140,8 @@ const Dispatch = (props) => {
                                                 let key = e.keyCode || e.which;
 
                                                 switch (key) {
-                                                    case 37: case 38: // arrow left | arrow up
+                                                    case 37:
+                                                    case 38: // arrow left | arrow up
                                                         e.preventDefault();
                                                         if (showCarrierContactNames) {
                                                             let selectedIndex = carrierContactNameItems.findIndex(item => item.selected);
@@ -6901,7 +7195,8 @@ const Dispatch = (props) => {
                                                         }
                                                         break;
 
-                                                    case 39: case 40: // arrow right | arrow down
+                                                    case 39:
+                                                    case 40: // arrow right | arrow down
                                                         e.preventDefault();
                                                         if (showCarrierContactNames) {
                                                             let selectedIndex = carrierContactNameItems.findIndex(item => item.selected);
@@ -6962,7 +7257,7 @@ const Dispatch = (props) => {
                                                     case 13: // enter
                                                         if (showCarrierContactNames && carrierContactNameItems.findIndex(item => item.selected) > -1) {
                                                             if (carrierContactNameItems[carrierContactNameItems.findIndex((item) => item.selected)].id === null) {
-                                                                await setSelectedCarrierContact({ name: "" });
+                                                                await setSelectedCarrierContact({name: ""});
 
                                                                 axios.post(props.serverUrl + "/saveOrder", {
                                                                     ...selectedOrder,
@@ -7047,7 +7342,7 @@ const Dispatch = (props) => {
                                                         if (showCarrierContactNames) {
                                                             e.preventDefault();
                                                             if (carrierContactNameItems[carrierContactNameItems.findIndex((item) => item.selected)].id === null) {
-                                                                await setSelectedCarrierContact({ name: "" });
+                                                                await setSelectedCarrierContact({name: ""});
 
                                                                 axios.post(props.serverUrl + "/saveOrder", {
                                                                     ...selectedOrder,
@@ -7151,35 +7446,36 @@ const Dispatch = (props) => {
 
                                         {
                                             ((selectedCarrier?.contacts || []).length > 1) &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                                if (showCarrierContactNames) {
-                                                    setShowCarrierContactNames(false);
-                                                } else {
-                                                    if ((selectedCarrier?.contacts || []).length > 1) {
-                                                        await setCarrierContactNameItems((selectedCarrier?.contacts || []).map((item, index) => {
-                                                            item.selected = (selectedCarrierContact?.id || 0) > 0 ? (selectedCarrierContact?.id || 0) === item.id : index === 0
-                                                            return item;
-                                                        }))
+                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                             onClick={async () => {
+                                                                 if (showCarrierContactNames) {
+                                                                     setShowCarrierContactNames(false);
+                                                                 } else {
+                                                                     if ((selectedCarrier?.contacts || []).length > 1) {
+                                                                         await setCarrierContactNameItems((selectedCarrier?.contacts || []).map((item, index) => {
+                                                                             item.selected = (selectedCarrierContact?.id || 0) > 0 ? (selectedCarrierContact?.id || 0) === item.id : index === 0
+                                                                             return item;
+                                                                         }))
 
-                                                        window.setTimeout(async () => {
-                                                            await setShowCarrierContactNames(true);
+                                                                         window.setTimeout(async () => {
+                                                                             await setShowCarrierContactNames(true);
 
-                                                            refCarrierContactNamePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }, 0)
-                                                    }
-                                                }
+                                                                             refCarrierContactNamePopupItems.current.map((r, i) => {
+                                                                                 if (r && r.classList.contains('selected')) {
+                                                                                     r.scrollIntoView({
+                                                                                         behavior: 'auto',
+                                                                                         block: 'center',
+                                                                                         inline: 'nearest'
+                                                                                     })
+                                                                                 }
+                                                                                 return true;
+                                                                             });
+                                                                         }, 0)
+                                                                     }
+                                                                 }
 
-                                                refCarrierContactName.current.focus();
-                                            }} />
+                                                                 refCarrierContactName.current.focus();
+                                                             }}/>
                                         }
                                     </div>
                                     {
@@ -7194,8 +7490,9 @@ const Dispatch = (props) => {
                                                 }}
                                                 ref={refCarrierContactNameDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content" >
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                     style={{height: 150}}>
+                                                    <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {
                                                                 carrierContactNameItems.map((item, index) => {
@@ -7270,7 +7567,9 @@ const Dispatch = (props) => {
 
                                                                             {
                                                                                 item.selected &&
-                                                                                <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                                <FontAwesomeIcon
+                                                                                    className="dropdown-selected"
+                                                                                    icon={faCaretRight}/>
                                                                             }
                                                                         </div>
                                                                     )
@@ -7287,225 +7586,227 @@ const Dispatch = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="select-box-container input-phone">
                                     <div className="select-box-wrapper">
-                                        <MaskedInput tabIndex={54 + props.tabTimes}
-                                            mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                            guide={true}
-                                            type="text"
-                                            placeholder="Contact Phone"
-                                            ref={refCarrierContactPhone}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
+                                        <MaskedInput tabIndex={58 + props.tabTimes}
+                                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                     guide={true}
+                                                     type="text"
+                                                     placeholder="Contact Phone"
+                                                     ref={refCarrierContactPhone}
+                                                     onKeyDown={async (e) => {
+                                                         let key = e.keyCode || e.which;
 
-                                                switch (key) {
-                                                    case 37: case 38: // arrow left | arrow up
-                                                        e.preventDefault();
-                                                        if (showCarrierContactPhones) {
-                                                            let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
+                                                         switch (key) {
+                                                             case 37:
+                                                             case 38: // arrow left | arrow up
+                                                                 e.preventDefault();
+                                                                 if (showCarrierContactPhones) {
+                                                                     let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
 
-                                                            if (selectedIndex === -1) {
-                                                                await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (carrierContactPhoneItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
+                                                                     if (selectedIndex === -1) {
+                                                                         await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                             item.selected = index === 0;
+                                                                             return item;
+                                                                         }))
+                                                                     } else {
+                                                                         await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                             if (selectedIndex === 0) {
+                                                                                 item.selected = index === (carrierContactPhoneItems.length - 1);
+                                                                             } else {
+                                                                                 item.selected = index === (selectedIndex - 1)
+                                                                             }
+                                                                             return item;
+                                                                         }))
+                                                                     }
 
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (carrierContactPhoneItems.length > 1) {
-                                                                await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = (selectedOrder?.carrier_contact_primary_phone || '') === '' ? index === 0 : selectedOrder.carrier_contact_primary_phone === item.type;
-                                                                    return item;
-                                                                }))
+                                                                     refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 } else {
+                                                                     if (carrierContactPhoneItems.length > 1) {
+                                                                         await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                             item.selected = (selectedOrder?.carrier_contact_primary_phone || '') === '' ? index === 0 : selectedOrder.carrier_contact_primary_phone === item.type;
+                                                                             return item;
+                                                                         }))
 
-                                                                setShowCarrierContactPhones(true);
+                                                                         setShowCarrierContactPhones(true);
 
-                                                                refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
+                                                                         refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }
+                                                                 }
+                                                                 break;
 
-                                                    case 39: case 40: // arrow right | arrow down
-                                                        e.preventDefault();
-                                                        if (showCarrierContactPhones) {
-                                                            let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
+                                                             case 39:
+                                                             case 40: // arrow right | arrow down
+                                                                 e.preventDefault();
+                                                                 if (showCarrierContactPhones) {
+                                                                     let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
 
-                                                            if (selectedIndex === -1) {
-                                                                await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === (carrierContactPhoneItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
+                                                                     if (selectedIndex === -1) {
+                                                                         await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                             item.selected = index === 0;
+                                                                             return item;
+                                                                         }))
+                                                                     } else {
+                                                                         await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                             if (selectedIndex === (carrierContactPhoneItems.length - 1)) {
+                                                                                 item.selected = index === 0;
+                                                                             } else {
+                                                                                 item.selected = index === (selectedIndex + 1)
+                                                                             }
+                                                                             return item;
+                                                                         }))
+                                                                     }
 
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (carrierContactPhoneItems.length > 1) {
-                                                                await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = (selectedOrder?.carrier_contact_primary_phone || '') === '' ? index === 0 : selectedOrder.carrier_contact_primary_phone === item.type;
-                                                                    return item;
-                                                                }))
+                                                                     refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 } else {
+                                                                     if (carrierContactPhoneItems.length > 1) {
+                                                                         await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                             item.selected = (selectedOrder?.carrier_contact_primary_phone || '') === '' ? index === 0 : selectedOrder.carrier_contact_primary_phone === item.type;
+                                                                             return item;
+                                                                         }))
 
-                                                                setShowCarrierContactPhones(true);
+                                                                         setShowCarrierContactPhones(true);
 
-                                                                refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
+                                                                         refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }
+                                                                 }
+                                                                 break;
 
-                                                    case 27: // escape
-                                                        setShowCarrierContactPhones(false);
-                                                        break;
+                                                             case 27: // escape
+                                                                 setShowCarrierContactPhones(false);
+                                                                 break;
 
-                                                    case 13: // enter
-                                                        if (showCarrierContactPhones && carrierContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedOrder({
-                                                                ...selectedOrder,
-                                                                carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                            })
+                                                             case 13: // enter
+                                                                 if (showCarrierContactPhones && carrierContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                     await setSelectedOrder({
+                                                                         ...selectedOrder,
+                                                                         carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     })
 
-                                                            axios.post(props.serverUrl + "/saveOrder", {
-                                                                ...selectedOrder,
-                                                                carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                            }).then(async (res) => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setSelectedOrder({
-                                                                        ...res.data.order,
-                                                                    });
-                                                                    await props.setSelectedOrder({
-                                                                        ...res.data.order,
-                                                                        component_id: props.componentId,
-                                                                    });
-                                                                } else {
+                                                                     axios.post(props.serverUrl + "/saveOrder", {
+                                                                         ...selectedOrder,
+                                                                         carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     }).then(async (res) => {
+                                                                         if (res.data.result === "OK") {
+                                                                             await setSelectedOrder({
+                                                                                 ...res.data.order,
+                                                                             });
+                                                                             await props.setSelectedOrder({
+                                                                                 ...res.data.order,
+                                                                                 component_id: props.componentId,
+                                                                             });
+                                                                         } else {
 
-                                                                }
-                                                            }).catch((e) => {
-                                                                console.log("error saving order", e);
-                                                            }).finally(() => {
-                                                                setShowCarrierContactPhones(false);
-                                                                refCarrierContactPhone.current.inputElement.focus();
-                                                                setIsSavingOrder(false);
-                                                            });
+                                                                         }
+                                                                     }).catch((e) => {
+                                                                         console.log("error saving order", e);
+                                                                     }).finally(() => {
+                                                                         setShowCarrierContactPhones(false);
+                                                                         refCarrierContactPhone.current.inputElement.focus();
+                                                                         setIsSavingOrder(false);
+                                                                     });
 
-                                                        }
-                                                        break;
+                                                                 }
+                                                                 break;
 
-                                                    case 9: // tab
-                                                        if (showCarrierContactPhones) {
-                                                            e.preventDefault();
-                                                            await setSelectedOrder({
-                                                                ...selectedOrder,
-                                                                carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                            })
+                                                             case 9: // tab
+                                                                 if (showCarrierContactPhones) {
+                                                                     e.preventDefault();
+                                                                     await setSelectedOrder({
+                                                                         ...selectedOrder,
+                                                                         carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     })
 
-                                                            axios.post(props.serverUrl + "/saveOrder", {
-                                                                ...selectedOrder,
-                                                                carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                            }).then(async (res) => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setSelectedOrder({
-                                                                        ...res.data.order,
-                                                                    });
-                                                                    await props.setSelectedOrder({
-                                                                        ...res.data.order,
-                                                                        component_id: props.componentId,
-                                                                    });
-                                                                } else {
+                                                                     axios.post(props.serverUrl + "/saveOrder", {
+                                                                         ...selectedOrder,
+                                                                         carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     }).then(async (res) => {
+                                                                         if (res.data.result === "OK") {
+                                                                             await setSelectedOrder({
+                                                                                 ...res.data.order,
+                                                                             });
+                                                                             await props.setSelectedOrder({
+                                                                                 ...res.data.order,
+                                                                                 component_id: props.componentId,
+                                                                             });
+                                                                         } else {
 
-                                                                }
-                                                            }).catch((e) => {
-                                                                console.log("error saving order", e);
-                                                            }).finally(() => {
-                                                                setShowCarrierContactPhones(false);
-                                                                refCarrierContactPhone.current.inputElement.focus();
-                                                                setIsSavingOrder(false);
-                                                            });
-                                                        } else {
-                                                            // validateCarrierAddressForSaving({ keyCode: 9 });
-                                                        }
-                                                        break;
+                                                                         }
+                                                                     }).catch((e) => {
+                                                                         console.log("error saving order", e);
+                                                                     }).finally(() => {
+                                                                         setShowCarrierContactPhones(false);
+                                                                         refCarrierContactPhone.current.inputElement.focus();
+                                                                         setIsSavingOrder(false);
+                                                                     });
+                                                                 } else {
+                                                                     // validateCarrierAddressForSaving({ keyCode: 9 });
+                                                                 }
+                                                                 break;
 
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onInput={(e) => {
-                                                // setSelectedCustomer({
-                                                //     ...selectedCustomer,
-                                                //     carrier_contact_phone: e.target.value
-                                                // });
-                                            }}
-                                            onChange={(e) => {
-                                                // setSelectedCustomer({
-                                                //     ...selectedCustomer,
-                                                //     carrier_contact_phone: e.target.value
-                                                // });
-                                            }}
-                                            value={
-                                                (selectedOrder?.carrier_contact_primary_phone || '') === 'work'
-                                                    ? (selectedCarrierContact?.phone_work || '')
-                                                    : (selectedOrder?.carrier_contact_primary_phone || '') === 'fax'
-                                                        ? (selectedCarrierContact?.phone_work_fax || '')
-                                                        : (selectedOrder?.carrier_contact_primary_phone || '') === 'mobile'
-                                                            ? (selectedCarrierContact?.phone_mobile || '')
-                                                            : (selectedOrder?.carrier_contact_primary_phone || '') === 'direct'
-                                                                ? (selectedCarrierContact?.phone_direct || '')
-                                                                : (selectedOrder?.carrier_contact_primary_phone || '') === 'other'
-                                                                    ? (selectedCarrierContact?.phone_other || '')
-                                                                    : ''
-                                            }
+                                                             default:
+                                                                 break;
+                                                         }
+                                                     }}
+                                                     onInput={(e) => {
+                                                         // setSelectedCustomer({
+                                                         //     ...selectedCustomer,
+                                                         //     carrier_contact_phone: e.target.value
+                                                         // });
+                                                     }}
+                                                     onChange={(e) => {
+                                                         // setSelectedCustomer({
+                                                         //     ...selectedCustomer,
+                                                         //     carrier_contact_phone: e.target.value
+                                                         // });
+                                                     }}
+                                                     value={
+                                                         (selectedOrder?.carrier_contact_primary_phone || '') === 'work'
+                                                             ? (selectedCarrierContact?.phone_work || '')
+                                                             : (selectedOrder?.carrier_contact_primary_phone || '') === 'fax'
+                                                                 ? (selectedCarrierContact?.phone_work_fax || '')
+                                                                 : (selectedOrder?.carrier_contact_primary_phone || '') === 'mobile'
+                                                                     ? (selectedCarrierContact?.phone_mobile || '')
+                                                                     : (selectedOrder?.carrier_contact_primary_phone || '') === 'direct'
+                                                                         ? (selectedCarrierContact?.phone_direct || '')
+                                                                         : (selectedOrder?.carrier_contact_primary_phone || '') === 'other'
+                                                                             ? (selectedCarrierContact?.phone_other || '')
+                                                                             : ''
+                                                     }
                                         />
 
                                         {
@@ -7521,35 +7822,36 @@ const Dispatch = (props) => {
 
                                         {
                                             carrierContactPhoneItems.length > 1 &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                                if (showCarrierContactPhones) {
-                                                    setShowCarrierContactPhones(false);
-                                                } else {
-                                                    if (carrierContactPhoneItems.length > 1) {
-                                                        await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                            item.selected = (selectedOrder?.carrier_contact_primary_phone || '') === '' ? index === 0 : selectedOrder.carrier_contact_primary_phone === item.type;
-                                                            return item;
-                                                        }))
+                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                             onClick={async () => {
+                                                                 if (showCarrierContactPhones) {
+                                                                     setShowCarrierContactPhones(false);
+                                                                 } else {
+                                                                     if (carrierContactPhoneItems.length > 1) {
+                                                                         await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                             item.selected = (selectedOrder?.carrier_contact_primary_phone || '') === '' ? index === 0 : selectedOrder.carrier_contact_primary_phone === item.type;
+                                                                             return item;
+                                                                         }))
 
-                                                        window.setTimeout(async () => {
-                                                            await setShowCarrierContactPhones(true);
+                                                                         window.setTimeout(async () => {
+                                                                             await setShowCarrierContactPhones(true);
 
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }, 0)
-                                                    }
-                                                }
+                                                                             refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                                 if (r && r.classList.contains('selected')) {
+                                                                                     r.scrollIntoView({
+                                                                                         behavior: 'auto',
+                                                                                         block: 'center',
+                                                                                         inline: 'nearest'
+                                                                                     })
+                                                                                 }
+                                                                                 return true;
+                                                                             });
+                                                                         }, 0)
+                                                                     }
+                                                                 }
 
-                                                refCarrierContactPhone.current.inputElement.focus();
-                                            }} />
+                                                                 refCarrierContactPhone.current.inputElement.focus();
+                                                             }}/>
                                         }
                                     </div>
                                     {
@@ -7564,8 +7866,9 @@ const Dispatch = (props) => {
                                                 }}
                                                 ref={refCarrierContactPhoneDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content" >
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                     style={{height: 150}}>
+                                                    <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {
                                                                 carrierContactPhoneItems.map((item, index) => {
@@ -7619,18 +7922,20 @@ const Dispatch = (props) => {
                                                                             }
 
                                                                             (<b>
-                                                                                {
-                                                                                    item.type === 'work' ? item.phone
-                                                                                        : item.type === 'fax' ? item.phone
-                                                                                            : item.type === 'mobile' ? item.phone
-                                                                                                : item.type === 'direct' ? item.phone
-                                                                                                    : item.type === 'other' ? item.phone : ''
-                                                                                }
-                                                                            </b>)
+                                                                            {
+                                                                                item.type === 'work' ? item.phone
+                                                                                    : item.type === 'fax' ? item.phone
+                                                                                        : item.type === 'mobile' ? item.phone
+                                                                                            : item.type === 'direct' ? item.phone
+                                                                                                : item.type === 'other' ? item.phone : ''
+                                                                            }
+                                                                        </b>)
 
                                                                             {
                                                                                 item.selected &&
-                                                                                <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                                <FontAwesomeIcon
+                                                                                    className="dropdown-selected"
+                                                                                    icon={faCaretRight}/>
                                                                             }
                                                                         </div>
                                                                     )
@@ -7646,7 +7951,7 @@ const Dispatch = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-phone-ext">
                                     <input
-                                        tabIndex={55 + props.tabTimes}
+                                        tabIndex={59 + props.tabTimes}
                                         type="text"
                                         placeholder="Ext"
                                         onKeyDown={validateCarrierContactForSaving}
@@ -7678,11 +7983,11 @@ const Dispatch = (props) => {
                                     />
                                 </div>
                                 <div className="form-h-sep"></div>
-                                <div className="select-box-container" style={{ width: "9rem" }}>
+                                <div className="select-box-container" style={{width: "9rem"}}>
                                     <div className="select-box-wrapper">
                                         <input
                                             type="text"
-                                            tabIndex={56 + props.tabTimes}
+                                            tabIndex={60 + props.tabTimes}
                                             placeholder="Equipment"
                                             ref={refEquipment}
                                             onKeyDown={(e) => {
@@ -7868,15 +8173,15 @@ const Dispatch = (props) => {
                                                                         ...selectedOrder,
                                                                         equipment:
                                                                             equipmentItems[
-                                                                            equipmentItems.findIndex(
-                                                                                (item) => item.selected
-                                                                            )
-                                                                            ],
-                                                                        equipment_id:
-                                                                            equipmentItems[
                                                                                 equipmentItems.findIndex(
                                                                                     (item) => item.selected
                                                                                 )
+                                                                                ],
+                                                                        equipment_id:
+                                                                        equipmentItems[
+                                                                            equipmentItems.findIndex(
+                                                                                (item) => item.selected
+                                                                            )
                                                                             ].id,
                                                                     };
                                                                 });
@@ -7884,7 +8189,7 @@ const Dispatch = (props) => {
                                                                 resolve("OK");
                                                             })
                                                                 .then((response) => {
-                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                    validateOrderForSaving({keyCode: 9});
                                                                     setEquipmentItems([]);
                                                                     refDriverName.current.focus();
                                                                 })
@@ -7909,15 +8214,15 @@ const Dispatch = (props) => {
                                                                         ...selectedOrder,
                                                                         equipment:
                                                                             equipmentItems[
-                                                                            equipmentItems.findIndex(
-                                                                                (item) => item.selected
-                                                                            )
-                                                                            ],
-                                                                        equipment_id:
-                                                                            equipmentItems[
                                                                                 equipmentItems.findIndex(
                                                                                     (item) => item.selected
                                                                                 )
+                                                                                ],
+                                                                        equipment_id:
+                                                                        equipmentItems[
+                                                                            equipmentItems.findIndex(
+                                                                                (item) => item.selected
+                                                                            )
                                                                             ].id,
                                                                     };
                                                                 });
@@ -7925,7 +8230,7 @@ const Dispatch = (props) => {
                                                                 resolve("OK");
                                                             })
                                                                 .then((response) => {
-                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                    validateOrderForSaving({keyCode: 9});
                                                                     setEquipmentItems([]);
                                                                     refDriverName.current.focus();
                                                                 })
@@ -7965,7 +8270,7 @@ const Dispatch = (props) => {
                                                 if (e.target.value.trim() === "") {
                                                     setEquipmentItems([]);
                                                 } else {
-                                                    axios.post(props.serverUrl + "/getEquipments", { name: e.target.value.trim() }).then((res) => {
+                                                    axios.post(props.serverUrl + "/getEquipments", {name: e.target.value.trim()}).then((res) => {
                                                         if (res.data.result === "OK") {
                                                             setEquipmentItems(
                                                                 res.data.equipments.map((item, index) => {
@@ -8017,7 +8322,7 @@ const Dispatch = (props) => {
                                                                     res.data.equipments.map((item, index) => {
                                                                         item.selected =
                                                                             (selectedOrder?.equipment?.id || 0) ===
-                                                                                0
+                                                                            0
                                                                                 ? index === 0
                                                                                 : item.id ===
                                                                                 selectedOrder.equipment.id;
@@ -8046,7 +8351,7 @@ const Dispatch = (props) => {
                                                                     res.data.equipments.map((item, index) => {
                                                                         item.selected =
                                                                             (selectedOrder?.equipment?.id || 0) ===
-                                                                                0
+                                                                            0
                                                                                 ? index === 0
                                                                                 : item.id ===
                                                                                 selectedOrder.equipment.id;
@@ -8088,7 +8393,8 @@ const Dispatch = (props) => {
                                                     }}
                                                     ref={refEquipmentDropDown}
                                                 >
-                                                    <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
+                                                    <div className="mochi-contextual-popup vertical below"
+                                                         style={{height: 150}}>
                                                         <div className="mochi-contextual-popup-content">
                                                             <div className="mochi-contextual-popup-wrapper">
                                                                 {equipmentItems.map((item, index) => {
@@ -8099,8 +8405,8 @@ const Dispatch = (props) => {
 
                                                                     const searchValue =
                                                                         (selectedOrder?.equipment?.id || 0) === 0 &&
-                                                                            (selectedOrder?.equipment?.name || "") !==
-                                                                            ""
+                                                                        (selectedOrder?.equipment?.name || "") !==
+                                                                        ""
                                                                             ? selectedOrder?.equipment?.name
                                                                             : undefined;
 
@@ -8165,11 +8471,11 @@ const Dispatch = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="select-box-container" style={{ width: "9rem" }}>
+                                <div className="select-box-container" style={{width: "9rem"}}>
                                     <div className="select-box-wrapper">
                                         <input
                                             type="text"
-                                            tabIndex={57 + props.tabTimes}
+                                            tabIndex={61 + props.tabTimes}
                                             placeholder="Driver Name"
                                             ref={refDriverName}
                                             onKeyDown={async (e) => {
@@ -8404,7 +8710,7 @@ const Dispatch = (props) => {
                                                     case 13: // enter
                                                         if (driverItems.length > 0 && driverItems.findIndex((item) => item.selected) > -1) {
                                                             if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
-                                                                await setSelectedCarrierDriver({ name: "" });
+                                                                await setSelectedCarrierDriver({name: ""});
 
                                                                 axios.post(props.serverUrl + "/saveOrder", {
                                                                     ...selectedOrder,
@@ -8436,7 +8742,7 @@ const Dispatch = (props) => {
                                                                     equipment: driverItems[driverItems.findIndex((item) => item.selected)].equipment,
                                                                     equipment_id: driverItems[driverItems.findIndex((item) => item.selected)].equipment_id
                                                                 })
-                                                                validateCarrierDriverForSaving({ keyCode: 9 });
+                                                                validateCarrierDriverForSaving({keyCode: 9});
                                                                 refDriverPhone.current.inputElement.focus();
                                                             }
 
@@ -8448,7 +8754,7 @@ const Dispatch = (props) => {
                                                         if (driverItems.length > 0) {
                                                             e.preventDefault();
                                                             if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
-                                                                await setSelectedCarrierDriver({ name: "" });
+                                                                await setSelectedCarrierDriver({name: ""});
 
                                                                 axios.post(props.serverUrl + "/saveOrder", {
                                                                     ...selectedOrder,
@@ -8501,7 +8807,7 @@ const Dispatch = (props) => {
                                             onBlur={(e) => {
                                                 if ((selectedCarrierDriver?.id || 0) > 0) {
                                                     if (e.target.value.trim() === "") {
-                                                        setSelectedCarrierDriver({ name: "" });
+                                                        setSelectedCarrierDriver({name: ""});
                                                     }
                                                 }
                                             }}
@@ -8648,7 +8954,8 @@ const Dispatch = (props) => {
                                                     }}
                                                     ref={refDriverDropDown}
                                                 >
-                                                    <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
+                                                    <div className="mochi-contextual-popup vertical below"
+                                                         style={{height: 150}}>
                                                         <div className="mochi-contextual-popup-content">
                                                             <div className="mochi-contextual-popup-wrapper">
                                                                 {driverItems.map((item, index) => {
@@ -8689,7 +8996,7 @@ const Dispatch = (props) => {
                                                                                             props.setSelectedOrder({
                                                                                                 ...res.data.order,
                                                                                                 component_id:
-                                                                                                    props.componentId,
+                                                                                                props.componentId,
                                                                                             });
                                                                                         } else {
 
@@ -8762,11 +9069,10 @@ const Dispatch = (props) => {
                                             )
                                     )}
                                 </div>
-
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <MaskedInput
-                                        tabIndex={58 + props.tabTimes}
+                                        tabIndex={62 + props.tabTimes}
                                         ref={refDriverPhone}
                                         mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/,]}
                                         guide={true}
@@ -8789,12 +9095,9 @@ const Dispatch = (props) => {
                                     />
                                 </div>
                                 <div className="form-h-sep"></div>
-                                <div className="input-box-container" style={{
-                                    maxWidth: "5.8rem",
-                                    minWidth: "5.8rem",
-                                }}                >
+                                <div className="input-box-container" style={{maxWidth: "5.8rem", minWidth: "5.8rem"}}>
                                     <input
-                                        tabIndex={59 + props.tabTimes}
+                                        tabIndex={63 + props.tabTimes}
                                         type="text"
                                         placeholder="Unit Number"
                                         onKeyDown={validateCarrierDriverForSaving}
@@ -8814,20 +9117,14 @@ const Dispatch = (props) => {
                                     />
                                 </div>
                                 <div className="form-h-sep"></div>
-                                <div
-                                    className="input-box-container"
-                                    style={{
-                                        maxWidth: "5.8rem",
-                                        minWidth: "5.8rem",
-                                    }}
-                                >
+                                <div className="input-box-container" style={{maxWidth: "5.8rem", minWidth: "5.8rem"}}>
                                     <input
-                                        tabIndex={60 + props.tabTimes}
+                                        tabIndex={64 + props.tabTimes}
                                         type="text"
                                         placeholder="Trailer Number"
                                         onKeyDown={(e) => {
                                             e.preventDefault();
-                                            validateCarrierInfoForSaving({ keyCode: 9 });
+                                            validateCarrierInfoForSaving({keyCode: 9});
 
                                             if ((selectedOrder?.id || 0) === 0) {
                                                 // window.alert('You must create or load an order first!');
@@ -8884,7 +9181,7 @@ const Dispatch = (props) => {
                             >
                                 <div
                                     className="mochi-button"
-                                    style={{ fontSize: "1rem" }}
+                                    style={{fontSize: "1rem"}}
                                     onClick={() => {
                                         if ((selectedOrder?.id || 0) === 0) {
                                             window.alert("You must create or load an order first!");
@@ -8908,17 +9205,13 @@ const Dispatch = (props) => {
                                         props.openPanel(panel, props.origin);
                                     }}
                                 >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">
-                                        (
-                                    </div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left"> (</div>
                                     <div className="mochi-button-base">Rate Confirmation</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">
-                                        )
-                                    </div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right"> )</div>
                                 </div>
                                 <div
                                     className="mochi-button"
-                                    style={{ fontSize: "1rem" }}
+                                    style={{fontSize: "1rem"}}
                                     onClick={() => {
                                         if ((selectedOrder?.id || 0) === 0) {
                                             window.alert("You must create or load an order first!");
@@ -8955,7 +9248,7 @@ const Dispatch = (props) => {
                                         )
                                     </div>
                                 </div>
-                                <div className="mochi-button" style={{ fontSize: "1rem" }} onClick={(e) => {
+                                <div className="mochi-button" style={{fontSize: "1rem"}} onClick={(e) => {
                                     if ((selectedOrder?.id || 0) === 0) {
                                         window.alert("You must create or load an order first!");
                                         return;
@@ -8978,14 +9271,14 @@ const Dispatch = (props) => {
                                 </div>
                                 <div
                                     className="mochi-button"
-                                    style={{ fontSize: "1rem" }}
+                                    style={{fontSize: "1rem"}}
                                     onClick={() => {
                                         if ((selectedOrder?.order_number || 0) === 0) {
                                             window.alert("You must select or create an order first!");
                                             return;
                                         }
 
-                                        setSelectedNoteForDriver({ id: 0 });
+                                        setSelectedNoteForDriver({id: 0});
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -9001,7 +9294,7 @@ const Dispatch = (props) => {
 
                         <div
                             className="form-borderless-box"
-                            style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+                            style={{flexGrow: 1, display: "flex", flexDirection: "column"}}
                         >
                             <div
                                 className="form-row"
@@ -9021,7 +9314,7 @@ const Dispatch = (props) => {
                                                 haz_mat: e.target.checked ? 1 : 0,
                                             });
 
-                                            validateOrderForSaving({ keyCode: 9 });
+                                            validateOrderForSaving({keyCode: 9});
                                         }}
                                         checked={(selectedOrder?.haz_mat || 0) === 1}
                                     />
@@ -9040,7 +9333,7 @@ const Dispatch = (props) => {
                                                 expedited: e.target.checked ? 1 : 0,
                                             });
 
-                                            validateOrderForSaving({ keyCode: 9 });
+                                            validateOrderForSaving({keyCode: 9});
                                         }}
                                         checked={(selectedOrder?.expedited || 0) === 1}
                                     />
@@ -9052,7 +9345,7 @@ const Dispatch = (props) => {
                             </div>
                             <div
                                 className="form-row"
-                                style={{ flexGrow: 1, display: "flex" }}
+                                style={{flexGrow: 1, display: "flex"}}
                             >
                                 <div className="form-bordered-box">
                                     <div className="form-header">
@@ -9072,7 +9365,7 @@ const Dispatch = (props) => {
                                                         return;
                                                     }
 
-                                                    setSelectedNoteForCarrier({ id: 0 });
+                                                    setSelectedNoteForCarrier({id: 0});
                                                 }}
                                             >
                                                 <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -9243,7 +9536,7 @@ const Dispatch = (props) => {
                                         openPanel={props.openPanel}
                                         closePanel={props.closePanel}
                                         componentId={moment().format("x")}
-                                        selectedOwner={{ ...selectedOrder }}
+                                        selectedOwner={{...selectedOrder}}
                                         selectedOwnerDocument={{
                                             id: 0,
                                             user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -9357,7 +9650,7 @@ const Dispatch = (props) => {
                     maxWidth: "69%",
                     alignItems: "center",
                 }}>
-                    <div className="pickups-container" style={{ display: "flex", flexDirection: "row" }}>
+                    <div className="pickups-container" style={{display: "flex", flexDirection: "row"}}>
                         <div className="swiper-pickup-prev-btn">
                             <span className="fas fa-chevron-left"></span>
                         </div>
@@ -9545,7 +9838,7 @@ const Dispatch = (props) => {
                                                                                 order_id: selected_order?.id || 0,
                                                                                 pickup_id: null,
                                                                                 delivery_id:
-                                                                                    selected_order.deliveries[0].id,
+                                                                                selected_order.deliveries[0].id,
                                                                                 type: "delivery",
                                                                             },
                                                                         ];
@@ -9669,23 +9962,23 @@ const Dispatch = (props) => {
                                                                                                         setSelectedOrder({
                                                                                                             ...selected_order,
                                                                                                             order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
                                                                                                             order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
                                                                                                         });
 
                                                                                                         props.setSelectedOrder({
                                                                                                             ...selected_order,
                                                                                                             order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
                                                                                                             order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
                                                                                                             component_id:
-                                                                                                                props.componentId,
+                                                                                                            props.componentId,
                                                                                                         });
                                                                                                     }
                                                                                                 })
@@ -9711,23 +10004,23 @@ const Dispatch = (props) => {
                                                                                                         setSelectedOrder({
                                                                                                             ...selected_order,
                                                                                                             order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
                                                                                                             order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
                                                                                                         });
 
                                                                                                         props.setSelectedOrder({
                                                                                                             ...selected_order,
                                                                                                             order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
                                                                                                             order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
                                                                                                             component_id:
-                                                                                                                props.componentId,
+                                                                                                            props.componentId,
                                                                                                         });
                                                                                                     }
                                                                                                 })
@@ -9752,21 +10045,21 @@ const Dispatch = (props) => {
                                                                                                 setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                 });
 
                                                                                                 props.setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                     component_id: props.componentId,
                                                                                                 });
                                                                                             }
@@ -9889,21 +10182,21 @@ const Dispatch = (props) => {
                                                                                                 setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                 });
 
                                                                                                 props.setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                     component_id: props.componentId,
                                                                                                 });
                                                                                             }
@@ -9929,21 +10222,21 @@ const Dispatch = (props) => {
                                                                                                 setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                 });
 
                                                                                                 props.setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                     component_id: props.componentId,
                                                                                                 });
                                                                                             }
@@ -9969,21 +10262,21 @@ const Dispatch = (props) => {
                                                                                         setSelectedOrder({
                                                                                             ...selected_order,
                                                                                             order_customer_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_customer_ratings,
+                                                                                            res.data.order
+                                                                                                .order_customer_ratings,
                                                                                             order_carrier_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_carrier_ratings,
+                                                                                            res.data.order
+                                                                                                .order_carrier_ratings,
                                                                                         });
 
                                                                                         props.setSelectedOrder({
                                                                                             ...selected_order,
                                                                                             order_customer_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_customer_ratings,
+                                                                                            res.data.order
+                                                                                                .order_customer_ratings,
                                                                                             order_carrier_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_carrier_ratings,
+                                                                                            res.data.order
+                                                                                                .order_carrier_ratings,
                                                                                             component_id: props.componentId,
                                                                                         });
                                                                                     }
@@ -10010,17 +10303,17 @@ const Dispatch = (props) => {
                                                                                 setSelectedOrder({
                                                                                     ...selected_order,
                                                                                     order_customer_ratings:
-                                                                                        res.data.order.order_customer_ratings,
+                                                                                    res.data.order.order_customer_ratings,
                                                                                     order_carrier_ratings:
-                                                                                        res.data.order.order_carrier_ratings,
+                                                                                    res.data.order.order_carrier_ratings,
                                                                                 });
 
                                                                                 props.setSelectedOrder({
                                                                                     ...selected_order,
                                                                                     order_customer_ratings:
-                                                                                        res.data.order.order_customer_ratings,
+                                                                                    res.data.order.order_customer_ratings,
                                                                                     order_carrier_ratings:
-                                                                                        res.data.order.order_carrier_ratings,
+                                                                                    res.data.order.order_carrier_ratings,
                                                                                     component_id: props.componentId,
                                                                                 });
                                                                             }
@@ -10061,10 +10354,10 @@ const Dispatch = (props) => {
                                             // }
 
                                             let pickups = selectedOrder?.pickups || [];
-                                            pickups.push({ id: 0 });
-                                            setSelectedShipperCustomer({ id: 0, pickup_id: 0 });
+                                            pickups.push({id: 0});
+                                            setSelectedShipperCustomer({id: 0, pickup_id: 0});
                                             setSelectedShipperCustomerContact({});
-                                            setSelectedOrder({ ...selectedOrder, pickups: pickups });
+                                            setSelectedOrder({...selectedOrder, pickups: pickups});
 
                                             refShipperCompanyCode.current.focus();
                                         }}
@@ -10110,30 +10403,17 @@ const Dispatch = (props) => {
                             props.openPanel(panel, props.origin);
                         }}
                     >
-                        <div className="mochi-button-decorator mochi-button-decorator-left">
-                            (
-                        </div>
+                        <div className="mochi-button-decorator mochi-button-decorator-left">                            (                        </div>
                         <div className="mochi-button-base">Routing</div>
-                        <div className="mochi-button-decorator mochi-button-decorator-right">
-                            )
-                        </div>
+                        <div className="mochi-button-decorator mochi-button-decorator-right">                            )                        </div>
                     </div>
                     <div className="form-h-sep"></div>
-                    <div
-                        className="deliveries-container"
-                        style={{ display: "flex", flexDirection: "row" }}
-                    >
+                    <div className="deliveries-container" style={{display: "flex", flexDirection: "row"}}>
                         <div className="swiper-delivery-prev-btn">
                             <span className="fas fa-chevron-left"></span>
                         </div>
 
-                        <Swiper
-                            slidesPerView={5}
-                            navigation={{
-                                prevEl: ".swiper-delivery-prev-btn",
-                                nextEl: ".swiper-delivery-next-btn",
-                            }}
-                        >
+                        <Swiper slidesPerView={5} navigation={{prevEl: ".swiper-delivery-prev-btn", nextEl: ".swiper-delivery-next-btn"}}>
                             {[
                                 ...getDeliveriesOnRouting(),
                                 ...(selectedOrder?.deliveries || []).filter(
@@ -10224,6 +10504,10 @@ const Dispatch = (props) => {
                                                     delivery_date2: delivery.delivery_date2,
                                                     delivery_time1: delivery.delivery_time1,
                                                     delivery_time2: delivery.delivery_time2,
+                                                    bol_numbers: delivery.bol_numbers,
+                                                    po_numbers: delivery.po_numbers,
+                                                    ref_numbers: delivery.ref_numbers,
+                                                    seal_number: delivery.seal_number,
                                                     special_instructions: delivery.special_instructions,
                                                     type: delivery.type,
                                                 });
@@ -10298,9 +10582,9 @@ const Dispatch = (props) => {
                                                                     ];
 
                                                                     axios.post(props.serverUrl + "/saveOrderRouting", {
-                                                                        order_id: selected_order?.id || 0,
-                                                                        routing: routing,
-                                                                    }
+                                                                            order_id: selected_order?.id || 0,
+                                                                            routing: routing,
+                                                                        }
                                                                     ).then((res) => {
                                                                         if (res.data.result === "OK") {
                                                                             selected_order = res.data.order;
@@ -10412,23 +10696,23 @@ const Dispatch = (props) => {
                                                                                                 setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                 });
 
                                                                                                 props.setSelectedOrder({
                                                                                                     ...selected_order,
                                                                                                     order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_customer_ratings,
                                                                                                     order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    res.data.order
+                                                                                                        .order_carrier_ratings,
                                                                                                     component_id:
-                                                                                                        props.componentId,
+                                                                                                    props.componentId,
                                                                                                 });
                                                                                             }
                                                                                         })
@@ -10481,21 +10765,21 @@ const Dispatch = (props) => {
                                                                                         setSelectedOrder({
                                                                                             ...selected_order,
                                                                                             order_customer_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_customer_ratings,
+                                                                                            res.data.order
+                                                                                                .order_customer_ratings,
                                                                                             order_carrier_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_carrier_ratings,
+                                                                                            res.data.order
+                                                                                                .order_carrier_ratings,
                                                                                         });
 
                                                                                         props.setSelectedOrder({
                                                                                             ...selected_order,
                                                                                             order_customer_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_customer_ratings,
+                                                                                            res.data.order
+                                                                                                .order_customer_ratings,
                                                                                             order_carrier_ratings:
-                                                                                                res.data.order
-                                                                                                    .order_carrier_ratings,
+                                                                                            res.data.order
+                                                                                                .order_carrier_ratings,
                                                                                             component_id: props.componentId,
                                                                                         });
                                                                                     }
@@ -10618,21 +10902,21 @@ const Dispatch = (props) => {
                                                                                             setSelectedOrder({
                                                                                                 ...selected_order,
                                                                                                 order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_customer_ratings,
                                                                                                 order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_carrier_ratings,
                                                                                             });
 
                                                                                             props.setSelectedOrder({
                                                                                                 ...selected_order,
                                                                                                 order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_customer_ratings,
                                                                                                 order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_carrier_ratings,
                                                                                                 component_id: props.componentId,
                                                                                             });
                                                                                         }
@@ -10658,21 +10942,21 @@ const Dispatch = (props) => {
                                                                                             setSelectedOrder({
                                                                                                 ...selected_order,
                                                                                                 order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_customer_ratings,
                                                                                                 order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_carrier_ratings,
                                                                                             });
 
                                                                                             props.setSelectedOrder({
                                                                                                 ...selected_order,
                                                                                                 order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_customer_ratings,
                                                                                                 order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                res.data.order
+                                                                                                    .order_carrier_ratings,
                                                                                                 component_id: props.componentId,
                                                                                             });
                                                                                         }
@@ -10698,11 +10982,11 @@ const Dispatch = (props) => {
                                                                                     props.setSelectedOrder({
                                                                                         ...selected_order,
                                                                                         order_customer_ratings:
-                                                                                            res.data.order
-                                                                                                .order_customer_ratings,
+                                                                                        res.data.order
+                                                                                            .order_customer_ratings,
                                                                                         order_carrier_ratings:
-                                                                                            res.data.order
-                                                                                                .order_carrier_ratings,
+                                                                                        res.data.order
+                                                                                            .order_carrier_ratings,
                                                                                         component_id: props.componentId,
                                                                                     });
                                                                                 }
@@ -10729,9 +11013,9 @@ const Dispatch = (props) => {
                                                                             props.setSelectedOrder({
                                                                                 ...selected_order,
                                                                                 order_customer_ratings:
-                                                                                    res.data.order.order_customer_ratings,
+                                                                                res.data.order.order_customer_ratings,
                                                                                 order_carrier_ratings:
-                                                                                    res.data.order.order_carrier_ratings,
+                                                                                res.data.order.order_carrier_ratings,
                                                                                 component_id: props.componentId,
                                                                             });
                                                                         }
@@ -10772,8 +11056,8 @@ const Dispatch = (props) => {
                                             }
 
                                             let deliveries = selectedOrder?.deliveries || [];
-                                            deliveries.push({ id: 0 });
-                                            setSelectedConsigneeCustomer({ id: 0, delivery_id: 0 });
+                                            deliveries.push({id: 0});
+                                            setSelectedConsigneeCustomer({id: 0, delivery_id: 0});
                                             setSelectedConsigneeCustomerContact({});
                                             setSelectedOrder({
                                                 ...selectedOrder,
@@ -10822,7 +11106,7 @@ const Dispatch = (props) => {
 
             </div>
 
-            <div className="fields-container-row" style={{ marginTop: 10 }}>
+            <div className="fields-container-row" style={{marginTop: 10}}>
                 <div
                     className="fields-container-col"
                     style={{
@@ -10943,7 +11227,7 @@ const Dispatch = (props) => {
 
                             <div
                                 className="form-wrapper"
-                                style={{ overflowX: "hidden", overflowY: "visible" }}
+                                style={{overflowX: "hidden", overflowY: "visible"}}
                             >
                                 <div className="form-row">
                                     <div className="input-box-container input-code">
@@ -12095,7 +12379,7 @@ const Dispatch = (props) => {
                                                     <div className="form-h-sep"></div>
                                                     <div
                                                         className="input-box-container input-phone"
-                                                        style={{ position: "relative" }}
+                                                        style={{position: "relative"}}
                                                     >
                                                         <MaskedInput
                                                             tabIndex={24 + props.tabTimes}
@@ -12291,19 +12575,19 @@ const Dispatch = (props) => {
                                                         {(selectedShipperCustomer?.contacts || []).find(
                                                             (c) => c.is_primary === 1
                                                         ) !== undefined && (
-                                                                <div
-                                                                    className={classnames({
-                                                                        "selected-customer-contact-primary-phone": true,
-                                                                        pushed: false,
-                                                                    })}
-                                                                >
-                                                                    {
-                                                                        selectedShipperCustomer?.contacts.find(
-                                                                            (c) => c.is_primary === 1
-                                                                        ).primary_phone
-                                                                    }
-                                                                </div>
-                                                            )}
+                                                            <div
+                                                                className={classnames({
+                                                                    "selected-customer-contact-primary-phone": true,
+                                                                    pushed: false,
+                                                                })}
+                                                            >
+                                                                {
+                                                                    selectedShipperCustomer?.contacts.find(
+                                                                        (c) => c.is_primary === 1
+                                                                    ).primary_phone
+                                                                }
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="form-h-sep"></div>
                                                     <div className="input-box-container input-phone-ext">
@@ -12465,9 +12749,11 @@ const Dispatch = (props) => {
                                 {shipperSecondPageTransition(
                                     (style, item) =>
                                         item && (
-                                            <animated.div className="form-page second-page shipper-second-page" style={{ ...style }}>
-                                                <div className="form-row" style={{ alignItems: "center" }}>
-                                                    <div className="select-box-container" style={{ flexGrow: 1, position: "relative" }}>
+                                            <animated.div className="form-page second-page shipper-second-page"
+                                                          style={{...style}}>
+                                                <div className="form-row" style={{alignItems: "center"}}>
+                                                    <div className="select-box-container"
+                                                         style={{flexGrow: 1, position: "relative"}}>
                                                         <div className="select-box-wrapper">
                                                             <MaskedInput
                                                                 tabIndex={26 + props.tabTimes}
@@ -12482,11 +12768,9 @@ const Dispatch = (props) => {
                                                                     let key = e.keyCode || e.which;
                                                                     await setPuDate1KeyCode(key);
 
-                                                                    let puDate1 =
-                                                                        e.target.value.trim() === ""
-                                                                            ? moment()
-                                                                            : moment(
-                                                                                getFormattedDates(selectedShipperCustomer?.pu_date1 || ""), "MM/DD/YYYY");
+                                                                    let puDate1 = e.target.value.trim() === ""
+                                                                        ? moment()
+                                                                        : moment(getFormattedDates(selectedShipperCustomer?.pu_date1 || ""), "MM/DD/YYYY");
                                                                     await setPreSelectedPickupDate1(puDate1);
 
                                                                     if (key === 13) {
@@ -12545,9 +12829,7 @@ const Dispatch = (props) => {
 
                                                                             await setSelectedOrder({
                                                                                 ...selectedOrder,
-                                                                                pickups: (
-                                                                                    selectedOrder?.pickups || []
-                                                                                ).map((pu, i) => {
+                                                                                pickups: (selectedOrder?.pickups || []).map((pu, i) => {
                                                                                     if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                         pu.pu_date1 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
                                                                                     }
@@ -12604,11 +12886,11 @@ const Dispatch = (props) => {
                                                                     setSelectedOrder({
                                                                         ...selectedOrder,
                                                                         pickups: (selectedOrder?.pickups || []).map((pu, i) => {
-                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
-                                                                                pu.pu_date1 = e.target.value;
+                                                                                if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                    pu.pu_date1 = e.target.value;
+                                                                                }
+                                                                                return pu;
                                                                             }
-                                                                            return pu;
-                                                                        }
                                                                         ),
                                                                     });
                                                                 }}
@@ -12621,11 +12903,11 @@ const Dispatch = (props) => {
                                                                     setSelectedOrder({
                                                                         ...selectedOrder,
                                                                         pickups: (selectedOrder?.pickups || []).map((pu, i) => {
-                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
-                                                                                pu.pu_date1 = e.target.value;
+                                                                                if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                    pu.pu_date1 = e.target.value;
+                                                                                }
+                                                                                return pu;
                                                                             }
-                                                                            return pu;
-                                                                        }
                                                                         ),
                                                                     });
                                                                 }}
@@ -12669,7 +12951,7 @@ const Dispatch = (props) => {
                                                                     >
                                                                         <div
                                                                             className="mochi-contextual-popup vertical below right"
-                                                                            style={{ height: 275 }}
+                                                                            style={{height: 275}}
                                                                         >
                                                                             <div className="mochi-contextual-popup-content">
                                                                                 <div className="mochi-contextual-popup-wrapper">
@@ -12682,10 +12964,10 @@ const Dispatch = (props) => {
                                                                                                 ).trim(),
                                                                                                 "MM/DD/YYYY"
                                                                                             ).format("MM/DD/YYYY") ===
-                                                                                                (
-                                                                                                    selectedShipperCustomer?.pu_date1 ||
-                                                                                                    ""
-                                                                                                ).trim()
+                                                                                            (
+                                                                                                selectedShipperCustomer?.pu_date1 ||
+                                                                                                ""
+                                                                                            ).trim()
                                                                                                 ? moment(
                                                                                                     selectedShipperCustomer?.pu_date1,
                                                                                                     "MM/DD/YYYY"
@@ -12874,7 +13156,7 @@ const Dispatch = (props) => {
                                                     </div>
                                                     <div
                                                         className="select-box-container"
-                                                        style={{ flexGrow: 1, position: "relative" }}
+                                                        style={{flexGrow: 1, position: "relative"}}
                                                     >
                                                         <div className="select-box-wrapper">
                                                             <MaskedInput
@@ -13157,7 +13439,7 @@ const Dispatch = (props) => {
                                                                     >
                                                                         <div
                                                                             className="mochi-contextual-popup vertical below right"
-                                                                            style={{ height: 275 }}
+                                                                            style={{height: 275}}
                                                                         >
                                                                             <div className="mochi-contextual-popup-content">
                                                                                 <div className="mochi-contextual-popup-wrapper">
@@ -13170,10 +13452,10 @@ const Dispatch = (props) => {
                                                                                                 ).trim(),
                                                                                                 "MM/DD/YYYY"
                                                                                             ).format("MM/DD/YYYY") ===
-                                                                                                (
-                                                                                                    selectedShipperCustomer?.pu_date2 ||
-                                                                                                    ""
-                                                                                                ).trim()
+                                                                                            (
+                                                                                                selectedShipperCustomer?.pu_date2 ||
+                                                                                                ""
+                                                                                            ).trim()
                                                                                                 ? moment(
                                                                                                     selectedShipperCustomer?.pu_date2,
                                                                                                     "MM/DD/YYYY"
@@ -13345,90 +13627,59 @@ const Dispatch = (props) => {
                                                     </div>
                                                 </div>
 
-                                                <div
-                                                    className="form-row"
-                                                    style={{ alignItems: "center" }}
-                                                >
-                                                    <div
-                                                        className="input-box-container grow"
-                                                        style={{ flexGrow: 1, flexBasis: "100%" }}
-                                                    >
-                                                        {(selectedShipperCustomer?.bol_numbers || "")
-                                                            .split(" ")
-                                                            .map((item, index) => {
-                                                                if (item.trim() !== "") {
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            style={{
-                                                                                display: "flex",
-                                                                                alignItems: "center",
-                                                                                fontSize: "0.7rem",
-                                                                                backgroundColor: "rgba(0,0,0,0.2)",
-                                                                                padding: "2px 10px",
-                                                                                borderRadius: "10px",
-                                                                                marginRight: "2px",
-                                                                                cursor: "default",
+                                                <div className="form-row" style={{alignItems: "center"}}>
+                                                    <div className="input-box-container grow"
+                                                         style={{flexGrow: 1, flexBasis: "100%"}}>
+                                                        {(selectedShipperCustomer?.bol_numbers || "").split(" ").map((item, index) => {
+                                                            if (item.trim() !== "") {
+                                                                return (
+                                                                    <div key={index} style={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        fontSize: "0.7rem",
+                                                                        backgroundColor: "rgba(0,0,0,0.2)",
+                                                                        padding: "2px 10px",
+                                                                        borderRadius: "10px",
+                                                                        marginRight: "2px",
+                                                                        cursor: "default",
+                                                                    }}
+                                                                         title={item}
+                                                                    >
+                                                                            <span className="fas fa-trash-alt" style={{
+                                                                                marginRight: "5px",
+                                                                                cursor: "pointer"
+                                                                            }} onClick={() => {
+                                                                                setSelectedShipperCustomer({
+                                                                                    ...selectedShipperCustomer,
+                                                                                    bol_numbers: (selectedShipperCustomer?.bol_numbers || "").replace(item, "").trim(),
+                                                                                });
+
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                                        if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                            pu.bol_numbers = (selectedShipperCustomer?.bol_numbers || "").replace(item, "").trim();
+                                                                                        }
+                                                                                        return pu;
+                                                                                    }),
+                                                                                });
+
+                                                                                setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
                                                                             }}
-                                                                            title={item}
-                                                                        >
-                                                                            <span
-                                                                                className="fas fa-trash-alt"
-                                                                                style={{
-                                                                                    marginRight: "5px",
-                                                                                    cursor: "pointer",
-                                                                                }}
-                                                                                onClick={() => {
-                                                                                    setSelectedShipperCustomer({
-                                                                                        ...selectedShipperCustomer,
-                                                                                        bol_numbers: (
-                                                                                            selectedShipperCustomer?.bol_numbers ||
-                                                                                            ""
-                                                                                        )
-                                                                                            .replace(item, "")
-                                                                                            .trim(),
-                                                                                    });
-
-                                                                                    setSelectedOrder({
-                                                                                        ...selectedOrder,
-                                                                                        pickups: (
-                                                                                            selectedOrder?.pickups || []
-                                                                                        ).map((pu, i) => {
-                                                                                            if (
-                                                                                                pu.id ===
-                                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                                    0)
-                                                                                            ) {
-                                                                                                pu.bol_numbers = (
-                                                                                                    selectedShipperCustomer?.bol_numbers ||
-                                                                                                    ""
-                                                                                                )
-                                                                                                    .replace(item, "")
-                                                                                                    .trim();
-                                                                                            }
-                                                                                            return pu;
-                                                                                        }),
-                                                                                    });
-
-                                                                                    setIsSavingPickupId(
-                                                                                        selectedShipperCustomer?.pickup_id ||
-                                                                                        0
-                                                                                    );
-                                                                                }}
                                                                             ></span>
 
-                                                                            <span
-                                                                                className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: "nowrap" }}
-                                                                            >
+                                                                        <span
+                                                                            className="automatic-email-inputted"
+                                                                            style={{whiteSpace: "nowrap"}}
+                                                                        >
                                                                                 {item}
                                                                             </span>
-                                                                        </div>
-                                                                    );
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })}
+                                                                    </div>
+                                                                );
+                                                            } else {
+                                                                return false;
+                                                            }
+                                                        })}
 
                                                         <input
                                                             tabIndex={30 + props.tabTimes}
@@ -13454,7 +13705,7 @@ const Dispatch = (props) => {
                                                     ></div>
                                                     <div
                                                         className="input-box-container grow"
-                                                        style={{ flexGrow: 1, flexBasis: "100%" }}
+                                                        style={{flexGrow: 1, flexBasis: "100%"}}
                                                     >
                                                         {(selectedShipperCustomer?.po_numbers || "")
                                                             .split(" ")
@@ -13522,7 +13773,7 @@ const Dispatch = (props) => {
 
                                                                             <span
                                                                                 className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: "nowrap" }}
+                                                                                style={{whiteSpace: "nowrap"}}
                                                                             >
                                                                                 {item}
                                                                             </span>
@@ -13549,89 +13800,73 @@ const Dispatch = (props) => {
                                                     </div>
                                                 </div>
 
-                                                <div
-                                                    className="form-row"
-                                                    style={{ alignItems: "center" }}
-                                                >
-                                                    <div
-                                                        className="input-box-container grow"
-                                                        style={{ flexGrow: 1, flexBasis: "100%" }}
-                                                    >
-                                                        {(selectedShipperCustomer?.ref_numbers || "")
-                                                            .split(" ")
-                                                            .map((item, index) => {
-                                                                if (item.trim() !== "") {
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            style={{
-                                                                                display: "flex",
-                                                                                alignItems: "center",
-                                                                                fontSize: "0.7rem",
-                                                                                backgroundColor: "rgba(0,0,0,0.2)",
-                                                                                padding: "2px 10px",
-                                                                                borderRadius: "10px",
-                                                                                marginRight: "2px",
-                                                                                cursor: "default",
+                                                <div className="form-row" style={{alignItems: "center"}}>
+                                                    <div className="input-box-container grow"
+                                                         style={{flexGrow: 1, flexBasis: "100%"}}>
+                                                        {(selectedShipperCustomer?.ref_numbers || "").split(" ").map((item, index) => {
+                                                            if (item.trim() !== "") {
+                                                                return (
+                                                                    <div key={index} style={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        fontSize: "0.7rem",
+                                                                        backgroundColor: "rgba(0,0,0,0.2)",
+                                                                        padding: "2px 10px",
+                                                                        borderRadius: "10px",
+                                                                        marginRight: "2px",
+                                                                        cursor: "default",
+                                                                    }}
+                                                                         title={item}
+                                                                    >
+                                                                            <span className="fas fa-trash-alt" style={{
+                                                                                marginRight: "5px",
+                                                                                cursor: "pointer"
                                                                             }}
-                                                                            title={item}
-                                                                        >
-                                                                            <span
-                                                                                className="fas fa-trash-alt"
-                                                                                style={{
-                                                                                    marginRight: "5px",
-                                                                                    cursor: "pointer",
-                                                                                }}
-                                                                                onClick={() => {
-                                                                                    setSelectedShipperCustomer({
-                                                                                        ...selectedShipperCustomer,
-                                                                                        ref_numbers: (
-                                                                                            selectedShipperCustomer?.ref_numbers ||
-                                                                                            ""
-                                                                                        )
-                                                                                            .replace(item, "")
-                                                                                            .trim(),
-                                                                                    });
+                                                                                  onClick={() => {
+                                                                                      setSelectedShipperCustomer({
+                                                                                          ...selectedShipperCustomer,
+                                                                                          ref_numbers: (selectedShipperCustomer?.ref_numbers || "").replace(item, "").trim()
+                                                                                      });
 
-                                                                                    setSelectedOrder({
-                                                                                        ...selectedOrder,
-                                                                                        pickups: (
-                                                                                            selectedOrder?.pickups || []
-                                                                                        ).map((pu, i) => {
-                                                                                            if (
-                                                                                                pu.id ===
-                                                                                                selectedShipperCustomer.pickup_id
-                                                                                            ) {
-                                                                                                pu.ref_numbers = (
-                                                                                                    selectedShipperCustomer?.ref_numbers ||
-                                                                                                    ""
-                                                                                                )
-                                                                                                    .replace(item, "")
-                                                                                                    .trim();
-                                                                                            }
-                                                                                            return pu;
-                                                                                        }),
-                                                                                    });
+                                                                                      setSelectedOrder({
+                                                                                          ...selectedOrder,
+                                                                                          pickups: (
+                                                                                              selectedOrder?.pickups || []
+                                                                                          ).map((pu, i) => {
+                                                                                              if (
+                                                                                                  pu.id ===
+                                                                                                  selectedShipperCustomer.pickup_id
+                                                                                              ) {
+                                                                                                  pu.ref_numbers = (
+                                                                                                      selectedShipperCustomer?.ref_numbers ||
+                                                                                                      ""
+                                                                                                  )
+                                                                                                      .replace(item, "")
+                                                                                                      .trim();
+                                                                                              }
+                                                                                              return pu;
+                                                                                          }),
+                                                                                      });
 
-                                                                                    setIsSavingPickupId(
-                                                                                        selectedShipperCustomer?.pickup_id ||
-                                                                                        0
-                                                                                    );
-                                                                                }}
+                                                                                      setIsSavingPickupId(
+                                                                                          selectedShipperCustomer?.pickup_id ||
+                                                                                          0
+                                                                                      );
+                                                                                  }}
                                                                             ></span>
 
-                                                                            <span
-                                                                                className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: "nowrap" }}
-                                                                            >
+                                                                        <span
+                                                                            className="automatic-email-inputted"
+                                                                            style={{whiteSpace: "nowrap"}}
+                                                                        >
                                                                                 {item}
                                                                             </span>
-                                                                        </div>
-                                                                    );
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })}
+                                                                    </div>
+                                                                );
+                                                            } else {
+                                                                return false;
+                                                            }
+                                                        })}
                                                         <input
                                                             tabIndex={32 + props.tabTimes}
                                                             type="text"
@@ -13656,7 +13891,7 @@ const Dispatch = (props) => {
                                                     ></div>
                                                     <div
                                                         className="input-box-container grow"
-                                                        style={{ flexGrow: 1, flexBasis: "100%" }}
+                                                        style={{flexGrow: 1, flexBasis: "100%"}}
                                                     >
                                                         <input
                                                             tabIndex={33 + props.tabTimes}
@@ -13720,10 +13955,7 @@ const Dispatch = (props) => {
                                                     </div>
                                                 </div>
 
-                                                <div
-                                                    className="form-row"
-                                                    style={{ alignItems: "center" }}
-                                                >
+                                                <div className="form-row" style={{alignItems: "center"}}>
                                                     <div className="input-box-container grow">
                                                         <input
                                                             tabIndex={34 + props.tabTimes}
@@ -13796,6 +14028,7 @@ const Dispatch = (props) => {
                                                         />
                                                     </div>
                                                 </div>
+
                                             </animated.div>
                                         )
                                 )}
@@ -15067,55 +15300,25 @@ const Dispatch = (props) => {
                                                                 }
                                                             }}
                                                             value={
-                                                                (
-                                                                    selectedConsigneeCustomer?.contacts || []
-                                                                ).find((c) => c.is_primary === 1) === undefined
-                                                                    ? selectedConsigneeCustomer?.contact_name ||
-                                                                    ""
-                                                                    : selectedConsigneeCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).first_name +
-                                                                    " " +
-                                                                    selectedConsigneeCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).last_name
+                                                                (selectedConsigneeCustomer?.contacts || []).find((c) => c.is_primary === 1) === undefined
+                                                                    ? selectedConsigneeCustomer?.contact_name || ""
+                                                                    : selectedConsigneeCustomer?.contacts.find((c) => c.is_primary === 1).first_name + " " + selectedConsigneeCustomer?.contacts.find((c) => c.is_primary === 1).last_name
                                                             }
                                                         />
                                                     </div>
                                                     <div className="form-h-sep"></div>
-                                                    <div
-                                                        className="input-box-container input-phone"
-                                                        style={{ position: "relative" }}
-                                                    >
+                                                    <div className="input-box-container input-phone"
+                                                         style={{position: "relative"}}>
                                                         <MaskedInput
                                                             tabIndex={43 + props.tabTimes}
-                                                            mask={[
-                                                                /[0-9]/,
-                                                                /\d/,
-                                                                /\d/,
-                                                                "-",
-                                                                /\d/,
-                                                                /\d/,
-                                                                /\d/,
-                                                                "-",
-                                                                /\d/,
-                                                                /\d/,
-                                                                /\d/,
-                                                                /\d/,
-                                                            ]}
+                                                            mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
                                                             guide={true}
                                                             type="text"
                                                             placeholder="Contact Phone"
                                                             // onKeyDown={validateConsigneeCompanyContactForSaving}
                                                             onInput={(e) => {
-                                                                if (
-                                                                    (selectedConsigneeCustomer?.id || 0) === 0
-                                                                ) {
-                                                                    if (
-                                                                        (selectedOrder?.deliveries || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
+                                                                if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                    if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
                                                                             deliveries: [
@@ -15131,9 +15334,7 @@ const Dispatch = (props) => {
                                                                     } else {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
+                                                                            deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
                                                                                 if (p.id === 0) {
                                                                                     p.customer = {
                                                                                         ...p.customer,
@@ -15150,15 +15351,10 @@ const Dispatch = (props) => {
                                                                         contact_phone: e.target.value,
                                                                     });
                                                                 } else {
-                                                                    if (
-                                                                        (selectedConsigneeCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
+                                                                    if ((selectedConsigneeCustomer?.contacts || []).length === 0) {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
+                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
                                                                                 if (p.id === 0) {
                                                                                     p.customer = {
                                                                                         ...p.customer,
@@ -15177,14 +15373,8 @@ const Dispatch = (props) => {
                                                                 }
                                                             }}
                                                             onChange={(e) => {
-                                                                if (
-                                                                    (selectedConsigneeCustomer?.id || 0) === 0
-                                                                ) {
-                                                                    if (
-                                                                        (selectedOrder?.deliveries || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
+                                                                if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                    if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
                                                                             deliveries: [
@@ -15288,19 +15478,19 @@ const Dispatch = (props) => {
                                                         {(selectedConsigneeCustomer?.contacts || []).find(
                                                             (c) => c.is_primary === 1
                                                         ) !== undefined && (
-                                                                <div
-                                                                    className={classnames({
-                                                                        "selected-customer-contact-primary-phone": true,
-                                                                        pushed: false,
-                                                                    })}
-                                                                >
-                                                                    {
-                                                                        selectedConsigneeCustomer?.contacts.find(
-                                                                            (c) => c.is_primary === 1
-                                                                        ).primary_phone
-                                                                    }
-                                                                </div>
-                                                            )}
+                                                            <div
+                                                                className={classnames({
+                                                                    "selected-customer-contact-primary-phone": true,
+                                                                    pushed: false,
+                                                                })}
+                                                            >
+                                                                {
+                                                                    selectedConsigneeCustomer?.contacts.find(
+                                                                        (c) => c.is_primary === 1
+                                                                    ).primary_phone
+                                                                }
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="form-h-sep"></div>
                                                     <div className="input-box-container input-phone-ext">
@@ -15468,36 +15658,16 @@ const Dispatch = (props) => {
                                 {consigneeSecondPageTransition(
                                     (style, item) =>
                                         item && (
-                                            <animated.div
-                                                className="form-page second-page consignee-second-page"
-                                                style={{
-                                                    ...style,
-                                                }}
-                                            >
-                                                <div
-                                                    className="form-row"
-                                                    style={{ alignItems: "center" }}
-                                                >
-                                                    <div
-                                                        className="select-box-container"
-                                                        style={{ flexGrow: 1, position: "relative" }}
-                                                    >
+                                            <animated.div className="form-page second-page consignee-second-page"
+                                                          style={{...style}}>
+                                                <div className="form-row" style={{alignItems: "center"}}>
+                                                    <div className="select-box-container"
+                                                         style={{flexGrow: 1, position: "relative"}}>
                                                         <div className="select-box-wrapper">
                                                             <MaskedInput
                                                                 tabIndex={46 + props.tabTimes}
                                                                 ref={refDeliveryDate1}
-                                                                mask={[
-                                                                    /[0-9]/,
-                                                                    /\d/,
-                                                                    "/",
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    "/",
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                ]}
+                                                                mask={[/[0-9]/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]}
                                                                 guide={false}
                                                                 type="text"
                                                                 placeholder="Delivery Date 1"
@@ -15781,7 +15951,7 @@ const Dispatch = (props) => {
                                                                     >
                                                                         <div
                                                                             className="mochi-contextual-popup vertical below right"
-                                                                            style={{ height: 275 }}
+                                                                            style={{height: 275}}
                                                                         >
                                                                             <div className="mochi-contextual-popup-content">
                                                                                 <div className="mochi-contextual-popup-wrapper">
@@ -15794,10 +15964,10 @@ const Dispatch = (props) => {
                                                                                                 ).trim(),
                                                                                                 "MM/DD/YYYY"
                                                                                             ).format("MM/DD/YYYY") ===
-                                                                                                (
-                                                                                                    selectedConsigneeCustomer?.delivery_date1 ||
-                                                                                                    ""
-                                                                                                ).trim()
+                                                                                            (
+                                                                                                selectedConsigneeCustomer?.delivery_date1 ||
+                                                                                                ""
+                                                                                            ).trim()
                                                                                                 ? moment(
                                                                                                     selectedConsigneeCustomer?.delivery_date1,
                                                                                                     "MM/DD/YYYY"
@@ -15982,35 +16152,19 @@ const Dispatch = (props) => {
                                                             }
                                                         />
                                                     </div>
-                                                    <div
-                                                        style={{
-                                                            minWidth: "1.8rem",
-                                                            fontSize: "1rem",
-                                                            textAlign: "center",
-                                                        }}
-                                                    >
-                                                        To
+                                                    <div style={{
+                                                        minWidth: "1.8rem",
+                                                        fontSize: "1rem",
+                                                        textAlign: "center"
+                                                    }}>To
                                                     </div>
-                                                    <div
-                                                        className="select-box-container"
-                                                        style={{ flexGrow: 1, position: "relative" }}
-                                                    >
+                                                    <div className="select-box-container"
+                                                         style={{flexGrow: 1, position: "relative"}}>
                                                         <div className="select-box-wrapper">
                                                             <MaskedInput
                                                                 tabIndex={47 + props.tabTimes}
                                                                 ref={refDeliveryDate2}
-                                                                mask={[
-                                                                    /[0-9]/,
-                                                                    /\d/,
-                                                                    "/",
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    "/",
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                ]}
+                                                                mask={[/[0-9]/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]}
                                                                 guide={false}
                                                                 type="text"
                                                                 placeholder="Delivery Date 2"
@@ -16019,43 +16173,23 @@ const Dispatch = (props) => {
                                                                     let key = e.keyCode || e.which;
                                                                     await setDeliveryDate2KeyCode(key);
 
-                                                                    let deliveryDate2 =
-                                                                        e.target.value.trim() === ""
-                                                                            ? moment()
-                                                                            : moment(
-                                                                                getFormattedDates(
-                                                                                    selectedConsigneeCustomer?.delivery_date2 ||
-                                                                                    ""
-                                                                                ),
-                                                                                "MM/DD/YYYY"
-                                                                            );
-                                                                    await setPreSelectedDeliveryDate1(
-                                                                        deliveryDate2
-                                                                    );
+                                                                    let deliveryDate2 = e.target.value.trim() === ""
+                                                                        ? moment()
+                                                                        : moment(getFormattedDates(selectedConsigneeCustomer?.delivery_date2 || ""), "MM/DD/YYYY");
+                                                                    await setPreSelectedDeliveryDate1(deliveryDate2);
 
                                                                     if (key === 13) {
                                                                         if (isDeliveryDate2CalendarShown) {
                                                                             await setSelectedConsigneeCustomer({
                                                                                 ...selectedConsigneeCustomer,
-                                                                                delivery_date2: preSelectedDeliveryDate2
-                                                                                    .clone()
-                                                                                    .format("MM/DD/YYYY"),
+                                                                                delivery_date2: preSelectedDeliveryDate2.clone().format("MM/DD/YYYY")
                                                                             });
 
                                                                             await setSelectedOrder({
                                                                                 ...selectedOrder,
-                                                                                deliveries: (
-                                                                                    selectedOrder?.deliveries || []
-                                                                                ).map((delivery, i) => {
-                                                                                    if (
-                                                                                        delivery.id ===
-                                                                                        (selectedConsigneeCustomer?.delivery_id ||
-                                                                                            0)
-                                                                                    ) {
-                                                                                        delivery.delivery_date2 =
-                                                                                            preSelectedDeliveryDate2
-                                                                                                .clone()
-                                                                                                .format("MM/DD/YYYY");
+                                                                                deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                                    if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                        delivery.delivery_date2 = preSelectedDeliveryDate2.clone().format("MM/DD/YYYY");
                                                                                         setIsSavingDeliveryId(-1);
                                                                                         setIsSavingDeliveryId(delivery.id);
                                                                                     }
@@ -16063,18 +16197,10 @@ const Dispatch = (props) => {
                                                                                 }),
                                                                             });
 
-                                                                            await setIsPickupDate1CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsPickupDate2CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsDeliveryDate1CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsDeliveryDate2CalendarShown(
-                                                                                false
-                                                                            );
+                                                                            await setIsPickupDate1CalendarShown(false);
+                                                                            await setIsPickupDate2CalendarShown(false);
+                                                                            await setIsDeliveryDate1CalendarShown(false);
+                                                                            await setIsDeliveryDate2CalendarShown(false);
 
                                                                             refDeliveryTime2.current.focus();
                                                                         }
@@ -16086,54 +16212,29 @@ const Dispatch = (props) => {
 
                                                                             if (key === 37) {
                                                                                 // left - minus 1
-                                                                                setPreSelectedDeliveryDate2(
-                                                                                    preSelectedDeliveryDate2
-                                                                                        .clone()
-                                                                                        .subtract(1, "day")
-                                                                                );
+                                                                                setPreSelectedDeliveryDate2(preSelectedDeliveryDate2.clone().subtract(1, "day"));
                                                                             }
 
                                                                             if (key === 38) {
                                                                                 // up - minus 7
-                                                                                setPreSelectedDeliveryDate2(
-                                                                                    preSelectedDeliveryDate2
-                                                                                        .clone()
-                                                                                        .subtract(7, "day")
-                                                                                );
+                                                                                setPreSelectedDeliveryDate2(preSelectedDeliveryDate2.clone().subtract(7, "day"));
                                                                             }
 
                                                                             if (key === 39) {
                                                                                 // right - plus 1
-                                                                                setPreSelectedDeliveryDate2(
-                                                                                    preSelectedDeliveryDate2
-                                                                                        .clone()
-                                                                                        .add(1, "day")
-                                                                                );
+                                                                                setPreSelectedDeliveryDate2(preSelectedDeliveryDate2.clone().add(1, "day"));
                                                                             }
 
                                                                             if (key === 40) {
                                                                                 // down - plus 7
-                                                                                setPreSelectedDeliveryDate2(
-                                                                                    preSelectedDeliveryDate2
-                                                                                        .clone()
-                                                                                        .add(7, "day")
-                                                                                );
+                                                                                setPreSelectedDeliveryDate2(preSelectedDeliveryDate2.clone().add(7, "day"));
                                                                             }
 
                                                                             await setSelectedOrder({
                                                                                 ...selectedOrder,
-                                                                                deliveries: (
-                                                                                    selectedOrder?.deliveries || []
-                                                                                ).map((delivery, i) => {
-                                                                                    if (
-                                                                                        delivery.id ===
-                                                                                        (selectedConsigneeCustomer?.delivery_id ||
-                                                                                            0)
-                                                                                    ) {
-                                                                                        delivery.delivery_date2 =
-                                                                                            preSelectedDeliveryDate2
-                                                                                                .clone()
-                                                                                                .format("MM/DD/YYYY");
+                                                                                deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                                    if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                        delivery.delivery_date2 = preSelectedDeliveryDate2.clone().format("MM/DD/YYYY");
                                                                                     }
                                                                                     return delivery;
                                                                                 }),
@@ -16157,14 +16258,8 @@ const Dispatch = (props) => {
                                                                             delivery_date2: formatted,
                                                                         });
 
-                                                                        let deliveries = (
-                                                                            selectedOrder?.deliveries || []
-                                                                        ).map((delivery, i) => {
-                                                                            if (
-                                                                                delivery.id ===
-                                                                                (selectedConsigneeCustomer?.delivery_id ||
-                                                                                    0)
-                                                                            ) {
+                                                                        let deliveries = (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                            if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                                                                 delivery.delivery_date2 = formatted;
                                                                                 setIsSavingDeliveryId(-1);
                                                                                 setIsSavingDeliveryId(delivery.id);
@@ -16186,16 +16281,9 @@ const Dispatch = (props) => {
 
                                                                     setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        deliveries: (
-                                                                            selectedOrder?.deliveries || []
-                                                                        ).map((delivery, i) => {
-                                                                            if (
-                                                                                delivery.id ===
-                                                                                (selectedConsigneeCustomer?.delivery_id ||
-                                                                                    0)
-                                                                            ) {
-                                                                                delivery.delivery_date2 =
-                                                                                    e.target.value;
+                                                                        deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                            if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                delivery.delivery_date2 = e.target.value;
                                                                             }
                                                                             return delivery;
                                                                         }),
@@ -16209,25 +16297,15 @@ const Dispatch = (props) => {
 
                                                                     setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        deliveries: (
-                                                                            selectedOrder?.deliveries || []
-                                                                        ).map((delivery, i) => {
-                                                                            if (
-                                                                                delivery.id ===
-                                                                                (selectedConsigneeCustomer?.delivery_id ||
-                                                                                    0)
-                                                                            ) {
-                                                                                delivery.delivery_date2 =
-                                                                                    e.target.value;
+                                                                        deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                            if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                delivery.delivery_date2 = e.target.value;
                                                                             }
                                                                             return delivery;
                                                                         }),
                                                                     });
                                                                 }}
-                                                                value={
-                                                                    selectedConsigneeCustomer?.delivery_date2 ||
-                                                                    ""
-                                                                }
+                                                                value={selectedConsigneeCustomer?.delivery_date2 || ""}
                                                             />
 
                                                             <FontAwesomeIcon
@@ -16239,25 +16317,8 @@ const Dispatch = (props) => {
                                                                     setIsPickupDate1CalendarShown(false);
                                                                     setIsPickupDate2CalendarShown(false);
 
-                                                                    if (
-                                                                        moment(
-                                                                            (
-                                                                                selectedConsigneeCustomer?.delivery_date2 ||
-                                                                                ""
-                                                                            ).trim(),
-                                                                            "MM/DD/YYYY"
-                                                                        ).format("MM/DD/YYYY") ===
-                                                                        (
-                                                                            selectedConsigneeCustomer?.delivery_date2 ||
-                                                                            ""
-                                                                        ).trim()
-                                                                    ) {
-                                                                        setPreSelectedDeliveryDate2(
-                                                                            moment(
-                                                                                selectedConsigneeCustomer?.delivery_date2,
-                                                                                "MM/DD/YYYY"
-                                                                            )
-                                                                        );
+                                                                    if (moment((selectedConsigneeCustomer?.delivery_date2 || "").trim(), "MM/DD/YYYY").format("MM/DD/YYYY") === (selectedConsigneeCustomer?.delivery_date2 || "").trim()) {
+                                                                        setPreSelectedDeliveryDate2(moment(selectedConsigneeCustomer?.delivery_date2, "MM/DD/YYYY"));
                                                                     } else {
                                                                         setPreSelectedDeliveryDate2(moment());
                                                                     }
@@ -16284,65 +16345,31 @@ const Dispatch = (props) => {
                                                                     >
                                                                         <div
                                                                             className="mochi-contextual-popup vertical below right"
-                                                                            style={{ height: 275 }}
-                                                                        >
+                                                                            style={{height: 275}}>
                                                                             <div className="mochi-contextual-popup-content">
                                                                                 <div className="mochi-contextual-popup-wrapper">
                                                                                     <Calendar
-                                                                                        value={
-                                                                                            moment(
-                                                                                                (
-                                                                                                    selectedConsigneeCustomer?.delivery_date2 ||
-                                                                                                    ""
-                                                                                                ).trim(),
-                                                                                                "MM/DD/YYYY"
-                                                                                            ).format("MM/DD/YYYY") ===
-                                                                                                (
-                                                                                                    selectedConsigneeCustomer?.delivery_date2 ||
-                                                                                                    ""
-                                                                                                ).trim()
-                                                                                                ? moment(
-                                                                                                    selectedConsigneeCustomer?.delivery_date2,
-                                                                                                    "MM/DD/YYYY"
-                                                                                                )
-                                                                                                : moment()
+                                                                                        value={moment((selectedConsigneeCustomer?.delivery_date2 || "").trim(), "MM/DD/YYYY").format("MM/DD/YYYY") === (selectedConsigneeCustomer?.delivery_date2 || "").trim()
+                                                                                            ? moment(selectedConsigneeCustomer?.delivery_date2, "MM/DD/YYYY")
+                                                                                            : moment()
                                                                                         }
                                                                                         onChange={(day) => {
-                                                                                            setSelectedConsigneeCustomer(
-                                                                                                (selectedConsigneeCustomer) => {
+                                                                                            setSelectedConsigneeCustomer((selectedConsigneeCustomer) => {
                                                                                                     return {
                                                                                                         ...selectedConsigneeCustomer,
-                                                                                                        delivery_date2:
-                                                                                                            day.format("MM/DD/YYYY"),
+                                                                                                        delivery_date2: day.format("MM/DD/YYYY"),
                                                                                                     };
                                                                                                 }
                                                                                             );
 
-                                                                                            setSelectedOrder(
-                                                                                                (selectedOrder) => {
+                                                                                            setSelectedOrder((selectedOrder) => {
                                                                                                     return {
                                                                                                         ...selectedOrder,
-                                                                                                        deliveries: (
-                                                                                                            selectedOrder?.deliveries ||
-                                                                                                            []
-                                                                                                        ).map((delivery, i) => {
-                                                                                                            if (
-                                                                                                                delivery.id ===
-                                                                                                                (selectedConsigneeCustomer?.delivery_id ||
-                                                                                                                    0)
-                                                                                                            ) {
-                                                                                                                delivery.delivery_date2 =
-                                                                                                                    preSelectedDeliveryDate1
-                                                                                                                        .clone()
-                                                                                                                        .format(
-                                                                                                                            "MM/DD/YYYY"
-                                                                                                                        );
-                                                                                                                setIsSavingDeliveryId(
-                                                                                                                    -1
-                                                                                                                );
-                                                                                                                setIsSavingDeliveryId(
-                                                                                                                    delivery.id
-                                                                                                                );
+                                                                                                        deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                                                            if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                                                delivery.delivery_date2 = preSelectedDeliveryDate1.clone().format("MM/DD/YYYY");
+                                                                                                                setIsSavingDeliveryId(-1);
+                                                                                                                setIsSavingDeliveryId(delivery.id);
                                                                                                             }
                                                                                                             return delivery;
                                                                                                         }),
@@ -16350,31 +16377,19 @@ const Dispatch = (props) => {
                                                                                                 }
                                                                                             );
 
-                                                                                            setIsPickupDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsPickupDate2CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate2CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsPickupDate1CalendarShown(false);
+                                                                                            setIsPickupDate2CalendarShown(false);
+                                                                                            setIsDeliveryDate1CalendarShown(false);
+                                                                                            setIsDeliveryDate2CalendarShown(false);
 
                                                                                             refDeliveryTime2.current.focus();
                                                                                         }}
                                                                                         closeCalendar={() => {
-                                                                                            setIsDeliveryDate2CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsDeliveryDate2CalendarShown(false);
                                                                                         }}
                                                                                         preDay={preSelectedDeliveryDate2}
                                                                                         onChangePreDay={(preDay) => {
-                                                                                            setPreSelectedDeliveryDate2(
-                                                                                                preDay
-                                                                                            );
+                                                                                            setPreSelectedDeliveryDate2(preDay);
                                                                                         }}
                                                                                     />
                                                                                 </div>
@@ -16479,34 +16494,275 @@ const Dispatch = (props) => {
                                                     </div>
                                                 </div>
 
-                                                <div className="form-row" style={{ flexGrow: 1 }}>
-                                                    <div
-                                                        className="input-box-container grow"
-                                                        style={{
-                                                            maxHeight: "initial",
-                                                            minHeight: "initial",
-                                                        }}
-                                                    >
-                                                        <textarea
+                                                <div className="form-row" style={{alignItems: "center"}}>
+                                                    <div className="input-box-container grow"
+                                                         style={{flexGrow: 1, flexBasis: "100%"}}>
+                                                        {
+                                                            (selectedConsigneeCustomer?.bol_numbers || "").split(" ").map((item, index) => {
+                                                                if (item.trim() !== "") {
+                                                                    return (
+                                                                        <div key={index} style={{
+                                                                            display: "flex",
+                                                                            alignItems: "center",
+                                                                            fontSize: "0.7rem",
+                                                                            backgroundColor: "rgba(0,0,0,0.2)",
+                                                                            padding: "2px 10px",
+                                                                            borderRadius: "10px",
+                                                                            marginRight: "2px",
+                                                                            cursor: "default",
+                                                                        }}
+                                                                             title={item}
+                                                                        >
+                                                                            <span className="fas fa-trash-alt" style={{
+                                                                                marginRight: "5px",
+                                                                                cursor: "pointer"
+                                                                            }} onClick={() => {
+                                                                                setSelectedConsigneeCustomer({
+                                                                                    ...selectedConsigneeCustomer,
+                                                                                    bol_numbers: (selectedConsigneeCustomer?.bol_numbers || "").replace(item, "").trim(),
+                                                                                });
+
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                                        if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                            delivery.bol_numbers = (selectedConsigneeCustomer?.bol_numbers || "").replace(item, "").trim();
+                                                                                        }
+                                                                                        return delivery;
+                                                                                    }),
+                                                                                });
+
+                                                                                setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+                                                                            }}
+                                                                            ></span>
+
+                                                                            <span className="automatic-email-inputted"
+                                                                                  style={{whiteSpace: "nowrap"}}>{item}</span>
+                                                                        </div>
+                                                                    );
+                                                                } else {
+                                                                    return false;
+                                                                }
+                                                            })
+                                                        }
+
+                                                        <input
                                                             tabIndex={49 + props.tabTimes}
-                                                            placeholder="Special Instructions"
-                                                            style={{
-                                                                resize: "none",
-                                                                flexGrow: 1,
-                                                                border: 0,
-                                                                width: "100%",
-                                                                height: "100%",
+                                                            type="text"
+                                                            placeholder="BOL Numbers"
+                                                            ref={refDeliveryBolNumbers}
+                                                            onKeyDown={deliveryBolNumbersOnKeydown}
+                                                            onInput={(e) => {
+                                                                setConsigneeBolNumber(e.target.value);
                                                             }}
+                                                            onChange={(e) => {
+                                                                setConsigneeBolNumber(e.target.value);
+                                                            }}
+                                                            value={consigneeBolNumber || ""}
+                                                        />
+                                                    </div>
+                                                    <div style={{
+                                                        minWidth: "1.8rem",
+                                                        fontSize: "1rem",
+                                                        textAlign: "center"
+                                                    }}></div>
+                                                    <div className="input-box-container grow"
+                                                         style={{flexGrow: 1, flexBasis: "100%"}}>
+                                                        {(selectedConsigneeCustomer?.po_numbers || "").split(" ").map((item, index) => {
+                                                            if (item.trim() !== "") {
+                                                                return (
+                                                                    <div key={index} style={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        fontSize: "0.7rem",
+                                                                        backgroundColor: "rgba(0,0,0,0.2)",
+                                                                        padding: "2px 10px",
+                                                                        borderRadius: "10px",
+                                                                        marginRight: "2px",
+                                                                        cursor: "default",
+                                                                    }}
+                                                                         title={item}
+                                                                    >
+                                                                            <span className="fas fa-trash-alt" style={{
+                                                                                marginRight: "5px",
+                                                                                cursor: "pointer"
+                                                                            }} onClick={() => {
+                                                                                setSelectedConsigneeCustomer({
+                                                                                    ...selectedConsigneeCustomer,
+                                                                                    po_numbers: (selectedConsigneeCustomer?.po_numbers || "").replace(item, "").trim()
+                                                                                });
+
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                                        if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                            delivery.po_numbers = (selectedConsigneeCustomer?.po_numbers || "").replace(item, "").trim();
+                                                                                        }
+                                                                                        return delivery;
+                                                                                    }),
+                                                                                });
+
+                                                                                setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+                                                                            }}
+                                                                            ></span>
+                                                                        <span className="automatic-email-inputted"
+                                                                              style={{whiteSpace: "nowrap"}}>{item}</span>
+                                                                    </div>
+                                                                );
+                                                            } else {
+                                                                return false;
+                                                            }
+                                                        })}
+                                                        <input
+                                                            tabIndex={50 + props.tabTimes}
+                                                            type="text"
+                                                            placeholder="PO Numbers"
+                                                            ref={refDeliveryPoNumbers}
+                                                            onKeyDown={deliveryPoNumbersOnKeydown}
+                                                            onInput={(e) => {
+                                                                setConsigneePoNumber(e.target.value);
+                                                            }}
+                                                            onChange={(e) => {
+                                                                setConsigneePoNumber(e.target.value);
+                                                            }}
+                                                            value={consigneePoNumber || ""}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-row" style={{alignItems: "center"}}>
+                                                    <div className="input-box-container grow"
+                                                         style={{flexGrow: 1, flexBasis: "100%"}}>
+                                                        {(selectedConsigneeCustomer?.ref_numbers || "").split(" ").map((item, index) => {
+                                                            if (item.trim() !== "") {
+                                                                return (
+                                                                    <div key={index} style={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        fontSize: "0.7rem",
+                                                                        backgroundColor: "rgba(0,0,0,0.2)",
+                                                                        padding: "2px 10px",
+                                                                        borderRadius: "10px",
+                                                                        marginRight: "2px",
+                                                                        cursor: "default",
+                                                                    }}
+                                                                         title={item}
+                                                                    >
+                                                                            <span className="fas fa-trash-alt" style={{
+                                                                                marginRight: "5px",
+                                                                                cursor: "pointer"
+                                                                            }}
+                                                                                  onClick={() => {
+                                                                                      setSelectedConsigneeCustomer({
+                                                                                          ...selectedConsigneeCustomer,
+                                                                                          ref_numbers: (selectedConsigneeCustomer?.ref_numbers || "").replace(item, "").trim()
+                                                                                      });
+
+                                                                                      setSelectedOrder({
+                                                                                          ...selectedOrder,
+                                                                                          deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                                              if (delivery.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                                  delivery.ref_numbers = (selectedConsigneeCustomer?.ref_numbers || "").replace(item, "").trim();
+                                                                                              }
+                                                                                              return delivery;
+                                                                                          }),
+                                                                                      });
+
+                                                                                      setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+                                                                                  }}
+                                                                            ></span>
+                                                                        <span className="automatic-email-inputted"
+                                                                              style={{whiteSpace: "nowrap"}}>{item}</span>
+                                                                    </div>
+                                                                );
+                                                            } else {
+                                                                return false;
+                                                            }
+                                                        })}
+                                                        <input
+                                                            tabIndex={51 + props.tabTimes}
+                                                            type="text"
+                                                            placeholder="REF Numbers"
+                                                            ref={refDeliveryRefNumbers}
+                                                            onKeyDown={deliveryRefNumbersOnKeydown}
+                                                            onInput={(e) => {
+                                                                setConsigneeRefNumber(e.target.value);
+                                                            }}
+                                                            onChange={(e) => {
+                                                                setConsigneeRefNumber(e.target.value);
+                                                            }}
+                                                            value={consigneeRefNumber || ""}
+                                                        />
+                                                    </div>
+                                                    <div style={{
+                                                        minWidth: "1.8rem",
+                                                        fontSize: "1rem",
+                                                        textAlign: "center"
+                                                    }}></div>
+                                                    <div className="input-box-container grow"
+                                                         style={{flexGrow: 1, flexBasis: "100%"}}>
+                                                        <input
+                                                            tabIndex={52 + props.tabTimes}
+                                                            type="text"
+                                                            placeholder="SEAL Number"
+                                                            onKeyDown={(e) => {
+                                                                let key = e.keyCode || e.which;
+
+                                                                if (key === 9) {
+                                                                    setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+                                                                }
+                                                            }}
+                                                            onInput={(e) => {
+                                                                setSelectedOrder({
+                                                                    ...selectedOrder,
+                                                                    deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                        if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                            delivery.seal_number = e.target.value;
+                                                                        }
+                                                                        return delivery;
+                                                                    })
+                                                                });
+
+                                                                setSelectedConsigneeCustomer({
+                                                                    ...selectedConsigneeCustomer,
+                                                                    seal_number: e.target.value,
+                                                                });
+                                                            }}
+                                                            onChange={(e) => {
+                                                                setSelectedOrder({
+                                                                    ...selectedOrder,
+                                                                    deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                        if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                            delivery.seal_number = e.target.value;
+                                                                        }
+                                                                        return delivery;
+                                                                    })
+                                                                });
+
+                                                                setSelectedConsigneeCustomer({
+                                                                    ...selectedConsigneeCustomer,
+                                                                    seal_number: e.target.value,
+                                                                });
+                                                            }}
+                                                            value={selectedConsigneeCustomer?.seal_number || ""}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-row" style={{alignItems: "center"}}>
+                                                    <div className="input-box-container grow">
+                                                        <input
+                                                            tabIndex={53 + props.tabTimes}
+                                                            type="text"
+                                                            placeholder="Special Instructions"
                                                             onKeyDown={(e) => {
                                                                 let key = e.keyCode || e.which;
 
                                                                 if (key === 9) {
                                                                     e.preventDefault();
-                                                                    setIsSavingDeliveryId(
-                                                                        selectedConsigneeCustomer?.delivery_id || 0
-                                                                    );
+                                                                    setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
                                                                     goToTabindex(
-                                                                        (50 + props.tabTimes).toString()
+                                                                        (54 + props.tabTimes).toString()
                                                                     );
                                                                     setIsShowingConsigneeSecondPage(false);
                                                                 }
@@ -16514,19 +16770,12 @@ const Dispatch = (props) => {
                                                             onInput={(e) => {
                                                                 setSelectedOrder({
                                                                     ...selectedOrder,
-                                                                    deliveries: (
-                                                                        selectedOrder?.deliveries || []
-                                                                    ).map((delivery, i) => {
-                                                                        if (
-                                                                            delivery.id ===
-                                                                            (selectedConsigneeCustomer?.delivery_id ||
-                                                                                0)
-                                                                        ) {
-                                                                            delivery.special_instructions =
-                                                                                e.target.value;
+                                                                    deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                        if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                            delivery.special_instructions = e.target.value;
                                                                         }
                                                                         return delivery;
-                                                                    }),
+                                                                    })
                                                                 });
 
                                                                 setSelectedConsigneeCustomer({
@@ -16537,19 +16786,12 @@ const Dispatch = (props) => {
                                                             onChange={(e) => {
                                                                 setSelectedOrder({
                                                                     ...selectedOrder,
-                                                                    deliveries: (
-                                                                        selectedOrder?.deliveries || []
-                                                                    ).map((delivery, i) => {
-                                                                        if (
-                                                                            delivery.id ===
-                                                                            (selectedConsigneeCustomer?.delivery_id ||
-                                                                                0)
-                                                                        ) {
-                                                                            delivery.special_instructions =
-                                                                                e.target.value;
+                                                                    deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                        if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                            delivery.special_instructions = e.target.value;
                                                                         }
                                                                         return delivery;
-                                                                    }),
+                                                                    })
                                                                 });
 
                                                                 setSelectedConsigneeCustomer({
@@ -16557,13 +16799,98 @@ const Dispatch = (props) => {
                                                                     special_instructions: e.target.value,
                                                                 });
                                                             }}
-                                                            value={
-                                                                selectedConsigneeCustomer?.special_instructions ||
-                                                                ""
-                                                            }
-                                                        ></textarea>
+                                                            value={selectedConsigneeCustomer?.special_instructions || ""}
+                                                        />
                                                     </div>
                                                 </div>
+
+                                                {/*<div className="form-row" style={{flexGrow: 1}}>*/}
+                                                {/*    <div*/}
+                                                {/*        className="input-box-container grow"*/}
+                                                {/*        style={{*/}
+                                                {/*            maxHeight: "initial",*/}
+                                                {/*            minHeight: "initial",*/}
+                                                {/*        }}*/}
+                                                {/*    >*/}
+                                                {/*        <textarea*/}
+                                                {/*            tabIndex={49 + props.tabTimes}*/}
+                                                {/*            placeholder="Special Instructions"*/}
+                                                {/*            style={{*/}
+                                                {/*                resize: "none",*/}
+                                                {/*                flexGrow: 1,*/}
+                                                {/*                border: 0,*/}
+                                                {/*                width: "100%",*/}
+                                                {/*                height: "100%",*/}
+                                                {/*            }}*/}
+                                                {/*            onKeyDown={(e) => {*/}
+                                                {/*                let key = e.keyCode || e.which;*/}
+
+                                                {/*                if (key === 9) {*/}
+                                                {/*                    e.preventDefault();*/}
+                                                {/*                    setIsSavingDeliveryId(*/}
+                                                {/*                        selectedConsigneeCustomer?.delivery_id || 0*/}
+                                                {/*                    );*/}
+                                                {/*                    goToTabindex(*/}
+                                                {/*                        (50 + props.tabTimes).toString()*/}
+                                                {/*                    );*/}
+                                                {/*                    setIsShowingConsigneeSecondPage(false);*/}
+                                                {/*                }*/}
+                                                {/*            }}*/}
+                                                {/*            onInput={(e) => {*/}
+                                                {/*                setSelectedOrder({*/}
+                                                {/*                    ...selectedOrder,*/}
+                                                {/*                    deliveries: (*/}
+                                                {/*                        selectedOrder?.deliveries || []*/}
+                                                {/*                    ).map((delivery, i) => {*/}
+                                                {/*                        if (*/}
+                                                {/*                            delivery.id ===*/}
+                                                {/*                            (selectedConsigneeCustomer?.delivery_id ||*/}
+                                                {/*                                0)*/}
+                                                {/*                        ) {*/}
+                                                {/*                            delivery.special_instructions =*/}
+                                                {/*                                e.target.value;*/}
+                                                {/*                        }*/}
+                                                {/*                        return delivery;*/}
+                                                {/*                    }),*/}
+                                                {/*                });*/}
+
+                                                {/*                setSelectedConsigneeCustomer({*/}
+                                                {/*                    ...selectedConsigneeCustomer,*/}
+                                                {/*                    special_instructions: e.target.value,*/}
+                                                {/*                });*/}
+                                                {/*            }}*/}
+                                                {/*            onChange={(e) => {*/}
+                                                {/*                setSelectedOrder({*/}
+                                                {/*                    ...selectedOrder,*/}
+                                                {/*                    deliveries: (*/}
+                                                {/*                        selectedOrder?.deliveries || []*/}
+                                                {/*                    ).map((delivery, i) => {*/}
+                                                {/*                        if (*/}
+                                                {/*                            delivery.id ===*/}
+                                                {/*                            (selectedConsigneeCustomer?.delivery_id ||*/}
+                                                {/*                                0)*/}
+                                                {/*                        ) {*/}
+                                                {/*                            delivery.special_instructions =*/}
+                                                {/*                                e.target.value;*/}
+                                                {/*                        }*/}
+                                                {/*                        return delivery;*/}
+                                                {/*                    }),*/}
+                                                {/*                });*/}
+
+                                                {/*                setSelectedConsigneeCustomer({*/}
+                                                {/*                    ...selectedConsigneeCustomer,*/}
+                                                {/*                    special_instructions: e.target.value,*/}
+                                                {/*                });*/}
+                                                {/*            }}*/}
+                                                {/*            value={*/}
+                                                {/*                selectedConsigneeCustomer?.special_instructions ||*/}
+                                                {/*                ""*/}
+                                                {/*            }*/}
+                                                {/*        ></textarea>*/}
+                                                {/*    </div>*/}
+                                                {/*</div>*/}
+
+
                                             </animated.div>
                                         )
                                 )}
@@ -16572,11 +16899,11 @@ const Dispatch = (props) => {
 
                         <div
                             className="form-borderless-box"
-                            style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+                            style={{flexGrow: 1, display: "flex", flexDirection: "column"}}
                         >
                             <div
                                 className="form-row"
-                                style={{ flexGrow: 1, display: "flex" }}
+                                style={{flexGrow: 1, display: "flex"}}
                             >
                                 <div className="form-bordered-box">
                                     <div className="form-header">
@@ -16593,7 +16920,7 @@ const Dispatch = (props) => {
                                                         );
                                                         return;
                                                     }
-                                                    setSelectedInternalNote({ id: 0 });
+                                                    setSelectedInternalNote({id: 0});
                                                 }}
                                             >
                                                 <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -16642,7 +16969,7 @@ const Dispatch = (props) => {
                 >
                     <div
                         className="form-bordered-box"
-                        style={{ flexGrow: 1, justifyContent: "space-evenly" }}
+                        style={{flexGrow: 1, justifyContent: "space-evenly"}}
                     >
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
@@ -16652,7 +16979,7 @@ const Dispatch = (props) => {
                         </div>
 
                         <div className="input-box-container grow">
-                            <input type="text" placeholder="Agent Code" readOnly={true} />
+                            <input type="text" placeholder="Agent Code" readOnly={true}/>
                         </div>
                         <div className="input-box-container grow">
                             <input
@@ -16662,7 +16989,7 @@ const Dispatch = (props) => {
                             />
                         </div>
                         <div className="input-box-container grow">
-                            <input type="text" placeholder="Salesman Code" readOnly={true} />
+                            <input type="text" placeholder="Salesman Code" readOnly={true}/>
                         </div>
                         <div className="input-box-container grow">
                             <input
@@ -16675,7 +17002,7 @@ const Dispatch = (props) => {
                 </div>
             </div>
 
-            <div className="fields-container-row" style={{ marginBottom: 10 }}>
+            <div className="fields-container-row" style={{marginBottom: 10}}>
                 <div
                     style={{
                         minWidth: "70%",
@@ -16687,7 +17014,7 @@ const Dispatch = (props) => {
                 >
                     <div
                         className="select-box-container"
-                        style={{ width: "10rem", position: "relative" }}
+                        style={{width: "10rem", position: "relative"}}
                     >
                         <div className="select-box-wrapper">
                             <input
@@ -17037,10 +17364,10 @@ const Dispatch = (props) => {
                                                 } else {
                                                     let item =
                                                         dispatchEventItems[
-                                                        dispatchEventItems.findIndex(
-                                                            (item) => item.selected
-                                                        )
-                                                        ];
+                                                            dispatchEventItems.findIndex(
+                                                                (item) => item.selected
+                                                            )
+                                                            ];
 
                                                     if ((item?.name || "").toLowerCase() === "arrived") {
                                                         if (
@@ -17520,10 +17847,10 @@ const Dispatch = (props) => {
                                                     } else {
                                                         let item =
                                                             dispatchEventItems[
-                                                            dispatchEventItems.findIndex(
-                                                                (item) => item.selected
-                                                            )
-                                                            ];
+                                                                dispatchEventItems.findIndex(
+                                                                    (item) => item.selected
+                                                                )
+                                                                ];
 
                                                         if (
                                                             (item?.name || "").toLowerCase() === "arrived"
@@ -18062,7 +18389,7 @@ const Dispatch = (props) => {
                                     >
                                         <div
                                             className="mochi-contextual-popup vertical below right"
-                                            style={{ height: 150 }}
+                                            style={{height: 150}}
                                         >
                                             <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper multipage">
@@ -18070,7 +18397,7 @@ const Dispatch = (props) => {
                                                         className="mochi-contextual-popup-slider"
                                                         style={{
                                                             transform: `translateX(${showDispatchEventSecondPageItems ? "-50%" : "0"
-                                                                })`,
+                                                            })`,
                                                         }}
                                                     >
                                                         <div className="first-page">
@@ -18084,7 +18411,7 @@ const Dispatch = (props) => {
 
                                                                     const searchValue =
                                                                         (dispatchEvent?.id || 0) === 0 &&
-                                                                            (dispatchEvent?.name || "") !== ""
+                                                                        (dispatchEvent?.name || "") !== ""
                                                                             ? dispatchEvent?.name
                                                                             : undefined;
 
@@ -18137,8 +18464,8 @@ const Dispatch = (props) => {
                                                                                         ) {
                                                                                             let event =
                                                                                                 (selectedOrder?.events || [])[
-                                                                                                i
-                                                                                                ];
+                                                                                                    i
+                                                                                                    ];
 
                                                                                             if (
                                                                                                 (
@@ -18159,8 +18486,8 @@ const Dispatch = (props) => {
                                                                                         ) {
                                                                                             let event =
                                                                                                 (selectedOrder?.events || [])[
-                                                                                                i
-                                                                                                ];
+                                                                                                    i
+                                                                                                    ];
 
                                                                                             if (
                                                                                                 (
@@ -18368,7 +18695,7 @@ const Dispatch = (props) => {
                                                                                             "Departed at " +
                                                                                             arrived_customer.code +
                                                                                             (arrived_customer.code_number ===
-                                                                                                0
+                                                                                            0
                                                                                                 ? ""
                                                                                                 : arrived_customer.code_number) +
                                                                                             " - " +
@@ -18764,7 +19091,7 @@ const Dispatch = (props) => {
                         )}
                     </div>
                     <div className="form-h-sep"></div>
-                    <div className="input-box-container" style={{ width: "10rem" }}>
+                    <div className="input-box-container" style={{width: "10rem"}}>
                         <input
                             tabIndex={72 + props.tabTimes}
                             type="text"
@@ -18824,7 +19151,7 @@ const Dispatch = (props) => {
                         />
                     </div>
                     <div className="form-h-sep"></div>
-                    <div className="select-box-container" style={{ width: "8rem" }}>
+                    <div className="select-box-container" style={{width: "8rem"}}>
                         <div className="select-box-wrapper">
                             <MaskedInput
                                 tabIndex={74 + props.tabTimes}
@@ -18989,7 +19316,7 @@ const Dispatch = (props) => {
                                     >
                                         <div
                                             className="mochi-contextual-popup vertical below"
-                                            style={{ height: 275 }}
+                                            style={{height: 275}}
                                         >
                                             <div className="mochi-contextual-popup-content">
                                                 <div className="mochi-contextual-popup-wrapper">
@@ -18999,7 +19326,7 @@ const Dispatch = (props) => {
                                                                 (dispatchEventDate || "").trim(),
                                                                 "MM/DD/YYYY"
                                                             ).format("MM/DD/YYYY") ===
-                                                                (dispatchEventDate || "").trim()
+                                                            (dispatchEventDate || "").trim()
                                                                 ? moment(dispatchEventDate, "MM/DD/YYYY")
                                                                 : moment()
                                                         }
@@ -19022,7 +19349,7 @@ const Dispatch = (props) => {
                         )}
                     </div>
                     <div className="form-h-sep"></div>
-                    <div className="input-box-container" style={{ width: "6rem" }}>
+                    <div className="input-box-container" style={{width: "6rem"}}>
                         <input
                             tabIndex={75 + props.tabTimes}
                             type="text"
@@ -19170,7 +19497,7 @@ const Dispatch = (props) => {
                             ".8fr 0.1fr 1.3fr 0.1fr 1.3fr 0.1fr 1.3fr 0.1fr .9fr",
                     }}
                 >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{display: "flex", flexDirection: "column"}}>
                         <div
                             style={{
                                 fontSize: "0.7rem",
@@ -19214,7 +19541,7 @@ const Dispatch = (props) => {
                             }}
                         >
                             {mileageLoaderVisible ? (
-                                <div className="loading-container" style={{ right: "initial", left: "50%" }}>
+                                <div className="loading-container" style={{right: "initial", left: "50%"}}>
                                     <Loader
                                         type="ThreeDots"
                                         color="#333738"
@@ -19238,7 +19565,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{display: "flex", flexDirection: "column"}}>
                         <div
                             style={{
                                 fontSize: "0.7rem",
@@ -19274,14 +19601,14 @@ const Dispatch = (props) => {
                                                                 Number(b.total_charges),
                                                         };
                                                     },
-                                                    { total_charges: "" }
+                                                    {total_charges: ""}
                                                 )?.total_charges || ""
                                             )
                                                 .toString()
                                                 .replace(",", "")
                                         ) < 0,
                                 })}
-                                style={{ fontSize: "0.7rem", textAlign: "center" }}
+                                style={{fontSize: "0.7rem", textAlign: "center"}}
                                 value={new Intl.NumberFormat("en-US", {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
@@ -19295,7 +19622,7 @@ const Dispatch = (props) => {
                                                             Number(a.total_charges) + Number(b.total_charges),
                                                     };
                                                 },
-                                                { total_charges: "" }
+                                                {total_charges: ""}
                                             )?.total_charges || ""
                                         )
                                             .toString()
@@ -19308,7 +19635,8 @@ const Dispatch = (props) => {
                                 fixedDecimalScale={true}
                                 prefix={"$ "}
                                 type="text"
-                                onValueChange={(values) => { }}
+                                onValueChange={(values) => {
+                                }}
                                 displayType={"text"}
                                 readOnly={true}
                             />
@@ -19324,7 +19652,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{display: "flex", flexDirection: "column"}}>
                         <div
                             style={{
                                 fontSize: "0.7rem",
@@ -19360,14 +19688,14 @@ const Dispatch = (props) => {
                                                                 Number(b.total_charges),
                                                         };
                                                     },
-                                                    { total_charges: "" }
+                                                    {total_charges: ""}
                                                 )?.total_charges || ""
                                             )
                                                 .toString()
                                                 .replace(",", "")
                                         ) < 0,
                                 })}
-                                style={{ fontSize: "0.7rem", textAlign: "center" }}
+                                style={{fontSize: "0.7rem", textAlign: "center"}}
                                 value={new Intl.NumberFormat("en-US", {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
@@ -19381,7 +19709,7 @@ const Dispatch = (props) => {
                                                             Number(a.total_charges) + Number(b.total_charges),
                                                     };
                                                 },
-                                                { total_charges: "" }
+                                                {total_charges: ""}
                                             )?.total_charges || ""
                                         )
                                             .toString()
@@ -19394,7 +19722,8 @@ const Dispatch = (props) => {
                                 fixedDecimalScale={true}
                                 prefix={"$ "}
                                 type="text"
-                                onValueChange={(values) => { }}
+                                onValueChange={(values) => {
+                                }}
                                 displayType={"text"}
                                 readOnly={true}
                             />
@@ -19410,7 +19739,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{display: "flex", flexDirection: "column"}}>
                         <div
                             style={{
                                 fontSize: "0.7rem",
@@ -19454,7 +19783,7 @@ const Dispatch = (props) => {
                                                                 ),
                                                         };
                                                     },
-                                                    { total_charges: "" }
+                                                    {total_charges: ""}
                                                 )?.total_charges || ""
                                             )
                                                 .toString()
@@ -19478,7 +19807,7 @@ const Dispatch = (props) => {
                                                                 ),
                                                         };
                                                     },
-                                                    { total_charges: "" }
+                                                    {total_charges: ""}
                                                 )?.total_charges || ""
                                             )
                                                 .toString()
@@ -19486,7 +19815,7 @@ const Dispatch = (props) => {
                                         ) <
                                         0,
                                 })}
-                                style={{ fontSize: "0.7rem", textAlign: "center" }}
+                                style={{fontSize: "0.7rem", textAlign: "center"}}
                                 value={new Intl.NumberFormat("en-US", {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
@@ -19509,7 +19838,7 @@ const Dispatch = (props) => {
                                                             ),
                                                     };
                                                 },
-                                                { total_charges: "" }
+                                                {total_charges: ""}
                                             )?.total_charges || ""
                                         )
                                             .toString()
@@ -19533,7 +19862,7 @@ const Dispatch = (props) => {
                                                             ),
                                                     };
                                                 },
-                                                { total_charges: "" }
+                                                {total_charges: ""}
                                             )?.total_charges || ""
                                         )
                                             .toString()
@@ -19546,7 +19875,8 @@ const Dispatch = (props) => {
                                 fixedDecimalScale={true}
                                 prefix={"$ "}
                                 type="text"
-                                onValueChange={(values) => { }}
+                                onValueChange={(values) => {
+                                }}
                                 displayType={"text"}
                                 readOnly={true}
                             />
@@ -19562,7 +19892,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{display: "flex", flexDirection: "column"}}>
                         <div
                             style={{
                                 fontSize: "0.7rem",
@@ -19606,88 +19936,88 @@ const Dispatch = (props) => {
                                                                 ),
                                                         };
                                                     },
-                                                    { total_charges: "" }
+                                                    {total_charges: ""}
                                                 )?.total_charges || ""
                                             )
                                                 .toString()
                                                 .replace(",", "")
                                         ) > 0 ||
-                                            Number(
-                                                (
-                                                    (selectedOrder?.order_carrier_ratings || []).reduce(
-                                                        (a, b) => {
-                                                            return {
-                                                                total_charges:
-                                                                    Number(
-                                                                        (a.total_charges || "")
-                                                                            .toString()
-                                                                            .replace(",", "")
-                                                                    ) +
-                                                                    Number(
-                                                                        (b.total_charges || "")
-                                                                            .toString()
-                                                                            .replace(",", "")
-                                                                    ),
-                                                            };
-                                                        },
-                                                        { total_charges: "" }
-                                                    )?.total_charges || ""
-                                                )
-                                                    .toString()
-                                                    .replace(",", "")
-                                            ) > 0
+                                        Number(
+                                            (
+                                                (selectedOrder?.order_carrier_ratings || []).reduce(
+                                                    (a, b) => {
+                                                        return {
+                                                            total_charges:
+                                                                Number(
+                                                                    (a.total_charges || "")
+                                                                        .toString()
+                                                                        .replace(",", "")
+                                                                ) +
+                                                                Number(
+                                                                    (b.total_charges || "")
+                                                                        .toString()
+                                                                        .replace(",", "")
+                                                                ),
+                                                        };
+                                                    },
+                                                    {total_charges: ""}
+                                                )?.total_charges || ""
+                                            )
+                                                .toString()
+                                                .replace(",", "")
+                                        ) > 0
                                             ? ((Number(
-                                                (
-                                                    (
-                                                        selectedOrder?.order_customer_ratings || []
-                                                    ).reduce(
-                                                        (a, b) => {
-                                                            return {
-                                                                total_charges:
-                                                                    Number(
-                                                                        (a.total_charges || "")
-                                                                            .toString()
-                                                                            .replace(",", "")
-                                                                    ) +
-                                                                    Number(
-                                                                        (b.total_charges || "")
-                                                                            .toString()
-                                                                            .replace(",", "")
-                                                                    ),
-                                                            };
-                                                        },
-                                                        { total_charges: "" }
-                                                    )?.total_charges || ""
-                                                )
-                                                    .toString()
-                                                    .replace(",", "")
-                                            ) -
-                                                Number(
-                                                    (
                                                         (
-                                                            selectedOrder?.order_carrier_ratings || []
-                                                        ).reduce(
-                                                            (a, b) => {
-                                                                return {
-                                                                    total_charges:
-                                                                        Number(
-                                                                            (a.total_charges || "")
-                                                                                .toString()
-                                                                                .replace(",", "")
-                                                                        ) +
-                                                                        Number(
-                                                                            (b.total_charges || "")
-                                                                                .toString()
-                                                                                .replace(",", "")
-                                                                        ),
-                                                                };
-                                                            },
-                                                            { total_charges: "" }
-                                                        )?.total_charges || ""
-                                                    )
-                                                        .toString()
-                                                        .replace(",", "")
-                                                )) *
+                                                            (
+                                                                selectedOrder?.order_customer_ratings || []
+                                                            ).reduce(
+                                                                (a, b) => {
+                                                                    return {
+                                                                        total_charges:
+                                                                            Number(
+                                                                                (a.total_charges || "")
+                                                                                    .toString()
+                                                                                    .replace(",", "")
+                                                                            ) +
+                                                                            Number(
+                                                                                (b.total_charges || "")
+                                                                                    .toString()
+                                                                                    .replace(",", "")
+                                                                            ),
+                                                                    };
+                                                                },
+                                                                {total_charges: ""}
+                                                            )?.total_charges || ""
+                                                        )
+                                                            .toString()
+                                                            .replace(",", "")
+                                                    ) -
+                                                    Number(
+                                                        (
+                                                            (
+                                                                selectedOrder?.order_carrier_ratings || []
+                                                            ).reduce(
+                                                                (a, b) => {
+                                                                    return {
+                                                                        total_charges:
+                                                                            Number(
+                                                                                (a.total_charges || "")
+                                                                                    .toString()
+                                                                                    .replace(",", "")
+                                                                            ) +
+                                                                            Number(
+                                                                                (b.total_charges || "")
+                                                                                    .toString()
+                                                                                    .replace(",", "")
+                                                                            ),
+                                                                    };
+                                                                },
+                                                                {total_charges: ""}
+                                                            )?.total_charges || ""
+                                                        )
+                                                            .toString()
+                                                            .replace(",", "")
+                                                    )) *
                                                 100) /
                                             (Number(
                                                 (
@@ -19709,7 +20039,7 @@ const Dispatch = (props) => {
                                                                     ),
                                                             };
                                                         },
-                                                        { total_charges: "" }
+                                                        {total_charges: ""}
                                                     )?.total_charges || ""
                                                 )
                                                     .toString()
@@ -19735,7 +20065,7 @@ const Dispatch = (props) => {
                                                                         ),
                                                                 };
                                                             },
-                                                            { total_charges: "" }
+                                                            {total_charges: ""}
                                                         )?.total_charges || ""
                                                     )
                                                         .toString()
@@ -19761,7 +20091,7 @@ const Dispatch = (props) => {
                                                                         ),
                                                                 };
                                                             },
-                                                            { total_charges: "" }
+                                                            {total_charges: ""}
                                                         )?.total_charges || ""
                                                     )
                                                         .toString()
@@ -19769,7 +20099,7 @@ const Dispatch = (props) => {
                                                 ))
                                             : 0) < 0,
                                 })}
-                                style={{ fontSize: "0.7rem", textAlign: "center" }}
+                                style={{fontSize: "0.7rem", textAlign: "center"}}
                                 value={
                                     Number(
                                         (
@@ -19789,84 +20119,84 @@ const Dispatch = (props) => {
                                                             ),
                                                     };
                                                 },
-                                                { total_charges: "" }
+                                                {total_charges: ""}
                                             )?.total_charges || ""
                                         )
                                             .toString()
                                             .replace(",", "")
                                     ) > 0 ||
-                                        Number(
-                                            (
-                                                (selectedOrder?.order_carrier_ratings || []).reduce(
-                                                    (a, b) => {
-                                                        return {
-                                                            total_charges:
-                                                                Number(
-                                                                    (a.total_charges || "")
-                                                                        .toString()
-                                                                        .replace(",", "")
-                                                                ) +
-                                                                Number(
-                                                                    (b.total_charges || "")
-                                                                        .toString()
-                                                                        .replace(",", "")
-                                                                ),
-                                                        };
-                                                    },
-                                                    { total_charges: "" }
-                                                )?.total_charges || ""
-                                            )
-                                                .toString()
-                                                .replace(",", "")
-                                        ) > 0
+                                    Number(
+                                        (
+                                            (selectedOrder?.order_carrier_ratings || []).reduce(
+                                                (a, b) => {
+                                                    return {
+                                                        total_charges:
+                                                            Number(
+                                                                (a.total_charges || "")
+                                                                    .toString()
+                                                                    .replace(",", "")
+                                                            ) +
+                                                            Number(
+                                                                (b.total_charges || "")
+                                                                    .toString()
+                                                                    .replace(",", "")
+                                                            ),
+                                                    };
+                                                },
+                                                {total_charges: ""}
+                                            )?.total_charges || ""
+                                        )
+                                            .toString()
+                                            .replace(",", "")
+                                    ) > 0
                                         ? ((Number(
-                                            (
-                                                (selectedOrder?.order_customer_ratings || []).reduce(
-                                                    (a, b) => {
-                                                        return {
-                                                            total_charges:
-                                                                Number(
-                                                                    (a.total_charges || "")
-                                                                        .toString()
-                                                                        .replace(",", "")
-                                                                ) +
-                                                                Number(
-                                                                    (b.total_charges || "")
-                                                                        .toString()
-                                                                        .replace(",", "")
-                                                                ),
-                                                        };
-                                                    },
-                                                    { total_charges: "" }
-                                                )?.total_charges || ""
-                                            )
-                                                .toString()
-                                                .replace(",", "")
-                                        ) -
-                                            Number(
-                                                (
-                                                    (selectedOrder?.order_carrier_ratings || []).reduce(
-                                                        (a, b) => {
-                                                            return {
-                                                                total_charges:
-                                                                    Number(
-                                                                        (a.total_charges || "")
-                                                                            .toString()
-                                                                            .replace(",", "")
-                                                                    ) +
-                                                                    Number(
-                                                                        (b.total_charges || "")
-                                                                            .toString()
-                                                                            .replace(",", "")
-                                                                    ),
-                                                            };
-                                                        },
-                                                        { total_charges: "" }
-                                                    )?.total_charges || ""
-                                                )
-                                                    .toString()
-                                                    .replace(",", "")
-                                            )) *
+                                                    (
+                                                        (selectedOrder?.order_customer_ratings || []).reduce(
+                                                            (a, b) => {
+                                                                return {
+                                                                    total_charges:
+                                                                        Number(
+                                                                            (a.total_charges || "")
+                                                                                .toString()
+                                                                                .replace(",", "")
+                                                                        ) +
+                                                                        Number(
+                                                                            (b.total_charges || "")
+                                                                                .toString()
+                                                                                .replace(",", "")
+                                                                        ),
+                                                                };
+                                                            },
+                                                            {total_charges: ""}
+                                                        )?.total_charges || ""
+                                                    )
+                                                        .toString()
+                                                        .replace(",", "")
+                                                ) -
+                                                Number(
+                                                    (
+                                                        (selectedOrder?.order_carrier_ratings || []).reduce(
+                                                            (a, b) => {
+                                                                return {
+                                                                    total_charges:
+                                                                        Number(
+                                                                            (a.total_charges || "")
+                                                                                .toString()
+                                                                                .replace(",", "")
+                                                                        ) +
+                                                                        Number(
+                                                                            (b.total_charges || "")
+                                                                                .toString()
+                                                                                .replace(",", "")
+                                                                        ),
+                                                                };
+                                                            },
+                                                            {total_charges: ""}
+                                                        )?.total_charges || ""
+                                                    )
+                                                        .toString()
+                                                        .replace(",", "")
+                                                )) *
                                             100) /
                                         (Number(
                                             (
@@ -19886,7 +20216,7 @@ const Dispatch = (props) => {
                                                                 ),
                                                         };
                                                     },
-                                                    { total_charges: "" }
+                                                    {total_charges: ""}
                                                 )?.total_charges || ""
                                             )
                                                 .toString()
@@ -19912,7 +20242,7 @@ const Dispatch = (props) => {
                                                                     ),
                                                             };
                                                         },
-                                                        { total_charges: "" }
+                                                        {total_charges: ""}
                                                     )?.total_charges || ""
                                                 )
                                                     .toString()
@@ -19938,7 +20268,7 @@ const Dispatch = (props) => {
                                                                     ),
                                                             };
                                                         },
-                                                        { total_charges: "" }
+                                                        {total_charges: ""}
                                                     )?.total_charges || ""
                                                 )
                                                     .toString()
@@ -19961,7 +20291,7 @@ const Dispatch = (props) => {
                 </div>
             </div>
 
-            <div className="fields-container-row" style={{ flexGrow: 1 }}>
+            <div className="fields-container-row" style={{flexGrow: 1}}>
                 <div className="form-bordered-box">
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
@@ -19996,13 +20326,13 @@ const Dispatch = (props) => {
                                         html += `
                                     <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
                                         <div style="min-width:15%;max-width:15%;">${item.event_date
-                                            }@${item.event_time}</div>
+                                        }@${item.event_time}</div>
                                         <div style="min-width:10%;max-width:10%;">${item?.user_code?.code || ''}</div>
                                         <div style="min-width:15%;max-width:15%;">${item.event_type.name.toUpperCase()}</div>
                                         <div style="min-width:20%;max-width:20%;">${item.event_location || ""
-                                            }</div>
+                                        }</div>
                                         <div style="min-width:40%;max-width:40%;">${item.event_notes || ""
-                                            }</div> 
+                                        }</div> 
                                     </div>
                                     `;
 
@@ -20094,7 +20424,8 @@ const Dispatch = (props) => {
                                     closeModal={() => {
                                         setShowingChangeCarrier(false);
                                     }}
-                                    updateCarrier={() => { }}
+                                    updateCarrier={() => {
+                                    }}
                                     selectedOrder={selectedOrder}
                                 />
                             </div>
@@ -20122,14 +20453,14 @@ const Dispatch = (props) => {
             {noteForDriverTransition(
                 (style, item) =>
                     item && (
-                        <animated.div style={{ ...style }}>
+                        <animated.div style={{...style}}>
                             <DispatchModal
                                 selectedData={selectedNoteForDriver}
                                 setSelectedData={setSelectedNoteForDriver}
                                 selectedParent={selectedOrder}
                                 setSelectedParent={(data) => {
                                     setSelectedOrder((selectedOrder) => {
-                                        return { ...selectedOrder, notes_for_driver: data.notes };
+                                        return {...selectedOrder, notes_for_driver: data.notes};
                                     });
                                 }}
                                 savingDataUrl="/saveNotesForDriver"
@@ -20146,14 +20477,14 @@ const Dispatch = (props) => {
             {noteForCarrierTransition(
                 (style, item) =>
                     item && (
-                        <animated.div style={{ ...style }}>
+                        <animated.div style={{...style}}>
                             <DispatchModal
                                 selectedData={selectedNoteForCarrier}
                                 setSelectedData={setSelectedNoteForCarrier}
                                 selectedParent={selectedOrder}
                                 setSelectedParent={(data) => {
                                     setSelectedOrder((selectedOrder) => {
-                                        return { ...selectedOrder, notes_for_carrier: data.notes };
+                                        return {...selectedOrder, notes_for_carrier: data.notes};
                                     });
                                 }}
                                 savingDataUrl="/saveNotesForCarrier"
@@ -20170,14 +20501,14 @@ const Dispatch = (props) => {
             {internalNoteTransition(
                 (style, item) =>
                     item && (
-                        <animated.div style={{ ...style }}>
+                        <animated.div style={{...style}}>
                             <DispatchModal
                                 selectedData={selectedInternalNote}
                                 setSelectedData={setSelectedInternalNote}
                                 selectedParent={selectedOrder}
                                 setSelectedParent={(data) => {
                                     setSelectedOrder((selectedOrder) => {
-                                        return { ...selectedOrder, internal_notes: data.notes };
+                                        return {...selectedOrder, internal_notes: data.notes};
                                     });
                                 }}
                                 savingDataUrl="/saveInternalNotes"
