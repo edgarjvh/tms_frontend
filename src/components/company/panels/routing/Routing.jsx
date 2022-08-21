@@ -1025,7 +1025,7 @@ const Routing = (props) => {
                     <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>A/E Number</div>
                     <input style={{ textAlign: 'right', fontWeight: 'bold' }} type="text" disabled={true}
                         onChange={(e) => { }}
-                        value={selectedOrder?.ae_number || ''} />
+                        value={props.user.user_code.code} />
                 </div>
 
                 <div className="input-box-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -2313,6 +2313,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

@@ -17,6 +17,7 @@ import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import Highlighter from "react-highlight-words";
 import ToPrint from './ToPrint.jsx';
 import {useReactToPrint} from 'react-to-print';
+import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 
 import {
     setCompanyOpenedPanels,
@@ -47,6 +48,7 @@ import {
 import {
     Dispatch
 } from './../../company';
+import NumberFormat from "react-number-format";
 
 const Customers = (props) => {
     // DECLARATIONS    
@@ -298,6 +300,18 @@ const Customers = (props) => {
         reverse: termsItems.length > 0
     });
 
+    const numberMask = createNumberMask({
+        prefix: '',
+        suffix: '',
+        includeThousandsSeparator: true,
+        thousandsSeparatorSymbol: ',',
+        allowDecimal: true,
+        decimalSymbol: '.',
+        decimalLimit: 2,
+        integerLimit: 15,
+        allowNegative: true,
+        allowLeadingZeroes: false,
+    })
 
     const handledPrintCustomerInformation = useReactToPrint({
         // pageStyle: () => {
@@ -388,7 +402,12 @@ const Customers = (props) => {
 
                 selectedCustomer.code = newCode.toUpperCase();
 
-                axios.post(props.serverUrl + '/saveCustomer', selectedCustomer).then(res => {
+                selectedCustomer.credit_limit_total = Number((selectedCustomer?.credit_limit_total || '').toString().replace(',', ''));
+
+                axios.post(props.serverUrl + '/saveCustomer', {
+                    ...selectedCustomer,
+                    user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+                }).then(res => {
                     if (res.data.result === 'OK') {
                         let customer = JSON.parse(JSON.stringify(res.data.customer));
                         if ((selectedCustomer?.id || 0) === 0) {
@@ -3877,99 +3896,102 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={38 + props.tabTimes} type="text" placeholder="Credit Limit Total"
-                                           readOnly={!props.isAdmin}
-                                           onInput={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       credit_limit_total: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       credit_limit_total: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedCustomer?.credit_limit_total || ''}
+                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Credit Limit $</div>
+                                    <MaskedInput
+                                        className={classnames({
+                                            'disabled': !props.isAdmin
+                                        })}
+                                        readOnly={!props.isAdmin}
+                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        mask={numberMask}
+                                        type="text"
+                                        guide={false}
+                                        value={selectedCustomer?.credit_limit_total || 0}
+                                        onKeyDown={(e) => {
+                                            if (props.isAdmin){
+                                                validateCustomerForSaving(e)
+                                            }
+                                        }}
+                                        onKeyPress={(e) => {
+                                            if (e.key === '.') {
+                                                if (e.target.value.includes('.')) {
+                                                    e.preventDefault();
+                                                }
+                                            }
+                                        }}
+                                        onBlur={(e) => {
+                                            if (e.target.value.toString() !== '') {
+                                                setSelectedCustomer({
+                                                    ...selectedCustomer,
+                                                    credit_limit_total: e.target.value
+                                                    // total_charges: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(e.target.value.toString().replace(',', '')))
+                                                })
+                                            }
+                                        }}
+                                        onInput={(e) => {
+                                            setSelectedCustomer({
+                                                ...selectedCustomer,
+                                                credit_limit_total: e.target.value
+                                            })
+                                        }}
+                                        onChange={(e) => {
+                                            setSelectedCustomer({
+                                                ...selectedCustomer,
+                                                credit_limit_total: e.target.value
+                                            })
+                                        }}
                                     />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input type="text" placeholder="Credit Ordered" readOnly={!props.isAdmin}
-                                           onInput={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       credit_ordered: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       credit_ordered: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedCustomer?.credit_ordered || ''}
+                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Credit Ordered $</div>
+                                    <MaskedInput
+                                        className={classnames({
+                                            'disabled': true
+                                        })}
+                                        readOnly={true}
+                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        mask={numberMask}
+                                        type="text"
+                                        guide={false}
+                                        value={selectedCustomer?.credit_ordered || 0}
                                     />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input type="text" placeholder="Credit Delivered Not Invoiced"
-                                           readOnly={!props.isAdmin}
-                                           onInput={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       credit_delivered_not_invoiced: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       credit_delivered_not_invoiced: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedCustomer?.credit_delivered_not_invoiced || ''}
+                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Credit Invoiced $</div>
+                                    <MaskedInput
+                                        className={classnames({
+                                            'disabled': true
+                                        })}
+                                        readOnly={true}
+                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        mask={numberMask}
+                                        type="text"
+                                        guide={false}
+                                        value={selectedCustomer?.credit_invoiced || 0}
                                     />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input type="text" placeholder="Available Credit" readOnly={!props.isAdmin}
-                                           onInput={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       available_credit: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       available_credit: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedCustomer?.available_credit || ''}
+                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Available Credit $</div>
+                                    <MaskedInput
+                                        className={classnames({
+                                            'disabled': true
+                                        })}
+                                        readOnly={true}
+                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        mask={numberMask}
+                                        type="text"
+                                        guide={false}
+                                        value={Number((selectedCustomer?.credit_limit_total || '').toString().replace(',','')) - (selectedCustomer?.credit_ordered || 0) - (selectedCustomer?.credit_invoiced || 0)}
                                     />
                                 </div>
                             </div>

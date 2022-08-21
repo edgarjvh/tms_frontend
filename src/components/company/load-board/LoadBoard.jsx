@@ -311,20 +311,31 @@ const LoadBoard = (props) => {
 
                                     setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
 
-                                    setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') === undefined)));
+                                    setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
 
                                     setInTransitOrders(res.data.orders.filter(item =>
                                         ((item.carrier_id || 0) > 0) &&
-                                        (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                                        // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
-                                        ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                                        (item.total_loaded_events > 0) &&
+                                        ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
 
                                     setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
                                         ((item.order_invoiced || 0) === 0) &&
                                         ((item.carrier_id || 0) > 0) &&
-                                        (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                                        // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
-                                        ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+                                        (item.total_loaded_events > 0) &&
+                                        ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
+
+                                    // setInTransitOrders(res.data.orders.filter(item =>
+                                    //     ((item.carrier_id || 0) > 0) &&
+                                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                                    //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
+                                    //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                                    //
+                                    // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                                    //     ((item.order_invoiced || 0) === 0) &&
+                                    //     ((item.carrier_id || 0) > 0) &&
+                                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                                    //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
+                                    //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
 
                                     if ((selectedOrder?.id || 0) > 0) {
                                         let order = res.data.orders.find(o => o.id === selectedOrder.id);
@@ -412,20 +423,32 @@ const LoadBoard = (props) => {
 
                 setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
 
-                setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') === undefined)));
+                setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
 
                 setInTransitOrders(res.data.orders.filter(item =>
                     ((item.carrier_id || 0) > 0) &&
-                    (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                    // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
-                    ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                    (item.total_loaded_events > 0) &&
+                    ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
 
                 setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
                     ((item.order_invoiced || 0) === 0) &&
                     ((item.carrier_id || 0) > 0) &&
-                    (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                    // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
-                    ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+                    (item.total_loaded_events > 0) &&
+                    ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
+
+                // setInTransitOrders(res.data.orders.filter(item =>
+                //     ((item.carrier_id || 0) > 0) &&
+                //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
+                //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                //
+                // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                //     ((item.order_invoiced || 0) === 0) &&
+                //     ((item.carrier_id || 0) > 0) &&
+                //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
+                //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+
 
                 setIsLoading(false);
             }
@@ -572,20 +595,32 @@ const LoadBoard = (props) => {
 
                     setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
 
-                    setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') === undefined)));
+                    setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
 
                     setInTransitOrders(res.data.orders.filter(item =>
                         ((item.carrier_id || 0) > 0) &&
-                        (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                        // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
-                        ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                        (item.total_loaded_events > 0) &&
+                        ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
 
                     setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
                         ((item.order_invoiced || 0) === 0) &&
                         ((item.carrier_id || 0) > 0) &&
-                        (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                        // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
-                        ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+                        (item.total_loaded_events > 0) &&
+                        ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
+
+                    // setInTransitOrders(res.data.orders.filter(item =>
+                    //     ((item.carrier_id || 0) > 0) &&
+                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                    //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
+                    //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                    //
+                    // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                    //     ((item.order_invoiced || 0) === 0) &&
+                    //     ((item.carrier_id || 0) > 0) &&
+                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                    //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
+                    //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+
 
                     if ((selectedOrder?.id || 0) > 0) {
                         let order = res.data.orders.find(o => o.id === selectedOrder.id);
