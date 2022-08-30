@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { connect } from 'react-redux';
 import Company from './company/Company.jsx';
 import Admin from './admin/Admin.jsx';
+import Login from './company/panels/login/Login';
 import './Root.css';
 import classnames from 'classnames';
 import axios from 'axios';
@@ -36,6 +37,7 @@ function Root(props) {
                         withCredentials: true
                     }).then(res => {
                         props.setUser(res.data);
+
                     }).catch((error) => {
                         props.setUser({});
                         props.setMainScreen('company');
@@ -80,11 +82,16 @@ function Root(props) {
             }
 
             {
-                !isLoading &&
-                <div>                    
-                    <Company className={companyClasses} />
-                    <Admin className={adminClasses} />
-                </div>
+                !isLoading ?
+                    ((props.user?.id || 0) > 0)
+                        ?
+                            <div>
+                                <Company className={companyClasses} />
+                                <Admin className={adminClasses} />
+                            </div>
+                        :
+                            <Login />
+                    : ''
             }
         </div>
     )
@@ -93,6 +100,7 @@ function Root(props) {
 const mapStateToProps = state => {
     return {
         companyId: state.systemReducers.companyId,
+        user: state.systemReducers.user,
         serverUrl: state.systemReducers.serverUrl,
         mainScreen: state.systemReducers.mainScreen
     }

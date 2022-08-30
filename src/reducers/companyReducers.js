@@ -3,15 +3,16 @@ import { companyConstants } from '../constants';
 export const companyReducers = (state = {
     pages: [
         'home',
-        'dispatch',
-        'customer',
         'carrier',
-        'load board',
+        'customer',
+        'dispatch',
         'invoice',
+        'load board',
         'reports'
     ],
     selectedPageIndex: 0,
     mainCompanyScreenFocused: true,
+    loginScreenFocused: false,
     dispatchScreenFocused: false,
     customerScreenFocused: false,
     carrierScreenFocused: false,
@@ -49,6 +50,19 @@ export const companyReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                loginScreenFocused: action.payload ? false : state.loginScreenFocused,
+            }
+            break;
+        case companyConstants.SET_LOGIN_SCREEN_FOCUSED:
+            state = {
+                ...state,
+                loginScreenFocused: action.payload,
+                mainCompanyScreenFocused: action.payload ? false : state.mainCompanyScreenFocused,
+                dispatchScreenFocused: action.payload ? false : state.dispatchScreenFocused,
+                customerScreenFocused: action.payload ? false : state.customerScreenFocused,
+                carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
+                loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
         case companyConstants.SET_DISPATCH_SCREEN_FOCUSED:
@@ -60,6 +74,7 @@ export const companyReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                loginScreenFocused: action.payload ? false : state.loginScreenFocused,
             }
             break;
         case companyConstants.SET_CUSTOMER_SCREEN_FOCUSED:
@@ -71,6 +86,7 @@ export const companyReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                loginScreenFocused: action.payload ? false : state.loginScreenFocused,
             }
             break;
         case companyConstants.SET_CARRIER_SCREEN_FOCUSED:
@@ -82,6 +98,7 @@ export const companyReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                loginScreenFocused: action.payload ? false : state.loginScreenFocused,
             }
             break;
         case companyConstants.SET_LOAD_BOARD_SCREEN_FOCUSED:
@@ -93,6 +110,7 @@ export const companyReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+                loginScreenFocused: action.payload ? false : state.loginScreenFocused,
             }
             break;
         case companyConstants.SET_INVOICE_SCREEN_FOCUSED:
@@ -104,6 +122,7 @@ export const companyReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
+                loginScreenFocused: action.payload ? false : state.loginScreenFocused,
             }
             break;
         default:

@@ -291,174 +291,179 @@ const LoadBoard = (props) => {
         }
 
         refreshTimer = window.setTimeout(() => {
-            axios.post(props.serverUrl + '/getConfig').then(res => {
-                if (res.data.result === 'OK') {
-                    let load_board_auto_refresh_enabled = res.data.config.find(c => c.name === 'load_board_auto_refresh_enabled');
+            if ((props.user?.id || 0) > 0) {
+                axios.post(props.serverUrl + '/getConfig').then(res => {
+                    if (res.data.result === 'OK') {
+                        let load_board_auto_refresh_enabled = res.data.config.find(c => c.name === 'load_board_auto_refresh_enabled');
 
-                    if (load_board_auto_refresh_enabled === undefined) {
-                       
-                    } else {
-                        if (load_board_auto_refresh_enabled.value === '0') {
-                            
+                        if (load_board_auto_refresh_enabled === undefined) {
+
                         } else {
-                            setIsLoading(true);
+                            if (load_board_auto_refresh_enabled.value === '0') {
 
-                            axios.post(props.serverUrl + '/getOrders', {
-                                user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
-                            }).then(async res => {
-                                if (res.data.result === 'OK') {
-                                    setOrders(res.data.orders.map(item => item));
+                            } else {
+                                setIsLoading(true);
 
-                                    setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
+                                axios.post(props.serverUrl + '/getOrders', {
+                                    user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+                                }).then(async res => {
+                                    if (res.data.result === 'OK') {
+                                        setOrders(res.data.orders.map(item => item));
 
-                                    setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
+                                        setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
 
-                                    setInTransitOrders(res.data.orders.filter(item =>
-                                        ((item.carrier_id || 0) > 0) &&
-                                        (item.total_loaded_events > 0) &&
-                                        ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
+                                        setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
 
-                                    setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
-                                        ((item.order_invoiced || 0) === 0) &&
-                                        ((item.carrier_id || 0) > 0) &&
-                                        (item.total_loaded_events > 0) &&
-                                        ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
+                                        setInTransitOrders(res.data.orders.filter(item =>
+                                            ((item.carrier_id || 0) > 0) &&
+                                            (item.total_loaded_events > 0) &&
+                                            ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
 
-                                    // setInTransitOrders(res.data.orders.filter(item =>
-                                    //     ((item.carrier_id || 0) > 0) &&
-                                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                                    //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
-                                    //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
-                                    //
-                                    // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
-                                    //     ((item.order_invoiced || 0) === 0) &&
-                                    //     ((item.carrier_id || 0) > 0) &&
-                                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                                    //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
-                                    //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+                                        setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                                            ((item.order_invoiced || 0) === 0) &&
+                                            ((item.carrier_id || 0) > 0) &&
+                                            (item.total_loaded_events > 0) &&
+                                            ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
 
-                                    if ((selectedOrder?.id || 0) > 0) {
-                                        let order = res.data.orders.find(o => o.id === selectedOrder.id);
+                                        // setInTransitOrders(res.data.orders.filter(item =>
+                                        //     ((item.carrier_id || 0) > 0) &&
+                                        //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                                        //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
+                                        //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                                        //
+                                        // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                                        //     ((item.order_invoiced || 0) === 0) &&
+                                        //     ((item.carrier_id || 0) > 0) &&
+                                        //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                                        //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
+                                        //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
 
-                                        setSelectedOrder(order);
+                                        if ((selectedOrder?.id || 0) > 0) {
+                                            let order = res.data.orders.find(o => o.id === selectedOrder.id);
 
-                                        setSelectedBillToCustomer(order.bill_to_company || {})
-                                        setSelectedBillToCustomerContact({});
+                                            setSelectedOrder(order);
 
-                                        order.bill_to_company?.contacts.map(c => {
-                                            if (c.is_primary === 1) {
-                                                setSelectedBillToCustomerContact(c);
-                                            }
-                                            return true;
-                                        });
+                                            setSelectedBillToCustomer(order.bill_to_company || {})
+                                            setSelectedBillToCustomerContact({});
 
-                                        setSelectedCarrier(order.carrier || {})
-                                        setSelectedCarrierContact({})
+                                            order.bill_to_company?.contacts.map(c => {
+                                                if (c.is_primary === 1) {
+                                                    setSelectedBillToCustomerContact(c);
+                                                }
+                                                return true;
+                                            });
 
-                                        order.carrier?.contacts.map(c => {
-                                            if (c.is_primary === 1) {
-                                                setSelectedCarrierContact(c);
-                                            }
-                                            return true;
-                                        });
+                                            setSelectedCarrier(order.carrier || {})
+                                            setSelectedCarrierContact({})
 
-                                        setSelectedCarrierDriver(order.driver || {});
+                                            order.carrier?.contacts.map(c => {
+                                                if (c.is_primary === 1) {
+                                                    setSelectedCarrierContact(c);
+                                                }
+                                                return true;
+                                            });
 
-                                        setSelectedShipperCustomer(order.pickups[0]?.customer || {});
-                                        setSelectedShipperCustomerContact({});
+                                            setSelectedCarrierDriver(order.driver || {});
 
-                                        ((order.pickups.length > 0 ? order.pickups[0]?.customer : {}).contacts || []).map(c => {
-                                            if (c.is_primary === 1) {
-                                                setSelectedShipperCustomerContact(c);
-                                            }
-                                            return true;
-                                        });
+                                            setSelectedShipperCustomer(order.pickups[0]?.customer || {});
+                                            setSelectedShipperCustomerContact({});
 
-                                        setSelectedConsigneeCustomer(order.deliveries.length > 0 ? order.deliveries[0]?.customer : {});
-                                        setSelectedConsigneeCustomerContact({});
+                                            ((order.pickups.length > 0 ? order.pickups[0]?.customer : {}).contacts || []).map(c => {
+                                                if (c.is_primary === 1) {
+                                                    setSelectedShipperCustomerContact(c);
+                                                }
+                                                return true;
+                                            });
 
-                                        ((order.deliveries.length > 0 ? order.deliveries[0]?.customer : {}).contacts || []).map(c => {
-                                            if (c.is_primary === 1) {
-                                                setSelectedConsigneeCustomerContact(c);
-                                            }
-                                            return true;
-                                        });
+                                            setSelectedConsigneeCustomer(order.deliveries.length > 0 ? order.deliveries[0]?.customer : {});
+                                            setSelectedConsigneeCustomerContact({});
+
+                                            ((order.deliveries.length > 0 ? order.deliveries[0]?.customer : {}).contacts || []).map(c => {
+                                                if (c.is_primary === 1) {
+                                                    setSelectedConsigneeCustomerContact(c);
+                                                }
+                                                return true;
+                                            });
+                                        }
+
+                                        setIsLoading(false);
+
+                                        setLoadBoardTimer();
                                     }
-
+                                }).catch(e => {
+                                    console.log('error loading orders', e)
                                     setIsLoading(false);
-
-                                    setLoadBoardTimer();
-                                }
-                            }).catch(e => {
-                                console.log('error loading orders', e)
-                                setIsLoading(false);
-                            })
+                                })
+                            }
                         }
                     }
-                }
-            }).catch(e => {
-                console.log('error getting config', e);
-            });
+                }).catch(e => {
+                    console.log('error getting config', e);
+                });
+            }
         }, time);
     }
 
     useEffect(() => {
-        axios.post(props.serverUrl + '/getConfig').then(res => {
-            if (res.data.result === 'OK') {
-                setSystemConfig(res.data.config);
-            }
-        }).catch(e => {
-            console.log('error getting config', e);
-        })
+        if ((props.user?.id || 0) > 0){
+            axios.post(props.serverUrl + '/getConfig').then(res => {
+                if (res.data.result === 'OK') {
+                    setSystemConfig(res.data.config);
+                }
+            }).catch(e => {
+                console.log('error getting config', e);
+            })
+        }
     }, []);
 
     useEffect(() => {
-        setIsLoading(true);
+        if ((props.user?.id || 0) > 0){
+            setIsLoading(true);
 
-        axios.post(props.serverUrl + '/getOrders', {
-            user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
-        }).then(async res => {
-            if (res.data.result === 'OK') {
-                setOrders(res.data.orders.map(item => item));
+            axios.post(props.serverUrl + '/getOrders', {
+                user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+            }).then(async res => {
+                if (res.data.result === 'OK') {
+                    setOrders(res.data.orders.map(item => item));
 
-                setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
+                    setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
 
-                setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
+                    setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
 
-                setInTransitOrders(res.data.orders.filter(item =>
-                    ((item.carrier_id || 0) > 0) &&
-                    (item.total_loaded_events > 0) &&
-                    ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
+                    setInTransitOrders(res.data.orders.filter(item =>
+                        ((item.carrier_id || 0) > 0) &&
+                        (item.total_loaded_events > 0) &&
+                        ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
 
-                setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
-                    ((item.order_invoiced || 0) === 0) &&
-                    ((item.carrier_id || 0) > 0) &&
-                    (item.total_loaded_events > 0) &&
-                    ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
+                    setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                        ((item.order_invoiced || 0) === 0) &&
+                        ((item.carrier_id || 0) > 0) &&
+                        (item.total_loaded_events > 0) &&
+                        ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
 
-                // setInTransitOrders(res.data.orders.filter(item =>
-                //     ((item.carrier_id || 0) > 0) &&
-                //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
-                //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
-                //
-                // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
-                //     ((item.order_invoiced || 0) === 0) &&
-                //     ((item.carrier_id || 0) > 0) &&
-                //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
-                //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+                    // setInTransitOrders(res.data.orders.filter(item =>
+                    //     ((item.carrier_id || 0) > 0) &&
+                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                    //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
+                    //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                    //
+                    // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                    //     ((item.order_invoiced || 0) === 0) &&
+                    //     ((item.carrier_id || 0) > 0) &&
+                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                    //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
+                    //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
 
 
+                    setIsLoading(false);
+                }
+            }).catch(e => {
+                console.log('error loading orders', e)
                 setIsLoading(false);
-            }
-        }).catch(e => {
-            console.log('error loading orders', e)
-            setIsLoading(false);
-        })
+            })
 
-        updateSystemDateTime();
-
+            updateSystemDateTime();
+        }
     }, [props.screenFocused])
 
     const updateSystemDateTime = () => {
@@ -584,98 +589,100 @@ const LoadBoard = (props) => {
     }
 
     const onRefreshBtnClick = () => {
-        if (!isLoading) {
-            setIsLoading(true);
+        if ((props.user?.id || 0) > 0){
+            if (!isLoading) {
+                setIsLoading(true);
 
-            axios.post(props.serverUrl + '/getOrders', {
-                user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
-            }).then(async res => {
-                if (res.data.result === 'OK') {
-                    setOrders(res.data.orders.map(item => item));
+                axios.post(props.serverUrl + '/getOrders', {
+                    user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+                }).then(async res => {
+                    if (res.data.result === 'OK') {
+                        setOrders(res.data.orders.map(item => item));
 
-                    setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
+                        setAvailableOrders(res.data.orders.filter(item => (item.carrier_id || 0) === 0));
 
-                    setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
+                        setBookedOrders(res.data.orders.filter(item => ((item.carrier_id || 0) > 0) && (item.total_loaded_events === 0)));
 
-                    setInTransitOrders(res.data.orders.filter(item =>
-                        ((item.carrier_id || 0) > 0) &&
-                        (item.total_loaded_events > 0) &&
-                        ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
+                        setInTransitOrders(res.data.orders.filter(item =>
+                            ((item.carrier_id || 0) > 0) &&
+                            (item.total_loaded_events > 0) &&
+                            ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))))
 
-                    setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
-                        ((item.order_invoiced || 0) === 0) &&
-                        ((item.carrier_id || 0) > 0) &&
-                        (item.total_loaded_events > 0) &&
-                        ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
+                        setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                            ((item.order_invoiced || 0) === 0) &&
+                            ((item.carrier_id || 0) > 0) &&
+                            (item.total_loaded_events > 0) &&
+                            ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))))
 
-                    // setInTransitOrders(res.data.orders.filter(item =>
-                    //     ((item.carrier_id || 0) > 0) &&
-                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                    //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
-                    //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
-                    //
-                    // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
-                    //     ((item.order_invoiced || 0) === 0) &&
-                    //     ((item.carrier_id || 0) > 0) &&
-                    //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                    //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
-                    //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
+                        // setInTransitOrders(res.data.orders.filter(item =>
+                        //     ((item.carrier_id || 0) > 0) &&
+                        //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                        //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
+                        //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
+                        //
+                        // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
+                        //     ((item.order_invoiced || 0) === 0) &&
+                        //     ((item.carrier_id || 0) > 0) &&
+                        //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
+                        //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
+                        //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
 
 
-                    if ((selectedOrder?.id || 0) > 0) {
-                        let order = res.data.orders.find(o => o.id === selectedOrder.id);
+                        if ((selectedOrder?.id || 0) > 0) {
+                            let order = res.data.orders.find(o => o.id === selectedOrder.id);
 
-                        setSelectedOrder(order);
+                            setSelectedOrder(order);
 
-                        setSelectedBillToCustomer(order.bill_to_company || {})
-                        setSelectedBillToCustomerContact({});
+                            setSelectedBillToCustomer(order.bill_to_company || {})
+                            setSelectedBillToCustomerContact({});
 
-                        order.bill_to_company?.contacts.map(c => {
-                            if (c.is_primary === 1) {
-                                setSelectedBillToCustomerContact(c);
-                            }
-                            return true;
-                        });
+                            order.bill_to_company?.contacts.map(c => {
+                                if (c.is_primary === 1) {
+                                    setSelectedBillToCustomerContact(c);
+                                }
+                                return true;
+                            });
 
-                        setSelectedCarrier(order.carrier || {})
-                        setSelectedCarrierContact({})
+                            setSelectedCarrier(order.carrier || {})
+                            setSelectedCarrierContact({})
 
-                        order.carrier?.contacts.map(c => {
-                            if (c.is_primary === 1) {
-                                setSelectedCarrierContact(c);
-                            }
-                            return true;
-                        });
+                            order.carrier?.contacts.map(c => {
+                                if (c.is_primary === 1) {
+                                    setSelectedCarrierContact(c);
+                                }
+                                return true;
+                            });
 
-                        setSelectedCarrierDriver(order.driver || {});
+                            setSelectedCarrierDriver(order.driver || {});
 
-                        setSelectedShipperCustomer(order.pickups[0]?.customer || {});
-                        setSelectedShipperCustomerContact({});
+                            setSelectedShipperCustomer(order.pickups[0]?.customer || {});
+                            setSelectedShipperCustomerContact({});
 
-                        ((order.pickups.length > 0 ? order.pickups[0]?.customer : {}).contacts || []).map(c => {
-                            if (c.is_primary === 1) {
-                                setSelectedShipperCustomerContact(c);
-                            }
-                            return true;
-                        });
+                            ((order.pickups.length > 0 ? order.pickups[0]?.customer : {}).contacts || []).map(c => {
+                                if (c.is_primary === 1) {
+                                    setSelectedShipperCustomerContact(c);
+                                }
+                                return true;
+                            });
 
-                        setSelectedConsigneeCustomer(order.deliveries.length > 0 ? order.deliveries[0]?.customer : {});
-                        setSelectedConsigneeCustomerContact({});
+                            setSelectedConsigneeCustomer(order.deliveries.length > 0 ? order.deliveries[0]?.customer : {});
+                            setSelectedConsigneeCustomerContact({});
 
-                        ((order.deliveries.length > 0 ? order.deliveries[0]?.customer : {}).contacts || []).map(c => {
-                            if (c.is_primary === 1) {
-                                setSelectedConsigneeCustomerContact(c);
-                            }
-                            return true;
-                        });
+                            ((order.deliveries.length > 0 ? order.deliveries[0]?.customer : {}).contacts || []).map(c => {
+                                if (c.is_primary === 1) {
+                                    setSelectedConsigneeCustomerContact(c);
+                                }
+                                return true;
+                            });
+                        }
+
+                        setIsLoading(false);
                     }
-
+                }).catch(e => {
+                    console.log('error loading orders', e)
                     setIsLoading(false);
-                }
-            }).catch(e => {
-                console.log('error loading orders', e)
-                setIsLoading(false);
-            })
+                })
+            }
         }
     }
 

@@ -38,6 +38,7 @@
     "react-draggable": "^4.4.3",
     "react-google-maps": "^9.4.5",
     "react-highlight-words": "^0.17.0",
+    "react-html-parser": "^2.0.2",
     "react-loader-spinner": "^4.0.0",
     "react-loaders": "^3.0.1",
     "react-masked-text": "^0.4.1",

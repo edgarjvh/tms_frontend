@@ -180,6 +180,15 @@ const Customers = (props) => {
     });
     const refDivisionPopupItems = useRef([]);
 
+    const refSalesman = useRef();
+    const [salesmanItems, setSalesmanItems] = useState([]);
+    const refSalesmanDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setSalesmanItems([]);
+        }
+    });
+    const refSalesmanPopupItems = useRef([]);
+
     const refTerms = useRef();
     const [termsItems, setTermsItems] = useState([]);
     const refTermsDropDown = useDetectClickOutside({
@@ -234,6 +243,14 @@ const Customers = (props) => {
         leave: {opacity: 0, top: "calc(100% + 7px)"},
         config: {duration: 100},
         reverse: divisionItems.length > 0
+    });
+
+    const salesmanTransition = useTransition(salesmanItems.length > 0, {
+        from: {opacity: 0, top: "calc(100% + 7px)"},
+        enter: {opacity: 1, top: "calc(100% + 12px)"},
+        leave: {opacity: 0, top: "calc(100% + 7px)"},
+        config: {duration: 100},
+        reverse: salesmanItems.length > 0
     });
 
     const customerContactPhonesTransition = useTransition(showCustomerContactPhones, {
@@ -764,6 +781,8 @@ const Customers = (props) => {
         setAutomaticEmailsCc('');
         setAutomaticEmailsBcc('');
         setSelectedCustomer({id: 0, code: clearCode ? '' : selectedCustomer?.code});
+
+        refCustomerCode.current.focus();
     }
 
     const searchCustomerByCode = (e) => {
@@ -1789,11 +1808,14 @@ const Customers = (props) => {
                                 <div className="form-title">Mailing Address</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={mailingAddressBillToBtn}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Bill to</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
+                                    {
+                                        props.user?.user_code?.type !== 'agent' &&
+                                        <div className="mochi-button" onClick={mailingAddressBillToBtn}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">Bill to</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    }
                                     <div className="mochi-button" onClick={remitToAddressBtn}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Remit to address is the same</div>
@@ -2981,32 +3003,25 @@ const Customers = (props) => {
                                 <div className="input-box-container grow">
                                     <input tabIndex={32 + props.tabTimes} type="text"
                                            style={{textTransform: 'uppercase'}} placeholder="Bill To"
-                                           readOnly={false}
+                                           readOnly={!props.isAdmin}
                                            onInput={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
-                                                   mailing_address: {
-                                                       ...selectedCustomer?.mailing_address,
-                                                       bill_to_code: e.target.value
-                                                   }
+                                                   bill_to_code: e.target.value
                                                })
                                            }}
                                            onChange={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
-                                                   mailing_address: {
-                                                       ...selectedCustomer?.mailing_address,
-                                                       bill_to_code: e.target.value
-                                                   }
+                                                   bill_to_code: e.target.value
                                                })
                                            }}
-                                           value={(selectedCustomer?.mailing_address?.bill_to_code || '') + ((selectedCustomer?.mailing_address?.bill_to_code_number || 0) === 0 ? '' : selectedCustomer?.mailing_address?.bill_to_code_number)}/>
+                                           value={selectedCustomer?.bill_to_code || ''}/>
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="select-box-container grow">
-
                                     <div className="select-box-wrapper">
                                         <input
                                             type="text"
@@ -3064,11 +3079,11 @@ const Customers = (props) => {
                                                                     if (res.data.result === "OK") {
                                                                         await setDivisionItems(res.data.divisions.map((item, index) => {
                                                                             item.selected =
-                                                                                (selectedCustomer?.mailing_address?.division?.id ||
+                                                                                (selectedCustomer?.division?.id ||
                                                                                     0) === 0
                                                                                     ? index === 0
                                                                                     : item.id ===
-                                                                                    selectedCustomer.mailing_address.division.id;
+                                                                                    selectedCustomer.division.id;
                                                                             return item;
                                                                         }));
 
@@ -3126,12 +3141,9 @@ const Customers = (props) => {
                                                                     if (res.data.result === "OK") {
                                                                         await setDivisionItems(res.data.divisions.map(
                                                                                 (item, index) => {
-                                                                                    item.selected =
-                                                                                        (selectedCustomer?.mailing_address?.division?.id ||
-                                                                                            0) === 0
+                                                                                    item.selected = (selectedCustomer?.division?.id || 0) === 0
                                                                                             ? index === 0
-                                                                                            : item.id ===
-                                                                                            selectedCustomer?.mailing_address?.division.id;
+                                                                                            : item.id === selectedCustomer.division.id;
                                                                                     return item;
                                                                                 }
                                                                             )
@@ -3163,15 +3175,12 @@ const Customers = (props) => {
                                                                 await setSelectedCustomer(selectedCustomer => {
                                                                     return {
                                                                         ...selectedCustomer,
-                                                                        mailing_address: {
-                                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                                            division: divisionItems[divisionItems.findIndex((item) => item.selected)],
-                                                                            division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
-                                                                        }
+                                                                        division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                                        division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
                                                                     }
                                                                 })
 
-                                                                validateMailingAddressForSaving({keyCode: 9});
+                                                                validateCustomerForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
                                                                 refDivision.current.focus();
                                                             }
@@ -3183,15 +3192,12 @@ const Customers = (props) => {
                                                                 await setSelectedCustomer(selectedCustomer => {
                                                                     return {
                                                                         ...selectedCustomer,
-                                                                        mailing_address: {
-                                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                                            division: divisionItems[divisionItems.findIndex((item) => item.selected)],
-                                                                            division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
-                                                                        }
+                                                                        division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                                        division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
                                                                     }
                                                                 })
 
-                                                                validateMailingAddressForSaving({keyCode: 9});
+                                                                validateCustomerForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
                                                                 refDivision.current.focus();
                                                             }
@@ -3203,21 +3209,18 @@ const Customers = (props) => {
                                                 }
                                             }}
                                             onBlur={async () => {
-                                                if ((selectedCustomer?.mailing_address?.division?.id || 0) === 0) {
+                                                if ((selectedCustomer?.division?.id || 0) === 0) {
                                                     await setSelectedCustomer(selectedCustomer => {
                                                         return {
                                                             ...selectedCustomer,
-                                                            mailing_address: {
-                                                                ...(selectedCustomer?.mailing_address || {}),
-                                                                division: {},
-                                                                division_id: null
-                                                            }
+                                                            division: {},
+                                                            division_id: null
                                                         }
                                                     })
                                                 }
                                             }}
                                             onInput={async (e) => {
-                                                let division = selectedCustomer?.mailing_address?.division || {};
+                                                let division = selectedCustomer?.division || {};
 
                                                 division.id = 0;
                                                 division.name = e.target.value;
@@ -3225,11 +3228,8 @@ const Customers = (props) => {
                                                 await setSelectedCustomer(selectedCustomer => {
                                                     return {
                                                         ...selectedCustomer,
-                                                        mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                            division: division,
-                                                            division_id: division.id
-                                                        }
+                                                        division: division,
+                                                        division_id: division.id
                                                     }
                                                 })
 
@@ -3240,10 +3240,9 @@ const Customers = (props) => {
                                                         if (res.data.result === "OK") {
                                                             await setDivisionItems(
                                                                 res.data.divisions.map((item, index) => {
-                                                                    item.selected = (selectedCustomer?.mailing_address?.division?.id || 0) === 0
+                                                                    item.selected = (selectedCustomer?.division?.id || 0) === 0
                                                                         ? index === 0
-                                                                        : item.id ===
-                                                                        selectedCustomer.mailing_address.division.id;
+                                                                        : item.id === selectedCustomer.division.id;
                                                                     return item;
                                                                 })
                                                             );
@@ -3254,7 +3253,7 @@ const Customers = (props) => {
                                                 }
                                             }}
                                             onChange={async (e) => {
-                                                let division = selectedCustomer?.mailing_address?.division || {};
+                                                let division = selectedCustomer?.division || {};
 
                                                 division.id = 0;
                                                 division.name = e.target.value;
@@ -3262,15 +3261,12 @@ const Customers = (props) => {
                                                 await setSelectedCustomer(selectedCustomer => {
                                                     return {
                                                         ...selectedCustomer,
-                                                        mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                            division: division,
-                                                            division_id: division.id
-                                                        }
+                                                        division: division,
+                                                        division_id: division.id
                                                     }
                                                 })
                                             }}
-                                            value={selectedCustomer?.mailing_address?.division?.name || ""}
+                                            value={selectedCustomer?.division?.name || ""}
                                         />
                                         {
                                             props.isAdmin &&
@@ -3284,13 +3280,13 @@ const Customers = (props) => {
                                                     if (divisionItems.length > 0) {
                                                         setDivisionItems([]);
                                                     } else {
-                                                        if ((selectedCustomer?.mailing_address?.division?.id || 0) === 0 && (selectedCustomer?.mailing_address?.division?.name || "") !== "") {
-                                                            axios.post(props.serverUrl + "/getDivisions", {name: selectedCustomer.mailing_address.division.name}).then(async (res) => {
+                                                        if ((selectedCustomer?.division?.id || 0) === 0 && (selectedCustomer?.division?.name || "") !== "") {
+                                                            axios.post(props.serverUrl + "/getDivisions", {name: selectedCustomer.division.name}).then(async (res) => {
                                                                 if (res.data.result === "OK") {
                                                                     await setDivisionItems(res.data.divisions.map((item, index) => {
-                                                                        item.selected = (selectedCustomer?.mailing_address?.division?.id || 0) === 0
+                                                                        item.selected = (selectedCustomer?.division?.id || 0) === 0
                                                                             ? index === 0
-                                                                            : item.id === selectedCustomer.mailing_address.division.id;
+                                                                            : item.id === selectedCustomer.division.id;
                                                                         return item;
                                                                     }));
 
@@ -3312,9 +3308,9 @@ const Customers = (props) => {
                                                             axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
                                                                 if (res.data.result === "OK") {
                                                                     await setDivisionItems(res.data.divisions.map((item, index) => {
-                                                                        item.selected = (selectedCustomer?.mailing_address?.division?.id || 0) === 0
+                                                                        item.selected = (selectedCustomer?.division?.id || 0) === 0
                                                                             ? index === 0
-                                                                            : item.id === selectedCustomer.mailing_address.division.id;
+                                                                            : item.id === selectedCustomer.division.id;
                                                                         return item;
                                                                     }));
 
@@ -3363,8 +3359,8 @@ const Customers = (props) => {
                                                                     selected: item.selected,
                                                                 });
 
-                                                                const searchValue = (selectedCustomer?.mailing_address?.division?.id || 0) === 0 && (selectedCustomer?.mailing_address?.division?.name || "") !== ""
-                                                                    ? selectedCustomer?.mailing_address?.division?.name
+                                                                const searchValue = (selectedCustomer?.division?.id || 0) === 0 && (selectedCustomer?.division?.name || "") !== ""
+                                                                    ? selectedCustomer?.division?.name
                                                                     : undefined;
 
                                                                 return (
@@ -3376,16 +3372,13 @@ const Customers = (props) => {
                                                                             setSelectedCustomer(selectedCustomer => {
                                                                                 return {
                                                                                     ...selectedCustomer,
-                                                                                    mailing_address: {
-                                                                                        ...(selectedCustomer?.mailing_address || {}),
-                                                                                        division: item,
-                                                                                        division_id: item.id
-                                                                                    }
+                                                                                    division: item,
+                                                                                    division_id: item.id
                                                                                 }
                                                                             })
 
                                                                             window.setTimeout(() => {
-                                                                                validateMailingAddressForSaving({keyCode: 9});
+                                                                                validateCustomerForSaving({keyCode: 9});
                                                                                 setDivisionItems([]);
                                                                                 refDivision.current.focus();
                                                                             }, 0);
@@ -3423,14 +3416,16 @@ const Customers = (props) => {
                                     <input tabIndex={34 + props.tabTimes} type="text" placeholder="Agent Code"
                                            style={{textTransform: 'uppercase'}}
                                            readOnly={!props.isAdmin}
+                                           onKeyDown={e => {
+                                               if (props.isAdmin){
+                                                   validateCustomerForSaving(e);
+                                               }
+                                           }}
                                            onInput={e => {
                                                setSelectedCustomer(selectedCustomer => {
                                                    return {
                                                        ...selectedCustomer,
-                                                       mailing_address: {
-                                                           ...selectedCustomer?.mailing_address,
-                                                           agent_code: e.target.value
-                                                       }
+                                                       agent_code: e.target.value
                                                    }
                                                })
                                            }}
@@ -3438,46 +3433,403 @@ const Customers = (props) => {
                                                setSelectedCustomer(selectedCustomer => {
                                                    return {
                                                        ...selectedCustomer,
-                                                       mailing_address: {
-                                                           ...selectedCustomer?.mailing_address,
-                                                           agent_code: e.target.value
-                                                       }
+                                                       agent_code: e.target.value
                                                    }
                                                })
                                            }}
-                                           value={selectedCustomer?.mailing_address?.agent_code || ''}
+                                           value={selectedCustomer?.agent_code || ''}
                                     />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={35 + props.tabTimes} type="text" placeholder="Salesman"
-                                           readOnly={!props.isAdmin}
-                                           onInput={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       mailing_address: {
-                                                           ...selectedCustomer?.mailing_address,
-                                                           salesman: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedCustomer(selectedCustomer => {
-                                                   return {
-                                                       ...selectedCustomer,
-                                                       mailing_address: {
-                                                           ...selectedCustomer?.mailing_address,
-                                                           salesman: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedCustomer?.mailing_address?.salesman || ''}
-                                    />
+                                <div className="select-box-container grow">
+                                    <div className="select-box-wrapper">
+                                        <input
+                                            type="text"
+                                            readOnly={!props.isAdmin}
+                                            tabIndex={35 + props.tabTimes}
+                                            placeholder="Salesman"
+                                            ref={refSalesman}
+                                            onKeyDown={async (e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (!props.isAdmin) {
+                                                    e.preventDefault();
+                                                } else {
+                                                    switch (key) {
+                                                        case 37:
+                                                        case 38: // arrow left | arrow up
+                                                            e.preventDefault();
+                                                            if (salesmanItems.length > 0) {
+                                                                let selectedIndex = salesmanItems.findIndex((item) => item.selected);
+
+                                                                if (selectedIndex === -1) {
+                                                                    await setSalesmanItems(
+                                                                        salesmanItems.map((item, index) => {
+                                                                            item.selected = index === 0;
+                                                                            return item;
+                                                                        })
+                                                                    );
+                                                                } else {
+                                                                    await setSalesmanItems(
+                                                                        salesmanItems.map((item, index) => {
+                                                                            if (selectedIndex === 0) {
+                                                                                item.selected =
+                                                                                    index === salesmanItems.length - 1;
+                                                                            } else {
+                                                                                item.selected =
+                                                                                    index === selectedIndex - 1;
+                                                                            }
+                                                                            return item;
+                                                                        })
+                                                                    );
+                                                                }
+
+                                                                refSalesmanPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            } else {
+                                                                axios.post(props.serverUrl + "/getSalesmen").then(async (res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        await setSalesmanItems(res.data.salesmen.map((item, index) => {
+                                                                            item.selected =
+                                                                                (selectedCustomer?.salesman?.id ||
+                                                                                    0) === 0
+                                                                                    ? index === 0
+                                                                                    : item.id ===
+                                                                                    selectedCustomer.salesman.id;
+                                                                            return item;
+                                                                        }));
+
+                                                                        refSalesmanPopupItems.current.map((r, i) => {
+                                                                            if (r && r.classList.contains("selected")) {
+                                                                                r.scrollIntoView({
+                                                                                    behavior: "auto",
+                                                                                    block: "center",
+                                                                                    inline: "nearest",
+                                                                                });
+                                                                            }
+                                                                            return true;
+                                                                        });
+                                                                    }
+                                                                }).catch(async (e) => {
+                                                                    console.log("error getting salesmen", e);
+                                                                });
+                                                            }
+                                                            break;
+
+                                                        case 39:
+                                                        case 40: // arrow right | arrow down
+                                                            e.preventDefault();
+                                                            if (salesmanItems.length > 0) {
+                                                                let selectedIndex = salesmanItems.findIndex((item) => item.selected);
+
+                                                                if (selectedIndex === -1) {
+                                                                    await setSalesmanItems(salesmanItems.map((item, index) => {
+                                                                        item.selected = index === 0;
+                                                                        return item;
+                                                                    }));
+                                                                } else {
+                                                                    await setSalesmanItems(salesmanItems.map((item, index) => {
+                                                                        if (selectedIndex === salesmanItems.length - 1) {
+                                                                            item.selected = index === 0;
+                                                                        } else {
+                                                                            item.selected = index === selectedIndex + 1;
+                                                                        }
+                                                                        return item;
+                                                                    }));
+                                                                }
+
+                                                                refSalesmanPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            } else {
+                                                                axios.post(props.serverUrl + "/getSalesmen").then(async (res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        await setSalesmanItems(res.data.salesmen.map(
+                                                                                (item, index) => {
+                                                                                    item.selected = (selectedCustomer?.salesman?.id || 0) === 0
+                                                                                        ? index === 0
+                                                                                        : item.id === selectedCustomer.salesman.id;
+                                                                                    return item;
+                                                                                }
+                                                                            )
+                                                                        );
+
+                                                                        refSalesmanPopupItems.current.map((r, i) => {
+                                                                            if (r && r.classList.contains("selected")) {
+                                                                                r.scrollIntoView({
+                                                                                    behavior: "auto",
+                                                                                    block: "center",
+                                                                                    inline: "nearest",
+                                                                                });
+                                                                            }
+                                                                            return true;
+                                                                        });
+                                                                    }
+                                                                }).catch(async (e) => {
+                                                                    console.log("error getting salesmen", e);
+                                                                });
+                                                            }
+                                                            break;
+
+                                                        case 27: // escape
+                                                            setSalesmanItems([]);
+                                                            break;
+
+                                                        case 13: // enter
+                                                            if (salesmanItems.length > 0 && salesmanItems.findIndex((item) => item.selected) > -1) {
+                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                    return {
+                                                                        ...selectedCustomer,
+                                                                        salesman: salesmanItems[salesmanItems.findIndex((item) => item.selected)],
+                                                                        salesman_id: salesmanItems[salesmanItems.findIndex((item) => item.selected)].id
+                                                                    }
+                                                                })
+
+                                                                validateCustomerForSaving({keyCode: 9});
+                                                                setSalesmanItems([]);
+                                                                refSalesman.current.focus();
+                                                            }
+                                                            break;
+
+                                                        case 9: // tab
+                                                            if (salesmanItems.length > 0) {
+                                                                e.preventDefault();
+                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                    return {
+                                                                        ...selectedCustomer,
+                                                                        salesman: salesmanItems[salesmanItems.findIndex((item) => item.selected)],
+                                                                        salesman_id: salesmanItems[salesmanItems.findIndex((item) => item.selected)].id
+                                                                    }
+                                                                })
+
+                                                                validateCustomerForSaving({keyCode: 9});
+                                                                setSalesmanItems([]);
+                                                                refSalesman.current.focus();
+                                                            }
+                                                            break;
+
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                            }}
+                                            onBlur={async () => {
+                                                if ((selectedCustomer?.salesman?.id || 0) === 0) {
+                                                    await setSelectedCustomer(selectedCustomer => {
+                                                        return {
+                                                            ...selectedCustomer,
+                                                            salesman: {},
+                                                            salesman_id: null
+                                                        }
+                                                    })
+                                                }
+                                            }}
+                                            onInput={async (e) => {
+                                                let salesman = selectedCustomer?.salesman || {};
+
+                                                salesman.id = 0;
+                                                salesman.name = e.target.value;
+
+                                                await setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        salesman: salesman,
+                                                        salesman_id: salesman.id
+                                                    }
+                                                })
+
+                                                if (e.target.value.trim() === "") {
+                                                    setSalesmanItems([]);
+                                                } else {
+                                                    axios.post(props.serverUrl + "/getSalesmen", {name: e.target.value.trim()}).then(async (res) => {
+                                                        if (res.data.result === "OK") {
+                                                            await setSalesmanItems(
+                                                                res.data.salesmen.map((item, index) => {
+                                                                    item.selected = (selectedCustomer?.salesman?.id || 0) === 0
+                                                                        ? index === 0
+                                                                        : item.id === selectedCustomer.salesman.id;
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+                                                    }).catch(async (e) => {
+                                                        console.log("error getting salesmen", e);
+                                                    });
+                                                }
+                                            }}
+                                            onChange={async (e) => {
+                                                let salesman = selectedCustomer?.salesman || {};
+
+                                                salesman.id = 0;
+                                                salesman.name = e.target.value;
+
+                                                await setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        salesman: salesman,
+                                                        salesman_id: salesman.id
+                                                    }
+                                                })
+                                            }}
+                                            value={selectedCustomer?.salesman?.name || ""}
+                                        />
+                                        {
+                                            props.isAdmin &&
+                                            <FontAwesomeIcon
+                                                className="dropdown-button"
+                                                icon={faCaretDown}
+                                                style={{
+                                                    pointerEvents: props.isAdmin ? 'all' : 'none'
+                                                }}
+                                                onClick={() => {
+                                                    if (salesmanItems.length > 0) {
+                                                        setSalesmanItems([]);
+                                                    } else {
+                                                        if ((selectedCustomer?.salesman?.id || 0) === 0 && (selectedCustomer?.salesman?.name || "") !== "") {
+                                                            axios.post(props.serverUrl + "/getSalesmen", {name: selectedCustomer.salesman.name}).then(async (res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    await setSalesmanItems(res.data.salesmen.map((item, index) => {
+                                                                        item.selected = (selectedCustomer?.salesman?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCustomer.salesman.id;
+                                                                        return item;
+                                                                    }));
+
+                                                                    refSalesmanPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(async (e) => {
+                                                                console.log("error getting salesmen", e);
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + "/getSalesmen").then(async (res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    await setSalesmanItems(res.data.salesmen.map((item, index) => {
+                                                                        item.selected = (selectedCustomer?.salesman?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCustomer.salesman.id;
+                                                                        return item;
+                                                                    }));
+
+                                                                    refSalesmanPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(async (e) => {
+                                                                console.log("error getting salesmen", e);
+                                                            });
+                                                        }
+                                                    }
+
+                                                    refSalesman.current.focus();
+                                                }}
+                                            />
+                                        }
+                                    </div>
+
+                                    {
+                                        salesmanTransition((style, item) => item && (
+                                            <animated.div
+                                                className="mochi-contextual-container"
+                                                id="mochi-contextual-container-salesman"
+                                                style={{
+                                                    ...style,
+                                                    left: "-50%",
+                                                    display: "block",
+                                                }}
+                                                ref={refSalesmanDropDown}>
+
+                                                <div className="mochi-contextual-popup vertical below"
+                                                     style={{height: 150}}>
+                                                    <div className="mochi-contextual-popup-content">
+                                                        <div className="mochi-contextual-popup-wrapper">
+                                                            {salesmanItems.map((item, index) => {
+                                                                const mochiItemClasses = classnames({
+                                                                    "mochi-item": true,
+                                                                    selected: item.selected,
+                                                                });
+
+                                                                const searchValue = (selectedCustomer?.salesman?.id || 0) === 0 && (selectedCustomer?.salesman?.name || "") !== ""
+                                                                    ? selectedCustomer?.salesman?.name
+                                                                    : undefined;
+
+                                                                return (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={mochiItemClasses}
+                                                                        id={item.id}
+                                                                        onClick={() => {
+                                                                            setSelectedCustomer(selectedCustomer => {
+                                                                                return {
+                                                                                    ...selectedCustomer,
+                                                                                    salesman: item,
+                                                                                    salesman_id: item.id
+                                                                                }
+                                                                            })
+
+                                                                            window.setTimeout(() => {
+                                                                                validateCustomerForSaving({keyCode: 9});
+                                                                                setSalesmanItems([]);
+                                                                                refSalesman.current.focus();
+                                                                            }, 0);
+                                                                        }}
+                                                                        ref={(ref) => refSalesmanPopupItems.current.push(ref)}
+                                                                    >
+                                                                        {searchValue === undefined ? (item.name) : (
+                                                                            <Highlighter
+                                                                                highlightClassName="mochi-item-highlight-text"
+                                                                                searchWords={[searchValue]}
+                                                                                autoEscape={true}
+                                                                                textToHighlight={item.name}
+                                                                            />
+                                                                        )}
+                                                                        {item.selected && (
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </animated.div>
+                                        ))
+                                    }
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
@@ -3485,15 +3837,12 @@ const Customers = (props) => {
                                 <div className="input-box-container grow">
                                     <input tabIndex={36 + props.tabTimes} type="text" placeholder="FID"
                                            readOnly={!props.isAdmin}
-                                           onKeyDown={validateMailingAddressForSaving}
+                                           onKeyDown={validateCustomerForSaving}
                                            onInput={e => {
                                                setSelectedCustomer(selectedCustomer => {
                                                    return {
                                                        ...selectedCustomer,
-                                                       mailing_address: {
-                                                           ...selectedCustomer?.mailing_address,
-                                                           fid: e.target.value
-                                                       }
+                                                       fid: e.target.value
                                                    }
                                                })
                                            }}
@@ -3501,14 +3850,11 @@ const Customers = (props) => {
                                                setSelectedCustomer(selectedCustomer => {
                                                    return {
                                                        ...selectedCustomer,
-                                                       mailing_address: {
-                                                           ...selectedCustomer?.mailing_address,
-                                                           fid: e.target.value
-                                                       }
+                                                       fid: e.target.value
                                                    }
                                                })
                                            }}
-                                           value={selectedCustomer?.mailing_address?.fid || ''}
+                                           value={selectedCustomer?.fid || ''}
                                     />
                                 </div>
                             </div>

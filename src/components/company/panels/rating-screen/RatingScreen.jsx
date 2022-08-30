@@ -20,6 +20,8 @@ import {
     setSelectedOrder
 } from './../../../../actions';
 
+import {RatingModal} from './../../panels';
+
 var delayTimer = null;
 
 const RatingScreen = (props) => {
@@ -162,6 +164,15 @@ const RatingScreen = (props) => {
     const refCarrierSubtypeDriverAssistDropDown = useDetectClickOutside({ onTriggered: async () => { setCarrierSubtypeDriverAssistItems([]) } });
     const refCarrierSubtypeDriverAssistPopupItems = useRef([]);
 
+    const [showApprovalRequired, setShowApprovalRequired] = useState(false);
+
+    const approvalRequiredTransition = useTransition(showApprovalRequired, {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: showApprovalRequired,
+        config: { duration: 100 }
+    });
 
     const billToRateTypeTransition = useTransition(billToRateTypeItems.length > 0, {
         from: { opacity: 0, top: 'calc(100% + 7px)' },
@@ -531,7 +542,9 @@ const RatingScreen = (props) => {
 
                         setSelectedBillToRating({});
                         refBillToRateTypes.current.focus();
-                    } else {                        
+                    }else if(res.data.result === 'OVERDRAWN'){
+                        setShowApprovalRequired(true);
+                    }else {
                         window.alert('An error occurred while saving');
                         refBillToTotalCharges.current.inputElement.focus();
                     }
@@ -7781,6 +7794,20 @@ const RatingScreen = (props) => {
                 </div>
 
             </div>
+
+            {
+                approvalRequiredTransition((style, item) => item && (
+                    <animated.div style={{ ...style }}>
+                        <RatingModal
+                            title="Approval Required"
+                            text={'Order will be over Customer\'s Credit Limit.</br>Please call to get approval'}
+                            close={() => {
+                                setShowApprovalRequired(false)
+                            }}
+                        />
+                    </animated.div>
+                ))
+            }
 
         </div>
     )

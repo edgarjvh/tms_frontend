@@ -15,6 +15,13 @@ export const setSelectedPageIndex = index => {
     }
 }
 
+export const setLoginScreenFocused = bool => {
+    return {
+        type: companyConstants.SET_LOGIN_SCREEN_FOCUSED,
+        payload: bool
+    }
+}
+
 export const setMainCompanyScreenFocused = bool => {
     return {
         type: companyConstants.SET_MAIN_COMPANY_SCREEN_FOCUSED,

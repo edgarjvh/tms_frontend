@@ -50,6 +50,13 @@ export const setCarrierScreenFocused = bool => {
     }
 }
 
+export const setInvoiceScreenFocused = bool => {
+    return {
+        type: adminConstants.SET_INVOICE_SCREEN_FOCUSED,
+        payload: bool
+    }
+}
+
 export const setReportsScreenFocused = bool => {
     return {
         type: adminConstants.SET_REPORTS_SCREEN_FOCUSED,

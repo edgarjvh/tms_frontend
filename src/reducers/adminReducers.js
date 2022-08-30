@@ -3,11 +3,12 @@ import { adminConstants } from '../constants';
 export const adminReducers = (state = {
     pages: [
         'admin home',
-        'admin dispatch',
-        'admin customer',
         'admin carrier',
-        'admin reports',
-        'company setup'
+        'company setup',
+        'admin customer',
+        'admin dispatch',
+        'admin invoice',
+        'admin reports'
     ],
     selectedPageIndex: 0,
     mainAdminScreenFocused: true,
@@ -16,6 +17,7 @@ export const adminReducers = (state = {
     carrierScreenFocused: false,
     reportsScreenFocused: false,
     setupCompanyScreenFocused: false,
+    invoiceScreenFocused: false,
     adminOpenedPanels: []
 }, action) => {
     switch (action.type) {
@@ -48,6 +50,7 @@ export const adminReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
                 setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
         case adminConstants.SET_DISPATCH_SCREEN_FOCUSED:
@@ -59,6 +62,7 @@ export const adminReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
                 setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
         case adminConstants.SET_CUSTOMER_SCREEN_FOCUSED:
@@ -70,6 +74,7 @@ export const adminReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
                 setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
         case adminConstants.SET_CARRIER_SCREEN_FOCUSED:
@@ -81,6 +86,7 @@ export const adminReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
                 setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
         case adminConstants.SET_REPORTS_SCREEN_FOCUSED:
@@ -92,6 +98,7 @@ export const adminReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
         case adminConstants.SET_SETUP_COMPANY_SCREEN_FOCUSED:
@@ -103,6 +110,19 @@ export const adminReducers = (state = {
                 customerScreenFocused: action.payload ? false : state.customerScreenFocused,
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
+                invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
+            }
+            break;
+            case adminConstants.SET_INVOICE_SCREEN_FOCUSED:
+            state = {
+                ...state,
+                invoiceScreenFocused: action.payload,
+                mainAdminScreenFocused: action.payload ? false : state.mainAdminScreenFocused,
+                dispatchScreenFocused: action.payload ? false : state.dispatchScreenFocused,
+                customerScreenFocused: action.payload ? false : state.customerScreenFocused,
+                carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
+                reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
+                setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
             }
             break;
         default:

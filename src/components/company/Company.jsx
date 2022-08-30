@@ -683,23 +683,23 @@ function Company(props) {
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
-                        <div className="section chat-video-buttons">
-                            <div className="mochi-button" onClick={() => {
-                                window.open('', '_blank').focus();
-                            }}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Chat</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
+                        {/*<div className="section chat-video-buttons">*/}
+                        {/*    <div className="mochi-button" onClick={() => {*/}
+                        {/*        window.open('', '_blank').focus();*/}
+                        {/*    }}>*/}
+                        {/*        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>*/}
+                        {/*        <div className="mochi-button-base">Chat</div>*/}
+                        {/*        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>*/}
+                        {/*    </div>*/}
 
-                            <div className="mochi-button" onClick={() => {
-                                window.open('', '_blank').focus();
-                            }}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Video</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
-                        </div>
+                        {/*    <div className="mochi-button" onClick={() => {*/}
+                        {/*        window.open('', '_blank').focus();*/}
+                        {/*    }}>*/}
+                        {/*        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>*/}
+                        {/*        <div className="mochi-button-base">Video</div>*/}
+                        {/*        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
                         <div className="section">
                             <div className="mochi-input-decorator">
                                 <input type="search" placeholder="just type" id="txt-main-search" />
@@ -716,10 +716,10 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.dispatchScreenFocused
-                            })} onClick={dispatchBtnClick}>
+                                'screen-focused': props.carrierScreenFocused
+                            })} onClick={carriersBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Dispatch</div>
+                                <div className="mochi-button-base">Carriers</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                             <div className={classnames({
@@ -732,18 +732,10 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.carrierScreenFocused
-                            })} onClick={carriersBtnClick}>
+                                'screen-focused': props.dispatchScreenFocused
+                            })} onClick={dispatchBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Carriers</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
-                            <div className={classnames({
-                                'mochi-button': true,
-                                'screen-focused': props.loadBoardScreenFocused
-                            })} onClick={loadBoardBtnClick}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Load Board</div>
+                                <div className="mochi-button-base">Dispatch</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                             <div className={classnames({
@@ -752,6 +744,14 @@ function Company(props) {
                             })} onClick={invoiceBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Invoice</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={classnames({
+                                'mochi-button': true,
+                                'screen-focused': props.loadBoardScreenFocused
+                            })} onClick={loadBoardBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Load Board</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                             <div className={classnames({
@@ -850,13 +850,11 @@ function Company(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px',
-                            overflow: 'hidden'
-
+                            borderRadius: props.scale === 1 ? 0 : '20px'
                         }}>
                             {
-                                dispatchPanelTransition((style, panel, item, index) => {
-                                    const origin = 'dispatch';
+                                carrierPanelTransition((style, panel, item, index) => {
+                                    const origin = 'carrier';
 
                                     return (
                                         <Draggable
@@ -875,13 +873,13 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.dispatchOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+                                                // onClick={() => {
+                                                //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                                //     // let _panels = [...props.customerOpenedPanels];
+                                                //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
 
-                                            //     // props.setDispatchOpenedPanels(_panels);
-                                            // }}
+                                                //     // props.setCustomerOpenedPanels(_panels);
+                                                // }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -902,15 +900,15 @@ function Company(props) {
                                 })
                             }
 
-                            <Dispatch
-                                pageName={'Dispatch Page'}
-                                panelName={'dispatch'}
-                                tabTimes={1000}
-                                screenFocused={props.dispatchScreenFocused}
+                            <Carriers
+                                pageName={'Carrier'}
+                                title={'Carrier'}
+                                panelName={'carrier'}
+                                tabTimes={3000}
+                                screenFocused={props.carrierScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
-                                isAdmin={false}
-                                origin='dispatch'
+                                origin='carrier'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />
@@ -994,11 +992,13 @@ function Company(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
+
                         }}>
                             {
-                                carrierPanelTransition((style, panel, item, index) => {
-                                    const origin = 'carrier';
+                                dispatchPanelTransition((style, panel, item, index) => {
+                                    const origin = 'dispatch';
 
                                     return (
                                         <Draggable
@@ -1017,13 +1017,13 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+                                                // onClick={() => {
+                                                //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                                //     // let _panels = [...props.dispatchOpenedPanels];
+                                                //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
 
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
+                                                //     // props.setDispatchOpenedPanels(_panels);
+                                                // }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -1044,15 +1044,85 @@ function Company(props) {
                                 })
                             }
 
-                            <Carriers
-                                pageName={'Carrier'}
-                                title={'Carrier'}
-                                panelName={'carrier'}
-                                tabTimes={3000}
-                                screenFocused={props.carrierScreenFocused}
+                            <Dispatch
+                                pageName={'Dispatch Page'}
+                                panelName={'dispatch'}
+                                tabTimes={1000}
+                                screenFocused={props.dispatchScreenFocused}
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
-                                origin='carrier'
+                                isAdmin={false}
+                                origin='dispatch'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
+                            />
+                        </div>
+
+                        <div style={{
+                            width: `${100 / props.pages.length}%`,
+                            height: '100%',
+                            transform: `scale(${props.scale})`,
+                            transition: 'all ease 0.7s',
+                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
+                            borderRadius: props.scale === 1 ? 0 : '20px'
+                        }}>
+                            {
+                                invoicePanelTransition((style, panel, item, index) => {
+                                    const origin = 'invoice';
+
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                                // onClick={() => {
+                                                //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                                //     // let _panels = [...props.customerOpenedPanels];
+                                                //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+
+                                                //     // props.setCustomerOpenedPanels(_panels);
+                                                // }}
+                                            >
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
+                            <Invoice
+                                pageName={'Invoice'}
+                                title={'Invoice'}
+                                panelName={'invoice'}
+                                tabTimes={5000}
+                                screenFocused={props.invoiceScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                origin='invoice'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />
@@ -1124,76 +1194,6 @@ function Company(props) {
                                 isOnPanel={false}
                                 isAdmin={false}
                                 origin='load-board'
-                                openPanel={openPanel}
-                                closePanel={closePanel}
-                            />
-                        </div>
-
-                        <div style={{
-                            width: `${100 / props.pages.length}%`,
-                            height: '100%',
-                            transform: `scale(${props.scale})`,
-                            transition: 'all ease 0.7s',
-                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
-                            {
-                                invoicePanelTransition((style, panel, item, index) => {
-                                    const origin = 'invoice';
-
-                                    return (
-                                        <Draggable
-                                            axis="x"
-                                            handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
-                                            key={index}
-                                        >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
-                                                ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
-                                            }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
-                                            >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
-
-                                                {
-                                                    panel?.component?.props?.isOnPanel
-                                                        ?
-                                                        <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
-                                                            {panel?.component}
-                                                        </div>
-                                                        :
-                                                        panel?.component
-                                                }
-                                            </animated.div>
-                                        </Draggable>
-                                    )
-                                })
-                            }
-
-                            <Invoice
-                                pageName={'Invoice'}
-                                title={'Invoice'}
-                                panelName={'invoice'}
-                                tabTimes={5000}
-                                screenFocused={props.invoiceScreenFocused}
-                                componentId={moment().format('x')}
-                                isOnPanel={false}
-                                origin='invoice'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />

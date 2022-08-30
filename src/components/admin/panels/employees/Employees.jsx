@@ -363,7 +363,6 @@ const Employees = (props) => {
                                         {(employeeSearchCompany?.selectedEmployee?.prefix || '') + " " + (employeeSearchCompany?.selectedEmployee?.first_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.middle_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.last_name || '')}
                                     </div>
                                     <div className="online-status">
-                                        {isEditingEmployee ? tempSelectedEmployee.prefix || '' : employeeSearchCompany?.selectedEmployee?.prefix || ''}
                                         <div className={(isEditingEmployee ? tempSelectedEmployee.is_online : employeeSearchCompany?.selectedEmployee?.is_online) === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
                                         <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>

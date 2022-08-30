@@ -9,7 +9,8 @@ import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import {
     setUser,
     setSelectedPageIndex,
-    setMainCompanyScreenFocused
+    setMainCompanyScreenFocused,
+    setLoginScreenFocused
 } from './../../../actions';
 
 import {
@@ -17,7 +18,11 @@ import {
 } from './../panels';
 
 const CompanyHome = (props) => {
-    
+    useEffect(() => {
+        if ((props.user?.id || 0) === 0){
+
+        }
+    }, []);
 
     return (
         <div>
@@ -50,5 +55,6 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
     setUser,
     setSelectedPageIndex,
-    setMainCompanyScreenFocused
+    setMainCompanyScreenFocused,
+    setLoginScreenFocused
 })(CompanyHome)
