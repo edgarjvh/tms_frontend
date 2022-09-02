@@ -342,6 +342,13 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (isSavingOrder) {
+            if ((props.user?.user_code?.is_admin || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+                setIsSavingOrder(false);
+                return;
+            }
+
             let selected_order = {...selectedOrder} || {order_number: 0};
 
             // check if there's a bill-to-company loaded
@@ -919,6 +926,13 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (isSavingBillToCompanyInfo) {
+            if ((props.user?.user_code?.is_admin || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+                setIsSavingBillToCompanyInfo(false);
+                return;
+            }
+
             if ((selectedBillToCustomer.id || 0) === 0) {
                 return;
             }
@@ -1004,6 +1018,13 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (isSavingBillToCompanyContact) {
+            if ((props.user?.user_code?.is_admin || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+                setIsSavingBillToCompanyContact(false);
+                return;
+            }
+
             if (selectedBillToCustomer.id === undefined) {
                 return;
             }
@@ -1052,6 +1073,13 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (isSavingCarrierInfo) {
+            if ((props.user?.user_code?.is_admin || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+                setIsSavingCarrierInfo(false);
+                return;
+            }
+
             if ((selectedCarrier.id || 0) === 0) {
                 return;
             }
@@ -1148,6 +1176,13 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (isSavingCarrierContact) {
+            if ((props.user?.user_code?.is_admin || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+                setIsSavingCarrierContact(false);
+                return;
+            }
+
             if ((selectedCarrier.id || 0) === 0) {
                 return;
             }
@@ -1200,6 +1235,13 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (isSavingCarrierDriver) {
+            if ((props.user?.user_code?.is_admin || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+                setIsSavingCarrierDriver(false);
+                return;
+            }
+
             let driver = {
                 ...selectedCarrierDriver,
                 id: (selectedCarrierDriver?.id || 0),
@@ -1409,6 +1451,12 @@ const Invoice = (props) => {
     }
 
     const validateCustomerRatingForSaving = (e) => {
+        if ((props.user?.user_code?.is_admin || 0) === 0 &&
+            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+            return;
+        }
+
         let key = e.keyCode || e.which;
 
         if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
@@ -1633,6 +1681,12 @@ const Invoice = (props) => {
     }
 
     const validateCarrierRatingForSaving = (e) => {
+        if ((props.user?.user_code?.is_admin || 0) === 0 &&
+            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0) {
+            return;
+        }
+
         let key = e.keyCode || e.which;
 
         if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
@@ -1943,7 +1997,10 @@ const Invoice = (props) => {
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
                             <div className={classnames({
-                                'mochi-button': true
+                                'mochi-button': true,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
                                 setSelectedBillToRating({});
                                 refBillToRateTypes.current.focus();
@@ -1954,9 +2011,16 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0),
                                 'active': (selectedOrder?.invoice_customer_reviewed || 0) === 1
                             })} style={{
-                                pointerEvents: (selectedOrder?.order_invoiced || 0) === 1 ? 'none' : 'all'
+                                pointerEvents: (selectedOrder?.order_invoiced || 0) === 1 ||
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                    ? 'none' : 'all'
                             }} onClick={() => {
                                 let invoice_customer_reviewed = (selectedOrder?.invoice_customer_reviewed || 0) === 0 ? 1 : 0;
 
@@ -2026,7 +2090,9 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': false
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
                                 if ((selectedOrder?.id || 0) === 0) {
                                     window.alert('You must select an order first!');
@@ -2055,6 +2121,7 @@ const Invoice = (props) => {
                                         deletingDocumentUrl='/deleteOrderBillingDocument'
                                         savingDocumentNoteUrl='/saveOrderBillingDocumentNote'
                                         serverDocumentsFolder='/order-billing-documents/'
+                                        permissionName='invoice'
                                     />
                                 }
 
@@ -2066,7 +2133,9 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                // 'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 0,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0),
                                 'active': (selectedOrder?.order_invoiced || 0) === 1
                             })} style={{
                                 // pointerEvents: ((selectedOrder?.invoice_customer_reviewed || 0) === 0 || (selectedOrder?.order_invoiced || 0) === 1) ? 'none' : 'all'
@@ -2112,7 +2181,10 @@ const Invoice = (props) => {
                         <div className="form-buttons">
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': (selectedOrder?.id || 0) === 0 || (selectedBillToRating.id || 0) === 0
+                                'disabled': ((selectedOrder?.id || 0) === 0 || (selectedBillToRating.id || 0) === 0) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} style={{marginRight: 10}} onClick={() => {
                                 if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
                                     if (window.confirm('Are you sure you want to delete this item?')) {
@@ -2197,16 +2269,21 @@ const Invoice = (props) => {
                                 <input type="text" style={{
                                     textAlign: 'left',
                                 }}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                       })}
-                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                       readOnly={
+                                           ((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                       }
                                        placeholder='Rate Type'
                                        ref={refBillToRateTypes}
                                        onKeyDown={(e) => {
                                            let key = e.keyCode || e.which;
 
-                                           if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                           if ((selectedOrder?.invoice_customer_reviewed || 0) === 0 &&
+                                               ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                switch (key) {
                                                    case 37:
                                                    case 38: // arrow left | arrow up
@@ -2461,7 +2538,10 @@ const Invoice = (props) => {
                                        value={selectedBillToRating.rate_type?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                    if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                         if (billToRateTypeItems.length > 0) {
                                             setBillToRateTypeItems([]);
                                         } else {
@@ -2613,10 +2693,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Description</div> */}
                             <input type="text" style={{textAlign: 'left'}}
-                                   readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                   className={classnames({
-                                       'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                   })}
+                                   readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                       ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                    placeholder='Description'
                                    ref={refBillToDescription}
                                    onKeyDown={(e) => {
@@ -2655,10 +2736,11 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Pieces/Skids</div> */}
                                 <MaskedInput
-                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                    })}
+                                    readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                     placeholder='Pieces/Skids'
                                     ref={refBillToPieces}
                                     style={{textAlign: 'left'}}
@@ -2834,7 +2916,10 @@ const Invoice = (props) => {
                                 {
                                     (selectedBillToRating.pieces || '') !== '' &&
                                     <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                        if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) ||
+                                            ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                             if (showBillToPiecesItems) {
                                                 setShowBillToPiecesItems(false);
                                             } else {
@@ -2945,10 +3030,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Weight</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                 placeholder='Weight'
                                 ref={refBillToWeight}
                                 style={{textAlign: 'left'}}
@@ -3003,10 +3089,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Feet Required</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                 placeholder='Feet Required'
                                 ref={refBillToFeetRequired}
                                 style={{textAlign: 'left'}}
@@ -3051,10 +3138,11 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                       })}
+                                       readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                        placeholder='Type'
                                        ref={refBillToSubtypeFuelSurcharge}
                                        onKeyDown={(e) => {
@@ -3356,7 +3444,10 @@ const Invoice = (props) => {
                                        value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                    if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                         if (billToSubtypeFuelSurchargeItems.length > 0) {
                                             setBillToSubtypeFuelSurchargeItems([]);
                                         } else {
@@ -3509,10 +3600,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Percentage %</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                 placeholder='Percentage %'
                                 ref={refBillToSubtypeFuelSurchargePercentage}
                                 style={{textAlign: 'left'}}
@@ -3562,9 +3654,7 @@ const Invoice = (props) => {
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Linehaul $</div> */}
                             <MaskedInput
                                 readOnly={true}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+
                                 placeholder='Linehaul $'
                                 style={{textAlign: 'left'}}
                                 mask={numberMask}
@@ -3585,10 +3675,11 @@ const Invoice = (props) => {
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
 
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeFuelSurchargeRate}
                                 style={{textAlign: 'left'}}
@@ -3635,9 +3726,7 @@ const Invoice = (props) => {
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Miles</div> */}
                             <MaskedInput
                                 readOnly={true}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+
                                 placeholder='Miles'
                                 style={{textAlign: 'left'}}
                                 mask={numberMask}
@@ -3657,10 +3746,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeLinehaulRate}
                                 style={{textAlign: 'left'}}
@@ -3710,9 +3800,7 @@ const Invoice = (props) => {
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Miles</div> */}
                             <MaskedInput
                                 readOnly={true}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+
                                 placeholder='Miles'
                                 style={{textAlign: 'left'}}
                                 mask={numberMask}
@@ -3732,10 +3820,11 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                       })}
+                                       readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                        placeholder='Type'
                                        ref={refBillToSubtypeLayover}
                                        onKeyDown={(e) => {
@@ -4003,7 +4092,10 @@ const Invoice = (props) => {
                                        value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                    if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                         if (billToSubtypeLayoverItems.length > 0) {
                                             setBillToSubtypeLayoverItems([]);
                                         } else {
@@ -4136,10 +4228,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeLayoverRate}
                                 style={{textAlign: 'left'}}
@@ -4185,10 +4277,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Days</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Days'
                                 ref={refBillToSubtypeLayoverDays}
                                 style={{textAlign: 'left'}}
@@ -4236,10 +4328,11 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                       })}
+                                       readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                        placeholder='Type'
                                        ref={refBillToSubtypeDetention}
                                        onKeyDown={(e) => {
@@ -4507,7 +4600,10 @@ const Invoice = (props) => {
                                        value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                    if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) ||
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                         if (billToSubtypeDetentionItems.length > 0) {
                                             setBillToSubtypeDetentionItems([]);
                                         } else {
@@ -4640,10 +4736,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeDetentionRate}
                                 style={{textAlign: 'left'}}
@@ -4689,10 +4785,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Hours</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Hours'
                                 ref={refBillToSubtypeDetentionHours}
                                 style={{textAlign: 'left'}}
@@ -4740,10 +4836,10 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                       })}
+                                       readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                        placeholder='Type'
                                        ref={refBillToSubtypeDriverAssist}
                                        onKeyDown={(e) => {
@@ -5011,7 +5107,10 @@ const Invoice = (props) => {
                                        value={selectedBillToRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                    if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                         if (billToSubtypeDriverAssistItems.length > 0) {
                                             setBillToSubtypeDriverAssistItems([]);
                                         } else {
@@ -5144,10 +5243,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                 placeholder='Rate $'
                                 ref={refBillToSubtypeDriverAssistRate}
                                 style={{textAlign: 'left'}}
@@ -5193,10 +5293,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Hours</div> */}
                             <MaskedInput
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+
                                 placeholder='Hours'
                                 ref={refBillToSubtypeDriverAssistHours}
                                 style={{textAlign: 'left'}}
@@ -5243,7 +5344,10 @@ const Invoice = (props) => {
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Total Charges $</div> */}
                             <MaskedInput
                                 readOnly={
-                                    (selectedOrder?.invoice_customer_reviewed || 0) === 1 ||
+                                    (((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)) ||
                                     ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'detention'
                                         ? ((selectedBillToRating.rate_subtype?.name || '').toLowerCase().trim() === '' || (selectedBillToRating.rate_subtype?.name || '').toLowerCase() !== 'flat')
                                         : (selectedBillToRating.rate_type?.name || '').toLowerCase() === 'driver assist'
@@ -5254,9 +5358,7 @@ const Invoice = (props) => {
                                                     ? ((selectedBillToRating.rate_subtype?.name || '').toLowerCase().trim() === '' || (selectedBillToRating.rate_subtype?.name || '').toLowerCase() !== 'flat')
                                                     : false)
                                 }
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                })}
+
                                 placeholder='Total Charges $'
                                 ref={refBillToTotalCharges}
                                 style={{
@@ -5267,6 +5369,12 @@ const Invoice = (props) => {
                                 guide={false}
                                 value={selectedBillToRating.total_charges || ''}
                                 onKeyDown={(e) => {
+                                    if (((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)) {
+                                        return;
+                                    }
                                     validateCustomerRatingForSaving(e);
                                 }}
 
@@ -5394,7 +5502,10 @@ const Invoice = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedBillToRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                                if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
+                                                    ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                     const {rate, linehaul, total_charges} = rating;
 
                                                     setSelectedBillToRating({
@@ -5602,7 +5713,10 @@ const Invoice = (props) => {
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
                             <div className={classnames({
-                                'mochi-button': true
+                                'mochi-button': true,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
                                 setSelectedCarrierRating({});
                                 refCarrierRateTypes.current.focus();
@@ -5613,7 +5727,10 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'active': (selectedOrder?.invoice_carrier_previewed || 0) === 1
+                                'active': (selectedOrder?.invoice_carrier_previewed || 0) === 1,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} style={{
                                 pointerEvents: (selectedOrder?.invoice_carrier_approved || 0) === 1 ? 'none' : 'all'
                             }} onClick={() => {
@@ -5685,7 +5802,10 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'carrier invoice') !== undefined
+                                'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'carrier invoice') !== undefined,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Invoice Rec'd</div>
@@ -5693,7 +5813,10 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'signed bill of lading') !== undefined
+                                'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'signed bill of lading') !== undefined,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">BOL Rec'd</div>
@@ -5701,7 +5824,10 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'signed rate confirmation') !== undefined
+                                'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'signed rate confirmation') !== undefined,
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Rate Conf Rec'd</div>
@@ -5709,7 +5835,9 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': false
+                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
                                 if ((selectedOrder?.id || 0) === 0) {
                                     window.alert('You must select an order first!');
@@ -5738,6 +5866,7 @@ const Invoice = (props) => {
                                         deletingDocumentUrl='/deleteOrderDocument'
                                         savingDocumentNoteUrl='/saveOrderDocumentNote'
                                         serverDocumentsFolder='/order-documents/'
+                                        permissionName='invoice'
                                     />
                                 }
 
@@ -5749,7 +5878,10 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 0,
+                                'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 0 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0),
                                 'active': (selectedOrder?.invoice_carrier_approved || 0) === 1
                             })} style={{
                                 pointerEvents: ((selectedOrder?.invoice_carrier_previewed || 0) === 0 || (selectedOrder?.invoice_carrier_approved || 0) === 1) ? 'none' : 'all'
@@ -5984,7 +6116,10 @@ const Invoice = (props) => {
                         <div className="form-buttons">
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': (selectedOrder?.id || 0) === 0 || (selectedCarrierRating.id || 0) === 0
+                                'disabled': ((selectedOrder?.id || 0) === 0 || (selectedCarrierRating.id || 0) === 0) ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} style={{marginRight: 10}} onClick={() => {
                                 if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
                                     if (window.confirm('Are you sure you want to delete this item?')) {
@@ -6067,16 +6202,20 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                       })}
-                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                        placeholder='Rate Type'
                                        ref={refCarrierRateTypes}
                                        onKeyDown={(e) => {
                                            let key = e.keyCode || e.which;
 
-                                           if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                           if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                               ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                switch (key) {
                                                    case 37:
                                                    case 38: // arrow left | arrow up
@@ -6331,7 +6470,10 @@ const Invoice = (props) => {
                                        value={selectedCarrierRating.rate_type?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                         if (carrierRateTypeItems.length > 0) {
                                             setCarrierRateTypeItems([]);
                                         } else {
@@ -6484,10 +6626,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Description</div> */}
                             <input type="text" style={{textAlign: 'left'}}
-                                   className={classnames({
-                                       'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                   })}
-                                   readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                   readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                       ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                    placeholder='Description'
                                    ref={refCarrierDescription}
                                    onKeyDown={(e) => {
@@ -6526,10 +6668,10 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Pieces/Skids</div> */}
                                 <MaskedInput
-                                    className={classnames({
-                                        'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                    })}
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                     placeholder='Pieces/Skids'
                                     ref={refCarrierPieces}
                                     style={{textAlign: 'left'}}
@@ -6705,7 +6847,10 @@ const Invoice = (props) => {
                                 {
                                     (selectedCarrierRating.pieces || '') !== '' &&
                                     <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 ||
+                                            ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                             if (showCarrierPiecesItems) {
                                                 setShowCarrierPiecesItems(false);
                                             } else {
@@ -6816,10 +6961,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Weight</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Weight'
                                 ref={refCarrierWeight}
                                 style={{textAlign: 'left'}}
@@ -6874,10 +7019,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Feet Required</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Feet Required'
                                 ref={refCarrierFeetRequired}
                                 style={{textAlign: 'left'}}
@@ -6922,10 +7067,10 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                       })}
-                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                        placeholder='Type'
                                        ref={refCarrierSubtypeFuelSurcharge}
                                        onKeyDown={(e) => {
@@ -7227,7 +7372,10 @@ const Invoice = (props) => {
                                        value={selectedCarrierRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                         if (carrierSubtypeFuelSurchargeItems.length > 0) {
                                             setCarrierSubtypeFuelSurchargeItems([]);
                                         } else {
@@ -7380,10 +7528,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Percentage %</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Percentage %'
                                 ref={refCarrierSubtypeFuelSurchargePercentage}
                                 style={{textAlign: 'left'}}
@@ -7432,9 +7580,6 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Linehaul $</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
                                 readOnly={true}
                                 placeholder='Linehaul $'
                                 style={{textAlign: 'left'}}
@@ -7456,10 +7601,10 @@ const Invoice = (props) => {
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
 
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeFuelSurchargeRate}
                                 style={{textAlign: 'left'}}
@@ -7505,9 +7650,6 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Miles</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
                                 readOnly={true}
                                 placeholder='Miles'
                                 style={{textAlign: 'left'}}
@@ -7528,10 +7670,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeLinehaulRate}
                                 style={{textAlign: 'left'}}
@@ -7580,9 +7722,6 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Miles</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
                                 readOnly={true}
                                 placeholder='Miles'
                                 style={{textAlign: 'left'}}
@@ -7603,10 +7742,10 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                       })}
-                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                        placeholder='Type'
                                        ref={refCarrierSubtypeLayover}
                                        onKeyDown={(e) => {
@@ -7874,7 +8013,11 @@ const Invoice = (props) => {
                                        value={selectedCarrierRating.rate_subtype?.name || ''}
                                 />
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+
                                         if (carrierSubtypeLayoverItems.length > 0) {
                                             setCarrierSubtypeLayoverItems([]);
                                         } else {
@@ -8007,10 +8150,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeLayoverRate}
                                 style={{textAlign: 'left'}}
@@ -8056,10 +8199,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Days</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Days'
                                 ref={refCarrierSubtypeLayoverDays}
                                 style={{textAlign: 'left'}}
@@ -8107,10 +8250,10 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                       })}
-                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                        placeholder='Type'
                                        ref={refCarrierSubtypeDetention}
                                        onKeyDown={(e) => {
@@ -8511,10 +8654,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeDetentionRate}
                                 style={{textAlign: 'left'}}
@@ -8560,10 +8703,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Hours</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Hours'
                                 ref={refCarrierSubtypeDetentionHours}
                                 style={{textAlign: 'left'}}
@@ -8611,10 +8754,10 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Type</div> */}
                                 <input type="text" style={{textAlign: 'left'}}
-                                       className={classnames({
-                                           'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                       })}
-                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                       readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                        placeholder='Type'
                                        ref={refCarrierSubtypeDriverAssist}
                                        onKeyDown={(e) => {
@@ -9015,10 +9158,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate $</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Rate $'
                                 ref={refCarrierSubtypeDriverAssistRate}
                                 style={{textAlign: 'left'}}
@@ -9064,10 +9207,10 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Hours</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
                                 placeholder='Hours'
                                 ref={refCarrierSubtypeDriverAssistHours}
                                 style={{textAlign: 'left'}}
@@ -9113,11 +9256,11 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Total Charges $</div> */}
                             <MaskedInput
-                                className={classnames({
-                                    'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
-                                })}
                                 readOnly={
-                                    (selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    ((selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)) ||
                                     ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'detention'
                                         ? ((selectedCarrierRating.rate_subtype?.name || '').toLowerCase().trim() === '' || (selectedCarrierRating.rate_subtype?.name || '').toLowerCase() !== 'flat')
                                         : (selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'driver assist'
@@ -9136,6 +9279,12 @@ const Invoice = (props) => {
                                 guide={false}
                                 value={selectedCarrierRating.total_charges || ''}
                                 onKeyDown={(e) => {
+                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)) {
+                                        return;
+                                    }
                                     validateCarrierRatingForSaving(e);
                                 }}
                                 onKeyPress={(e) => {
@@ -9262,7 +9411,10 @@ const Invoice = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedCarrierRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                                if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                                    ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                     const {rate, linehaul, total_charges} = rating;
 
                                                     setSelectedCarrierRating({
@@ -9569,10 +9721,12 @@ const Invoice = (props) => {
                             <div className='form-title'>Bill To Docs</div>
                             <div className='top-border top-border-middle'></div>
                             <div className="form-buttons">
-                                <div className={classnames({
-                                    'mochi-button': true,
-                                    'disabled': false
-                                })} onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if ((selectedOrder?.id || 0) === 0) {
                                         window.alert('You must select an order first!');
                                         return;
@@ -9657,6 +9811,7 @@ const Invoice = (props) => {
                                                     deletingDocumentUrl='/deleteOrderBillingDocument'
                                                     savingDocumentNoteUrl='/saveOrderBillingDocumentNote'
                                                     serverDocumentsFolder='/order-billing-documents/'
+                                                    permissionName='invoice'
                                                 />
                                             }
 
@@ -9683,10 +9838,12 @@ const Invoice = (props) => {
                             <div className='form-title'>Order Docs</div>
                             <div className='top-border top-border-middle'></div>
                             <div className="form-buttons">
-                                <div className={classnames({
-                                    'mochi-button': true,
-                                    'disabled': false
-                                })} onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if ((selectedOrder?.id || 0) === 0) {
                                         window.alert('You must select an order first!');
                                         return;
@@ -9714,6 +9871,7 @@ const Invoice = (props) => {
                                             deletingDocumentUrl='/deleteOrderDocument'
                                             savingDocumentNoteUrl='/saveOrderDocumentNote'
                                             serverDocumentsFolder='/order-documents/'
+                                            permissionName='invoice'
                                         />
                                     }
 
@@ -9771,6 +9929,7 @@ const Invoice = (props) => {
                                                     deletingDocumentUrl='/deleteOrderDocument'
                                                     savingDocumentNoteUrl='/saveOrderDocumentNote'
                                                     serverDocumentsFolder='/order-documents/'
+                                                    permissionName='invoice'
                                                 />
                                             }
 
@@ -9813,7 +9972,12 @@ const Invoice = (props) => {
                             <div className='form-title'>Bill To</div>
                             <div className='top-border top-border-middle'></div>
                             <div className='form-buttons'>
-                                <div className='mochi-button' onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if ((selectedBillToCustomer.id || 0) === 0) {
                                         window.alert('You must select a customer first!');
                                         return;
@@ -9863,7 +10027,7 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={7 + props.tabTimes} type="text" placeholder="Name"
-                                    // onKeyDown={validateBillToCompanyInfoForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedBillToCustomer({...selectedBillToCustomer, name: e.target.value})
                                        }}
@@ -9878,7 +10042,7 @@ const Invoice = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={8 + props.tabTimes} type="text" placeholder="Address 1"
-                                    // onKeyDown={validateBillToCompanyInfoForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedBillToCustomer({
                                                ...selectedBillToCustomer,
@@ -9899,7 +10063,7 @@ const Invoice = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={9 + props.tabTimes} type="text" placeholder="Address 2"
-                                    // onKeyDown={validateBillToCompanyInfoForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedBillToCustomer({
                                                ...selectedBillToCustomer,
@@ -9920,7 +10084,7 @@ const Invoice = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={10 + props.tabTimes} type="text" placeholder="City"
-                                    // onKeyDown={validateBillToCompanyInfoForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedBillToCustomer({...selectedBillToCustomer, city: e.target.value})
                                        }}
@@ -9933,7 +10097,7 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-state">
                                 <input tabIndex={11 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                    // onKeyDown={validateBillToCompanyInfoForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedBillToCustomer({...selectedBillToCustomer, state: e.target.value})
                                        }}
@@ -9946,7 +10110,8 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-zip-code">
                                 <input tabIndex={12 + props.tabTimes} type="text" placeholder="Postal Code"
-                                       onKeyDown={validateBillToCompanyInfoForSaving}
+                                       readOnly={true}
+                                    // onKeyDown={validateBillToCompanyInfoForSaving}
                                        onInput={(e) => {
                                            setSelectedBillToCustomer({...selectedBillToCustomer, zip: e.target.value})
                                        }}
@@ -9961,7 +10126,7 @@ const Invoice = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={13 + props.tabTimes} type="text" placeholder="Contact Name"
-                                       onKeyDown={validateBillToCompanyContactForSaving}
+                                       readOnly={true}
                                        onChange={(e) => {
                                            // let splitted = e.target.value.split(' ');
                                            // let first_name = splitted[0];
@@ -10029,7 +10194,7 @@ const Invoice = (props) => {
                                              mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                              guide={true}
                                              type="text" placeholder="Contact Phone"
-                                    // onKeyDown={validateBillToCompanyContactForSaving}
+                                             readOnly={true}
                                              onInput={(e) => {
                                                  if ((selectedBillToCustomer?.contacts || []).length === 0) {
                                                      setSelectedBillToCustomer({
@@ -10077,7 +10242,8 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input tabIndex={15 + props.tabTimes} type="text" placeholder="Ext"
-                                       onKeyDown={validateBillToCompanyContactForSaving}
+                                       readOnly={true}
+                                    // onKeyDown={validateBillToCompanyContactForSaving}
                                        onInput={(e) => {
                                            if ((selectedBillToCustomer?.contacts || []).length === 0) {
                                                setSelectedBillToCustomer({
@@ -10129,16 +10295,16 @@ const Invoice = (props) => {
                                                 setSelectedRoute(route);
                                             }}>
                                                 {route.type === 'pickup' ? 'PU' : 'Delivery'} {
-                                                    route.type === 'pickup'
-                                                        ? ([
-                                                        ...getPickupsOnRouting(),
-                                                        ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined)
-                                                    ].map(x => x.id).indexOf(route.id)) + 1
-                                                        : ([
-                                                        ...getDeliveriesOnRouting(),
-                                                        ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
-                                                    ].map(x => x.id).indexOf(route.id)) + 1
-                                                }
+                                                route.type === 'pickup'
+                                                    ? ([
+                                                    ...getPickupsOnRouting(),
+                                                    ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined)
+                                                ].map(x => x.id).indexOf(route.id)) + 1
+                                                    : ([
+                                                    ...getDeliveriesOnRouting(),
+                                                    ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
+                                                ].map(x => x.id).indexOf(route.id)) + 1
+                                            }
                                             </div>
                                         )
                                     })
@@ -10176,7 +10342,12 @@ const Invoice = (props) => {
                                 <div className='form-title'>Internal Notes</div>
                                 <div className='top-border top-border-middle'></div>
                                 <div className='form-buttons'>
-                                    <div className='mochi-button' onClick={() => {
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
                                         if ((selectedOrder?.id || 0) === 0) {
                                             window.alert('You must select an order first!');
                                             return;
@@ -10212,10 +10383,13 @@ const Invoice = (props) => {
                                 <div className='form-title'>Billing Notes</div>
                                 <div className='top-border top-border-middle'></div>
                                 <div className='form-buttons'>
-                                    <div className={classnames({
-                                        'mochi-button': true,
-                                        'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
-                                    })} onClick={() => {
+                                    <div className={
+                                        (selectedOrder?.invoice_customer_reviewed || 0) === 1 ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
                                         if ((selectedOrder?.id || 0) === 0) {
                                             window.alert('You must select an order first!');
                                             return;
@@ -10254,7 +10428,12 @@ const Invoice = (props) => {
                             <div className='form-title'>Carrier</div>
                             <div className='top-border top-border-middle'></div>
                             <div className='form-buttons'>
-                                <div className='mochi-button' onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if ((selectedCarrier.id || 0) === 0) {
                                         window.alert('You must select a carrier first!');
                                         return;
@@ -10313,7 +10492,7 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={51 + props.tabTimes} type="text" placeholder="Name"
-                                       onKeyDown={validateCarrierInfoForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedCarrier({...selectedCarrier, name: e.target.value})
                                        }}
@@ -10358,8 +10537,7 @@ const Invoice = (props) => {
                                 minWidth: '7.5rem'
                             }}>
                                 <input tabIndex={53 + props.tabTimes} type="text" placeholder="Contact Name"
-                                       onKeyDown={validateCarrierContactForSaving}
-
+                                       readOnly={true}
                                        onChange={(e) => {
                                            if ((selectedCarrierContact?.contacts || []).length === 0) {
                                                setSelectedCarrierContact({
@@ -10395,7 +10573,7 @@ const Invoice = (props) => {
                                              mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                              guide={true}
                                              type="text" placeholder="Contact Phone"
-                                             onKeyDown={validateCarrierContactForSaving}
+                                             readOnly={true}
                                     // onInput={(e) => { setSelectedCarrierContact({ ...selectedCarrierContact, phone_work: e.target.value }) }}
                                     // onChange={(e) => { setSelectedCarrierContact({ ...selectedCarrierContact, phone_work: e.target.value }) }}
                                     // value={selectedCarrierContact.phone_work || ''}
@@ -10437,7 +10615,7 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input tabIndex={55 + props.tabTimes} type="text" placeholder="Ext"
-                                       onKeyDown={validateCarrierContactForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            if ((selectedCarrier?.contacts || []).length === 0) {
                                                setSelectedCarrier({...selectedCarrier, ext: e.target.value})
@@ -10462,171 +10640,172 @@ const Invoice = (props) => {
                                            tabIndex={56 + props.tabTimes}
                                            placeholder="Equipment"
                                            ref={refEquipment}
-                                           onKeyDown={(e) => {
-                                               let key = e.keyCode || e.which;
-
-                                               switch (key) {
-                                                   case 37:
-                                                   case 38: // arrow left | arrow up
-                                                       e.preventDefault();
-                                                       if (equipmentItems.length > 0) {
-                                                           let selectedIndex = equipmentItems.findIndex(item => item.selected);
-
-                                                           if (selectedIndex === -1) {
-                                                               setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                   item.selected = index === 0;
-                                                                   return item;
-                                                               }))
-                                                           } else {
-                                                               setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                   if (selectedIndex === 0) {
-                                                                       item.selected = index === (equipmentItems.length - 1);
-                                                                   } else {
-                                                                       item.selected = index === (selectedIndex - 1)
-                                                                   }
-                                                                   return item;
-                                                               }))
-                                                           }
-
-                                                           refEquipmentPopupItems.current.map((r, i) => {
-                                                               if (r && r.classList.contains('selected')) {
-                                                                   r.scrollIntoView({
-                                                                       behavior: 'auto',
-                                                                       block: 'center',
-                                                                       inline: 'nearest'
-                                                                   })
-                                                               }
-                                                               return true;
-                                                           });
-                                                       } else {
-                                                           axios.post(props.serverUrl + '/getEquipments').then(res => {
-                                                               if (res.data.result === 'OK') {
-                                                                   setEquipmentItems(res.data.equipments.map((item, index) => {
-                                                                       item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
-                                                                           ? index === 0
-                                                                           : item.id === selectedCarrierDriver.equipment.id
-                                                                       return item;
-                                                                   }))
-
-                                                                   refEquipmentPopupItems.current.map((r, i) => {
-                                                                       if (r && r.classList.contains('selected')) {
-                                                                           r.scrollIntoView({
-                                                                               behavior: 'auto',
-                                                                               block: 'center',
-                                                                               inline: 'nearest'
-                                                                           })
-                                                                       }
-                                                                       return true;
-                                                                   });
-                                                               }
-                                                           }).catch(e => {
-                                                               console.log('error getting equipments', e);
-                                                           })
-                                                       }
-                                                       break;
-
-                                                   case 39:
-                                                   case 40: // arrow right | arrow down
-                                                       e.preventDefault();
-                                                       if (equipmentItems.length > 0) {
-                                                           let selectedIndex = equipmentItems.findIndex(item => item.selected);
-
-                                                           if (selectedIndex === -1) {
-                                                               setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                   item.selected = index === 0;
-                                                                   return item;
-                                                               }))
-                                                           } else {
-                                                               setEquipmentItems(equipmentItems.map((item, index) => {
-                                                                   if (selectedIndex === (equipmentItems.length - 1)) {
-                                                                       item.selected = index === 0;
-                                                                   } else {
-                                                                       item.selected = index === (selectedIndex + 1)
-                                                                   }
-                                                                   return item;
-                                                               }))
-                                                           }
-
-                                                           refEquipmentPopupItems.current.map((r, i) => {
-                                                               if (r && r.classList.contains('selected')) {
-                                                                   r.scrollIntoView({
-                                                                       behavior: 'auto',
-                                                                       block: 'center',
-                                                                       inline: 'nearest'
-                                                                   })
-                                                               }
-                                                               return true;
-                                                           });
-                                                       } else {
-                                                           axios.post(props.serverUrl + '/getEquipments').then(res => {
-                                                               if (res.data.result === 'OK') {
-                                                                   setEquipmentItems(res.data.equipments.map((item, index) => {
-                                                                       item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
-                                                                           ? index === 0
-                                                                           : item.id === selectedCarrierDriver.equipment.id
-                                                                       return item;
-                                                                   }))
-
-                                                                   refEquipmentPopupItems.current.map((r, i) => {
-                                                                       if (r && r.classList.contains('selected')) {
-                                                                           r.scrollIntoView({
-                                                                               behavior: 'auto',
-                                                                               block: 'center',
-                                                                               inline: 'nearest'
-                                                                           })
-                                                                       }
-                                                                       return true;
-                                                                   });
-                                                               }
-                                                           }).catch(e => {
-                                                               console.log('error getting equipments', e);
-                                                           })
-                                                       }
-                                                       break;
-
-                                                   case 27: // escape
-                                                       setEquipmentItems([]);
-                                                       break;
-
-                                                   case 13: // enter
-                                                       if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
-                                                           if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
-                                                               setSelectedOrder(selectedOrder => {
-                                                                   return {
-                                                                       ...selectedOrder,
-                                                                       equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
-                                                                       equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
-                                                                   }
-                                                               });
-
-                                                               // validateOrderForSaving({ keyCode: 9 });
-                                                               setEquipmentItems([]);
-                                                               refDriverName.current.focus();
-                                                           }
-                                                       }
-                                                       break;
-
-                                                   case 9: // tab
-                                                       if (equipmentItems.length > 0) {
-                                                           e.preventDefault();
-                                                           setSelectedOrder(selectedOrder => {
-                                                               return {
-                                                                   ...selectedOrder,
-                                                                   equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
-                                                                   equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
-                                                               }
-                                                           });
-
-                                                           // validateOrderForSaving({ keyCode: 9 });
-                                                           setEquipmentItems([]);
-                                                           refDriverName.current.focus();
-                                                       }
-                                                       break;
-
-                                                   default:
-                                                       break;
-                                               }
-                                           }}
+                                           readOnly={true}
+                                        // onKeyDown={(e) => {
+                                        //     let key = e.keyCode || e.which;
+                                        //
+                                        //     switch (key) {
+                                        //         case 37:
+                                        //         case 38: // arrow left | arrow up
+                                        //             e.preventDefault();
+                                        //             if (equipmentItems.length > 0) {
+                                        //                 let selectedIndex = equipmentItems.findIndex(item => item.selected);
+                                        //
+                                        //                 if (selectedIndex === -1) {
+                                        //                     setEquipmentItems(equipmentItems.map((item, index) => {
+                                        //                         item.selected = index === 0;
+                                        //                         return item;
+                                        //                     }))
+                                        //                 } else {
+                                        //                     setEquipmentItems(equipmentItems.map((item, index) => {
+                                        //                         if (selectedIndex === 0) {
+                                        //                             item.selected = index === (equipmentItems.length - 1);
+                                        //                         } else {
+                                        //                             item.selected = index === (selectedIndex - 1)
+                                        //                         }
+                                        //                         return item;
+                                        //                     }))
+                                        //                 }
+                                        //
+                                        //                 refEquipmentPopupItems.current.map((r, i) => {
+                                        //                     if (r && r.classList.contains('selected')) {
+                                        //                         r.scrollIntoView({
+                                        //                             behavior: 'auto',
+                                        //                             block: 'center',
+                                        //                             inline: 'nearest'
+                                        //                         })
+                                        //                     }
+                                        //                     return true;
+                                        //                 });
+                                        //             } else {
+                                        //                 axios.post(props.serverUrl + '/getEquipments').then(res => {
+                                        //                     if (res.data.result === 'OK') {
+                                        //                         setEquipmentItems(res.data.equipments.map((item, index) => {
+                                        //                             item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
+                                        //                                 ? index === 0
+                                        //                                 : item.id === selectedCarrierDriver.equipment.id
+                                        //                             return item;
+                                        //                         }))
+                                        //
+                                        //                         refEquipmentPopupItems.current.map((r, i) => {
+                                        //                             if (r && r.classList.contains('selected')) {
+                                        //                                 r.scrollIntoView({
+                                        //                                     behavior: 'auto',
+                                        //                                     block: 'center',
+                                        //                                     inline: 'nearest'
+                                        //                                 })
+                                        //                             }
+                                        //                             return true;
+                                        //                         });
+                                        //                     }
+                                        //                 }).catch(e => {
+                                        //                     console.log('error getting equipments', e);
+                                        //                 })
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         case 39:
+                                        //         case 40: // arrow right | arrow down
+                                        //             e.preventDefault();
+                                        //             if (equipmentItems.length > 0) {
+                                        //                 let selectedIndex = equipmentItems.findIndex(item => item.selected);
+                                        //
+                                        //                 if (selectedIndex === -1) {
+                                        //                     setEquipmentItems(equipmentItems.map((item, index) => {
+                                        //                         item.selected = index === 0;
+                                        //                         return item;
+                                        //                     }))
+                                        //                 } else {
+                                        //                     setEquipmentItems(equipmentItems.map((item, index) => {
+                                        //                         if (selectedIndex === (equipmentItems.length - 1)) {
+                                        //                             item.selected = index === 0;
+                                        //                         } else {
+                                        //                             item.selected = index === (selectedIndex + 1)
+                                        //                         }
+                                        //                         return item;
+                                        //                     }))
+                                        //                 }
+                                        //
+                                        //                 refEquipmentPopupItems.current.map((r, i) => {
+                                        //                     if (r && r.classList.contains('selected')) {
+                                        //                         r.scrollIntoView({
+                                        //                             behavior: 'auto',
+                                        //                             block: 'center',
+                                        //                             inline: 'nearest'
+                                        //                         })
+                                        //                     }
+                                        //                     return true;
+                                        //                 });
+                                        //             } else {
+                                        //                 axios.post(props.serverUrl + '/getEquipments').then(res => {
+                                        //                     if (res.data.result === 'OK') {
+                                        //                         setEquipmentItems(res.data.equipments.map((item, index) => {
+                                        //                             item.selected = (selectedCarrierDriver?.equipment?.id || 0) === 0
+                                        //                                 ? index === 0
+                                        //                                 : item.id === selectedCarrierDriver.equipment.id
+                                        //                             return item;
+                                        //                         }))
+                                        //
+                                        //                         refEquipmentPopupItems.current.map((r, i) => {
+                                        //                             if (r && r.classList.contains('selected')) {
+                                        //                                 r.scrollIntoView({
+                                        //                                     behavior: 'auto',
+                                        //                                     block: 'center',
+                                        //                                     inline: 'nearest'
+                                        //                                 })
+                                        //                             }
+                                        //                             return true;
+                                        //                         });
+                                        //                     }
+                                        //                 }).catch(e => {
+                                        //                     console.log('error getting equipments', e);
+                                        //                 })
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         case 27: // escape
+                                        //             setEquipmentItems([]);
+                                        //             break;
+                                        //
+                                        //         case 13: // enter
+                                        //             if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
+                                        //                 if (equipmentItems.length > 0 && equipmentItems.findIndex(item => item.selected) > -1) {
+                                        //                     setSelectedOrder(selectedOrder => {
+                                        //                         return {
+                                        //                             ...selectedOrder,
+                                        //                             equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
+                                        //                             equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
+                                        //                         }
+                                        //                     });
+                                        //
+                                        //                     // validateOrderForSaving({ keyCode: 9 });
+                                        //                     setEquipmentItems([]);
+                                        //                     refDriverName.current.focus();
+                                        //                 }
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         case 9: // tab
+                                        //             if (equipmentItems.length > 0) {
+                                        //                 e.preventDefault();
+                                        //                 setSelectedOrder(selectedOrder => {
+                                        //                     return {
+                                        //                         ...selectedOrder,
+                                        //                         equipment: equipmentItems[equipmentItems.findIndex(item => item.selected)],
+                                        //                         equipment_id: equipmentItems[equipmentItems.findIndex(item => item.selected)].id
+                                        //                     }
+                                        //                 });
+                                        //
+                                        //                 // validateOrderForSaving({ keyCode: 9 });
+                                        //                 setEquipmentItems([]);
+                                        //                 refDriverName.current.focus();
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         default:
+                                        //             break;
+                                        //     }
+                                        // }}
                                            onBlur={() => {
                                                if ((selectedOrder?.equipment?.id || 0) === 0) {
                                                    setSelectedOrder(selectedOrder => {
@@ -10683,65 +10862,65 @@ const Invoice = (props) => {
                                            }}
                                            value={selectedOrder?.equipment?.name || ''}
                                     />
-                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                        if (equipmentItems.length > 0) {
-                                            setEquipmentItems([]);
-                                        } else {
-                                            if ((selectedOrder?.equipment?.id || 0) === 0 && (selectedOrder?.equipment?.name || '') !== '') {
-                                                axios.post(props.serverUrl + '/getEquipments', {
-                                                    name: selectedOrder?.equipment.name
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setEquipmentItems(res.data.equipments.map((item, index) => {
-                                                            item.selected = (selectedOrder?.equipment?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedOrder.equipment.id
-                                                            return item;
-                                                        }))
+                                    {/*<FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {*/}
+                                    {/*    if (equipmentItems.length > 0) {*/}
+                                    {/*        setEquipmentItems([]);*/}
+                                    {/*    } else {*/}
+                                    {/*        if ((selectedOrder?.equipment?.id || 0) === 0 && (selectedOrder?.equipment?.name || '') !== '') {*/}
+                                    {/*            axios.post(props.serverUrl + '/getEquipments', {*/}
+                                    {/*                name: selectedOrder?.equipment.name*/}
+                                    {/*            }).then(res => {*/}
+                                    {/*                if (res.data.result === 'OK') {*/}
+                                    {/*                    setEquipmentItems(res.data.equipments.map((item, index) => {*/}
+                                    {/*                        item.selected = (selectedOrder?.equipment?.id || 0) === 0*/}
+                                    {/*                            ? index === 0*/}
+                                    {/*                            : item.id === selectedOrder.equipment.id*/}
+                                    {/*                        return item;*/}
+                                    {/*                    }))*/}
 
-                                                        refEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting equipments', e);
-                                                })
-                                            } else {
-                                                axios.post(props.serverUrl + '/getEquipments').then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setEquipmentItems(res.data.equipments.map((item, index) => {
-                                                            item.selected = (selectedOrder?.equipment?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedOrder.equipment.id
-                                                            return item;
-                                                        }))
+                                    {/*                    refEquipmentPopupItems.current.map((r, i) => {*/}
+                                    {/*                        if (r && r.classList.contains('selected')) {*/}
+                                    {/*                            r.scrollIntoView({*/}
+                                    {/*                                behavior: 'auto',*/}
+                                    {/*                                block: 'center',*/}
+                                    {/*                                inline: 'nearest'*/}
+                                    {/*                            })*/}
+                                    {/*                        }*/}
+                                    {/*                        return true;*/}
+                                    {/*                    });*/}
+                                    {/*                }*/}
+                                    {/*            }).catch(e => {*/}
+                                    {/*                console.log('error getting equipments', e);*/}
+                                    {/*            })*/}
+                                    {/*        } else {*/}
+                                    {/*            axios.post(props.serverUrl + '/getEquipments').then(res => {*/}
+                                    {/*                if (res.data.result === 'OK') {*/}
+                                    {/*                    setEquipmentItems(res.data.equipments.map((item, index) => {*/}
+                                    {/*                        item.selected = (selectedOrder?.equipment?.id || 0) === 0*/}
+                                    {/*                            ? index === 0*/}
+                                    {/*                            : item.id === selectedOrder.equipment.id*/}
+                                    {/*                        return item;*/}
+                                    {/*                    }))*/}
 
-                                                        refEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(async e => {
-                                                    console.log('error getting equipments', e);
-                                                })
-                                            }
-                                        }
+                                    {/*                    refEquipmentPopupItems.current.map((r, i) => {*/}
+                                    {/*                        if (r && r.classList.contains('selected')) {*/}
+                                    {/*                            r.scrollIntoView({*/}
+                                    {/*                                behavior: 'auto',*/}
+                                    {/*                                block: 'center',*/}
+                                    {/*                                inline: 'nearest'*/}
+                                    {/*                            })*/}
+                                    {/*                        }*/}
+                                    {/*                        return true;*/}
+                                    {/*                    });*/}
+                                    {/*                }*/}
+                                    {/*            }).catch(async e => {*/}
+                                    {/*                console.log('error getting equipments', e);*/}
+                                    {/*            })*/}
+                                    {/*        }*/}
+                                    {/*    }*/}
 
-                                        refEquipment.current.focus();
-                                    }}/>
+                                    {/*    refEquipment.current.focus();*/}
+                                    {/*}}/>*/}
                                 </div>
                                 {
                                     equipmentTransition((style, item) => item && (
@@ -10828,179 +11007,180 @@ const Invoice = (props) => {
                                            tabIndex={57 + props.tabTimes}
                                            placeholder="Driver Name"
                                            ref={refDriverName}
-                                           onKeyDown={async (e) => {
-                                               let key = e.keyCode || e.which;
-
-                                               switch (key) {
-                                                   case 37:
-                                                   case 38: // arrow left | arrow up
-                                                       e.preventDefault();
-                                                       if (driverItems.length > 0) {
-                                                           let selectedIndex = driverItems.findIndex(item => item.selected);
-
-                                                           if (selectedIndex === -1) {
-                                                               await setDriverItems(driverItems.map((item, index) => {
-                                                                   item.selected = index === 0;
-                                                                   return item;
-                                                               }))
-                                                           } else {
-                                                               await setDriverItems(driverItems.map((item, index) => {
-                                                                   if (selectedIndex === 0) {
-                                                                       item.selected = index === (driverItems.length - 1);
-                                                                   } else {
-                                                                       item.selected = index === (selectedIndex - 1)
-                                                                   }
-                                                                   return item;
-                                                               }))
-                                                           }
-
-                                                           refDriverPopupItems.current.map((r, i) => {
-                                                               if (r && r.classList.contains('selected')) {
-                                                                   r.scrollIntoView({
-                                                                       behavior: 'auto',
-                                                                       block: 'center',
-                                                                       inline: 'nearest'
-                                                                   })
-                                                               }
-                                                               return true;
-                                                           });
-                                                       } else {
-                                                           if ((selectedCarrier?.id || 0) > 0) {
-                                                               axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                                   carrier_id: selectedCarrier.id
-                                                               }).then(async res => {
-                                                                   if (res.data.result === 'OK') {
-                                                                       if (res.data.count > 1) {
-                                                                           await setDriverItems(res.data.drivers.map((item, index) => {
-                                                                               item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                                                   ? index === 0
-                                                                                   : item.id === selectedCarrierDriver.id
-                                                                               return item;
-                                                                           }))
-
-                                                                           refDriverPopupItems.current.map((r, i) => {
-                                                                               if (r && r.classList.contains('selected')) {
-                                                                                   r.scrollIntoView({
-                                                                                       behavior: 'auto',
-                                                                                       block: 'center',
-                                                                                       inline: 'nearest'
-                                                                                   })
-                                                                               }
-                                                                               return true;
-                                                                           });
-                                                                       }
-                                                                   }
-                                                               }).catch(async e => {
-                                                                   console.log('error getting carrier drivers', e);
-                                                               })
-                                                           }
-                                                       }
-                                                       break;
-
-                                                   case 39:
-                                                   case 40: // arrow right | arrow down
-                                                       e.preventDefault();
-                                                       if (driverItems.length > 0) {
-                                                           let selectedIndex = driverItems.findIndex(item => item.selected);
-
-                                                           if (selectedIndex === -1) {
-                                                               await setDriverItems(driverItems.map((item, index) => {
-                                                                   item.selected = index === 0;
-                                                                   return item;
-                                                               }))
-                                                           } else {
-                                                               await setDriverItems(driverItems.map((item, index) => {
-                                                                   if (selectedIndex === (driverItems.length - 1)) {
-                                                                       item.selected = index === 0;
-                                                                   } else {
-                                                                       item.selected = index === (selectedIndex + 1)
-                                                                   }
-                                                                   return item;
-                                                               }))
-                                                           }
-
-                                                           refDriverPopupItems.current.map((r, i) => {
-                                                               if (r && r.classList.contains('selected')) {
-                                                                   r.scrollIntoView({
-                                                                       behavior: 'auto',
-                                                                       block: 'center',
-                                                                       inline: 'nearest'
-                                                                   })
-                                                               }
-                                                               return true;
-                                                           });
-                                                       } else {
-                                                           if ((selectedCarrier?.id || 0) > 0) {
-                                                               axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                                   carrier_id: selectedCarrier.id
-                                                               }).then(async res => {
-                                                                   if (res.data.result === 'OK') {
-                                                                       if (res.data.count > 1) {
-                                                                           await setDriverItems(res.data.drivers.map((item, index) => {
-                                                                               item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                                                   ? index === 0
-                                                                                   : item.id === selectedCarrierDriver.id
-                                                                               return item;
-                                                                           }))
-
-                                                                           refDriverPopupItems.current.map((r, i) => {
-                                                                               if (r && r.classList.contains('selected')) {
-                                                                                   r.scrollIntoView({
-                                                                                       behavior: 'auto',
-                                                                                       block: 'center',
-                                                                                       inline: 'nearest'
-                                                                                   })
-                                                                               }
-                                                                               return true;
-                                                                           });
-                                                                       }
-                                                                   }
-                                                               }).catch(async e => {
-                                                                   console.log('error getting carrier drivers', e);
-                                                               })
-                                                           }
-                                                       }
-                                                       break;
-
-                                                   case 27: // escape
-                                                       setDriverItems([]);
-                                                       break;
-
-                                                   case 13: // enter
-                                                       if (driverItems.length > 0 && driverItems.findIndex(item => item.selected) > -1) {
-                                                           await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
-
-                                                           await setSelectedOrder({
-                                                               ...selectedOrder,
-                                                               carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
-                                                           })
-
-                                                           // validateOrderForSaving({ keyCode: 9 });
-                                                           setDriverItems([]);
-                                                           refDriverName.current.focus();
-                                                       }
-                                                       break;
-
-                                                   case 9: // tab
-                                                       if (driverItems.length > 0) {
-                                                           e.preventDefault();
-                                                           await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
-
-                                                           await setSelectedOrder({
-                                                               ...selectedOrder,
-                                                               carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
-                                                           })
-
-                                                           // validateOrderForSaving({ keyCode: 9 });
-                                                           setDriverItems([]);
-                                                           refDriverName.current.focus();
-                                                       }
-                                                       break;
-
-                                                   default:
-                                                       break;
-                                               }
-                                           }}
+                                           readOnly={true}
+                                        // onKeyDown={async (e) => {
+                                        //     let key = e.keyCode || e.which;
+                                        //
+                                        //     switch (key) {
+                                        //         case 37:
+                                        //         case 38: // arrow left | arrow up
+                                        //             e.preventDefault();
+                                        //             if (driverItems.length > 0) {
+                                        //                 let selectedIndex = driverItems.findIndex(item => item.selected);
+                                        //
+                                        //                 if (selectedIndex === -1) {
+                                        //                     await setDriverItems(driverItems.map((item, index) => {
+                                        //                         item.selected = index === 0;
+                                        //                         return item;
+                                        //                     }))
+                                        //                 } else {
+                                        //                     await setDriverItems(driverItems.map((item, index) => {
+                                        //                         if (selectedIndex === 0) {
+                                        //                             item.selected = index === (driverItems.length - 1);
+                                        //                         } else {
+                                        //                             item.selected = index === (selectedIndex - 1)
+                                        //                         }
+                                        //                         return item;
+                                        //                     }))
+                                        //                 }
+                                        //
+                                        //                 refDriverPopupItems.current.map((r, i) => {
+                                        //                     if (r && r.classList.contains('selected')) {
+                                        //                         r.scrollIntoView({
+                                        //                             behavior: 'auto',
+                                        //                             block: 'center',
+                                        //                             inline: 'nearest'
+                                        //                         })
+                                        //                     }
+                                        //                     return true;
+                                        //                 });
+                                        //             } else {
+                                        //                 if ((selectedCarrier?.id || 0) > 0) {
+                                        //                     axios.post(props.serverUrl + '/getDriversByCarrierId', {
+                                        //                         carrier_id: selectedCarrier.id
+                                        //                     }).then(async res => {
+                                        //                         if (res.data.result === 'OK') {
+                                        //                             if (res.data.count > 1) {
+                                        //                                 await setDriverItems(res.data.drivers.map((item, index) => {
+                                        //                                     item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                        //                                         ? index === 0
+                                        //                                         : item.id === selectedCarrierDriver.id
+                                        //                                     return item;
+                                        //                                 }))
+                                        //
+                                        //                                 refDriverPopupItems.current.map((r, i) => {
+                                        //                                     if (r && r.classList.contains('selected')) {
+                                        //                                         r.scrollIntoView({
+                                        //                                             behavior: 'auto',
+                                        //                                             block: 'center',
+                                        //                                             inline: 'nearest'
+                                        //                                         })
+                                        //                                     }
+                                        //                                     return true;
+                                        //                                 });
+                                        //                             }
+                                        //                         }
+                                        //                     }).catch(async e => {
+                                        //                         console.log('error getting carrier drivers', e);
+                                        //                     })
+                                        //                 }
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         case 39:
+                                        //         case 40: // arrow right | arrow down
+                                        //             e.preventDefault();
+                                        //             if (driverItems.length > 0) {
+                                        //                 let selectedIndex = driverItems.findIndex(item => item.selected);
+                                        //
+                                        //                 if (selectedIndex === -1) {
+                                        //                     await setDriverItems(driverItems.map((item, index) => {
+                                        //                         item.selected = index === 0;
+                                        //                         return item;
+                                        //                     }))
+                                        //                 } else {
+                                        //                     await setDriverItems(driverItems.map((item, index) => {
+                                        //                         if (selectedIndex === (driverItems.length - 1)) {
+                                        //                             item.selected = index === 0;
+                                        //                         } else {
+                                        //                             item.selected = index === (selectedIndex + 1)
+                                        //                         }
+                                        //                         return item;
+                                        //                     }))
+                                        //                 }
+                                        //
+                                        //                 refDriverPopupItems.current.map((r, i) => {
+                                        //                     if (r && r.classList.contains('selected')) {
+                                        //                         r.scrollIntoView({
+                                        //                             behavior: 'auto',
+                                        //                             block: 'center',
+                                        //                             inline: 'nearest'
+                                        //                         })
+                                        //                     }
+                                        //                     return true;
+                                        //                 });
+                                        //             } else {
+                                        //                 if ((selectedCarrier?.id || 0) > 0) {
+                                        //                     axios.post(props.serverUrl + '/getDriversByCarrierId', {
+                                        //                         carrier_id: selectedCarrier.id
+                                        //                     }).then(async res => {
+                                        //                         if (res.data.result === 'OK') {
+                                        //                             if (res.data.count > 1) {
+                                        //                                 await setDriverItems(res.data.drivers.map((item, index) => {
+                                        //                                     item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                        //                                         ? index === 0
+                                        //                                         : item.id === selectedCarrierDriver.id
+                                        //                                     return item;
+                                        //                                 }))
+                                        //
+                                        //                                 refDriverPopupItems.current.map((r, i) => {
+                                        //                                     if (r && r.classList.contains('selected')) {
+                                        //                                         r.scrollIntoView({
+                                        //                                             behavior: 'auto',
+                                        //                                             block: 'center',
+                                        //                                             inline: 'nearest'
+                                        //                                         })
+                                        //                                     }
+                                        //                                     return true;
+                                        //                                 });
+                                        //                             }
+                                        //                         }
+                                        //                     }).catch(async e => {
+                                        //                         console.log('error getting carrier drivers', e);
+                                        //                     })
+                                        //                 }
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         case 27: // escape
+                                        //             setDriverItems([]);
+                                        //             break;
+                                        //
+                                        //         case 13: // enter
+                                        //             if (driverItems.length > 0 && driverItems.findIndex(item => item.selected) > -1) {
+                                        //                 await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
+                                        //
+                                        //                 await setSelectedOrder({
+                                        //                     ...selectedOrder,
+                                        //                     carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
+                                        //                 })
+                                        //
+                                        //                 // validateOrderForSaving({ keyCode: 9 });
+                                        //                 setDriverItems([]);
+                                        //                 refDriverName.current.focus();
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         case 9: // tab
+                                        //             if (driverItems.length > 0) {
+                                        //                 e.preventDefault();
+                                        //                 await setSelectedCarrierDriver(driverItems[driverItems.findIndex(item => item.selected)]);
+                                        //
+                                        //                 await setSelectedOrder({
+                                        //                     ...selectedOrder,
+                                        //                     carrier_driver_id: driverItems[driverItems.findIndex(item => item.selected)].id
+                                        //                 })
+                                        //
+                                        //                 // validateOrderForSaving({ keyCode: 9 });
+                                        //                 setDriverItems([]);
+                                        //                 refDriverName.current.focus();
+                                        //             }
+                                        //             break;
+                                        //
+                                        //         default:
+                                        //             break;
+                                        //     }
+                                        // }}
                                            onBlur={async (e) => {
                                                if ((selectedCarrierDriver?.id || 0) === 0) {
                                                    await setSelectedCarrierDriver({});
@@ -11079,47 +11259,47 @@ const Invoice = (props) => {
                                            value={(selectedCarrierDriver?.first_name || '') + ((selectedCarrierDriver?.last_name || '').trim() === '' ? '' : ' ' + selectedCarrierDriver?.last_name)}
                                     />
                                     {
-                                        (selectedCarrier?.drivers || []).length > 1 &&
+                                        // (selectedCarrier?.drivers || []).length > 1 &&
 
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                            if (driverItems.length > 0) {
-                                                setDriverItems([]);
-                                            } else {
-                                                window.setTimeout(async () => {
-                                                    if ((selectedCarrier?.id || 0) > 0) {
-                                                        axios.post(props.serverUrl + '/getDriversByCarrierId', {
-                                                            carrier_id: selectedCarrier.id
-                                                        }).then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                if (res.data.count > 1) {
-                                                                    await setDriverItems(res.data.drivers.map((item, index) => {
-                                                                        item.selected = (selectedCarrierDriver?.id || 0) === 0
-                                                                            ? index === 0
-                                                                            : item.id === selectedCarrierDriver.id
-                                                                        return item;
-                                                                    }))
-
-                                                                    refDriverPopupItems.current.map((r, i) => {
-                                                                        if (r && r.classList.contains('selected')) {
-                                                                            r.scrollIntoView({
-                                                                                behavior: 'auto',
-                                                                                block: 'center',
-                                                                                inline: 'nearest'
-                                                                            })
-                                                                        }
-                                                                        return true;
-                                                                    });
-                                                                }
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting carrier drivers', e);
-                                                        })
-                                                    }
-
-                                                    refDriverName.current.focus();
-                                                }, 0)
-                                            }
-                                        }}/>
+                                        // <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                        //     if (driverItems.length > 0) {
+                                        //         setDriverItems([]);
+                                        //     } else {
+                                        //         window.setTimeout(async () => {
+                                        //             if ((selectedCarrier?.id || 0) > 0) {
+                                        //                 axios.post(props.serverUrl + '/getDriversByCarrierId', {
+                                        //                     carrier_id: selectedCarrier.id
+                                        //                 }).then(async res => {
+                                        //                     if (res.data.result === 'OK') {
+                                        //                         if (res.data.count > 1) {
+                                        //                             await setDriverItems(res.data.drivers.map((item, index) => {
+                                        //                                 item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                        //                                     ? index === 0
+                                        //                                     : item.id === selectedCarrierDriver.id
+                                        //                                 return item;
+                                        //                             }))
+                                        //
+                                        //                             refDriverPopupItems.current.map((r, i) => {
+                                        //                                 if (r && r.classList.contains('selected')) {
+                                        //                                     r.scrollIntoView({
+                                        //                                         behavior: 'auto',
+                                        //                                         block: 'center',
+                                        //                                         inline: 'nearest'
+                                        //                                     })
+                                        //                                 }
+                                        //                                 return true;
+                                        //                             });
+                                        //                         }
+                                        //                     }
+                                        //                 }).catch(async e => {
+                                        //                     console.log('error getting carrier drivers', e);
+                                        //                 })
+                                        //             }
+                                        //
+                                        //             refDriverName.current.focus();
+                                        //         }, 0)
+                                        //     }
+                                        // }}/>
                                     }
                                 </div>
                                 {
@@ -11203,7 +11383,7 @@ const Invoice = (props) => {
                                              mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                              guide={true}
                                              type="text" placeholder="Driver Phone"
-                                             onKeyDown={validateCarrierDriverForSaving}
+                                             readOnly={true}
                                              onInput={(e) => {
                                                  setSelectedCarrierDriver({
                                                      ...selectedCarrierDriver,
@@ -11222,7 +11402,7 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container">
                                 <input tabIndex={59 + props.tabTimes} type="text" placeholder="Unit Number"
-                                       onKeyDown={validateCarrierDriverForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedCarrierDriver({...selectedCarrierDriver, truck: e.target.value})
                                        }}
@@ -11235,7 +11415,7 @@ const Invoice = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container">
                                 <input tabIndex={60 + props.tabTimes} type="text" placeholder="Trailer Number"
-                                       onKeyDown={validateCarrierDriverForSaving}
+                                       readOnly={true}
                                        onInput={(e) => {
                                            setSelectedCarrierDriver({...selectedCarrierDriver, trailer: e.target.value})
                                        }}
@@ -11255,7 +11435,12 @@ const Invoice = (props) => {
                             alignItems: 'flex-end',
                             marginTop: 21
                         }}>
-                            <div className='mochi-button' style={{fontSize: '1rem'}}>
+                            <div className={
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                    ? 'mochi-button disabled' : 'mochi-button'
+                            } style={{fontSize: '1rem'}}>
                                 <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                 <div className='mochi-button-base'>E-mail Rate Confirmation To Carrier</div>
                                 <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
@@ -11278,10 +11463,13 @@ const Invoice = (props) => {
                         gridGap: '0.5rem',
                         marginTop: -2
                     }}>
-                        <div className={classnames({
-                            'mochi-button': true,
-                            'disabled': (selectedOrder?.order_invoiced || 0) === 0
-                        })} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}
+                        <div className={
+                            (selectedOrder?.order_invoiced || 0) === 0 ||
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                ? 'mochi-button disabled' : 'mochi-button'
+                        } style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}
                              onClick={() => {
                                  if ((selectedOrder?.id || 0) === 0) {
                                      window.alert('You must load an order first!');
@@ -11301,13 +11489,23 @@ const Invoice = (props) => {
                             <div className="mochi-button-base" style={{fontSize: '1.2rem'}}>Print Invoice</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
-                        <div className="mochi-button"
+                        <div className={
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                ? 'mochi-button disabled' : 'mochi-button'
+                        }
                              style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base" style={{fontSize: '1.2rem'}}>E-Mail Invoice</div>
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
-                        <div className="mochi-button"
+                        <div className={
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                ? 'mochi-button disabled' : 'mochi-button'
+                        }
                              style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base" style={{fontSize: '1.2rem'}}>Batch Billing</div>
@@ -11317,11 +11515,20 @@ const Invoice = (props) => {
                             <div className="input-box-container grow" style={{marginBottom: 2}}>
                                 <input type="text" placeholder="Check Number"
                                        tabIndex={73 + props.tabTimes}
+                                       readOnly={
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                       }
                                        onKeyDown={(e) => {
                                            let key = e.keyCode || e.which;
 
-                                           if (key === 9) {
-                                               validateOrderForSaving(e);
+                                           if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                               if (key === 9) {
+                                                   validateOrderForSaving(e);
+                                               }
                                            }
                                        }}
                                        onInput={(e) => {
@@ -11350,83 +11557,92 @@ const Invoice = (props) => {
                                                  mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                                  guide={false}
                                                  type="text" placeholder="Date Received"
+                                                 readOnly={
+                                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                                 }
                                                  onKeyDown={async (e) => {
                                                      let key = e.keyCode || e.which;
 
-                                                     if (key >= 37 && key <= 40) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedDateReceived(event_date);
+                                                     if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                         if (key >= 37 && key <= 40) {
+                                                             let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                             await setPreSelectedDateReceived(event_date);
 
-                                                         if (isDateReceivedCalendarShown) {
-                                                             e.preventDefault();
+                                                             if (isDateReceivedCalendarShown) {
+                                                                 e.preventDefault();
 
-                                                             if (key === 37) { // left - minus 1
-                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(1, 'day'));
-                                                             }
-
-                                                             if (key === 38) { // up - minus 7
-                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(7, 'day'));
-                                                             }
-
-                                                             if (key === 39) { // right - plus 1
-                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().add(1, 'day'));
-                                                             }
-
-                                                             if (key === 40) { // down - plus 7
-                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().add(7, 'day'));
-                                                             }
-                                                         } else {
-                                                             await setIsDateReceivedCalendarShown(true);
-                                                         }
-                                                     }
-
-                                                     if (key === 13) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedDateReceived(event_date);
-
-                                                         if (isDateReceivedCalendarShown) {
-                                                             event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
-
-                                                             await setSelectedOrder(selectedOrder => {
-                                                                 return {
-                                                                     ...selectedOrder,
-                                                                     customer_date_received: event_date
+                                                                 if (key === 37) { // left - minus 1
+                                                                     setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(1, 'day'));
                                                                  }
-                                                             })
 
-                                                             await validateOrderForSaving({keyCode: 9});
-
-                                                             await setIsDateReceivedCalendarShown(false);
-                                                         }
-                                                     }
-
-                                                     if (key === 9) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedDateReceived(event_date);
-
-                                                         if (isDateReceivedCalendarShown) {
-                                                             event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
-
-                                                             await setSelectedOrder(selectedOrder => {
-                                                                 return {
-                                                                     ...selectedOrder,
-                                                                     customer_date_received: event_date
+                                                                 if (key === 38) { // up - minus 7
+                                                                     setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(7, 'day'));
                                                                  }
-                                                             })
 
-                                                             await validateOrderForSaving({keyCode: 9});
+                                                                 if (key === 39) { // right - plus 1
+                                                                     setPreSelectedDateReceived(preSelectedDateReceived.clone().add(1, 'day'));
+                                                                 }
 
-                                                             await setIsDateReceivedCalendarShown(false);
-                                                         } else {
-                                                             if (e.target.value.trim() === '') {
+                                                                 if (key === 40) { // down - plus 7
+                                                                     setPreSelectedDateReceived(preSelectedDateReceived.clone().add(7, 'day'));
+                                                                 }
+                                                             } else {
+                                                                 await setIsDateReceivedCalendarShown(true);
+                                                             }
+                                                         }
+
+                                                         if (key === 13) {
+                                                             let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                             await setPreSelectedDateReceived(event_date);
+
+                                                             if (isDateReceivedCalendarShown) {
+                                                                 event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
+
                                                                  await setSelectedOrder(selectedOrder => {
                                                                      return {
                                                                          ...selectedOrder,
-                                                                         customer_date_received: null
+                                                                         customer_date_received: event_date
                                                                      }
                                                                  })
 
                                                                  await validateOrderForSaving({keyCode: 9});
+
+                                                                 await setIsDateReceivedCalendarShown(false);
+                                                             }
+                                                         }
+
+                                                         if (key === 9) {
+                                                             let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                             await setPreSelectedDateReceived(event_date);
+
+                                                             if (isDateReceivedCalendarShown) {
+                                                                 event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
+
+                                                                 await setSelectedOrder(selectedOrder => {
+                                                                     return {
+                                                                         ...selectedOrder,
+                                                                         customer_date_received: event_date
+                                                                     }
+                                                                 })
+
+                                                                 await validateOrderForSaving({keyCode: 9});
+
+                                                                 await setIsDateReceivedCalendarShown(false);
+                                                             } else {
+                                                                 if (e.target.value.trim() === '') {
+                                                                     await setSelectedOrder(selectedOrder => {
+                                                                         return {
+                                                                             ...selectedOrder,
+                                                                             customer_date_received: null
+                                                                         }
+                                                                     })
+
+                                                                     await validateOrderForSaving({keyCode: 9});
+                                                                 }
                                                              }
                                                          }
                                                      }
@@ -11459,31 +11675,38 @@ const Invoice = (props) => {
                                                  ref={refDateReceived}
                                     />
 
-                                    <FontAwesomeIcon className="dropdown-button calendar date-received-calendar"
-                                                     icon={faCalendarAlt} onClick={(e) => {
-                                        if (isDateReceivedCalendarShown) {
-                                            setIsDateReceivedCalendarShown(false);
-                                        } else {
-                                            // e.stopPropagation();
+                                    {
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
+                                        <FontAwesomeIcon className="dropdown-button calendar date-received-calendar"
+                                                         icon={faCalendarAlt} onClick={(e) => {
+                                            if (isDateReceivedCalendarShown) {
+                                                setIsDateReceivedCalendarShown(false);
+                                            } else {
+                                                // e.stopPropagation();
 
 
-                                            new Promise((resolve, reject) => {
-                                                if (moment((selectedOrder?.customer_date_received || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.customer_date_received || '').trim()) {
-                                                    setPreSelectedDateReceived(moment(selectedOrder?.customer_date_received, 'MM/DD/YYYY'));
-                                                } else {
-                                                    setPreSelectedDateReceived(moment());
-                                                }
+                                                new Promise((resolve, reject) => {
+                                                    if (moment((selectedOrder?.customer_date_received || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.customer_date_received || '').trim()) {
+                                                        setPreSelectedDateReceived(moment(selectedOrder?.customer_date_received, 'MM/DD/YYYY'));
+                                                    } else {
+                                                        setPreSelectedDateReceived(moment());
+                                                    }
 
-                                                resolve('OK');
-                                            }).then(res => {
-                                                setIsDateReceivedCalendarShown(true);
-                                                refDateReceived.current.inputElement.focus();
-                                            }).catch(e => {
+                                                    resolve('OK');
+                                                }).then(res => {
+                                                    setIsDateReceivedCalendarShown(true);
+                                                    refDateReceived.current.inputElement.focus();
+                                                }).catch(e => {
 
-                                            });
+                                                });
 
-                                        }
-                                    }}/>
+                                            }
+                                        }}/>
+                                    }
+
+
                                 </div>
                                 {
                                     dateReceivedTransition((style, item) => item && (
@@ -11549,86 +11772,96 @@ const Invoice = (props) => {
                                              mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                              guide={false}
                                              type="text" placeholder="Invoice Rec'd Date"
+                                             readOnly={
+                                                 ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                             }
                                              onKeyDown={async (e) => {
                                                  let key = e.keyCode || e.which;
 
-                                                 if (key >= 37 && key <= 40) {
-                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                                     await setPreSelectedInvoiceReceivedDate(event_date);
+                                                 if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                     if (key >= 37 && key <= 40) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedInvoiceReceivedDate(event_date);
 
-                                                     if (isInvoiceReceivedDateCalendarShown) {
-                                                         e.preventDefault();
+                                                         if (isInvoiceReceivedDateCalendarShown) {
+                                                             e.preventDefault();
 
-                                                         if (key === 37) { // left - minus 1
-                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(1, 'day'));
-                                                         }
-
-                                                         if (key === 38) { // up - minus 7
-                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(7, 'day'));
-                                                         }
-
-                                                         if (key === 39) { // right - plus 1
-                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(1, 'day'));
-                                                         }
-
-                                                         if (key === 40) { // down - plus 7
-                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(7, 'day'));
-                                                         }
-                                                     } else {
-                                                         await setIsInvoiceReceivedDateCalendarShown(true);
-                                                     }
-                                                 }
-
-                                                 if (key === 13) {
-                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                                     await setPreSelectedInvoiceReceivedDate(event_date);
-
-                                                     if (isInvoiceReceivedDateCalendarShown) {
-                                                         event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
-
-                                                         await setSelectedOrder(selectedOrder => {
-                                                             return {
-                                                                 ...selectedOrder,
-                                                                 invoice_received_date: event_date
+                                                             if (key === 37) { // left - minus 1
+                                                                 setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(1, 'day'));
                                                              }
-                                                         })
 
-                                                         await validateOrderForSaving({keyCode: 9});
-
-                                                         await setIsInvoiceReceivedDateCalendarShown(false);
-                                                     }
-                                                 }
-
-                                                 if (key === 9) {
-                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                                     await setPreSelectedInvoiceReceivedDate(event_date);
-
-                                                     if (isInvoiceReceivedDateCalendarShown) {
-                                                         event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
-
-                                                         await setSelectedOrder(selectedOrder => {
-                                                             return {
-                                                                 ...selectedOrder,
-                                                                 invoice_received_date: event_date
+                                                             if (key === 38) { // up - minus 7
+                                                                 setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(7, 'day'));
                                                              }
-                                                         })
 
-                                                         await validateOrderForSaving({keyCode: 9});
+                                                             if (key === 39) { // right - plus 1
+                                                                 setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(1, 'day'));
+                                                             }
 
-                                                         await setIsInvoiceReceivedDateCalendarShown(false);
-                                                     } else {
-                                                         if (e.target.value.trim() === '') {
+                                                             if (key === 40) { // down - plus 7
+                                                                 setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(7, 'day'));
+                                                             }
+                                                         } else {
+                                                             await setIsInvoiceReceivedDateCalendarShown(true);
+                                                         }
+                                                     }
+
+                                                     if (key === 13) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedInvoiceReceivedDate(event_date);
+
+                                                         if (isInvoiceReceivedDateCalendarShown) {
+                                                             event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
+
                                                              await setSelectedOrder(selectedOrder => {
                                                                  return {
                                                                      ...selectedOrder,
-                                                                     invoice_received_date: null
+                                                                     invoice_received_date: event_date
                                                                  }
                                                              })
 
                                                              await validateOrderForSaving({keyCode: 9});
+
+                                                             await setIsInvoiceReceivedDateCalendarShown(false);
+                                                         }
+                                                     }
+
+                                                     if (key === 9) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedInvoiceReceivedDate(event_date);
+
+                                                         if (isInvoiceReceivedDateCalendarShown) {
+                                                             event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
+
+                                                             await setSelectedOrder(selectedOrder => {
+                                                                 return {
+                                                                     ...selectedOrder,
+                                                                     invoice_received_date: event_date
+                                                                 }
+                                                             })
+
+                                                             await validateOrderForSaving({keyCode: 9});
+
+                                                             await setIsInvoiceReceivedDateCalendarShown(false);
+                                                         } else {
+                                                             if (e.target.value.trim() === '') {
+                                                                 await setSelectedOrder(selectedOrder => {
+                                                                     return {
+                                                                         ...selectedOrder,
+                                                                         invoice_received_date: null
+                                                                     }
+                                                                 })
+
+                                                                 await validateOrderForSaving({keyCode: 9});
+                                                             }
                                                          }
                                                      }
                                                  }
+
 
                                              }}
                                              onBlur={e => {
@@ -11659,27 +11892,33 @@ const Invoice = (props) => {
                                              ref={refInvoiceReceivedDate}
                                 />
 
-                                <FontAwesomeIcon className="dropdown-button calendar invoice-received-date-calendar"
-                                                 icon={faCalendarAlt} onClick={(e) => {
-                                    if (isInvoiceReceivedDateCalendarShown) {
-                                        setIsInvoiceReceivedDateCalendarShown(false);
-                                    } else {
-                                        new Promise((resolve, reject) => {
-                                            if (moment((selectedOrder?.invoice_received_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_received_date || '').trim()) {
-                                                setPreSelectedInvoiceReceivedDate(moment(selectedOrder?.invoice_received_date, 'MM/DD/YYYY'));
-                                            } else {
-                                                setPreSelectedInvoiceReceivedDate(moment());
-                                            }
+                                {
+                                    ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
+                                    <FontAwesomeIcon className="dropdown-button calendar invoice-received-date-calendar"
+                                                     icon={faCalendarAlt} onClick={(e) => {
+                                        if (isInvoiceReceivedDateCalendarShown) {
+                                            setIsInvoiceReceivedDateCalendarShown(false);
+                                        } else {
+                                            new Promise((resolve, reject) => {
+                                                if (moment((selectedOrder?.invoice_received_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_received_date || '').trim()) {
+                                                    setPreSelectedInvoiceReceivedDate(moment(selectedOrder?.invoice_received_date, 'MM/DD/YYYY'));
+                                                } else {
+                                                    setPreSelectedInvoiceReceivedDate(moment());
+                                                }
 
-                                            resolve('OK');
-                                        }).then(res => {
-                                            setIsInvoiceReceivedDateCalendarShown(true);
-                                            refInvoiceReceivedDate.current.inputElement.focus();
-                                        }).catch(e => {
+                                                resolve('OK');
+                                            }).then(res => {
+                                                setIsInvoiceReceivedDateCalendarShown(true);
+                                                refInvoiceReceivedDate.current.inputElement.focus();
+                                            }).catch(e => {
 
-                                        });
-                                    }
-                                }}/>
+                                            });
+                                        }
+                                    }}/>
+                                }
+
                             </div>
                             {
                                 invoiceReceivedDateTransition((style, item) => item && (
@@ -11733,11 +11972,20 @@ const Invoice = (props) => {
                         <div className="input-box-container">
                             <input type="text" placeholder="Invoice Number"
                                    tabIndex={76 + props.tabTimes}
+                                   readOnly={
+                                       ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                   }
                                    onKeyDown={(e) => {
                                        let key = e.keyCode || e.which;
 
-                                       if (key === 9) {
-                                           validateOrderForSaving(e);
+                                       if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                           if (key === 9) {
+                                               validateOrderForSaving(e);
+                                           }
                                        }
                                    }}
                                    onInput={(e) => {
@@ -11763,169 +12011,179 @@ const Invoice = (props) => {
                             <div className="select-box-wrapper">
                                 <input type="text" placeholder="Terms"
                                        tabIndex={77 + props.tabTimes}
+                                       readOnly={
+                                           ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                       }
                                        ref={refTerms}
                                        onKeyDown={async (e) => {
                                            let key = e.keyCode || e.which;
 
-                                           switch (key) {
-                                               case 37:
-                                               case 38: // arrow left | arrow up
-                                                   e.preventDefault();
-                                                   if (termsItems.length > 0) {
-                                                       let selectedIndex = termsItems.findIndex(item => item.selected);
-
-                                                       if (selectedIndex === -1) {
-                                                           await setTermsItems(termsItems.map((item, index) => {
-                                                               item.selected = index === 0;
-                                                               return item;
-                                                           }))
-                                                       } else {
-                                                           await setTermsItems(termsItems.map((item, index) => {
-                                                               if (selectedIndex === 0) {
-                                                                   item.selected = index === (termsItems.length - 1);
-                                                               } else {
-                                                                   item.selected = index === (selectedIndex - 1)
-                                                               }
-                                                               return item;
-                                                           }))
-                                                       }
-
-                                                       refTermsPopupItems.current.map((r, i) => {
-                                                           if (r && r.classList.contains('selected')) {
-                                                               r.scrollIntoView({
-                                                                   behavior: 'auto',
-                                                                   block: 'center',
-                                                                   inline: 'nearest'
-                                                               })
-                                                           }
-                                                           return true;
-                                                       });
-                                                   } else {
-                                                       axios.post(props.serverUrl + '/getTerms').then(async res => {
-                                                           if (res.data.result === 'OK') {
-                                                               await setTermsItems(res.data.terms.map((item, index) => {
-                                                                   item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                                       ? index === 0
-                                                                       : item.id === selectedOrder?.term?.id
-                                                                   return item;
-                                                               }))
-
-                                                               refTermsPopupItems.current.map((r, i) => {
-                                                                   if (r && r.classList.contains('selected')) {
-                                                                       r.scrollIntoView({
-                                                                           behavior: 'auto',
-                                                                           block: 'center',
-                                                                           inline: 'nearest'
-                                                                       })
-                                                                   }
-                                                                   return true;
-                                                               });
-                                                           }
-                                                       }).catch(async e => {
-                                                           console.log('error getting terms', e);
-                                                       })
-                                                   }
-                                                   break;
-
-                                               case 39:
-                                               case 40: // arrow right | arrow down
-                                                   e.preventDefault();
-                                                   if (termsItems.length > 0) {
-                                                       let selectedIndex = termsItems.findIndex(item => item.selected);
-
-                                                       if (selectedIndex === -1) {
-                                                           await setTermsItems(termsItems.map((item, index) => {
-                                                               item.selected = index === 0;
-                                                               return item;
-                                                           }))
-                                                       } else {
-                                                           await setTermsItems(termsItems.map((item, index) => {
-                                                               if (selectedIndex === (termsItems.length - 1)) {
-                                                                   item.selected = index === 0;
-                                                               } else {
-                                                                   item.selected = index === (selectedIndex + 1)
-                                                               }
-                                                               return item;
-                                                           }))
-                                                       }
-
-                                                       refTermsPopupItems.current.map((r, i) => {
-                                                           if (r && r.classList.contains('selected')) {
-                                                               r.scrollIntoView({
-                                                                   behavior: 'auto',
-                                                                   block: 'center',
-                                                                   inline: 'nearest'
-                                                               })
-                                                           }
-                                                           return true;
-                                                       });
-                                                   } else {
-                                                       axios.post(props.serverUrl + '/getTerms').then(async res => {
-                                                           if (res.data.result === 'OK') {
-                                                               await setTermsItems(res.data.terms.map((item, index) => {
-                                                                   item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                                       ? index === 0
-                                                                       : item.id === selectedOrder?.term?.id
-                                                                   return item;
-                                                               }))
-
-                                                               refTermsPopupItems.current.map((r, i) => {
-                                                                   if (r && r.classList.contains('selected')) {
-                                                                       r.scrollIntoView({
-                                                                           behavior: 'auto',
-                                                                           block: 'center',
-                                                                           inline: 'nearest'
-                                                                       })
-                                                                   }
-                                                                   return true;
-                                                               });
-                                                           }
-                                                       }).catch(async e => {
-                                                           console.log('error getting terms', e);
-                                                       })
-                                                   }
-                                                   break;
-
-                                               case 27: // escape
-                                                   setTermsItems([]);
-                                                   break;
-
-                                               case 13: // enter
-                                                   if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
-                                                       setSelectedOrder(selectedOrder => {
-                                                           return {
-                                                               ...selectedOrder,
-                                                               term: termsItems[termsItems.findIndex(item => item.selected)],
-                                                               term_id: termsItems[termsItems.findIndex(item => item.selected)].id
-                                                           }
-                                                       })
-
-                                                       validateOrderForSaving({keyCode: 9});
-                                                       setTermsItems([]);
-                                                       refTerms.current.focus();
-                                                   }
-                                                   break;
-
-                                               case 9: // tab
-                                                   if (termsItems.length > 0) {
+                                           if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
                                                        e.preventDefault();
-                                                       setSelectedOrder(selectedOrder => {
-                                                           return {
-                                                               ...selectedOrder,
-                                                               term: termsItems[termsItems.findIndex(item => item.selected)],
-                                                               term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                       if (termsItems.length > 0) {
+                                                           let selectedIndex = termsItems.findIndex(item => item.selected);
+
+                                                           if (selectedIndex === -1) {
+                                                               await setTermsItems(termsItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setTermsItems(termsItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (termsItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
                                                            }
-                                                       })
 
-                                                       validateOrderForSaving({keyCode: 9});
+                                                           refTermsPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setTermsItems(res.data.terms.map((item, index) => {
+                                                                       item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedOrder?.term?.id
+                                                                       return item;
+                                                                   }))
+
+                                                                   refTermsPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting terms', e);
+                                                           })
+                                                       }
+                                                       break;
+
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (termsItems.length > 0) {
+                                                           let selectedIndex = termsItems.findIndex(item => item.selected);
+
+                                                           if (selectedIndex === -1) {
+                                                               await setTermsItems(termsItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setTermsItems(termsItems.map((item, index) => {
+                                                                   if (selectedIndex === (termsItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
+
+                                                           refTermsPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setTermsItems(res.data.terms.map((item, index) => {
+                                                                       item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedOrder?.term?.id
+                                                                       return item;
+                                                                   }))
+
+                                                                   refTermsPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting terms', e);
+                                                           })
+                                                       }
+                                                       break;
+
+                                                   case 27: // escape
                                                        setTermsItems([]);
-                                                       refTerms.current.focus();
-                                                   }
-                                                   break;
+                                                       break;
 
-                                               default:
-                                                   break;
+                                                   case 13: // enter
+                                                       if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
+                                                           setSelectedOrder(selectedOrder => {
+                                                               return {
+                                                                   ...selectedOrder,
+                                                                   term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                                   term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                               }
+                                                           })
+
+                                                           validateOrderForSaving({keyCode: 9});
+                                                           setTermsItems([]);
+                                                           refTerms.current.focus();
+                                                       }
+                                                       break;
+
+                                                   case 9: // tab
+                                                       if (termsItems.length > 0) {
+                                                           e.preventDefault();
+                                                           setSelectedOrder(selectedOrder => {
+                                                               return {
+                                                                   ...selectedOrder,
+                                                                   term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                                   term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                               }
+                                                           })
+
+                                                           validateOrderForSaving({keyCode: 9});
+                                                           setTermsItems([]);
+                                                           refTerms.current.focus();
+                                                       }
+                                                       break;
+
+                                                   default:
+                                                       break;
+                                               }
                                            }
+
                                        }}
                                        onBlur={async () => {
                                            if ((selectedOrder?.term?.id || 0) === 0) {
@@ -11984,65 +12242,70 @@ const Invoice = (props) => {
                                        }}
                                        value={selectedOrder?.term?.name || ''}
                                 />
-                                <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={(e) => {
-                                    if (termsItems.length > 0) {
-                                        setTermsItems([]);
-                                    } else {
-                                        if ((selectedOrder?.term?.id || 0) === 0 && (selectedOrder?.term?.name || '') !== '') {
-                                            axios.post(props.serverUrl + '/getTerms', {
-                                                name: selectedOrder?.term?.name
-                                            }).then(async res => {
-                                                if (res.data.result === 'OK') {
-                                                    await setTermsItems(res.data.terms.map((item, index) => {
-                                                        item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                            ? index === 0
-                                                            : item.id === selectedOrder?.term?.id
-                                                        return item;
-                                                    }))
-
-                                                    refTermsPopupItems.current.map((r, i) => {
-                                                        if (r && r.classList.contains('selected')) {
-                                                            r.scrollIntoView({
-                                                                behavior: 'auto',
-                                                                block: 'center',
-                                                                inline: 'nearest'
-                                                            })
-                                                        }
-                                                        return true;
-                                                    });
-                                                }
-                                            }).catch(async e => {
-                                                console.log('error getting terms', e);
-                                            })
+                                {
+                                    ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={(e) => {
+                                        if (termsItems.length > 0) {
+                                            setTermsItems([]);
                                         } else {
-                                            axios.post(props.serverUrl + '/getTerms').then(async res => {
-                                                if (res.data.result === 'OK') {
-                                                    await setTermsItems(res.data.terms.map((item, index) => {
-                                                        item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                            ? index === 0
-                                                            : item.id === selectedOrder?.term?.id
-                                                        return item;
-                                                    }))
+                                            if ((selectedOrder?.term?.id || 0) === 0 && (selectedOrder?.term?.name || '') !== '') {
+                                                axios.post(props.serverUrl + '/getTerms', {
+                                                    name: selectedOrder?.term?.name
+                                                }).then(async res => {
+                                                    if (res.data.result === 'OK') {
+                                                        await setTermsItems(res.data.terms.map((item, index) => {
+                                                            item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === selectedOrder?.term?.id
+                                                            return item;
+                                                        }))
 
-                                                    refTermsPopupItems.current.map((r, i) => {
-                                                        if (r && r.classList.contains('selected')) {
-                                                            r.scrollIntoView({
-                                                                behavior: 'auto',
-                                                                block: 'center',
-                                                                inline: 'nearest'
-                                                            })
-                                                        }
-                                                        return true;
-                                                    });
-                                                }
-                                            }).catch(async e => {
-                                                console.log('error getting terms', e);
-                                            })
+                                                        refTermsPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async e => {
+                                                    console.log('error getting terms', e);
+                                                })
+                                            } else {
+                                                axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                    if (res.data.result === 'OK') {
+                                                        await setTermsItems(res.data.terms.map((item, index) => {
+                                                            item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === selectedOrder?.term?.id
+                                                            return item;
+                                                        }))
+
+                                                        refTermsPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async e => {
+                                                    console.log('error getting terms', e);
+                                                })
+                                            }
                                         }
-                                    }
 
-                                    refTerms.current.focus();
-                                }}/>
+                                        refTerms.current.focus();
+                                    }}/>
+                                }
                             </div>
                             {
                                 termsTransition((style, item) => item && (
@@ -12134,86 +12397,96 @@ const Invoice = (props) => {
                                              mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                              guide={false}
                                              type="text" placeholder="Date Paid"
+                                             readOnly={
+                                                 ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                             }
                                              onKeyDown={async (e) => {
                                                  let key = e.keyCode || e.which;
 
-                                                 if (key >= 37 && key <= 40) {
-                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                                     await setPreSelectedDatePaid(event_date);
+                                                 if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                     if (key >= 37 && key <= 40) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedDatePaid(event_date);
 
-                                                     if (isDatePaidCalendarShown) {
-                                                         e.preventDefault();
+                                                         if (isDatePaidCalendarShown) {
+                                                             e.preventDefault();
 
-                                                         if (key === 37) { // left - minus 1
-                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(1, 'day'));
-                                                         }
-
-                                                         if (key === 38) { // up - minus 7
-                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(7, 'day'));
-                                                         }
-
-                                                         if (key === 39) { // right - plus 1
-                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().add(1, 'day'));
-                                                         }
-
-                                                         if (key === 40) { // down - plus 7
-                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().add(7, 'day'));
-                                                         }
-                                                     } else {
-                                                         await setIsDatePaidCalendarShown(true);
-                                                     }
-                                                 }
-
-                                                 if (key === 13) {
-                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                                     await setPreSelectedDatePaid(event_date);
-
-                                                     if (isDatePaidCalendarShown) {
-                                                         event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
-
-                                                         await setSelectedOrder(selectedOrder => {
-                                                             return {
-                                                                 ...selectedOrder,
-                                                                 invoice_date_paid: event_date
+                                                             if (key === 37) { // left - minus 1
+                                                                 setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(1, 'day'));
                                                              }
-                                                         })
 
-                                                         await validateOrderForSaving({keyCode: 9});
-
-                                                         await setIsDatePaidCalendarShown(false);
-                                                     }
-                                                 }
-
-                                                 if (key === 9) {
-                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                                     await setPreSelectedDatePaid(event_date);
-
-                                                     if (isDatePaidCalendarShown) {
-                                                         event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
-
-                                                         await setSelectedOrder(selectedOrder => {
-                                                             return {
-                                                                 ...selectedOrder,
-                                                                 invoice_date_paid: event_date
+                                                             if (key === 38) { // up - minus 7
+                                                                 setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(7, 'day'));
                                                              }
-                                                         })
 
-                                                         await validateOrderForSaving({keyCode: 9});
+                                                             if (key === 39) { // right - plus 1
+                                                                 setPreSelectedDatePaid(preSelectedDatePaid.clone().add(1, 'day'));
+                                                             }
 
-                                                         await setIsDatePaidCalendarShown(false);
-                                                     } else {
-                                                         if (e.target.value.trim() === '') {
+                                                             if (key === 40) { // down - plus 7
+                                                                 setPreSelectedDatePaid(preSelectedDatePaid.clone().add(7, 'day'));
+                                                             }
+                                                         } else {
+                                                             await setIsDatePaidCalendarShown(true);
+                                                         }
+                                                     }
+
+                                                     if (key === 13) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedDatePaid(event_date);
+
+                                                         if (isDatePaidCalendarShown) {
+                                                             event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
+
                                                              await setSelectedOrder(selectedOrder => {
                                                                  return {
                                                                      ...selectedOrder,
-                                                                     invoice_date_paid: null
+                                                                     invoice_date_paid: event_date
                                                                  }
                                                              })
 
                                                              await validateOrderForSaving({keyCode: 9});
+
+                                                             await setIsDatePaidCalendarShown(false);
+                                                         }
+                                                     }
+
+                                                     if (key === 9) {
+                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                         await setPreSelectedDatePaid(event_date);
+
+                                                         if (isDatePaidCalendarShown) {
+                                                             event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
+
+                                                             await setSelectedOrder(selectedOrder => {
+                                                                 return {
+                                                                     ...selectedOrder,
+                                                                     invoice_date_paid: event_date
+                                                                 }
+                                                             })
+
+                                                             await validateOrderForSaving({keyCode: 9});
+
+                                                             await setIsDatePaidCalendarShown(false);
+                                                         } else {
+                                                             if (e.target.value.trim() === '') {
+                                                                 await setSelectedOrder(selectedOrder => {
+                                                                     return {
+                                                                         ...selectedOrder,
+                                                                         invoice_date_paid: null
+                                                                     }
+                                                                 })
+
+                                                                 await validateOrderForSaving({keyCode: 9});
+                                                             }
                                                          }
                                                      }
                                                  }
+
 
                                              }}
                                              onBlur={e => {
@@ -12243,28 +12516,32 @@ const Invoice = (props) => {
                                              value={selectedOrder?.invoice_date_paid || ''}
                                              ref={refDatePaid}
                                 />
+                                {
+                                    ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
+                                    <FontAwesomeIcon className="dropdown-button calendar date-paid-calendar"
+                                                     icon={faCalendarAlt} onClick={(e) => {
+                                        if (isDatePaidCalendarShown) {
+                                            setIsDatePaidCalendarShown(false);
+                                        } else {
+                                            new Promise((resolve, reject) => {
+                                                if (moment((selectedOrder?.invoice_date_paid || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_date_paid || '').trim()) {
+                                                    setPreSelectedDatePaid(moment(selectedOrder?.invoice_date_paid, 'MM/DD/YYYY'));
+                                                } else {
+                                                    setPreSelectedDatePaid(moment());
+                                                }
 
-                                <FontAwesomeIcon className="dropdown-button calendar date-paid-calendar"
-                                                 icon={faCalendarAlt} onClick={(e) => {
-                                    if (isDatePaidCalendarShown) {
-                                        setIsDatePaidCalendarShown(false);
-                                    } else {
-                                        new Promise((resolve, reject) => {
-                                            if (moment((selectedOrder?.invoice_date_paid || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_date_paid || '').trim()) {
-                                                setPreSelectedDatePaid(moment(selectedOrder?.invoice_date_paid, 'MM/DD/YYYY'));
-                                            } else {
-                                                setPreSelectedDatePaid(moment());
-                                            }
+                                                resolve('OK');
+                                            }).then(res => {
+                                                setIsDatePaidCalendarShown(true);
+                                                refDatePaid.current.inputElement.focus();
+                                            }).catch(e => {
 
-                                            resolve('OK');
-                                        }).then(res => {
-                                            setIsDatePaidCalendarShown(true);
-                                            refDatePaid.current.inputElement.focus();
-                                        }).catch(e => {
-
-                                        });
-                                    }
-                                }}/>
+                                            });
+                                        }
+                                    }}/>
+                                }
                             </div>
                             {
                                 datePaidTransition((style, item) => item && (
@@ -12314,14 +12591,23 @@ const Invoice = (props) => {
                         <div className="input-box-container">
                             <input type="text" placeholder="Check Number"
                                    tabIndex={79 + props.tabTimes}
+                                   readOnly={
+                                       ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                   }
                                    onKeyDown={(e) => {
                                        let key = e.keyCode || e.which;
 
-                                       if (key === 9) {
-                                           e.preventDefault();
-                                           validateOrderForSaving(e);
+                                       if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                           if (key === 9) {
+                                               e.preventDefault();
+                                               validateOrderForSaving(e);
 
-                                           refOrderNumber.current.focus();
+                                               refOrderNumber.current.focus();
+                                           }
                                        }
                                    }}
                                    onInput={(e) => {
@@ -12367,8 +12653,16 @@ const Invoice = (props) => {
                     savingDataUrl='/saveInternalNotes'
                     deletingDataUrl=''
                     type='note'
-                    isEditable={false}
-                    isDeletable={false}
+                    isEditable={
+                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)
+                    }
+                    isDeletable={
+                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)
+                    }
                     isAdding={selectedInternalNote.id === 0}
                     title=""
                 />
@@ -12394,8 +12688,16 @@ const Invoice = (props) => {
                     savingDataUrl='/saveOrderBillingNotes'
                     deletingDataUrl=''
                     type='note'
-                    isEditable={false}
-                    isDeletable={false}
+                    isEditable={
+                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)
+                    }
+                    isDeletable={
+                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)
+                    }
                     isAdding={selectedBillingNote.id === 0}
                     title="Will appear on Invoice"
                 />

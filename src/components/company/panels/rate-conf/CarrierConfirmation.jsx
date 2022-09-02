@@ -153,7 +153,7 @@ export default class CarrierConfirmation extends Component {
               </span>{" "}
                             serves to supplement the Master Brokerage Agreement between{" "}
                             <span style={{...this.styleFieldDataBold}}>
-                ET3 Logistics, LLC
+                {(this.props.selectedCompany?.name || '')}
               </span>
                             , an ICC Property Broker (MC{" "}
                             <span style={{...this.styleFieldData}}>780648</span>) and:{" "}
@@ -470,14 +470,14 @@ export default class CarrierConfirmation extends Component {
                             Carrier agrees that this reflects the entire amount due for all
                             services provided and that no other amount will be billed to{" "}
                             <span style={{...this.styleFieldDataBold}}>
-                ET3 Logistics, LLC
+                {(this.props.selectedCompany?.name || '')}
               </span>
                             . Broker will remit payment to carrier within 30 days of receipt of signed bills
                             of lading and signed delivery receipts, completed W-9
                             forms, signed Master Carrier Agreement, Rate confirmation,
                             Contract Authority, and original certificates of Insurance naming{" "}
                             <span style={{...this.styleFieldDataBold}}>
-                ET3 Logistics, LLC
+                {(this.props.selectedCompany?.name || '')}
               </span>{" "}
                             as certificate holder.
                         </div>

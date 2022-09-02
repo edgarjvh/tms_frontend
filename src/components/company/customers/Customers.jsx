@@ -389,6 +389,20 @@ const Customers = (props) => {
 
     useEffect(() => {
         if (isSavingCustomer) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedCustomer?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0) {
+                        setIsSavingCustomer(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0) {
+                        setIsSavingCustomer(false);
+                        return;
+                    }
+                }
+            }
+
             if (selectedCustomer.id === undefined || selectedCustomer.id === -1) {
                 selectedCustomer.id = 0;
                 setSelectedCustomer(selectedCustomer => {
@@ -420,6 +434,10 @@ const Customers = (props) => {
                 selectedCustomer.code = newCode.toUpperCase();
 
                 selectedCustomer.credit_limit_total = Number((selectedCustomer?.credit_limit_total || '').toString().replace(',', ''));
+
+                if (props.user?.user_code?.type === 'agent'){
+                    selectedCustomer.agent_code = props.user?.user_code?.code || '';
+                }
 
                 axios.post(props.serverUrl + '/saveCustomer', {
                     ...selectedCustomer,
@@ -471,6 +489,20 @@ const Customers = (props) => {
 
     useEffect(() => {
         if (isSavingContact) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedContact?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0) {
+                        setIsSavingContact(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0) {
+                        setIsSavingContact(false);
+                        return;
+                    }
+                }
+            }
+
             if ((selectedCustomer?.id || 0) === 0) {
                 setIsSavingContact(false);
                 return;
@@ -542,6 +574,20 @@ const Customers = (props) => {
 
     useEffect(() => {
         if (isSavingMailingAddress) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedCustomer?.mailing_address?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) {
+                        setIsSavingMailingAddress(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0) {
+                        setIsSavingMailingAddress(false);
+                        return;
+                    }
+                }
+            }
+
             if ((selectedCustomer.id || 0) > 0) {
                 let mailing_address = selectedCustomer.mailing_address || {};
 
@@ -781,8 +827,6 @@ const Customers = (props) => {
         setAutomaticEmailsCc('');
         setAutomaticEmailsBcc('');
         setSelectedCustomer({id: 0, code: clearCode ? '' : selectedCustomer?.code});
-
-        refCustomerCode.current.focus();
     }
 
     const searchCustomerByCode = (e) => {
@@ -1101,10 +1145,6 @@ const Customers = (props) => {
         props.openPanel(panel, props.origin);
     }
 
-    const laneHistoryBtnClick = () => {
-
-    }
-
     const documentsBtnClick = () => {
         if ((selectedCustomer?.id || 0) > 0) {
             let panel = {
@@ -1128,6 +1168,7 @@ const Customers = (props) => {
                     deletingDocumentUrl='/deleteCustomerDocument'
                     savingDocumentNoteUrl='/saveCustomerDocumentNote'
                     serverDocumentsFolder='/customer-documents/'
+                    permissionName='customer documents'
                 />
             }
 
@@ -1504,7 +1545,7 @@ const Customers = (props) => {
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
                                     {
-                                        (props.isAdmin || false) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1) &&
                                         <div className="mochi-button" onClick={importCustomerBtnClick}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Import</div>
@@ -1516,7 +1557,10 @@ const Customers = (props) => {
                                         <div className="mochi-button-base">Search</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
-                                    <div className="mochi-button" onClick={setInitialValues}>
+                                    <div className="mochi-button" onClick={() => {
+                                        setInitialValues();
+                                        refCustomerCode.current.focus();
+                                    }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Clear</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -1551,7 +1595,11 @@ const Customers = (props) => {
                                 <div className="input-box-container grow">
                                     <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name"
                                            ref={refCustomerName}
-                                        // onKeyDown={validateCustomerForSaving}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => setSelectedCustomer({
                                                ...selectedCustomer,
                                                name: e.target.value
@@ -1563,7 +1611,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1"
-                                        // onKeyDown={validateCustomerForSaving}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => setSelectedCustomer({
                                                ...selectedCustomer,
                                                address1: e.target.value
@@ -1575,7 +1627,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2"
-                                        // onKeyDown={validateCustomerForSaving}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => setSelectedCustomer({
                                                ...selectedCustomer,
                                                address2: e.target.value
@@ -1587,7 +1643,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={5 + props.tabTimes} type="text" placeholder="City"
-                                        // onKeyDown={validateCustomerForSaving}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => setSelectedCustomer({
                                                ...selectedCustomer,
                                                city: e.target.value
@@ -1597,7 +1657,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-state">
                                     <input tabIndex={6 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                        // onKeyDown={validateCustomerForSaving}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => setSelectedCustomer({
                                                ...selectedCustomer,
                                                state: e.target.value
@@ -1607,6 +1671,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-zip-code">
                                     <input tabIndex={7 + props.tabTimes} type="text" placeholder="Postal Code"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onKeyDown={validateCustomerForSaving}
                                            onChange={e => setSelectedCustomer({
                                                ...selectedCustomer,
@@ -1619,6 +1688,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact Name"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={(e) => {
                                                if ((selectedCustomer?.contacts || []).length === 0) {
                                                    setSelectedCustomer({
@@ -1637,8 +1711,8 @@ const Customers = (props) => {
                                            }}
                                            value={
                                                (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                   // ? (selectedCustomer?.contact_name || '')
-                                                   ? ''
+                                                   ? (selectedCustomer?.contact_name || '')
+                                                   // ? ''
                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCustomer?.contacts.find(c => c.is_primary === 1).last_name
                                            }
                                     />
@@ -1650,6 +1724,11 @@ const Customers = (props) => {
                                         mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                         guide={true}
                                         type="text" placeholder="Contact Phone"
+                                        readOnly={
+                                            (props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                        }
                                         onInput={(e) => {
                                             if ((selectedCustomer?.contacts || []).length === 0) {
                                                 setSelectedCustomer({
@@ -1668,8 +1747,8 @@ const Customers = (props) => {
                                         }}
                                         value={
                                             (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                // ? (selectedCustomer?.contact_phone || '')
-                                                ? ''
+                                                ? (selectedCustomer?.contact_phone || '')
+                                                // ? ''
                                                 : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
                                                     ? selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_work
                                                     : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
@@ -1698,6 +1777,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={10 + props.tabTimes} type="text" placeholder="Ext"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={(e) => {
                                                if ((selectedCustomer?.contacts || []).length === 0) {
                                                    setSelectedCustomer({...selectedCustomer, ext: e.target.value})
@@ -1710,8 +1794,8 @@ const Customers = (props) => {
                                            }}
                                            value={
                                                (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                   // ? (selectedCustomer?.ext || '')
-                                                   ? ''
+                                                   ? (selectedCustomer?.ext || '')
+                                                   // ? ''
                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_ext
                                            }
                                     />
@@ -1744,6 +1828,11 @@ const Customers = (props) => {
                                            type="text"
                                            placeholder="E-Mail"
                                            style={{textTransform: 'lowercase'}}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
+                                           }
                                            onKeyDown={validateCustomerForSaving}
                                            onInput={(e) => {
                                                if ((selectedCustomer?.contacts || []).length === 0) {
@@ -1757,8 +1846,8 @@ const Customers = (props) => {
                                            }}
                                            value={
                                                (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                   // ? (selectedCustomer?.email || '')
-                                                   ? ''
+                                                   ? (selectedCustomer?.email || '')
+                                                   // ? ''
                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1).email_work
                                                        : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
@@ -1808,20 +1897,32 @@ const Customers = (props) => {
                                 <div className="form-title">Mailing Address</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    {
-                                        props.user?.user_code?.type !== 'agent' &&
-                                        <div className="mochi-button" onClick={mailingAddressBillToBtn}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Bill to</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
-                                    <div className="mochi-button" onClick={remitToAddressBtn}>
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={mailingAddressBillToBtn}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Bill to</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={remitToAddressBtn}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Remit to address is the same</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
-                                    <div className="mochi-button" onClick={mailingAddressClearBtn}>
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={mailingAddressClearBtn}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Clear</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -1858,6 +1959,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={19 + props.tabTimes} type="text" placeholder="Name"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
@@ -1883,6 +1989,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={20 + props.tabTimes} type="text" placeholder="Address 1"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
@@ -1908,6 +2019,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 2"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
@@ -1933,6 +2049,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={22 + props.tabTimes} type="text" placeholder="City"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
@@ -1956,6 +2077,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-state">
                                     <input tabIndex={23 + props.tabTimes} type="text" placeholder="State" maxLength="2"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
@@ -1979,6 +2105,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-zip-code">
                                     <input tabIndex={24 + props.tabTimes} type="text" placeholder="Postal Code"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                           }
                                            onKeyDown={validateMailingAddressForSaving}
                                            onInput={e => {
                                                setSelectedCustomer({
@@ -2006,6 +2137,11 @@ const Customers = (props) => {
                                 <div className="select-box-container" style={{flexGrow: 1}}>
                                     <div className="select-box-wrapper">
                                         <input
+                                            readOnly={
+                                                (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            }
                                             tabIndex={25 + props.tabTimes}
                                             type="text"
                                             placeholder="Contact Name"
@@ -2133,7 +2269,29 @@ const Customers = (props) => {
                                                             await setSelectedCustomer({
                                                                 ...selectedCustomer,
                                                                 mailing_address: {
-                                                                    ...selectedCustomer?.mailing_address,
+                                                                    ...(selectedCustomer?.mailing_address || {}),
+                                                                    contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                        + ' '
+                                                                        + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                    contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                        : '',
+                                                                    ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                    email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                                : '',
                                                                     mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
                                                                     mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
                                                                     mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
@@ -2150,7 +2308,7 @@ const Customers = (props) => {
                                                                 }
                                                             });
 
-                                                            validateMailingAddressForSaving({keyCode: 9});
+                                                            // validateMailingAddressForSaving({keyCode: 9});
                                                             setShowMailingContactNames(false);
                                                             refMailingContactName.current.focus();
                                                         }
@@ -2162,7 +2320,29 @@ const Customers = (props) => {
                                                             await setSelectedCustomer({
                                                                 ...selectedCustomer,
                                                                 mailing_address: {
-                                                                    ...selectedCustomer?.mailing_address,
+                                                                    ...(selectedCustomer?.mailing_address || {}),
+                                                                    contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                        + ' '
+                                                                        + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                    contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                        : '',
+                                                                    ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                    email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                                : '',
                                                                     mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
                                                                     mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
                                                                     mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
@@ -2179,11 +2359,11 @@ const Customers = (props) => {
                                                                 }
                                                             });
 
-                                                            validateMailingAddressForSaving({keyCode: 9});
+                                                            // validateMailingAddressForSaving({keyCode: 9});
                                                             setShowMailingContactNames(false);
                                                             refMailingContactName.current.focus();
                                                         } else {
-                                                            validateMailingAddressForSaving({keyCode: 9});
+                                                            // validateMailingAddressForSaving({keyCode: 9});
                                                         }
                                                         break;
 
@@ -2191,34 +2371,86 @@ const Customers = (props) => {
                                                         break;
                                                 }
                                             }}
-                                            onInput={(e) => {
-                                                // setSelectedCustomer({
-                                                //     ...selectedCustomer,
-                                                //     mailing_contact_name: e.target.value
-                                                // })
+                                            onBlur={e => {
+                                                let contact = (selectedCustomer?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+
+                                                if (contact) {
+                                                    setSelectedCustomer(selectedCustomer => {
+                                                        return {
+                                                            ...selectedCustomer,
+                                                            mailing_address: {
+                                                                ...(selectedCustomer?.mailing_address || {}),
+                                                                contact_phone: (contact.primary_phone || '') === 'work'
+                                                                    ? (contact.phone_work || '')
+                                                                    : (contact.primary_phone || '') === 'fax'
+                                                                        ? (contact.phone_work_fax || '')
+                                                                        : (contact.primary_phone || '') === 'mobile'
+                                                                            ? (contact.phone_mobile || '')
+                                                                            : (contact.primary_phone || '') === 'direct'
+                                                                                ? (contact.phone_direct || '')
+                                                                                : (contact.primary_phone || '') === 'other'
+                                                                                    ? (contact.phone_other || '')
+                                                                                    : '',
+                                                                ext: (contact.phone_ext || ''),
+                                                                email: (contact.primary_email || '') === 'work'
+                                                                    ? (contact.email_work || '')
+                                                                    : (contact.primary_email || '') === 'personal'
+                                                                        ? (contact.email_personal || '')
+                                                                        : (contact.primary_email || '') === 'other'
+                                                                            ? (contact.email_other || '')
+                                                                            : '',
+                                                                mailing_contact_id: contact.id
+                                                            }
+                                                        }
+                                                    })
+                                                } else {
+                                                    setSelectedCustomer(selectedCustomer => {
+                                                        return {
+                                                            ...selectedCustomer,
+                                                            mailing_address: {
+                                                                ...(selectedCustomer?.mailing_address || {}),
+                                                                mailing_contact_id: null,
+                                                            }
+                                                        }
+                                                    })
+                                                }
                                             }}
-                                            onChange={(e) => {
-                                                // setSelectedCustomer({
-                                                //     ...selectedCustomer,
-                                                //     mailing_contact_name: e.target.value
-                                                // })
+                                            onInput={e => {
+                                                setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        mailing_address: {
+                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                            contact_name: e.target.value
+                                                        }
+                                                    }
+                                                })
                                             }}
-                                            value={
-                                                (selectedCustomer?.mailing_address?.mailing_contact?.first_name || '') +
-                                                ((selectedCustomer?.mailing_address?.mailing_contact?.last_name || '') === ''
-                                                    ? ''
-                                                    : ' ' + selectedCustomer?.mailing_address?.mailing_contact?.last_name)
-                                            }
+                                            onChange={e => {
+                                                setSelectedCustomer(selectedCustomer => {
+                                                    return {
+                                                        ...selectedCustomer,
+                                                        mailing_address: {
+                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                            contact_name: e.target.value
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                            value={selectedCustomer?.mailing_address?.contact_name || ''}
                                         />
 
                                         {
-                                            ((selectedCustomer?.contacts || []).length > 1 && (selectedCustomer?.mailing_address?.code || '') !== '') &&
+                                            ((selectedCustomer?.contacts || []).length > 0 && ((selectedCustomer?.mailing_address?.id || 0) > 0)) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
                                                              onClick={async () => {
                                                                  if (showMailingContactNames) {
                                                                      setShowMailingContactNames(false);
                                                                  } else {
-                                                                     if ((selectedCustomer?.contacts || []).length > 1) {
+                                                                     if ((selectedCustomer?.contacts || []).length > 0) {
                                                                          await setMailingContactNameItems((selectedCustomer?.contacts || []).map((item, index) => {
                                                                              item.selected = index === 0
                                                                              return item;
@@ -2274,27 +2506,49 @@ const Customers = (props) => {
                                                                             className={mochiItemClasses}
                                                                             id={item.id}
                                                                             onClick={async () => {
-                                                                                await setSelectedCustomer({
-                                                                                    ...selectedCustomer,
-                                                                                    mailing_address: {
-                                                                                        ...selectedCustomer?.mailing_address,
-                                                                                        mailing_contact: item,
-                                                                                        mailing_contact_id: item.id,
-                                                                                        mailing_contact_primary_phone: (item.phone_work || '') !== ''
-                                                                                            ? 'work'
-                                                                                            : (item.phone_work_fax || '') !== ''
-                                                                                                ? 'fax'
-                                                                                                : (item.phone_mobile || '') !== ''
-                                                                                                    ? 'mobile'
-                                                                                                    : (item.phone_direct || '') !== ''
-                                                                                                        ? 'direct'
-                                                                                                        : (item.phone_other || '') !== ''
-                                                                                                            ? 'other' :
-                                                                                                            ''
+                                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                                    return {
+                                                                                        ...selectedCustomer,
+                                                                                        mailing_address: {
+                                                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                                                            contact_name: (item.first_name + ' ' + item.last_name).trim(),
+                                                                                            contact_phone: (item.primary_phone || '') === 'work'
+                                                                                                ? (item.phone_work || '')
+                                                                                                : (item.primary_phone || '') === 'fax'
+                                                                                                    ? (item.phone_work_fax || '')
+                                                                                                    : (item.primary_phone || '') === 'mobile'
+                                                                                                        ? (item.phone_mobile || '')
+                                                                                                        : (item.primary_phone || '') === 'direct'
+                                                                                                            ? (item.phone_direct || '')
+                                                                                                            : (item.primary_phone || '') === 'other'
+                                                                                                                ? (item.phone_other || '')
+                                                                                                                : '',
+                                                                                            ext: (item.phone_ext || ''),
+                                                                                            email: (item.primary_email || '') === 'work'
+                                                                                                ? (item.email_work || '')
+                                                                                                : (item.primary_email || '') === 'personal'
+                                                                                                    ? (item.email_personal || '')
+                                                                                                    : (item.primary_email || '') === 'other'
+                                                                                                        ? (item.email_other || '')
+                                                                                                        : '',
+                                                                                            mailing_contact: item,
+                                                                                            mailing_contact_id: item.id,
+                                                                                            mailing_contact_primary_phone: (item.phone_work || '') !== ''
+                                                                                                ? 'work'
+                                                                                                : (item.phone_work_fax || '') !== ''
+                                                                                                    ? 'fax'
+                                                                                                    : (item.phone_mobile || '') !== ''
+                                                                                                        ? 'mobile'
+                                                                                                        : (item.phone_direct || '') !== ''
+                                                                                                            ? 'direct'
+                                                                                                            : (item.phone_other || '') !== ''
+                                                                                                                ? 'other' :
+                                                                                                                ''
+                                                                                        }
                                                                                     }
                                                                                 });
 
-                                                                                validateMailingAddressForSaving({keyCode: 9});
+                                                                                // validateMailingAddressForSaving({keyCode: 9});
                                                                                 setShowMailingContactNames(false);
                                                                                 refMailingContactName.current.focus();
                                                                             }}
@@ -2322,13 +2576,15 @@ const Customers = (props) => {
                                     }
                                 </div>
 
-                                {/* <div className="input-box-container grow">
-                                    <input tabIndex={25 + props.tabTimes} type="text" placeholder="Contact Name" onKeyDown={validateCustomerForSaving} onChange={e => setSelectedCustomer({ ...selectedCustomer, mailing_contact_name: e.target.value })} value={selectedCustomer?.mailing_contact_name || ''} />
-                                </div> */}
                                 <div className="form-h-sep"></div>
                                 <div className="select-box-container input-phone">
                                     <div className="select-box-wrapper">
                                         <MaskedInput tabIndex={26 + props.tabTimes}
+                                                     readOnly={
+                                                         (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                                     }
                                                      mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                      guide={true}
                                                      type="text"
@@ -2457,12 +2713,13 @@ const Customers = (props) => {
                                                                      await setSelectedCustomer({
                                                                          ...selectedCustomer,
                                                                          mailing_address: {
-                                                                             ...selectedCustomer.mailing_address,
+                                                                             ...(selectedCustomer?.mailing_address || {}),
+                                                                             contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
                                                                              mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
                                                                          }
                                                                      });
 
-                                                                     validateMailingAddressForSaving({keyCode: 9});
+                                                                     // validateMailingAddressForSaving({keyCode: 9});
                                                                      setShowMailingContactPhones(false);
                                                                      refMailingContactPhone.current.inputElement.focus();
                                                                  }
@@ -2474,63 +2731,64 @@ const Customers = (props) => {
                                                                      await setSelectedCustomer({
                                                                          ...selectedCustomer,
                                                                          mailing_address: {
-                                                                             ...selectedCustomer.mailing_address,
+                                                                             ...(selectedCustomer?.mailing_address || {}),
+                                                                             contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
                                                                              mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
                                                                          }
                                                                      });
 
-                                                                     validateMailingAddressForSaving({keyCode: 9});
+                                                                     // validateMailingAddressForSaving({keyCode: 9});
                                                                      setShowMailingContactPhones(false);
                                                                      refMailingContactPhone.current.inputElement.focus();
                                                                  } else {
-                                                                     validateMailingAddressForSaving({keyCode: 9});
+                                                                     // validateMailingAddressForSaving({keyCode: 9});
                                                                  }
                                                                  break;
-
                                                              default:
                                                                  break;
                                                          }
                                                      }}
                                                      onInput={(e) => {
-                                                         // setSelectedCustomer({
-                                                         //     ...selectedCustomer,
-                                                         //     mailing_contact_phone: e.target.value
-                                                         // });
+                                                         setSelectedCustomer(selectedCustomer => {
+                                                             return {
+                                                                 ...selectedCustomer,
+                                                                 mailing_address: {
+                                                                     ...(selectedCustomer?.mailing_address || {}),
+                                                                     contact_phone: e.target.value
+                                                                 }
+                                                             }
+                                                         })
                                                      }}
                                                      onChange={(e) => {
-                                                         // setSelectedCustomer({
-                                                         //     ...selectedCustomer,
-                                                         //     mailing_contact_phone: e.target.value
-                                                         // });
+                                                         setSelectedCustomer(selectedCustomer => {
+                                                             return {
+                                                                 ...selectedCustomer,
+                                                                 mailing_address: {
+                                                                     ...(selectedCustomer?.mailing_address || {}),
+                                                                     contact_phone: e.target.value
+                                                                 }
+                                                             }
+                                                         })
                                                      }}
-                                                     value={
-                                                         (selectedCustomer?.mailing_address?.mailing_contact_primary_phone || '') === 'work'
-                                                             ? (selectedCustomer?.mailing_address?.mailing_contact?.phone_work || '')
-                                                             : (selectedCustomer?.mailing_address?.mailing_contact_primary_phone || '') === 'fax'
-                                                                 ? (selectedCustomer?.mailing_address?.mailing_contact?.phone_work_fax || '')
-                                                                 : (selectedCustomer?.mailing_address?.mailing_contact_primary_phone || '') === 'mobile'
-                                                                     ? (selectedCustomer?.mailing_address?.mailing_contact?.phone_mobile || '')
-                                                                     : (selectedCustomer?.mailing_address?.mailing_contact_primary_phone || '') === 'direct'
-                                                                         ? (selectedCustomer?.mailing_address?.mailing_contact?.phone_direct || '')
-                                                                         : (selectedCustomer?.mailing_address?.mailing_contact_primary_phone || '') === 'other'
-                                                                             ? (selectedCustomer?.mailing_address?.mailing_contact?.phone_other || '')
-                                                                             : ''
-                                                     }
+                                                     value={selectedCustomer?.mailing_address?.contact_phone}
                                         />
 
                                         {
-                                            ((selectedCustomer?.id || 0) > 0 && (selectedCustomer?.mailing_address?.code || '') !== '') &&
+                                            ((selectedCustomer?.id || 0) > 0 && (selectedCustomer?.mailing_address?.id !== undefined)) &&
                                             <div
                                                 className={classnames({
                                                     'selected-mailing-contact-primary-phone': true,
                                                     'pushed': (mailingContactPhoneItems.length > 1)
                                                 })}>
-                                                {selectedCustomer?.mailing_address?.mailing_contact_primary_phone || ''}
+                                                {selectedCustomer?.mailing_address?.mailing_contact_id ? (selectedCustomer?.mailing_address?.mailing_contact_primary_phone || '') : ''}
                                             </div>
                                         }
 
                                         {
-                                            mailingContactPhoneItems.length > 1 &&
+                                            (mailingContactPhoneItems.length > 1 && ((selectedCustomer?.mailing_address?.mailing_contact_id || 0) > 0)) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
                                                              onClick={async () => {
                                                                  if (showMailingContactPhones) {
@@ -2595,12 +2853,13 @@ const Customers = (props) => {
                                                                                 await setSelectedCustomer({
                                                                                     ...selectedCustomer,
                                                                                     mailing_address: {
-                                                                                        ...selectedCustomer?.mailing_address,
+                                                                                        ...(selectedCustomer?.mailing_address || {}),
+                                                                                        contact_phone: item.phone,
                                                                                         mailing_contact_primary_phone: item.type
                                                                                     }
                                                                                 });
 
-                                                                                validateMailingAddressForSaving({keyCode: 9});
+                                                                                // validateMailingAddressForSaving({keyCode: 9});
                                                                                 setShowMailingContactPhones(false);
                                                                                 refMailingContactPhone.current.inputElement.focus();
                                                                             }}
@@ -2641,37 +2900,50 @@ const Customers = (props) => {
                                         ))
                                     }
                                 </div>
-
-                                {/* <div className="input-box-container input-phone">
-                                    <MaskedInput tabIndex={26 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text" placeholder="Contact Phone" onKeyDown={validateCustomerForSaving} onChange={e => setSelectedCustomer({ ...selectedCustomer, mailing_contact_phone: e.target.value })} value={selectedCustomer?.mailing_contact_phone || ''} />
-                                </div> */}
+                                
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={27 + props.tabTimes} type="text" placeholder="Ext"
-                                           onKeyDown={validateMailingAddressForSaving}
-                                           onChange={e => {
-                                               // setSelectedCustomer({ ...selectedCustomer, mailing_ext: e.target.value })
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                           }
+                                           onInput={e => {
+                                               setSelectedCustomer(selectedCustomer => {
+                                                   return {
+                                                       ...selectedCustomer,
+                                                       mailing_address: {
+                                                           ...(selectedCustomer?.mailing_address || {}),
+                                                           ext: e.target.value
+                                                       }
+                                                   }
+                                               })
                                            }}
-                                           value={selectedCustomer?.mailing_address?.mailing_contact?.phone_ext || ''}/>
+                                           onChange={e => {
+                                               setSelectedCustomer(selectedCustomer => {
+                                                   return {
+                                                       ...selectedCustomer,
+                                                       mailing_address: {
+                                                           ...(selectedCustomer?.mailing_address || {}),
+                                                           ext: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedCustomer?.mailing_address?.ext || ''}/>
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="select-box-container" style={{flexGrow: 1}}
                                      onMouseEnter={() => {
-                                         if ((selectedCustomer?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                             (selectedCustomer?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                             (selectedCustomer?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                         if ((selectedCustomer?.mailing_address?.email || '') !== '') {
                                              setShowMailingContactEmailCopyBtn(true);
                                          }
                                      }}
                                      onFocus={() => {
-                                         if ((selectedCustomer?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                             (selectedCustomer?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                             (selectedCustomer?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                         if ((selectedCustomer?.mailing_address?.email || '') !== '') {
                                              setShowMailingContactEmailCopyBtn(true);
                                          }
                                      }}
@@ -2686,6 +2958,11 @@ const Customers = (props) => {
 
                                     <div className="select-box-wrapper">
                                         <input tabIndex={28 + props.tabTimes} type="text" placeholder="E-Mail"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                               }
                                                ref={refMailingContactEmail}
                                                onKeyDown={async (e) => {
                                                    let key = e.keyCode || e.which;
@@ -2810,12 +3087,13 @@ const Customers = (props) => {
                                                                await setSelectedCustomer({
                                                                    ...selectedCustomer,
                                                                    mailing_address: {
-                                                                       ...selectedCustomer?.mailing_address,
+                                                                       ...(selectedCustomer?.mailing_address || {}),
+                                                                       email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
                                                                        mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
                                                                    }
                                                                });
 
-                                                               validateMailingAddressForSaving({keyCode: 9});
+                                                               // validateMailingAddressForSaving({keyCode: 9});
                                                                setShowMailingContactEmails(false);
                                                                refMailingContactEmail.current.focus();
                                                            }
@@ -2827,7 +3105,8 @@ const Customers = (props) => {
                                                                await setSelectedCustomer({
                                                                    ...selectedCustomer,
                                                                    mailing_address: {
-                                                                       ...selectedCustomer?.mailing_address,
+                                                                       ...(selectedCustomer?.mailing_address || {}),
+                                                                       email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
                                                                        mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
                                                                    }
                                                                });
@@ -2844,27 +3123,39 @@ const Customers = (props) => {
                                                            break;
                                                    }
                                                }}
-                                               onChange={e => {
+                                               onInput={e => {
+                                                   setSelectedCustomer(selectedCustomer => {
+                                                       return {
+                                                           ...selectedCustomer,
+                                                           mailing_address: {
+                                                               ...(selectedCustomer?.mailing_address || {}),
+                                                               email: e.target.value
+                                                           }
+                                                       }
+                                                   })
                                                }}
-                                               value={
-                                                   (selectedCustomer?.mailing_address?.mailing_contact_primary_email || '') === 'work'
-                                                       ? (selectedCustomer?.mailing_address?.mailing_contact?.email_work || '')
-                                                       : (selectedCustomer?.mailing_address?.mailing_contact_primary_email || '') === 'personal'
-                                                           ? (selectedCustomer?.mailing_address?.mailing_contact?.email_personal || '')
-                                                           : (selectedCustomer?.mailing_address?.mailing_contact_primary_email || '') === 'other'
-                                                               ? (selectedCustomer?.mailing_address?.mailing_contact?.email_other || '')
-                                                               : ''
-                                               }
+                                               onChange={e => {
+                                                   setSelectedCustomer(selectedCustomer => {
+                                                       return {
+                                                           ...selectedCustomer,
+                                                           mailing_address: {
+                                                               ...(selectedCustomer?.mailing_address || {}),
+                                                               email: e.target.value
+                                                           }
+                                                       }
+                                                   })
+                                               }}
+                                               value={selectedCustomer?.mailing_address?.email || ''}
                                         />
 
                                         {
-                                            ((selectedCustomer?.id || 0) > 0 && (selectedCustomer?.mailing_address?.code || '') !== '') &&
+                                            ((selectedCustomer?.id || 0) > 0 && (selectedCustomer?.mailing_address?.id !== undefined)) &&
                                             <div
                                                 className={classnames({
                                                     'selected-mailing-contact-primary-email': true,
                                                     'pushed': (mailingContactEmailItems.length > 1)
                                                 })}>
-                                                {selectedCustomer?.mailing_address?.mailing_contact_primary_email || ''}
+                                                {(selectedCustomer?.mailing_address?.mailing_contact_id || 0) > 0 ? (selectedCustomer?.mailing_address?.mailing_contact_primary_email || '') : ''}
                                             </div>
                                         }
 
@@ -2888,7 +3179,10 @@ const Customers = (props) => {
                                         }
 
                                         {
-                                            mailingContactEmailItems.length > 1 &&
+                                            (mailingContactEmailItems.length > 1 && ((selectedCustomer?.mailing_address?.mailing_contact_id || 0) > 0)) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
                                                              onClick={async () => {
                                                                  if (showMailingContactEmails) {
@@ -2950,11 +3244,14 @@ const Customers = (props) => {
                                                                             className={mochiItemClasses}
                                                                             id={item.id}
                                                                             onClick={async () => {
-                                                                                await setSelectedCustomer({
-                                                                                    ...selectedCustomer,
-                                                                                    mailing_address: {
-                                                                                        ...selectedCustomer?.mailing_address,
-                                                                                        mailing_contact_primary_email: item.type
+                                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                                    return {
+                                                                                        ...selectedCustomer,
+                                                                                        mailing_address: {
+                                                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                                                            email: item.email,
+                                                                                            mailing_contact_primary_email: item.type
+                                                                                        }
                                                                                     }
                                                                                 });
 
@@ -3003,7 +3300,11 @@ const Customers = (props) => {
                                 <div className="input-box-container grow">
                                     <input tabIndex={32 + props.tabTimes} type="text"
                                            style={{textTransform: 'uppercase'}} placeholder="Bill To"
-                                           readOnly={!props.isAdmin}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.edit || 0) === 0
+                                           }
                                            onInput={e => {
                                                setSelectedCustomer({
                                                    ...selectedCustomer,
@@ -3025,10 +3326,14 @@ const Customers = (props) => {
                                     <div className="select-box-wrapper">
                                         <input
                                             type="text"
-                                            readOnly={!props.isAdmin}
                                             tabIndex={33 + props.tabTimes}
                                             placeholder="Division"
                                             ref={refDivision}
+                                            readOnly={
+                                                (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer division')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer division')?.pivot?.edit || 0) === 0
+                                            }
                                             onKeyDown={async (e) => {
                                                 let key = e.keyCode || e.which;
 
@@ -3415,7 +3720,11 @@ const Customers = (props) => {
                                 <div className="input-box-container grow">
                                     <input tabIndex={34 + props.tabTimes} type="text" placeholder="Agent Code"
                                            style={{textTransform: 'uppercase'}}
-                                           readOnly={!props.isAdmin}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer agent code')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer agent code')?.pivot?.edit || 0) === 0
+                                           }
                                            onKeyDown={e => {
                                                if (props.isAdmin){
                                                    validateCustomerForSaving(e);
@@ -3447,7 +3756,11 @@ const Customers = (props) => {
                                     <div className="select-box-wrapper">
                                         <input
                                             type="text"
-                                            readOnly={!props.isAdmin}
+                                            readOnly={
+                                                (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer salesman')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer salesman')?.pivot?.edit || 0) === 0
+                                            }
                                             tabIndex={35 + props.tabTimes}
                                             placeholder="Salesman"
                                             ref={refSalesman}
@@ -3836,7 +4149,11 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={36 + props.tabTimes} type="text" placeholder="FID"
-                                           readOnly={!props.isAdmin}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer fid')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer fid')?.pivot?.edit || 0) === 0
+                                           }
                                            onKeyDown={validateCustomerForSaving}
                                            onInput={e => {
                                                setSelectedCustomer(selectedCustomer => {
@@ -3873,7 +4190,11 @@ const Customers = (props) => {
                                 <div className="select-box-container" style={{position: 'relative', flexGrow: 1}}>
                                     <div className="select-box-wrapper">
                                         <input type="text" placeholder="Invoicing Terms"
-                                               readOnly={!props.isAdmin}
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer credit')?.pivot?.save || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer credit')?.pivot?.edit || 0) === 0
+                                               }
                                                tabIndex={37 + props.tabTimes}
                                                ref={refTerms}
                                                onKeyDown={async (e) => {
@@ -4248,7 +4569,11 @@ const Customers = (props) => {
                                         className={classnames({
                                             'disabled': !props.isAdmin
                                         })}
-                                        readOnly={!props.isAdmin}
+                                        readOnly={
+                                            (props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer division')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer division')?.pivot?.edit || 0) === 0
+                                        }
                                         style={{ textAlign: 'right', fontWeight: 'bold' }}
                                         mask={numberMask}
                                         type="text"
@@ -4352,7 +4677,11 @@ const Customers = (props) => {
                                 <div className="form-title">Contacts</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={async () => {
+                                    <div className={
+                                       ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={async () => {
                                         if (selectedCustomer?.id === undefined) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -4373,6 +4702,7 @@ const Customers = (props) => {
                                                 deletingContactUrl='/deleteContact'
                                                 uploadAvatarUrl='/uploadAvatar'
                                                 removeAvatarUrl='/removeAvatar'
+                                                permissionName='customer contacts'
                                                 origin={props.origin}
                                                 owner='customer'
                                                 openPanel={props.openPanel}
@@ -4399,7 +4729,11 @@ const Customers = (props) => {
                                         <div className="mochi-button-base">More</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
-                                    <div className="mochi-button" onClick={() => {
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
                                         if (selectedCustomer?.id === undefined) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -4415,6 +4749,7 @@ const Customers = (props) => {
                                                 deletingContactUrl='/deleteContact'
                                                 uploadAvatarUrl='/uploadAvatar'
                                                 removeAvatarUrl='/removeAvatar'
+                                                permissionName='customer contacts'
                                                 origin={props.origin}
                                                 owner='customer'
                                                 isEditingContact={true}
@@ -4451,7 +4786,11 @@ const Customers = (props) => {
                                 <div className="input-box-container grow">
                                     <input tabIndex={12 + props.tabTimes} type="text" placeholder="First Name"
                                            ref={refCustomerContactFirstName}
-                                        // onKeyDown={validateContactForSaving} 
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => {
                                                setSelectedContact({...selectedContact, first_name: e.target.value})
                                            }}
@@ -4460,7 +4799,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={13 + props.tabTimes} type="text" placeholder="Last Name"
-                                        // onKeyDown={validateContactForSaving} 
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => setSelectedContact({
                                                ...selectedContact,
                                                last_name: e.target.value
@@ -4473,6 +4816,11 @@ const Customers = (props) => {
                                 <div className="select-box-container" style={{width: '50%'}}>
                                     <div className="select-box-wrapper">
                                         <MaskedInput tabIndex={14 + props.tabTimes}
+                                                     readOnly={
+                                                         (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
+                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
+                                                     }
                                                      mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                      guide={true}
                                                      type="text"
@@ -4868,7 +5216,12 @@ const Customers = (props) => {
                                 <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
                                     <div className="input-box-container input-phone-ext">
                                         <input tabIndex={15 + props.tabTimes} type="text" placeholder="Ext"
-                                               onKeyDown={validateContactForSaving}
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
+                                               }
+                                               // onKeyDown={validateContactForSaving}
                                                onChange={e => setSelectedContact({
                                                    ...selectedContact,
                                                    phone_ext: e.target.value
@@ -4877,6 +5230,11 @@ const Customers = (props) => {
                                     </div>
                                     <div className="input-toggle-container">
                                         <input type="checkbox"
+                                               disabled={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
+                                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
+                                               }
                                                id={props.panelName + '-cbox-customer-contacts-primary-btn'}
                                                onChange={(e) => {
                                                    setSelectedContact({
@@ -4926,6 +5284,11 @@ const Customers = (props) => {
                                                 textOverflow: 'ellipsis',
                                                 whiteSpace: 'nowrap'
                                             }}
+                                            readOnly={
+                                                (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
+                                            }
                                             tabIndex={16 + props.tabTimes}
                                             type="text"
                                             placeholder="E-Mail"
@@ -5306,6 +5669,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={17 + props.tabTimes} type="text" placeholder="Notes"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
+                                           }
                                            onKeyDown={validateContactForSaving}
                                            onChange={e => setSelectedContact({
                                                ...selectedContact,
@@ -5326,7 +5694,12 @@ const Customers = (props) => {
                                 <div className="form-title">Automatic E-Mails</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => {
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
                                         if ((selectedCustomer?.id || 0) === 0) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -5397,7 +5770,12 @@ const Customers = (props) => {
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
 
-                                    <div className="mochi-button" onClick={() => {
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
                                         setTempAutomaticEmails([]);
                                         setTempBookedLoad(false);
                                         setTempCheckCalls(false);
@@ -5458,6 +5836,11 @@ const Customers = (props) => {
                                             }
                                             <SwiperSlide>
                                                 <input type="text"
+                                                       readOnly={
+                                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                                       }
                                                        tabIndex={29 + props.tabTimes}
                                                        placeholder="E-Mail To"
                                                        ref={refAutomaticEmailsTo}
@@ -5760,6 +6143,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-toggle-container">
                                     <input type="checkbox"
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                           }
                                            id={props.panelName + '-cbox-automatic-emails-booked-load-btn'}
                                            onChange={e => {
                                                setTempAutomaticEmails(tempAutomaticEmails.map((t, i) => {
@@ -5779,6 +6167,11 @@ const Customers = (props) => {
                                 <div className="input-toggle-container">
                                     <input type="checkbox"
                                            id={props.panelName + '-cbox-automatic-emails-check-calls-btn'}
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => {
                                                setTempAutomaticEmails(tempAutomaticEmails.map((t, i) => {
                                                    t.check_calls = e.target.checked ? 1 : 0;
@@ -5839,6 +6232,11 @@ const Customers = (props) => {
                                             <SwiperSlide>
                                                 <input type="text"
                                                        tabIndex={30 + props.tabTimes}
+                                                       readOnly={
+                                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                                       }
                                                        placeholder="E-Mail Cc"
                                                        ref={refAutomaticEmailsCc}
                                                        onKeyDown={async (e) => {
@@ -6145,6 +6543,11 @@ const Customers = (props) => {
                                 <div className="input-toggle-container">
                                     <input type="checkbox"
                                            id={props.panelName + '-cbox-automatic-emails-carrier-arrival-shipper-btn'}
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => {
                                                setTempAutomaticEmails(tempAutomaticEmails.map((t, i) => {
                                                    t.carrier_arrival_shipper = e.target.checked ? 1 : 0;
@@ -6164,6 +6567,11 @@ const Customers = (props) => {
                                 <div className="input-toggle-container">
                                     <input type="checkbox"
                                            id={props.panelName + '-cbox-automatic-emails-carrier-arrival-consignee-btn'}
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => {
                                                setTempAutomaticEmails(tempAutomaticEmails.map((t, i) => {
                                                    t.carrier_arrival_consignee = e.target.checked ? 1 : 0;
@@ -6226,6 +6634,11 @@ const Customers = (props) => {
                                             <SwiperSlide>
                                                 <input type="text"
                                                        tabIndex={31 + props.tabTimes}
+                                                       readOnly={
+                                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                                       }
                                                        placeholder="E-Mail Bcc"
                                                        ref={refAutomaticEmailsBcc}
                                                        onKeyDown={async (e) => {
@@ -6528,6 +6941,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-toggle-container">
                                     <input type="checkbox" id={props.panelName + '-cbox-automatic-emails-loaded-btn'}
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => {
                                                setTempAutomaticEmails(tempAutomaticEmails.map((t, i) => {
                                                    t.loaded = e.target.checked ? 1 : 0;
@@ -6545,6 +6963,11 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-toggle-container">
                                     <input type="checkbox" id={props.panelName + '-cbox-automatic-emails-empty-btn'}
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
+                                           }
                                            onChange={e => {
                                                setTempAutomaticEmails(tempAutomaticEmails.map((t, i) => {
                                                    t.empty = e.target.checked ? 1 : 0;
@@ -6574,7 +6997,13 @@ const Customers = (props) => {
 
                             <div className="form-row">
                                 <div className="input-toggle-container">
-                                    <input type="checkbox" id="cbox-aditional-documents-pod-btn"/>
+                                    <input type="checkbox" id="cbox-aditional-documents-pod-btn"
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer aditional documents required')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer aditional documents required')?.pivot?.edit || 0) === 0
+                                           }
+                                    />
                                     <label htmlFor="cbox-aditional-documents-pod-btn">
                                         <div className="label-text">POD</div>
                                         <div className="input-toggle-btn"></div>
@@ -6644,6 +7073,11 @@ const Customers = (props) => {
                                                     return (
                                                         <div className="contact-list-item" key={index}
                                                              onDoubleClick={async () => {
+                                                                 if (((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)){
+                                                                     return;
+                                                                 }
+
                                                                  let panel = {
                                                                      panelName: `${props.panelName}-contacts`,
                                                                      component: <Contacts
@@ -6654,6 +7088,7 @@ const Customers = (props) => {
                                                                          deletingContactUrl='/deleteContact'
                                                                          uploadAvatarUrl='/uploadAvatar'
                                                                          removeAvatarUrl='/removeAvatar'
+                                                                         permissionName='customer contacts'
                                                                          origin={props.origin}
                                                                          owner='customer'
                                                                          openPanel={props.openPanel}
@@ -6829,6 +7264,12 @@ const Customers = (props) => {
                                     {
                                         (selectedCustomer?.automatic_emails || []).map((item, index) => {
                                             return <div className="automatic-email-item" key={index} onClick={() => {
+                                                if ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0)){
+                                                    return;
+                                                }
+
                                                 let itemIndex = tempAutomaticEmails.findIndex(t => t.email === item.email && t.type === item.type);
                                                 let temp = [...tempAutomaticEmails];
 
@@ -6877,6 +7318,8 @@ const Customers = (props) => {
                                                 }
 
                                                 {
+                                                    ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.delete || 1) === 0) &&
                                                     <FontAwesomeIcon icon={faTrashAlt} style={{marginLeft: '0.3rem'}}
                                                                      onClick={(e) => {
                                                                          e.stopPropagation();
@@ -6914,8 +7357,7 @@ const Customers = (props) => {
                             justifyContent: 'space-between',
                             flexGrow: 1
                         }}>
-                            <div className="form-bordered-box"
-                                 style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
+                            <div className="form-bordered-box" style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
                                 <div className="form-header">
                                     <div className="top-border top-border-left"></div>
                                     <div className="form-title">Hours</div>
@@ -6926,6 +7368,11 @@ const Customers = (props) => {
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
                                         <input tabIndex={39 + props.tabTimes} type="text" placeholder="Open"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onBlur={(e) => validateHoursForSaving(e, 'hours open')}
                                                onChange={e => {
                                                    let hours = (selectedCustomer?.hours || {});
@@ -6937,6 +7384,11 @@ const Customers = (props) => {
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
                                         <input tabIndex={40 + props.tabTimes} type="text" placeholder="Close"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onBlur={(e) => validateHoursForSaving(e, 'hours close')}
                                                onChange={e => {
                                                    let hours = (selectedCustomer?.hours || {});
@@ -6950,6 +7402,11 @@ const Customers = (props) => {
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
                                         <input tabIndex={41 + props.tabTimes} type="text" placeholder="Open"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onBlur={(e) => validateHoursForSaving(e, 'hours open 2')}
                                                onChange={e => {
                                                    let hours = (selectedCustomer?.hours || {});
@@ -6961,6 +7418,11 @@ const Customers = (props) => {
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
                                         <input tabIndex={42 + props.tabTimes} type="text" placeholder="Close"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onBlur={(e) => validateHoursForSaving(e, 'hours close 2')}
                                                onChange={e => {
                                                    let hours = (selectedCustomer?.hours || {});
@@ -6972,8 +7434,7 @@ const Customers = (props) => {
                                 </div>
                             </div>
 
-                            <div className="form-bordered-box"
-                                 style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
+                            <div className="form-bordered-box" style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
                                 <div className="form-header">
                                     <div className="top-border top-border-left"></div>
                                     <div className="form-title">Delivery Hours</div>
@@ -6984,6 +7445,11 @@ const Customers = (props) => {
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
                                         <input tabIndex={43 + props.tabTimes} type="text" placeholder="Open"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onBlur={(e) => validateHoursForSaving(e, 'delivery hours open')}
                                                onChange={e => {
                                                    let hours = (selectedCustomer?.hours || {});
@@ -6995,6 +7461,11 @@ const Customers = (props) => {
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
                                         <input tabIndex={44 + props.tabTimes} type="text" placeholder="Close"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onBlur={(e) => validateHoursForSaving(e, 'delivery hours close')}
                                                onChange={e => {
                                                    let hours = (selectedCustomer?.hours || {});
@@ -7008,6 +7479,11 @@ const Customers = (props) => {
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
                                         <input tabIndex={45 + props.tabTimes} type="text" placeholder="Open"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onBlur={(e) => validateHoursForSaving(e, 'delivery hours open 2')}
                                                onChange={e => {
                                                    let hours = (selectedCustomer?.hours || {});
@@ -7019,6 +7495,11 @@ const Customers = (props) => {
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
                                         <input tabIndex={46 + props.tabTimes} type="text" placeholder="Close"
+                                               readOnly={
+                                                   (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                   (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
+                                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.edit || 0) === 0)
+                                               }
                                                onKeyDown={(e) => {
 
                                                    let key = e.keyCode || e.which;
@@ -7059,7 +7540,11 @@ const Customers = (props) => {
                                 <div className="form-title">Notes</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => {
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer notes')?.pivot?.edit || 0) === 0))
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
                                         if ((selectedCustomer?.id || 0) === 0) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -7124,7 +7609,11 @@ const Customers = (props) => {
                                 <div className="form-title">Directions</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => {
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer directions')?.pivot?.edit || 0) === 0))
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
                                         if ((selectedCustomer?.id || 0) === 0) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -7270,19 +7759,17 @@ const Customers = (props) => {
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
 
-                {/* <div className="mochi-button wrap" onClick={laneHistoryBtnClick}>
-                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                    <div className="mochi-button-base">Lane History</div>
-                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                </div> */}
-
                 <div className="mochi-button wrap" onClick={documentsBtnClick}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">Documents</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
 
-                <div className="mochi-button wrap" onClick={() => {
+                <div className={
+                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                        (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer print customer info')?.pivot?.edit || 0) === 0))
+                        ? 'mochi-button disabled wrap' : 'mochi-button wrap'
+                } onClick={() => {
                     if ((selectedCustomer?.id || 0) === 0) {
                         window.alert('There is nothing to print!');
                         return;
@@ -7295,13 +7782,21 @@ const Customers = (props) => {
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
 
-                <div className="mochi-button wrap">
+                <div className={
+                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                        (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer email customer')?.pivot?.edit || 0) === 0))
+                        ? 'mochi-button disabled wrap' : 'mochi-button wrap'
+                }>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">E-Mail Customer</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
 
-                <div className="mochi-button wrap">
+                <div className={
+                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                        (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer crm')?.pivot?.edit || 0) === 0))
+                        ? 'mochi-button disabled wrap' : 'mochi-button wrap'
+                }>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">CRM</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -7322,8 +7817,14 @@ const Customers = (props) => {
                             savingDataUrl='/saveCustomerNote'
                             deletingDataUrl='/deleteCustomerNote'
                             type='note'
-                            isEditable={props.isAdmin}
-                            isDeletable={props.isAdmin}
+                            isEditable={
+                                ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer notes')?.pivot?.edit || 0) === 1))
+                            }
+                            isDeletable={
+                                ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer notes')?.pivot?.delete || 0) === 1))
+                            }
                             isAdding={selectedNote.id === 0}
                         />
                     </animated.div>
@@ -7344,8 +7845,14 @@ const Customers = (props) => {
                             savingDataUrl='/saveCustomerDirection'
                             deletingDataUrl='/deleteCustomerDirection'
                             type='direction'
-                            isEditable={true}
-                            isDeletable={true}
+                            isEditable={
+                                ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer directions')?.pivot?.edit || 0) === 1))
+                            }
+                            isDeletable={
+                                ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer directions')?.pivot?.delete || 0) === 1))
+                            }
                             isAdding={selectedDirection.id === 0}/>
                     </animated.div>
                 ))

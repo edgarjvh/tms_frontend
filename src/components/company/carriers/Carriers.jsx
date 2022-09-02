@@ -1,23 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, {useState, useRef, useEffect} from 'react';
+import {connect} from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
 import './Carriers.css';
-import { useTransition, animated } from 'react-spring';
+import {useTransition, animated} from 'react-spring';
 import moment from 'moment';
 import MaskedInput from 'react-text-mask';
 import PanelContainer from './panels/panel-container/PanelContainer.jsx';
 // import CarrierModal from './modal/Modal.jsx';
 import accounting from 'accounting';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
-import { useDetectClickOutside } from "react-detect-click-outside";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {
+    faCaretDown,
+    faCaretRight,
+    faCalendarAlt,
+    faPencilAlt,
+    faPen,
+    faCheck,
+    faCopy
+} from '@fortawesome/free-solid-svg-icons';
+import {useDetectClickOutside} from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
 import "react-datepicker/dist/react-datepicker.css";
 import Rating from '@material-ui/lab/Rating';
 import axios from 'axios';
 import ToPrint from './ToPrint.jsx';
-import { useReactToPrint } from 'react-to-print';
+import {useReactToPrint} from 'react-to-print';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import {
@@ -83,7 +91,11 @@ const Carriers = (props) => {
     const [insurancesScrollBarVisible, setInsurancesScrollBarVisible] = useState(false);
     const [carrierContactPhoneItems, setCarrierContactPhoneItems] = useState([]);
     const [showCarrierContactPhones, setShowCarrierContactPhones] = useState(false);
-    const refCarrierContactPhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowCarrierContactPhones(false) } });
+    const refCarrierContactPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowCarrierContactPhones(false)
+        }
+    });
     const refCarrierContactPhonePopupItems = useRef([]);
 
     const [showCarrierEmailCopyBtn, setShowCarrierEmailCopyBtn] = useState(false);
@@ -96,42 +108,84 @@ const Carriers = (props) => {
     const refCarrierContactEmail = useRef();
     const [carrierContactEmailItems, setCarrierContactEmailItems] = useState([]);
     const [showCarrierContactEmails, setShowCarrierContactEmails] = useState(false);
-    const refCarrierContactEmailDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowCarrierContactEmails(false) } });
+    const refCarrierContactEmailDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowCarrierContactEmails(false)
+        }
+    });
     const refCarrierContactEmailPopupItems = useRef([]);
 
     const refMailingContactName = useRef();
     const [mailingContactNameItems, setMailingContactNameItems] = useState([]);
     const [showMailingContactNames, setShowMailingContactNames] = useState(false);
-    const refMailingContactNameDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowMailingContactNames(false) } });
+    const refMailingContactNameDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowMailingContactNames(false)
+        }
+    });
     const refMailingContactNamePopupItems = useRef([]);
 
     const refMailingContactPhone = useRef();
     const [mailingContactPhoneItems, setMailingContactPhoneItems] = useState([]);
     const [showMailingContactPhones, setShowMailingContactPhones] = useState(false);
-    const refMailingContactPhoneDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowMailingContactPhones(false) } });
+    const refMailingContactPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowMailingContactPhones(false)
+        }
+    });
     const refMailingContactPhonePopupItems = useRef([]);
 
     const refMailingContactEmail = useRef();
     const [mailingContactEmailItems, setMailingContactEmailItems] = useState([]);
     const [showMailingContactEmails, setShowMailingContactEmails] = useState(false);
-    const refMailingContactEmailDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowMailingContactEmails(false) } });
+    const refMailingContactEmailDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowMailingContactEmails(false)
+        }
+    });
     const refMailingContactEmailPopupItems = useRef([]);
 
     const [preSelectedExpirationDate, setPreSelectedExpirationDate] = useState(moment());
     const [insuranceTypeDropdownItems, setInsuranceTypeDropdownItems] = useState([]);
-    const refInsuranceTypeDropDown = useDetectClickOutside({ onTriggered: async () => { await setInsuranceTypeDropdownItems([]) } });
+    const refInsuranceTypeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setInsuranceTypeDropdownItems([])
+        }
+    });
     const refInsuranceTypePopupItems = useRef([]);
 
     const [insuranceCompanyDropdownItems, setInsuranceCompanyDropdownItems] = useState([]);
-    const refInsuranceCompanyDropDown = useDetectClickOutside({ onTriggered: async () => { await setInsuranceCompanyDropdownItems([]) } });
+    const refInsuranceCompanyDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setInsuranceCompanyDropdownItems([])
+        }
+    });
     const refInsuranceCompanyPopupItems = useRef([]);
 
     const [driverEquipmentDropdownItems, setDriverEquipmentDropdownItems] = useState([]);
-    const refDriverEquipmentDropDown = useDetectClickOutside({ onTriggered: async () => { await setDriverEquipmentDropdownItems([]) } });
+    const refDriverEquipmentDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setDriverEquipmentDropdownItems([])
+        }
+    });
     const refDriverEquipmentPopupItems = useRef([]);
 
     const [isCalendarShown, setIsCalendarShown] = useState(false);
-    const refInsuranceCalendarDropDown = useDetectClickOutside({ onTriggered: async () => { await setIsCalendarShown(false) } });
+    const refInsuranceCalendarDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setIsCalendarShown(false)
+        }
+    });
+
+    const refFactoringCompanyContactName = useRef();
+    const [factoringCompanyContactNameItems, setFactoringCompanyContactNameItems] = useState([]);
+    const [showFactoringCompanyContactNames, setShowFactoringCompanyContactNames] = useState(false);
+    const refFactoringCompanyContactNameDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowFactoringCompanyContactNames(false)
+        }
+    });
+    const refFactoringCompanyContactNamePopupItems = useRef([]);
 
     const [isSavingCarrier, setIsSavingCarrier] = useState(false);
     const [isSavingContact, setIsSavingContact] = useState(false);
@@ -149,105 +203,113 @@ const Carriers = (props) => {
     const [showingACHWiringInfo, setShowingACHWiringInfo] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
-        from: { opacity: 0, display: 'block' },
-        enter: { opacity: 1, display: 'block' },
-        leave: { opacity: 0, display: 'none' },
+        from: {opacity: 0, display: 'block'},
+        enter: {opacity: 1, display: 'block'},
+        leave: {opacity: 0, display: 'none'},
         reverse: isLoading,
     });
 
     const loadingCarrierOrdersTransition = useTransition(isLoadingCarrierOrders, {
-        from: { opacity: 0, display: 'block' },
-        enter: { opacity: 1, display: 'block' },
-        leave: { opacity: 0, display: 'none' },
+        from: {opacity: 0, display: 'block'},
+        enter: {opacity: 1, display: 'block'},
+        leave: {opacity: 0, display: 'none'},
         reverse: isLoadingCarrierOrders,
     });
 
     const carrierContactPhonesTransition = useTransition(showCarrierContactPhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showCarrierContactPhones
     });
 
     const carrierContactEmailsTransition = useTransition(showCarrierContactEmails, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showCarrierContactEmails
     });
 
     const equipmentTransition = useTransition(driverEquipmentDropdownItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: driverEquipmentDropdownItems.length > 0
     });
 
     const mailingContactNamesTransition = useTransition(showMailingContactNames, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showMailingContactNames
     });
 
     const mailingContactPhonesTransition = useTransition(showMailingContactPhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showMailingContactPhones
     });
 
     const mailingContactEmailsTransition = useTransition(showMailingContactEmails, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: showMailingContactEmails
     });
 
     const insuranceTypeTransition = useTransition(insuranceTypeDropdownItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: insuranceTypeDropdownItems.length > 0
     });
 
     const insuranceCompanyTransition = useTransition(insuranceCompanyDropdownItems.length > 0, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
         reverse: insuranceCompanyDropdownItems.length > 0
     });
 
+    const factoringCompanyContactNamesTransition = useTransition(showFactoringCompanyContactNames, {
+        from: {opacity: 0, top: 'calc(-165px + 7px)'},
+        enter: {opacity: 1, top: 'calc(-165px + 12px)'},
+        leave: {opacity: 0, top: 'calc(-165px + 7px)'},
+        config: {duration: 100},
+        reverse: showFactoringCompanyContactNames
+    });
+
     const calendarTransition = useTransition(isCalendarShown, {
-        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
         reverse: isCalendarShown,
-        config: { duration: 100 }
+        config: {duration: 100}
     });
 
     const noteTransition = useTransition(selectedNote?.id !== undefined, {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: selectedNote?.id !== undefined,
-        config: { duration: 100 }
+        config: {duration: 100}
     });
 
     const achWiringInfoTransition = useTransition(showingACHWiringInfo, {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: showingACHWiringInfo,
-        config: { duration: 100 },
+        config: {duration: 100},
     });
 
 
@@ -284,7 +346,21 @@ const Carriers = (props) => {
 
     useEffect(() => {
         if (isSavingCarrier) {
-            let newSelectedCarrier = { ...selectedCarrier };
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedCarrier?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0) {
+                        setIsSavingCarrier(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0) {
+                        setIsSavingCarrier(false);
+                        return;
+                    }
+                }
+            }
+
+            let newSelectedCarrier = {...selectedCarrier};
 
             if (newSelectedCarrier.id === undefined || newSelectedCarrier.id === -1) {
                 newSelectedCarrier.id = 0;
@@ -368,6 +444,20 @@ const Carriers = (props) => {
 
     useEffect(() => {
         if (isSavingContact) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedContact?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0) {
+                        setIsSavingContact(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0) {
+                        setIsSavingContact(false);
+                        return;
+                    }
+                }
+            }
+
             if ((selectedCarrier?.id || 0) === 0) {
                 setIsSavingContact(false);
                 return;
@@ -380,7 +470,7 @@ const Carriers = (props) => {
                 contact.carrier_id = selectedCarrier.id;
             }
 
-            if ((contact.first_name || '').trim() === '' ||                
+            if ((contact.first_name || '').trim() === '' ||
                 ((contact.phone_work || '').trim() === '' &&
                     (contact.phone_work_fax || '').trim() === '' &&
                     (contact.phone_mobile || '').trim() === '' &&
@@ -419,7 +509,7 @@ const Carriers = (props) => {
                                 }
                             }
                         });
-                        setSelectedContact({ ...res.data.contact });
+                        setSelectedContact({...res.data.contact});
 
                         contacts = res.data.contacts;
 
@@ -441,14 +531,28 @@ const Carriers = (props) => {
 
                     setIsSavingContact(false);
                 }).catch(e => {
-                    console.log('error on saving carrier contact', e);
-                    setIsSavingContact(false);
-                });
+                console.log('error on saving carrier contact', e);
+                setIsSavingContact(false);
+            });
         }
     }, [isSavingContact]);
 
     useEffect(() => {
         if (isSavingMailingAddress) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedCarrier?.mailing_address?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0) {
+                        setIsSavingMailingAddress(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0) {
+                        setIsSavingMailingAddress(false);
+                        return;
+                    }
+                }
+            }
+
             if ((selectedCarrier.id || 0) > 0) {
                 let mailing_address = selectedCarrier.mailing_address || {};
 
@@ -512,6 +616,20 @@ const Carriers = (props) => {
 
     useEffect(() => {
         if (isSavingFactoringCompany) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedCarrier?.factoring_company?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0) {
+                        setIsSavingFactoringCompany(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0) {
+                        setIsSavingFactoringCompany(false);
+                        return;
+                    }
+                }
+            }
+
             let factoring_company = selectedCarrier?.factoring_company || {};
 
             if (factoring_company.id === undefined) {
@@ -543,10 +661,16 @@ const Carriers = (props) => {
 
                 factoring_company.code = newCode.toUpperCase();
 
-                axios.post(props.serverUrl + '/saveFactoringCompany', { ...factoring_company, carrier_id: (selectedCarrier?.id || null) })
+                axios.post(props.serverUrl + '/saveFactoringCompany', {
+                    ...factoring_company,
+                    carrier_id: (selectedCarrier?.id || null)
+                })
                     .then(async res => {
                         if (res.data.result === 'OK') {
-                            await setSelectedCarrier({ ...selectedCarrier, factoring_company: res.data.factoring_company });
+                            await setSelectedCarrier({
+                                ...selectedCarrier,
+                                factoring_company: res.data.factoring_company
+                            });
                         }
                         setIsSavingFactoringCompany(false);
                     })
@@ -564,10 +688,10 @@ const Carriers = (props) => {
         if ((props.carrier_id || 0) > 0) {
             setIsLoading(true);
 
-            axios.post(props.serverUrl + '/getCarrierById', { id: props.carrier_id }).then(res => {
+            axios.post(props.serverUrl + '/getCarrierById', {id: props.carrier_id}).then(res => {
                 if (res.data.result === 'OK') {
-                    setSelectedCarrier({ ...res.data.carrier });
-                    setSelectedContact({ ...(res.data.carrier.contact || []).find(c => c.is_primary === 1) });
+                    setSelectedCarrier({...res.data.carrier});
+                    setSelectedContact({...(res.data.carrier.contact || []).find(c => c.is_primary === 1)});
                     setSelectedDriver({});
                     setSelectedInsurance({});
                 }
@@ -684,9 +808,21 @@ const Carriers = (props) => {
 
     useEffect(async () => {
         let emails = [];
-        (selectedCarrier?.mailing_address?.mailing_contact?.email_work || '') !== '' && emails.push({ id: 1, type: 'work', email: selectedCarrier?.mailing_address?.mailing_contact.email_work });
-        (selectedCarrier?.mailing_address?.mailing_contact?.email_personal || '') !== '' && emails.push({ id: 2, type: 'personal', email: selectedCarrier?.mailing_address?.mailing_contact.email_personal });
-        (selectedCarrier?.mailing_address?.mailing_contact?.email_other || '') !== '' && emails.push({ id: 3, type: 'other', email: selectedCarrier?.mailing_address?.mailing_contact.email_other });
+        (selectedCarrier?.mailing_address?.mailing_contact?.email_work || '') !== '' && emails.push({
+            id: 1,
+            type: 'work',
+            email: selectedCarrier?.mailing_address?.mailing_contact.email_work
+        });
+        (selectedCarrier?.mailing_address?.mailing_contact?.email_personal || '') !== '' && emails.push({
+            id: 2,
+            type: 'personal',
+            email: selectedCarrier?.mailing_address?.mailing_contact.email_personal
+        });
+        (selectedCarrier?.mailing_address?.mailing_contact?.email_other || '') !== '' && emails.push({
+            id: 3,
+            type: 'other',
+            email: selectedCarrier?.mailing_address?.mailing_contact.email_other
+        });
 
         await setMailingContactEmailItems(emails);
     }, [
@@ -698,11 +834,31 @@ const Carriers = (props) => {
 
     useEffect(async () => {
         let phones = [];
-        (selectedContact?.phone_work || '') !== '' && phones.push({ id: 1, type: 'work', phone: selectedContact.phone_work });
-        (selectedContact?.phone_work_fax || '') !== '' && phones.push({ id: 2, type: 'fax', phone: selectedContact.phone_work_fax });
-        (selectedContact?.phone_mobile || '') !== '' && phones.push({ id: 3, type: 'mobile', phone: selectedContact.phone_mobile });
-        (selectedContact?.phone_direct || '') !== '' && phones.push({ id: 4, type: 'direct', phone: selectedContact.phone_direct });
-        (selectedContact?.phone_other || '') !== '' && phones.push({ id: 5, type: 'other', phone: selectedContact.phone_other });
+        (selectedContact?.phone_work || '') !== '' && phones.push({
+            id: 1,
+            type: 'work',
+            phone: selectedContact.phone_work
+        });
+        (selectedContact?.phone_work_fax || '') !== '' && phones.push({
+            id: 2,
+            type: 'fax',
+            phone: selectedContact.phone_work_fax
+        });
+        (selectedContact?.phone_mobile || '') !== '' && phones.push({
+            id: 3,
+            type: 'mobile',
+            phone: selectedContact.phone_mobile
+        });
+        (selectedContact?.phone_direct || '') !== '' && phones.push({
+            id: 4,
+            type: 'direct',
+            phone: selectedContact.phone_direct
+        });
+        (selectedContact?.phone_other || '') !== '' && phones.push({
+            id: 5,
+            type: 'other',
+            phone: selectedContact.phone_other
+        });
 
         await setCarrierContactPhoneItems(phones);
     }, [
@@ -716,9 +872,21 @@ const Carriers = (props) => {
 
     useEffect(async () => {
         let emails = [];
-        (selectedContact?.email_work || '') !== '' && emails.push({ id: 1, type: 'work', email: selectedContact.email_work });
-        (selectedContact?.email_personal || '') !== '' && emails.push({ id: 2, type: 'personal', email: selectedContact.email_personal });
-        (selectedContact?.email_other || '') !== '' && emails.push({ id: 3, type: 'other', email: selectedContact.email_other });
+        (selectedContact?.email_work || '') !== '' && emails.push({
+            id: 1,
+            type: 'work',
+            email: selectedContact.email_work
+        });
+        (selectedContact?.email_personal || '') !== '' && emails.push({
+            id: 2,
+            type: 'personal',
+            email: selectedContact.email_personal
+        });
+        (selectedContact?.email_other || '') !== '' && emails.push({
+            id: 3,
+            type: 'other',
+            email: selectedContact.email_other
+        });
 
         await setCarrierContactEmailItems(emails);
     }, [
@@ -730,11 +898,31 @@ const Carriers = (props) => {
 
     useEffect(async () => {
         let phones = [];
-        (selectedCarrier?.mailing_address?.mailing_contact?.phone_work || '') !== '' && phones.push({ id: 1, type: 'work', phone: selectedCarrier?.mailing_address?.mailing_contact.phone_work });
-        (selectedCarrier?.mailing_address?.mailing_contact?.phone_work_fax || '') !== '' && phones.push({ id: 2, type: 'fax', phone: selectedCarrier?.mailing_address?.mailing_contact.phone_work_fax });
-        (selectedCarrier?.mailing_address?.mailing_contact?.phone_mobile || '') !== '' && phones.push({ id: 3, type: 'mobile', phone: selectedCarrier?.mailing_address?.mailing_contact.phone_mobile });
-        (selectedCarrier?.mailing_address?.mailing_contact?.phone_direct || '') !== '' && phones.push({ id: 4, type: 'direct', phone: selectedCarrier?.mailing_address?.mailing_contact.phone_direct });
-        (selectedCarrier?.mailing_address?.mailing_contact?.phone_other || '') !== '' && phones.push({ id: 5, type: 'other', phone: selectedCarrier?.mailing_address?.mailing_contact.phone_other });
+        (selectedCarrier?.mailing_address?.mailing_contact?.phone_work || '') !== '' && phones.push({
+            id: 1,
+            type: 'work',
+            phone: selectedCarrier?.mailing_address?.mailing_contact.phone_work
+        });
+        (selectedCarrier?.mailing_address?.mailing_contact?.phone_work_fax || '') !== '' && phones.push({
+            id: 2,
+            type: 'fax',
+            phone: selectedCarrier?.mailing_address?.mailing_contact.phone_work_fax
+        });
+        (selectedCarrier?.mailing_address?.mailing_contact?.phone_mobile || '') !== '' && phones.push({
+            id: 3,
+            type: 'mobile',
+            phone: selectedCarrier?.mailing_address?.mailing_contact.phone_mobile
+        });
+        (selectedCarrier?.mailing_address?.mailing_contact?.phone_direct || '') !== '' && phones.push({
+            id: 4,
+            type: 'direct',
+            phone: selectedCarrier?.mailing_address?.mailing_contact.phone_direct
+        });
+        (selectedCarrier?.mailing_address?.mailing_contact?.phone_other || '') !== '' && phones.push({
+            id: 5,
+            type: 'other',
+            phone: selectedCarrier?.mailing_address?.mailing_contact.phone_other
+        });
 
         await setMailingContactPhoneItems(phones);
     }, [
@@ -759,7 +947,7 @@ const Carriers = (props) => {
         setShowingContactList(true);
         setSelectedDriver({});
         setSelectedInsurance({})
-        setSelectedCarrier({ id: 0, code: clearCode ? '' : selectedCarrier.code });
+        setSelectedCarrier({id: 0, code: clearCode ? '' : selectedCarrier.code});
 
         // refCarrierCode.current.focus();
     }
@@ -816,9 +1004,9 @@ const Carriers = (props) => {
                 callback={(id) => {
                     new Promise((resolve, reject) => {
                         if ((id || 0) > 0) {
-                            axios.post(props.serverUrl + '/getCarrierById', { id: id }).then(res => {
+                            axios.post(props.serverUrl + '/getCarrierById', {id: id}).then(res => {
                                 if (res.data.result === 'OK') {
-                                    setSelectedCarrier({ ...res.data.carrier });
+                                    setSelectedCarrier({...res.data.carrier});
                                     setSelectedContact((res.data.carrier.contacts || []).find(c => c.is_primary === 1) || {});
                                     setSelectedInsurance({});
                                     setSelectedDriver({});
@@ -874,7 +1062,7 @@ const Carriers = (props) => {
                             let carrier = res.data.carriers[0];
                             setInitialValues();
 
-                            setSelectedCarrier({ ...carrier });
+                            setSelectedCarrier({...carrier});
                             setSelectedContact((carrier.contacts || []).find(c => c.is_primary === 1) || {});
                             setSelectedInsurance({});
                             setSelectedDriver({});
@@ -889,7 +1077,7 @@ const Carriers = (props) => {
                                     component_id: props.componentId
                                 });
                             }
-                            
+
                             getCarrierOrders(carrier);
                         } else {
                             setInitialValues(false);
@@ -911,7 +1099,7 @@ const Carriers = (props) => {
 
     const getFactoringCompanyByCode = (e) => {
         let key = e.keyCode || e.which;
-        let _selectedCarrier = { ...selectedCarrier };
+        let _selectedCarrier = {...selectedCarrier};
 
         if (key === 9) {
             if (e.target.value.trim() === '') {
@@ -922,7 +1110,7 @@ const Carriers = (props) => {
 
                 validateCarrierForSaving(e);
             } else {
-                axios.post(props.serverUrl + '/factoringCompanies', { code: e.target.value.trim().toLowerCase() }).then(async res => {
+                axios.post(props.serverUrl + '/factoringCompanies', {code: e.target.value.trim().toLowerCase()}).then(async res => {
                     if (res.data.result === 'OK') {
                         if (res.data.factoring_companies.length > 0) {
                             setSelectedCarrier(selectedCarrier => {
@@ -1035,13 +1223,13 @@ const Carriers = (props) => {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-                contactSearch={{ search: filters }}
+                contactSearch={{search: filters}}
 
                 callback={(contact) => {
                     new Promise((resolve, reject) => {
                         if (contact) {
-                            setSelectedCarrier({ ...contact.carrier });
-                            setSelectedContact({ ...(contact.carrier.contacts || []).find(c => c.is_primary === 1) });
+                            setSelectedCarrier({...contact.carrier});
+                            setSelectedContact({...(contact.carrier.contacts || []).find(c => c.is_primary === 1)});
 
                             setShowingContactList(true);
                             setContactSearch({});
@@ -1075,12 +1263,18 @@ const Carriers = (props) => {
     }
 
     const clearMailingAddressBtn = async () => {
-        await setSelectedCarrier({ ...selectedCarrier, mailing_address: {} });
+        await setSelectedCarrier({...selectedCarrier, mailing_address: {}});
 
         if (selectedCarrier.id || 0 > 0) {
-            await axios.post(props.serverUrl + '/deleteCarrierMailingAddress', { carrier_id: (selectedCarrier.id || 0) }).then(async res => {
+            if ((props.user?.is_admin || 0) === 0) {
+                if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.delete || 0) === 0) {
+                    return;
+                }
+            }
+
+            await axios.post(props.serverUrl + '/deleteCarrierMailingAddress', {carrier_id: (selectedCarrier.id || 0)}).then(async res => {
                 if (res.data.result === 'OK') {
-                    await setSelectedCarrier({ ...selectedCarrier, mailing_address: {} });
+                    await setSelectedCarrier({...selectedCarrier, mailing_address: {}});
                 }
             }).catch(e => {
                 console.log('error removing carrier mailing address', e);
@@ -1089,6 +1283,18 @@ const Carriers = (props) => {
     }
 
     const remitToAddressBtn = (e) => {
+        if ((props.user?.is_admin || 0) === 0) {
+            if ((selectedCarrier?.mailing_address?.id || 0) > 0) {
+                if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0) {
+                    return;
+                }
+            } else {
+                if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0) {
+                    return;
+                }
+            }
+        }
+
         if (selectedCarrier.id === undefined) {
             window.alert('You must select a carrier first!');
             return;
@@ -1189,9 +1395,9 @@ const Carriers = (props) => {
             mailing_address.mailing_contact_primary_email = 'work';
         }
 
-        setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
+        setSelectedCarrier({...selectedCarrier, mailing_address: mailing_address});
 
-        validateMailingAddressToSave({ keyCode: 9 });
+        validateMailingAddressToSave({keyCode: 9});
     }
 
     const validateFactoringCompanyToSave = (e) => {
@@ -1273,13 +1479,13 @@ const Carriers = (props) => {
                                             factoring_company_id: res.data.factoring_company.id
                                         }
                                     });
-    
-                                    validateCarrierForSaving({ keyCode: 9 });
-    
+
+                                    validateCarrierForSaving({keyCode: 9});
+
                                     resolve('OK');
                                 }).catch(e => {
 
-                                });                                
+                                });
                             } else {
                                 let panel = {
                                     panelName: `${props.panelName}-factoring-company`,
@@ -1350,9 +1556,9 @@ const Carriers = (props) => {
     }
 
     const clearFactoringCompanyBtnClick = () => {
-        let _selectedCarrier = { ...selectedCarrier };
+        let _selectedCarrier = {...selectedCarrier};
         _selectedCarrier.factoring_company_id = null;
-        
+
         setSelectedCarrier(selectedCarrier => {
             return {
                 ..._selectedCarrier,
@@ -1360,6 +1566,17 @@ const Carriers = (props) => {
             }
         });
 
+        if ((props.user?.is_admin || 0) === 0) {
+            if ((selectedCarrier?.factoring_company?.id || 0) > 0) {
+                if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0) {
+                    return;
+                }
+            } else {
+                if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0) {
+                    return;
+                }
+            }
+        }
 
         if (_selectedCarrier.id || 0 > 0) {
             axios.post(props.serverUrl + '/saveCarrier', _selectedCarrier).then(res => {
@@ -1392,15 +1609,31 @@ const Carriers = (props) => {
         mywindow.document.write('</body></html>');
         mywindow.document.close();
         mywindow.focus();
-        setTimeout(function () { mywindow.print(); }, 1000);
+        setTimeout(function () {
+            mywindow.print();
+        }, 1000);
 
         return true;
     }
 
     useEffect(() => {
         if (isSavingDriver) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedDriver?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0) {
+                        setIsSavingDriver(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0) {
+                        setIsSavingDriver(false);
+                        return;
+                    }
+                }
+            }
+
             if ((selectedCarrier?.id || 0) > 0) {
-                let driver = { ...selectedDriver, carrier_id: selectedCarrier.id };
+                let driver = {...selectedDriver, carrier_id: selectedCarrier.id};
 
                 if ((driver?.first_name || '').trim() !== '') {
 
@@ -1456,7 +1689,21 @@ const Carriers = (props) => {
 
     useEffect(() => {
         if (isSavingInsurance) {
-            let insurance = { ...selectedInsurance, carrier_id: (selectedCarrier?.id || 0) };
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedInsurance?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 0) {
+                        setIsSavingInsurance(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 0) {
+                        setIsSavingInsurance(false);
+                        return;
+                    }
+                }
+            }
+
+            let insurance = {...selectedInsurance, carrier_id: (selectedCarrier?.id || 0)};
 
             if ((insurance.insurance_type_id || 0) > 0 &&
                 (insurance.company || '') !== '' &&
@@ -1522,7 +1769,7 @@ const Carriers = (props) => {
             if (isCalendarShown) {
                 expiration_date = preSelectedExpirationDate.clone().format('MM/DD/YYYY');
 
-                let insurance = { ...selectedInsurance, carrier_id: selectedCarrier.id };
+                let insurance = {...selectedInsurance, carrier_id: selectedCarrier.id};
                 insurance.expiration_date = expiration_date;
 
                 await setSelectedInsurance(insurance);
@@ -1603,7 +1850,7 @@ const Carriers = (props) => {
                     openPanel={props.openPanel}
                     closePanel={props.closePanel}
                     componentId={moment().format('x')}
-                    selectedOwner={{ ...selectedCarrier }}
+                    selectedOwner={{...selectedCarrier}}
                     selectedOwnerDocument={{
                         id: 0,
                         user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -1613,6 +1860,7 @@ const Carriers = (props) => {
                     deletingDocumentUrl='/deleteCarrierDocument'
                     savingDocumentNoteUrl='/saveCarrierDocumentNote'
                     serverDocumentsFolder='/carrier-documents/'
+                    permissionName='carrier documents'
                 />
             }
 
@@ -1822,9 +2070,9 @@ const Carriers = (props) => {
 
             {
                 loadingTransition((style, item) => item &&
-                    <animated.div className='loading-container' style={style} >
+                    <animated.div className='loading-container' style={style}>
                         <div className="loading-container-wrapper">
-                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
                         </div>
                     </animated.div>
                 )
@@ -1832,7 +2080,7 @@ const Carriers = (props) => {
 
             {
                 (selectedCarrier?.id || 0) > 0 &&
-                <div style={{ display: 'none' }}>
+                <div style={{display: 'none'}}>
                     <ToPrint
                         ref={refPrintCarrierInformation}
                         selectedCarrier={selectedCarrier}
@@ -1855,7 +2103,7 @@ const Carriers = (props) => {
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
                                 {
-                                    (props.isAdmin || false) &&
+                                    ((props.user?.user_code?.is_admin || 0) === 1) &&
                                     <div className="mochi-button" onClick={importCarrierBtnClick}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Import</div>
@@ -1882,129 +2130,176 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container input-code">
                                 <input tabIndex={43 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                    ref={refCarrierCode}
-                                    onKeyDown={searchCarrierByCode}
-                                    onInput={e => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            code: e.target.value,
-                                            code_number: 0
-                                        })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            code: e.target.value,
-                                            code_number: 0
-                                        })
-                                    }}
-                                    value={(selectedCarrier.code_number || 0) === 0 ? (selectedCarrier.code || '') : selectedCarrier.code + selectedCarrier.code_number}
+                                       ref={refCarrierCode}
+                                       onKeyDown={searchCarrierByCode}
+                                       onInput={e => {
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               code: e.target.value,
+                                               code_number: 0
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               code: e.target.value,
+                                               code_number: 0
+                                           })
+                                       }}
+                                       value={(selectedCarrier.code_number || 0) === 0 ? (selectedCarrier.code || '') : selectedCarrier.code + selectedCarrier.code_number}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={44 + props.tabTimes} type="text" placeholder="Name"
-                                    ref={refCarrierName}
-                                    // onKeyDown={validateCarrierForSaving} 
-                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, name: e.target.value })}
-                                    value={selectedCarrier.name || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       ref={refCarrierName}
+                                       onChange={e => setSelectedCarrier({...selectedCarrier, name: e.target.value})}
+                                       value={selectedCarrier.name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={45 + props.tabTimes} type="text" placeholder="Address 1"
-                                    // onKeyDown={validateCarrierForSaving} 
-                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, address1: e.target.value })}
-                                    value={selectedCarrier.address1 || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => setSelectedCarrier({
+                                           ...selectedCarrier,
+                                           address1: e.target.value
+                                       })}
+                                       value={selectedCarrier.address1 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={46 + props.tabTimes} type="text" placeholder="Address 2"
-                                    // onKeyDown={validateCarrierForSaving} 
-                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, address2: e.target.value })}
-                                    value={selectedCarrier.address2 || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => setSelectedCarrier({
+                                           ...selectedCarrier,
+                                           address2: e.target.value
+                                       })}
+                                       value={selectedCarrier.address2 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={47 + props.tabTimes} type="text" placeholder="City"
-                                    // onKeyDown={validateCarrierForSaving} 
-                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, city: e.target.value })}
-                                    value={selectedCarrier.city || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => setSelectedCarrier({...selectedCarrier, city: e.target.value})}
+                                       value={selectedCarrier.city || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-state">
                                 <input tabIndex={48 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                    // onKeyDown={validateCarrierForSaving} 
-                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, state: e.target.value })}
-                                    value={selectedCarrier.state || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => setSelectedCarrier({...selectedCarrier, state: e.target.value})}
+                                       value={selectedCarrier.state || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-zip-code">
                                 <input tabIndex={49 + props.tabTimes} type="text" placeholder="Postal Code"
-                                    onKeyDown={validateCarrierForSaving}
-                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, zip: e.target.value })}
-                                    value={selectedCarrier.zip || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={validateCarrierForSaving}
+                                       onChange={e => setSelectedCarrier({...selectedCarrier, zip: e.target.value})}
+                                       value={selectedCarrier.zip || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={50 + props.tabTimes} type="text" placeholder="Contact Name"
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, contact_name: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, contact_name: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.contact_name || '')
-                                            ? ''
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name                                            
-                                    }
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       onInput={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, contact_name: e.target.value})
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, contact_name: e.target.value})
+                                           }
+                                       }}
+                                       value={
+                                           (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.contact_name || '')
+                                               // ? ''
+                                               : selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name
+                                       }
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="input-box-container input-phone" style={{ position: 'relative' }}>
+                            <div className="input-box-container input-phone" style={{position: 'relative'}}>
                                 <MaskedInput tabIndex={51 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text" placeholder="Contact Phone"
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, contact_phone: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, contact_phone: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.contact_phone || '')
-                                            ? ''
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
-                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work
-                                                : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
-                                                    ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                                    : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
-                                                        ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                                        : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
-                                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_direct
-                                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
-                                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_other
-                                                                : ''
-                                    }
+                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={true}
+                                             type="text" placeholder="Contact Phone"
+                                             readOnly={
+                                                 (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                             }
+                                             onInput={(e) => {
+                                                 if ((selectedCarrier?.contacts || []).length === 0) {
+                                                     setSelectedCarrier({
+                                                         ...selectedCarrier,
+                                                         contact_phone: e.target.value
+                                                     })
+                                                 }
+                                             }}
+                                             onChange={(e) => {
+                                                 if ((selectedCarrier?.contacts || []).length === 0) {
+                                                     setSelectedCarrier({
+                                                         ...selectedCarrier,
+                                                         contact_phone: e.target.value
+                                                     })
+                                                 }
+                                             }}
+                                             value={
+                                                 (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                                     ? (selectedCarrier?.contact_phone || '')
+                                                     // ? ''
+                                                     : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
+                                                         ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work
+                                                         : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
+                                                             ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work_fax
+                                                             : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
+                                                                 ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_mobile
+                                                                 : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
+                                                                     ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_direct
+                                                                     : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
+                                                                         ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_other
+                                                                         : ''
+                                             }
                                 />
 
                                 {
@@ -2021,72 +2316,83 @@ const Carriers = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input tabIndex={52 + props.tabTimes} type="text" placeholder="Ext"
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, ext: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, ext: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.ext || '')
-                                            ? ''
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
-                                    }
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       onInput={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, ext: e.target.value})
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, ext: e.target.value})
+                                           }
+                                       }}
+                                       value={
+                                           (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.ext || '')
+                                               // ? ''
+                                               : selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
+                                       }
                                 />
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedCarrier?.email || '') !== '') {
-                                        setShowCarrierEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedCarrier?.email || '') !== '') {
-                                        setShowCarrierEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowCarrierEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowCarrierEmailCopyBtn(false);
-                                }}
+                            <div className="input-box-container" style={{position: 'relative', flexGrow: 1}}
+                                 onMouseEnter={() => {
+                                     if ((selectedCarrier?.email || '') !== '') {
+                                         setShowCarrierEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onFocus={() => {
+                                     if ((selectedCarrier?.email || '') !== '') {
+                                         setShowCarrierEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onBlur={() => {
+                                     window.setTimeout(() => {
+                                         setShowCarrierEmailCopyBtn(false);
+                                     }, 1000);
+                                 }}
+                                 onMouseLeave={() => {
+                                     setShowCarrierEmailCopyBtn(false);
+                                 }}
                             >
-                                <input tabIndex={53 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                    ref={refCarrierEmail}
-                                    onKeyDown={validateCarrierForSaving}
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, email: e.target.value })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({ ...selectedCarrier, email: e.target.value })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedCarrier?.email || '')
-                                            ? ''
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
-                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_work
-                                                : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
-                                                    ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_personal
-                                                    : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'other'
-                                                        ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_other
-                                                        : ''
-                                    }
+                                <input tabIndex={53 + props.tabTimes} type="text" placeholder="E-Mail"
+                                       style={{textTransform: 'lowercase'}}
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       ref={refCarrierEmail}
+                                       onKeyDown={validateCarrierForSaving}
+                                       onInput={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, email: e.target.value})
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrier?.contacts || []).length === 0) {
+                                               setSelectedCarrier({...selectedCarrier, email: e.target.value})
+                                           }
+                                       }}
+                                       value={
+                                           (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.email || '')
+                                               // ? ''
+                                               : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
+                                                   ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_work
+                                                   : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
+                                                       ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_personal
+                                                       : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === 'other'
+                                                           ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_other
+                                                           : ''
+                                       }
                                 />
                                 {
                                     ((selectedCarrier?.contacts || []).find(c => c.is_primary === 1) !== undefined) &&
@@ -2115,7 +2421,7 @@ const Carriers = (props) => {
                                     }} icon={faCopy} onClick={(e) => {
                                         e.stopPropagation();
                                         navigator.clipboard.writeText(refCarrierEmail.current.value);
-                                    }} />
+                                    }}/>
                                 }
                             </div>
                         </div>
@@ -2128,10 +2434,16 @@ const Carriers = (props) => {
                         padding: '15px 5px'
                     }}>
                         <div className="input-toggle-container">
-                            <input type="checkbox" id={props.panelName + 'cbox-carrier-do-not-use-btn'} onChange={(e) => {
-                                setSelectedCarrier({ ...selectedCarrier, do_not_use: e.target.checked ? 1 : 0 });
-                                validateCarrierForSaving({ keyCode: 9 });
-                            }} checked={(selectedCarrier.do_not_use || 0) === 1} />
+                            <input type="checkbox" id={props.panelName + 'cbox-carrier-do-not-use-btn'}
+                                   disabled={
+                                       (props.user?.user_code?.is_admin || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                   }
+                                   onChange={(e) => {
+                                       setSelectedCarrier({...selectedCarrier, do_not_use: e.target.checked ? 1 : 0});
+                                       validateCarrierForSaving({keyCode: 9});
+                                   }} checked={(selectedCarrier.do_not_use || 0) === 1}/>
                             <label htmlFor={props.panelName + 'cbox-carrier-do-not-use-btn'}>
                                 <div className="label-text">DO NOT USE</div>
                                 <div className="input-toggle-btn"></div>
@@ -2142,50 +2454,76 @@ const Carriers = (props) => {
                         <Rating
                             name="simple-controlled"
                             value={selectedCarrier?.rating || 0}
+                            disabled={
+                                (props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                            }
                             onChange={(e, newValue) => {
                                 setSelectedCarrier({
                                     ...selectedCarrier,
                                     rating: newValue
                                 });
 
-                                validateCarrierForSaving({ keyCode: 9 });
+                                validateCarrierForSaving({keyCode: 9});
                             }}
                         />
 
-                        <div className="input-box-container" style={{ width: '100%' }}>
+                        <div className="input-box-container" style={{width: '100%'}}>
                             <input tabIndex={76 + props.tabTimes} type="text" placeholder='MC Number'
-                                onKeyDown={validateCarrierForSaving}
-                                onChange={(e) => {
-                                    setSelectedCarrier({ ...selectedCarrier, mc_number: e.target.value })
-                                }}
-                                value={selectedCarrier.mc_number || ''} />
+                                   readOnly={
+                                       (props.user?.user_code?.is_admin || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                   }
+                                   onKeyDown={validateCarrierForSaving}
+                                   onChange={(e) => {
+                                       setSelectedCarrier({...selectedCarrier, mc_number: e.target.value})
+                                   }}
+                                   value={selectedCarrier.mc_number || ''}/>
                         </div>
-                        <div className="input-box-container" style={{ width: '100%' }}>
+                        <div className="input-box-container" style={{width: '100%'}}>
                             <input tabIndex={77 + props.tabTimes} type="text" placeholder='DOT Number'
-                                onKeyDown={validateCarrierForSaving}
-                                onChange={(e) => {
-                                    setSelectedCarrier({ ...selectedCarrier, dot_number: e.target.value })
-                                }}
-                                value={selectedCarrier.dot_number || ''} />
+                                   readOnly={
+                                       (props.user?.user_code?.is_admin || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                   }
+                                   onKeyDown={validateCarrierForSaving}
+                                   onChange={(e) => {
+                                       setSelectedCarrier({...selectedCarrier, dot_number: e.target.value})
+                                   }}
+                                   value={selectedCarrier.dot_number || ''}/>
                         </div>
-                        <div className="input-box-container" style={{ width: '100%' }}>
-                            <input tabIndex={78 + props.tabTimes} type="text" placeholder='SCAC' style={{ textTransform: 'uppercase' }}
-                                onKeyDown={validateCarrierForSaving}
-                                onChange={(e) => {
-                                    setSelectedCarrier({ ...selectedCarrier, scac: e.target.value })
-                                }}
-                                value={selectedCarrier.scac || ''} />
+                        <div className="input-box-container" style={{width: '100%'}}>
+                            <input tabIndex={78 + props.tabTimes} type="text" placeholder='SCAC'
+                                   readOnly={
+                                       (props.user?.user_code?.is_admin || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                   }
+                                   style={{textTransform: 'uppercase'}}
+                                   onKeyDown={validateCarrierForSaving}
+                                   onChange={(e) => {
+                                       setSelectedCarrier({...selectedCarrier, scac: e.target.value})
+                                   }}
+                                   value={selectedCarrier.scac || ''}/>
                         </div>
-                        <div className="input-box-container" style={{ width: '100%' }}>
+                        <div className="input-box-container" style={{width: '100%'}}>
                             <input tabIndex={79 + props.tabTimes} type="text" placeholder='FID'
-                                onKeyDown={validateCarrierForSaving}
-                                onChange={(e) => {
-                                    setSelectedCarrier({ ...selectedCarrier, fid: e.target.value })
-                                }}
-                                value={selectedCarrier.fid || ''} />
+                                   readOnly={
+                                       (props.user?.user_code?.is_admin || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                   }
+                                   onKeyDown={validateCarrierForSaving}
+                                   onChange={(e) => {
+                                       setSelectedCarrier({...selectedCarrier, fid: e.target.value})
+                                   }}
+                                   value={selectedCarrier.fid || ''}/>
                         </div>
-                        <div className={insuranceStatusClasses()} style={{ width: '100%' }}>
-                            <input type="text" placeholder='Insurance' readOnly={true} />
+                        <div className={insuranceStatusClasses()} style={{width: '100%'}}>
+                            <input type="text" placeholder='Insurance' readOnly={true}/>
                         </div>
                     </div>
                 </div>
@@ -2204,54 +2542,65 @@ const Carriers = (props) => {
                             <div className="form-title">Contacts</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div className="mochi-button" onClick={async () => {
-                                    if (selectedCarrier.id === undefined) {
-                                        window.alert('You must select a contact first!');
-                                        return;
-                                    }
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                }
 
-                                    if (selectedContact.id === undefined) {
-                                        window.alert('You must select a contact');
-                                        return;
-                                    }
+                                     onClick={async () => {
+                                         if (selectedCarrier.id === undefined) {
+                                             window.alert('You must select a contact first!');
+                                             return;
+                                         }
 
-                                    let panel = {
-                                        panelName: `${props.panelName}-contacts`,
-                                        component: <Contacts
-                                            title='Contacts'
-                                            tabTimes={22000 + props.tabTimes}
-                                            panelName={`${props.panelName}-contacts`}
-                                            savingContactUrl='/saveCarrierContact'
-                                            deletingContactUrl='/deleteCarrierContact'
-                                            uploadAvatarUrl='/uploadCarrierAvatar'
-                                            removeAvatarUrl='/removeCarrierAvatar'
-                                            origin={props.origin}
-                                            owner='carrier'
-                                            openPanel={props.openPanel}
-                                            closePanel={props.closePanel}
-                                            componentId={moment().format('x')}
+                                         if (selectedContact.id === undefined) {
+                                             window.alert('You must select a contact');
+                                             return;
+                                         }
 
-                                            contactSearchCustomer={{
-                                                ...selectedCarrier,
-                                                selectedContact: {
-                                                    ...selectedContact,
-                                                    address1: (selectedCarrier?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedCarrier?.address1 || '') : (selectedContact?.address1 || ''),
-                                                    address2: (selectedCarrier?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedCarrier?.address2 || '') : (selectedContact?.address2 || ''),
-                                                    city: (selectedCarrier?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedCarrier?.city || '') : (selectedContact?.city || ''),
-                                                    state: (selectedCarrier?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedCarrier?.state || '') : (selectedContact?.state || ''),
-                                                    zip_code: (selectedCarrier?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedCarrier?.zip || '') : (selectedContact?.zip_code || ''),
-                                                }
-                                            }}
-                                        />
-                                    }
+                                         let panel = {
+                                             panelName: `${props.panelName}-contacts`,
+                                             component: <Contacts
+                                                 title='Contacts'
+                                                 tabTimes={22000 + props.tabTimes}
+                                                 panelName={`${props.panelName}-contacts`}
+                                                 savingContactUrl='/saveCarrierContact'
+                                                 deletingContactUrl='/deleteCarrierContact'
+                                                 uploadAvatarUrl='/uploadCarrierAvatar'
+                                                 removeAvatarUrl='/removeCarrierAvatar'
+                                                 permissionName='carrier contacts'
+                                                 origin={props.origin}
+                                                 owner='carrier'
+                                                 openPanel={props.openPanel}
+                                                 closePanel={props.closePanel}
+                                                 componentId={moment().format('x')}
 
-                                    props.openPanel(panel, props.origin);
-                                }}>
+                                                 contactSearchCustomer={{
+                                                     ...selectedCarrier,
+                                                     selectedContact: {
+                                                         ...selectedContact,
+                                                         address1: (selectedCarrier?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedCarrier?.address1 || '') : (selectedContact?.address1 || ''),
+                                                         address2: (selectedCarrier?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedCarrier?.address2 || '') : (selectedContact?.address2 || ''),
+                                                         city: (selectedCarrier?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedCarrier?.city || '') : (selectedContact?.city || ''),
+                                                         state: (selectedCarrier?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedCarrier?.state || '') : (selectedContact?.state || ''),
+                                                         zip_code: (selectedCarrier?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedCarrier?.zip || '') : (selectedContact?.zip_code || ''),
+                                                     }
+                                                 }}
+                                             />
+                                         }
+
+                                         props.openPanel(panel, props.origin);
+                                     }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">More</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className="mochi-button" onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if (selectedCarrier.id === undefined || selectedCarrier.id <= 0) {
                                         window.alert('You must select a carrier');
                                         return;
@@ -2267,6 +2616,7 @@ const Carriers = (props) => {
                                             deletingContactUrl='/deleteCarrierContact'
                                             uploadAvatarUrl='/uploadCarrierAvatar'
                                             removeAvatarUrl='/removeCarrierAvatar'
+                                            permissionName='carrier contacts'
                                             origin={props.origin}
                                             owner='carrier'
                                             isEditingContact={true}
@@ -2276,7 +2626,7 @@ const Carriers = (props) => {
 
                                             contactSearchCustomer={{
                                                 ...selectedCarrier,
-                                                selectedContact: { id: 0, carrier_id: selectedCarrier?.id }
+                                                selectedContact: {id: 0, carrier_id: selectedCarrier?.id}
                                             }}
                                         />
                                     }
@@ -2299,288 +2649,308 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={80 + props.tabTimes} type="text" placeholder="First Name"
-                                    ref={refCarrierContactFirstName}
-                                    // onKeyDown={validateContactForSaving} 
-                                    onChange={e => { setSelectedContact({ ...selectedContact, first_name: e.target.value }) }}
-                                    value={selectedContact.first_name || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0
+                                       }
+                                       ref={refCarrierContactFirstName}
+                                       onChange={e => {
+                                           setSelectedContact({...selectedContact, first_name: e.target.value})
+                                       }}
+                                       value={selectedContact.first_name || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={81 + props.tabTimes} type="text" placeholder="Last Name"
-                                    // onKeyDown={validateContactForSaving}
-                                    onChange={e => setSelectedContact({ ...selectedContact, last_name: e.target.value })}
-                                    value={selectedContact.last_name || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => setSelectedContact({
+                                           ...selectedContact,
+                                           last_name: e.target.value
+                                       })}
+                                       value={selectedContact.last_name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ width: '50%' }}>
+                            <div className="select-box-container" style={{width: '50%'}}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={82 + props.tabTimes}
-                                        ref={refCarrierContactPhone}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text" placeholder="Phone"
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                                 readOnly={
+                                                     (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0
+                                                 }
+                                                 ref={refCarrierContactPhone}
+                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={true}
+                                                 type="text" placeholder="Phone"
+                                                 onKeyDown={async (e) => {
+                                                     let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showCarrierContactPhones) {
-                                                        let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
+                                                     switch (key) {
+                                                         case 37:
+                                                         case 38: // arrow left | arrow up
+                                                             e.preventDefault();
+                                                             if (showCarrierContactPhones) {
+                                                                 let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierContactPhoneItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === 0) {
+                                                                             item.selected = index === (carrierContactPhoneItems.length - 1);
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex - 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactPhoneItems.length > 1) {
-                                                            await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (carrierContactPhoneItems.length > 1) {
+                                                                     await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowCarrierContactPhones(true);
+                                                                     setShowCarrierContactPhones(true);
 
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showCarrierContactPhones) {
-                                                        let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
+                                                         case 39:
+                                                         case 40: // arrow right | arrow down
+                                                             e.preventDefault();
+                                                             if (showCarrierContactPhones) {
+                                                                 let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierContactPhoneItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === (carrierContactPhoneItems.length - 1)) {
+                                                                             item.selected = index === 0;
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex + 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactPhoneItems.length > 1) {
-                                                            await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                return item;
-                                                            }))
+                                                                 refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (carrierContactPhoneItems.length > 1) {
+                                                                     await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowCarrierContactPhones(true);
+                                                                     setShowCarrierContactPhones(true);
 
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 27: // escape
-                                                    setShowCarrierContactPhones(false);
-                                                    break;
+                                                         case 27: // escape
+                                                             setShowCarrierContactPhones(false);
+                                                             break;
 
-                                                case 13: // enter
-                                                    if (showCarrierContactPhones && carrierContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                        });
+                                                         case 13: // enter
+                                                             if (showCarrierContactPhones && carrierContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                 await setSelectedContact({
+                                                                     ...selectedContact,
+                                                                     primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                 });
 
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactPhones(false);
-                                                        refCarrierContactPhone.current.inputElement.focus();
-                                                    }
-                                                    break;
-                                                case 9: // tab
-                                                    if (showCarrierContactPhones) {
-                                                        e.preventDefault();
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                        });
+                                                                 validateContactForSaving({keyCode: 9});
+                                                                 setShowCarrierContactPhones(false);
+                                                                 refCarrierContactPhone.current.inputElement.focus();
+                                                             }
+                                                             break;
+                                                         case 9: // tab
+                                                             if (showCarrierContactPhones) {
+                                                                 e.preventDefault();
+                                                                 await setSelectedContact({
+                                                                     ...selectedContact,
+                                                                     primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                 });
 
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactPhones(false);
-                                                        refCarrierContactPhone.current.inputElement.focus();
-                                                    } else {
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={(e) => {
-                                            if ((selectedContact?.id || 0) === 0) {
-                                                setSelectedContact({
-                                                    ...selectedContact,
-                                                    phone_work: e.target.value,
-                                                    primary_phone: 'work'
-                                                });
-                                            } else {
-                                                if ((selectedContact?.primary_phone || '') === '') {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    });
-                                                } else {
-                                                    switch (selectedContact?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work_fax: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_mobile: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_direct: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_other: e.target.value
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            if ((selectedContact?.id || 0) === 0) {
-                                                setSelectedContact({
-                                                    ...selectedContact,
-                                                    phone_work: e.target.value,
-                                                    primary_phone: 'work'
-                                                });
-                                            } else {
-                                                if ((selectedContact?.primary_phone || '') === '') {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    });
-                                                } else {
-                                                    switch (selectedContact?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work_fax: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_mobile: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_direct: e.target.value
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_other: e.target.value
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedContact?.primary_phone || '') === 'work'
-                                                ? (selectedContact?.phone_work || '')
-                                                : (selectedContact?.primary_phone || '') === 'fax'
-                                                    ? (selectedContact?.phone_work_fax || '')
-                                                    : (selectedContact?.primary_phone || '') === 'mobile'
-                                                        ? (selectedContact?.phone_mobile || '')
-                                                        : (selectedContact?.primary_phone || '') === 'direct'
-                                                            ? (selectedContact?.phone_direct || '')
-                                                            : (selectedContact?.primary_phone || '') === 'other'
-                                                                ? (selectedContact?.phone_other || '')
-                                                                : ''
-                                        }
+                                                                 validateContactForSaving({keyCode: 9});
+                                                                 setShowCarrierContactPhones(false);
+                                                                 refCarrierContactPhone.current.inputElement.focus();
+                                                             } else {
+                                                                 validateContactForSaving({keyCode: 9});
+                                                             }
+                                                             break;
+                                                         default:
+                                                             break;
+                                                     }
+                                                 }}
+                                                 onInput={(e) => {
+                                                     if ((selectedContact?.id || 0) === 0) {
+                                                         setSelectedContact({
+                                                             ...selectedContact,
+                                                             phone_work: e.target.value,
+                                                             primary_phone: 'work'
+                                                         });
+                                                     } else {
+                                                         if ((selectedContact?.primary_phone || '') === '') {
+                                                             setSelectedContact({
+                                                                 ...selectedContact,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             });
+                                                         } else {
+                                                             switch (selectedContact?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_work: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_work_fax: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_mobile: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_direct: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_other: e.target.value
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 onChange={(e) => {
+                                                     if ((selectedContact?.id || 0) === 0) {
+                                                         setSelectedContact({
+                                                             ...selectedContact,
+                                                             phone_work: e.target.value,
+                                                             primary_phone: 'work'
+                                                         });
+                                                     } else {
+                                                         if ((selectedContact?.primary_phone || '') === '') {
+                                                             setSelectedContact({
+                                                                 ...selectedContact,
+                                                                 phone_work: e.target.value,
+                                                                 primary_phone: 'work'
+                                                             });
+                                                         } else {
+                                                             switch (selectedContact?.primary_phone) {
+                                                                 case 'work':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_work: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'fax':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_work_fax: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'mobile':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_mobile: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'direct':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_direct: e.target.value
+                                                                     });
+                                                                     break;
+                                                                 case 'other':
+                                                                     setSelectedContact({
+                                                                         ...selectedContact,
+                                                                         phone_other: e.target.value
+                                                                     });
+                                                                     break;
+                                                             }
+                                                         }
+                                                     }
+                                                 }}
+                                                 value={
+                                                     (selectedContact?.primary_phone || '') === 'work'
+                                                         ? (selectedContact?.phone_work || '')
+                                                         : (selectedContact?.primary_phone || '') === 'fax'
+                                                             ? (selectedContact?.phone_work_fax || '')
+                                                             : (selectedContact?.primary_phone || '') === 'mobile'
+                                                                 ? (selectedContact?.phone_mobile || '')
+                                                                 : (selectedContact?.primary_phone || '') === 'direct'
+                                                                     ? (selectedContact?.phone_direct || '')
+                                                                     : (selectedContact?.primary_phone || '') === 'other'
+                                                                         ? (selectedContact?.phone_other || '')
+                                                                         : ''
+                                                 }
                                     />
 
                                     {
@@ -2595,36 +2965,40 @@ const Carriers = (props) => {
                                     }
 
                                     {
-                                        carrierContactPhoneItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showCarrierContactPhones) {
-                                                setShowCarrierContactPhones(false);
-                                            } else {
-                                                if (carrierContactPhoneItems.length > 1) {
-                                                    await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                        return item;
-                                                    }))
+                                        (carrierContactPhoneItems.length > 1 && ((selectedContact?.id || 0) > 0)) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 1)) &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showCarrierContactPhones) {
+                                                                 setShowCarrierContactPhones(false);
+                                                             } else {
+                                                                 if (carrierContactPhoneItems.length > 1) {
+                                                                     await setCarrierContactPhoneItems(carrierContactPhoneItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowCarrierContactPhones(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowCarrierContactPhones(true);
 
-                                                        refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refCarrierContactPhone.current.inputElement.focus();
-                                        }} />
+                                                             refCarrierContactPhone.current.inputElement.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -2639,8 +3013,9 @@ const Carriers = (props) => {
                                             }}
                                             ref={refCarrierContactPhoneDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             carrierContactPhoneItems.map((item, index) => {
@@ -2662,7 +3037,7 @@ const Carriers = (props) => {
                                                                                 }
                                                                             });
 
-                                                                            validateContactForSaving({ keyCode: 9 });
+                                                                            validateContactForSaving({keyCode: 9});
                                                                             setShowCarrierContactPhones(false);
                                                                             refCarrierContactPhone.current.inputElement.focus();
                                                                         }}
@@ -2677,18 +3052,20 @@ const Carriers = (props) => {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.phone
+                                                                                : item.type === 'fax' ? item.phone
+                                                                                    : item.type === 'mobile' ? item.phone
+                                                                                        : item.type === 'direct' ? item.phone
+                                                                                            : item.type === 'other' ? item.phone : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -2702,21 +3079,36 @@ const Carriers = (props) => {
                                 }
                             </div>
                             <div className="form-h-sep"></div>
-                            <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={83 + props.tabTimes} type="text" placeholder="Ext"
-                                        // onKeyDown={validateContactForSaving}
-                                        onChange={e => setSelectedContact({ ...selectedContact, phone_ext: e.target.value })}
-                                        value={selectedContact.phone_ext || ''}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0
+                                           }
+                                           onChange={e => setSelectedContact({
+                                               ...selectedContact,
+                                               phone_ext: e.target.value
+                                           })}
+                                           value={selectedContact.phone_ext || ''}
                                     />
                                 </div>
                                 <div className="input-toggle-container">
                                     <input type="checkbox" id={props.panelName + 'cbox-carrier-contacts-primary-btn'}
-                                        onChange={(e) => {
-                                            setSelectedContact({ ...selectedContact, is_primary: e.target.checked ? 1 : 0 });
-                                            validateContactForSaving({ keyCode: 9 });
-                                        }}
-                                        checked={(selectedContact.is_primary || 0) === 1} />
+                                           disabled={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0
+                                           }
+                                           onChange={(e) => {
+                                               setSelectedContact({
+                                                   ...selectedContact,
+                                                   is_primary: e.target.checked ? 1 : 0
+                                               });
+                                               validateContactForSaving({keyCode: 9});
+                                           }}
+                                           checked={(selectedContact.is_primary || 0) === 1}/>
                                     <label htmlFor={props.panelName + 'cbox-carrier-contacts-primary-btn'}>
                                         <div className="label-text">Primary</div>
                                         <div className="input-toggle-btn"></div>
@@ -2726,240 +3118,247 @@ const Carriers = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedContact?.email_work || '') !== '' ||
-                                        (selectedContact?.email_personal || '') !== '' ||
-                                        (selectedContact?.email_other || '') !== '') {
-                                        setShowCarrierContactEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedContact?.email_work || '') !== '' ||
-                                        (selectedContact?.email_personal || '') !== '' ||
-                                        (selectedContact?.email_other || '') !== '') {
-                                        setShowCarrierContactEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowCarrierContactEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowCarrierContactEmailCopyBtn(false);
-                                }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}
+                                 onMouseEnter={() => {
+                                     if ((selectedContact?.email_work || '') !== '' ||
+                                         (selectedContact?.email_personal || '') !== '' ||
+                                         (selectedContact?.email_other || '') !== '') {
+                                         setShowCarrierContactEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onFocus={() => {
+                                     if ((selectedContact?.email_work || '') !== '' ||
+                                         (selectedContact?.email_personal || '') !== '' ||
+                                         (selectedContact?.email_other || '') !== '') {
+                                         setShowCarrierContactEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onBlur={() => {
+                                     window.setTimeout(() => {
+                                         setShowCarrierContactEmailCopyBtn(false);
+                                     }, 1000);
+                                 }}
+                                 onMouseLeave={() => {
+                                     setShowCarrierContactEmailCopyBtn(false);
+                                 }}>
                                 <div className="select-box-wrapper">
                                     <input tabIndex={84 + props.tabTimes} type="text" placeholder="E-Mail"
-                                        style={{
-                                            width: 'calc(100% - 25px)',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                        ref={refCarrierContactEmail}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                           style={{
+                                               width: 'calc(100% - 25px)',
+                                               overflow: 'hidden',
+                                               textOverflow: 'ellipsis',
+                                               whiteSpace: 'nowrap'
+                                           }}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0
+                                           }
+                                           ref={refCarrierContactEmail}
+                                           onKeyDown={async (e) => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showCarrierContactEmails) {
-                                                        let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (showCarrierContactEmails) {
+                                                           let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierContactEmailItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (carrierContactEmailItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactEmailItems.length > 1) {
-                                                            await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (carrierContactEmailItems.length > 1) {
+                                                               await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedContact?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowCarrierContactEmails(true);
+                                                               setShowCarrierContactEmails(true);
 
-                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showCarrierContactEmails) {
-                                                        let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (showCarrierContactEmails) {
+                                                           let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierContactEmailItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === (carrierContactEmailItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactEmailItems.length > 1) {
-                                                            await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                return item;
-                                                            }))
+                                                           refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (carrierContactEmailItems.length > 1) {
+                                                               await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
+                                                                   item.selected = item.type === (selectedContact?.primary_email || '')
+                                                                   return item;
+                                                               }))
 
-                                                            setShowCarrierContactEmails(true);
+                                                               setShowCarrierContactEmails(true);
 
-                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setShowCarrierContactEmails(false);
-                                                    break;
+                                                   case 27: // escape
+                                                       setShowCarrierContactEmails(false);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (showCarrierContactEmails && carrierContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type
-                                                        });
+                                                   case 13: // enter
+                                                       if (showCarrierContactEmails && carrierContactEmailItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedContact({
+                                                               ...selectedContact,
+                                                               primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type
+                                                           });
 
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactEmails(false);
-                                                        refCarrierContactEmail.current.focus();
-                                                    }
-                                                    break;
+                                                           validateContactForSaving({keyCode: 9});
+                                                           setShowCarrierContactEmails(false);
+                                                           refCarrierContactEmail.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (showCarrierContactEmails) {
-                                                        e.preventDefault();
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type
-                                                        });
+                                                   case 9: // tab
+                                                       if (showCarrierContactEmails) {
+                                                           e.preventDefault();
+                                                           await setSelectedContact({
+                                                               ...selectedContact,
+                                                               primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type
+                                                           });
 
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactEmails(false);
-                                                        refCarrierContactEmail.current.focus();
-                                                    } else {
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                           validateContactForSaving({keyCode: 9});
+                                                           setShowCarrierContactEmails(false);
+                                                           refCarrierContactEmail.current.focus();
+                                                       } else {
+                                                           validateContactForSaving({keyCode: 9});
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={(e) => {
-                                            switch (selectedContact?.primary_email) {
-                                                case 'work':
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value
-                                                    });
-                                                    break;
-                                                case 'personal':
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_personal: e.target.value
-                                                    });
-                                                    break;
-                                                case 'other':
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_other: e.target.value
-                                                    });
-                                                    break;
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            switch (selectedContact?.primary_email) {
-                                                case 'work':
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value
-                                                    });
-                                                    break;
-                                                case 'personal':
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_personal: e.target.value
-                                                    });
-                                                    break;
-                                                case 'other':
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_other: e.target.value
-                                                    });
-                                                    break;
-                                            }
-                                        }}
-                                        value={
-                                            (selectedContact?.primary_email || '') === 'work'
-                                                ? (selectedContact?.email_work || '')
-                                                : (selectedContact?.primary_email || '') === 'personal'
-                                                    ? (selectedContact?.email_personal || '')
-                                                    : (selectedContact?.primary_email || '') === 'other'
-                                                        ? (selectedContact?.email_other || '')
-                                                        : ''
-                                        }
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onInput={(e) => {
+                                               switch (selectedContact?.primary_email) {
+                                                   case 'work':
+                                                       setSelectedContact({
+                                                           ...selectedContact,
+                                                           email_work: e.target.value
+                                                       });
+                                                       break;
+                                                   case 'personal':
+                                                       setSelectedContact({
+                                                           ...selectedContact,
+                                                           email_personal: e.target.value
+                                                       });
+                                                       break;
+                                                   case 'other':
+                                                       setSelectedContact({
+                                                           ...selectedContact,
+                                                           email_other: e.target.value
+                                                       });
+                                                       break;
+                                               }
+                                           }}
+                                           onChange={(e) => {
+                                               switch (selectedContact?.primary_email) {
+                                                   case 'work':
+                                                       setSelectedContact({
+                                                           ...selectedContact,
+                                                           email_work: e.target.value
+                                                       });
+                                                       break;
+                                                   case 'personal':
+                                                       setSelectedContact({
+                                                           ...selectedContact,
+                                                           email_personal: e.target.value
+                                                       });
+                                                       break;
+                                                   case 'other':
+                                                       setSelectedContact({
+                                                           ...selectedContact,
+                                                           email_other: e.target.value
+                                                       });
+                                                       break;
+                                               }
+                                           }}
+                                           value={
+                                               (selectedContact?.primary_email || '') === 'work'
+                                                   ? (selectedContact?.email_work || '')
+                                                   : (selectedContact?.primary_email || '') === 'personal'
+                                                       ? (selectedContact?.email_personal || '')
+                                                       : (selectedContact?.primary_email || '') === 'other'
+                                                           ? (selectedContact?.email_other || '')
+                                                           : ''
+                                           }
                                     />
 
                                     {
@@ -2989,40 +3388,44 @@ const Carriers = (props) => {
                                         }} icon={faCopy} onClick={(e) => {
                                             e.stopPropagation();
                                             navigator.clipboard.writeText(refCarrierContactEmail.current.value);
-                                        }} />
+                                        }}/>
                                     }
 
                                     {
-                                        carrierContactEmailItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showCarrierContactEmails) {
-                                                setShowCarrierContactEmails(false);
-                                            } else {
-                                                if (carrierContactEmailItems.length > 1) {
-                                                    await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
-                                                        item.selected = item.type === (selectedContact?.primary_email || '')
-                                                        return item;
-                                                    }))
+                                        (carrierContactEmailItems.length > 1 && ((selectedContact?.id || 0) > 0)) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 1)) &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showCarrierContactEmails) {
+                                                                 setShowCarrierContactEmails(false);
+                                                             } else {
+                                                                 if (carrierContactEmailItems.length > 1) {
+                                                                     await setCarrierContactEmailItems(carrierContactEmailItems.map((item, index) => {
+                                                                         item.selected = item.type === (selectedContact?.primary_email || '')
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowCarrierContactEmails(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowCarrierContactEmails(true);
 
-                                                        refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refCarrierContactEmail.current.focus();
-                                        }} />
+                                                             refCarrierContactEmail.current.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -3037,8 +3440,9 @@ const Carriers = (props) => {
                                             }}
                                             ref={refCarrierContactEmailDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             carrierContactEmailItems.map((item, index) => {
@@ -3058,7 +3462,7 @@ const Carriers = (props) => {
                                                                                 primary_email: item.type
                                                                             });
 
-                                                                            validateContactForSaving({ keyCode: 9 });
+                                                                            validateContactForSaving({keyCode: 9});
                                                                             setShowCarrierContactEmails(false);
                                                                             refCarrierContactEmail.current.focus();
                                                                         }}
@@ -3071,16 +3475,18 @@ const Carriers = (props) => {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.email
+                                                                                : item.type === 'personal' ? item.email
+                                                                                    : item.type === 'other' ? item.email : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -3095,7 +3501,15 @@ const Carriers = (props) => {
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
-                                <input tabIndex={85 + props.tabTimes} type="text" placeholder="Notes" onKeyDown={validateContactForSaving} onChange={e => setSelectedContact({ ...selectedContact, notes: e.target.value })} value={selectedContact.notes || ''} />
+                                <input tabIndex={85 + props.tabTimes} type="text" placeholder="Notes"
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={validateContactForSaving}
+                                       onChange={e => setSelectedContact({...selectedContact, notes: e.target.value})}
+                                       value={selectedContact.notes || ''}/>
                             </div>
                         </div>
                     </div>
@@ -3137,7 +3551,7 @@ const Carriers = (props) => {
                         </div>
 
                         <div className="form-slider">
-                            <div className="form-slider-wrapper" style={{ left: showingContactList ? 0 : '-100%' }}>
+                            <div className="form-slider-wrapper" style={{left: showingContactList ? 0 : '-100%'}}>
                                 <div className="contact-list-box">
 
                                     {
@@ -3155,37 +3569,45 @@ const Carriers = (props) => {
                                         {
                                             (selectedCarrier.contacts || []).map((contact, index) => {
                                                 return (
-                                                    <div className="contact-list-item" key={index} onDoubleClick={async () => {
-                                                        let panel = {
-                                                            panelName: `${props.panelName}-contacts`,
-                                                            component: <Contacts
-                                                                title='Contacts'
-                                                                tabTimes={22000 + props.tabTimes}
-                                                                panelName={`${props.panelName}-contacts`}
-                                                                savingContactUrl='/saveCarrierContact'
-                                                                deletingContactUrl='/deleteCarrierContact'
-                                                                uploadAvatarUrl='/uploadCarrierAvatar'
-                                                                removeAvatarUrl='/removeCarrierAvatar'
-                                                                origin={props.origin}
-                                                                owner='carrier'
-                                                                openPanel={props.openPanel}
-                                                                closePanel={props.closePanel}
-                                                                componentId={moment().format('x')}
+                                                    <div className="contact-list-item" key={index}
+                                                         onDoubleClick={async () => {
+                                                             if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.edit || 0) === 0) {
+                                                                 return;
+                                                             }
 
-                                                                contactSearchCustomer={{
-                                                                    ...selectedCarrier,
-                                                                    selectedContact: contact
-                                                                }}
-                                                            />
-                                                        }
+                                                             let panel = {
+                                                                 panelName: `${props.panelName}-contacts`,
+                                                                 component: <Contacts
+                                                                     title='Contacts'
+                                                                     tabTimes={22000 + props.tabTimes}
+                                                                     panelName={`${props.panelName}-contacts`}
+                                                                     savingContactUrl='/saveCarrierContact'
+                                                                     deletingContactUrl='/deleteCarrierContact'
+                                                                     uploadAvatarUrl='/uploadCarrierAvatar'
+                                                                     removeAvatarUrl='/removeCarrierAvatar'
+                                                                     permissionName='carrier contacts'
+                                                                     origin={props.origin}
+                                                                     owner='carrier'
+                                                                     openPanel={props.openPanel}
+                                                                     closePanel={props.closePanel}
+                                                                     componentId={moment().format('x')}
 
-                                                        props.openPanel(panel, props.origin);
-                                                    }} onClick={() => {
+                                                                     contactSearchCustomer={{
+                                                                         ...selectedCarrier,
+                                                                         selectedContact: contact
+                                                                     }}
+                                                                 />
+                                                             }
+
+                                                             props.openPanel(panel, props.origin);
+                                                         }} onClick={() => {
                                                         setSelectedContact(contact);
                                                         refCarrierContactFirstName.current.focus();
                                                     }}>
-                                                        <div className="contact-list-col tcol first-name">{contact.first_name}</div>
-                                                        <div className="contact-list-col tcol last-name">{contact.last_name}</div>
+                                                        <div
+                                                            className="contact-list-col tcol first-name">{contact.first_name}</div>
+                                                        <div
+                                                            className="contact-list-col tcol last-name">{contact.last_name}</div>
                                                         <div className="contact-list-col tcol phone-work">{
                                                             contact.primary_phone === 'work' ? contact.phone_work
                                                                 : contact.primary_phone === 'fax' ? contact.phone_work_fax
@@ -3203,13 +3625,13 @@ const Carriers = (props) => {
                                                         {
                                                             (contact.id === (selectedContact?.id || 0)) &&
                                                             <div className="contact-list-col tcol contact-selected">
-                                                                <FontAwesomeIcon icon={faPencilAlt} />
+                                                                <FontAwesomeIcon icon={faPencilAlt}/>
                                                             </div>
                                                         }
                                                         {
                                                             (contact.is_primary === 1) &&
                                                             <div className="contact-list-col tcol pri">
-                                                                <FontAwesomeIcon icon={faCheck} />
+                                                                <FontAwesomeIcon icon={faCheck}/>
                                                             </div>
                                                         }
                                                     </div>
@@ -3222,46 +3644,86 @@ const Carriers = (props) => {
                                 <div className="contact-search-box">
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="First Name" onChange={e => setContactSearch({ ...contactSearch, first_name: e.target.value })} value={contactSearch.first_name || ''} />
+                                            <input type="text" placeholder="First Name"
+                                                   onChange={e => setContactSearch({
+                                                       ...contactSearch,
+                                                       first_name: e.target.value
+                                                   })} value={contactSearch.first_name || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Last Name" onFocus={() => { setShowingContactList(false) }} onChange={e => setContactSearch({ ...contactSearch, last_name: e.target.value })} value={contactSearch.last_name || ''} />
+                                            <input type="text" placeholder="Last Name" onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                last_name: e.target.value
+                                            })} value={contactSearch.last_name || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 1" onFocus={() => { setShowingContactList(false) }} onChange={e => setContactSearch({ ...contactSearch, address1: e.target.value })} value={contactSearch.address1 || ''} />
+                                            <input type="text" placeholder="Address 1" onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                address1: e.target.value
+                                            })} value={contactSearch.address1 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 2" onFocus={() => { setShowingContactList(false) }} onChange={e => setContactSearch({ ...contactSearch, address2: e.target.value })} value={contactSearch.address2 || ''} />
+                                            <input type="text" placeholder="Address 2" onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                address2: e.target.value
+                                            })} value={contactSearch.address2 || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="City" onFocus={() => { setShowingContactList(false) }} onChange={e => setContactSearch({ ...contactSearch, city: e.target.value })} value={contactSearch.city || ''} />
+                                            <input type="text" placeholder="City" onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                city: e.target.value
+                                            })} value={contactSearch.city || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container input-state">
-                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => { setShowingContactList(false) }} onChange={e => setContactSearch({ ...contactSearch, state: e.target.value })} value={contactSearch.state || ''} />
+                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                state: e.target.value
+                                            })} value={contactSearch.state || ''}/>
                                         </div>
                                         <div className="form-h-sep"></div>
                                         <div className="input-box-container grow">
                                             <MaskedInput
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
-                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => { setShowingContactList(false) }} onChange={e => setContactSearch({ ...contactSearch, phone: e.target.value })} value={contactSearch.phone || ''} />
+                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                phone: e.target.value
+                                            })} value={contactSearch.phone || ''}/>
                                         </div>
                                     </div>
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }} onFocus={() => { setShowingContactList(false) }} onChange={e => setContactSearch({ ...contactSearch, email: e.target.value })} value={contactSearch.email || ''} />
+                                            <input type="text" placeholder="E-Mail" style={{textTransform: 'lowercase'}}
+                                                   onFocus={() => {
+                                                       setShowingContactList(false)
+                                                   }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                email: e.target.value
+                                            })} value={contactSearch.email || ''}/>
                                         </div>
                                     </div>
                                 </div>
@@ -3270,14 +3732,18 @@ const Carriers = (props) => {
                     </div>
                 </div>
 
-                <div className="fields-container-col" style={{ minWidth: '28%', maxWidth: '28%' }}>
+                <div className="fields-container-col" style={{minWidth: '28%', maxWidth: '28%'}}>
                     <div className="form-bordered-box">
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Driver Information</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div className="mochi-button" onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.delete || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if ((selectedCarrier.id || 0) === 0) {
                                         window.alert('You must selecte a carrier first!');
                                         return;
@@ -3291,7 +3757,7 @@ const Carriers = (props) => {
                                     if (window.confirm('Are you sure to delete this driver?')) {
                                         axios.post(props.serverUrl + '/deleteCarrierDriver', selectedDriver).then(res => {
                                             if (res.data.result === 'OK') {
-                                                setSelectedCarrier({ ...selectedCarrier, drivers: res.data.drivers });
+                                                setSelectedCarrier({...selectedCarrier, drivers: res.data.drivers});
                                                 setSelectedDriver({});
                                             }
                                         }).catch(e => {
@@ -3319,79 +3785,100 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={92 + props.tabTimes} type="text" placeholder="First Name"
-                                    ref={refCarrierDriverFirstName}
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({ ...selectedDriver, first_name: e.target.value })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({ ...selectedDriver, first_name: e.target.value })
-                                    }}
-                                    value={selectedDriver?.first_name || ''} />
+                                       ref={refCarrierDriverFirstName}
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={validateDriverForSaving}
+                                       onInput={e => {
+                                           setSelectedDriver({...selectedDriver, first_name: e.target.value})
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver({...selectedDriver, first_name: e.target.value})
+                                       }}
+                                       value={selectedDriver?.first_name || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={93 + props.tabTimes} type="text" placeholder="Last Name"
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({ ...selectedDriver, last_name: e.target.value })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({ ...selectedDriver, last_name: e.target.value })
-                                    }}
-                                    value={selectedDriver?.last_name || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={validateDriverForSaving}
+                                       onInput={e => {
+                                           setSelectedDriver({...selectedDriver, last_name: e.target.value})
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver({...selectedDriver, last_name: e.target.value})
+                                       }}
+                                       value={selectedDriver?.last_name || ''}/>
                             </div>
                         </div>
 
                         <div className="form-v-sep"></div>
 
                         <div className="form-row">
-                            <div className="input-box-container" style={{ width: '40%' }}>
+                            <div className="input-box-container" style={{width: '40%'}}>
                                 <MaskedInput tabIndex={94 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text" placeholder="Phone"
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({ ...selectedDriver, phone: e.target.value })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({ ...selectedDriver, phone: e.target.value })
-                                    }}
-                                    value={selectedDriver?.phone || ''} />
+                                             readOnly={
+                                                 (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                             }
+                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={true}
+                                             type="text" placeholder="Phone"
+                                             onKeyDown={validateDriverForSaving}
+                                             onInput={e => {
+                                                 setSelectedDriver({...selectedDriver, phone: e.target.value})
+                                             }}
+                                             onChange={e => {
+                                                 setSelectedDriver({...selectedDriver, phone: e.target.value})
+                                             }}
+                                             value={selectedDriver?.phone || ''}/>
                             </div>
 
                             <div className="form-h-sep"></div>
 
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedDriver?.email || '') !== '') {
-                                        setShowCarrierDriverEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedDriver?.email || '') !== '') {
-                                        setShowCarrierDriverEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowCarrierDriverEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowCarrierDriverEmailCopyBtn(false);
-                                }}>
-                                <input tabIndex={95 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                    ref={refCarrierDriverEmail}
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({ ...selectedDriver, email: e.target.value })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({ ...selectedDriver, email: e.target.value })
-                                    }}
-                                    value={selectedDriver?.email || ''} />
+                            <div className="input-box-container" style={{position: 'relative', flexGrow: 1}}
+                                 onMouseEnter={() => {
+                                     if ((selectedDriver?.email || '') !== '') {
+                                         setShowCarrierDriverEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onFocus={() => {
+                                     if ((selectedDriver?.email || '') !== '') {
+                                         setShowCarrierDriverEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onBlur={() => {
+                                     window.setTimeout(() => {
+                                         setShowCarrierDriverEmailCopyBtn(false);
+                                     }, 1000);
+                                 }}
+                                 onMouseLeave={() => {
+                                     setShowCarrierDriverEmailCopyBtn(false);
+                                 }}>
+                                <input tabIndex={95 + props.tabTimes} type="text" placeholder="E-Mail"
+                                       style={{textTransform: 'lowercase'}}
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                       }
+                                       ref={refCarrierDriverEmail}
+                                       onKeyDown={validateDriverForSaving}
+                                       onInput={e => {
+                                           setSelectedDriver({...selectedDriver, email: e.target.value})
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver({...selectedDriver, email: e.target.value})
+                                       }}
+                                       value={selectedDriver?.email || ''}/>
                                 {
                                     showCarrierDriverEmailCopyBtn &&
                                     <FontAwesomeIcon style={{
@@ -3408,271 +3895,283 @@ const Carriers = (props) => {
                                     }} icon={faCopy} onClick={(e) => {
                                         e.stopPropagation();
                                         navigator.clipboard.writeText(refCarrierDriverEmail.current.value);
-                                    }} />
+                                    }}/>
                                 }
                             </div>
 
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input type="text"
-                                        tabIndex={96 + props.tabTimes}
-                                        placeholder="Equipment"
-                                        ref={refEquipment}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={96 + props.tabTimes}
+                                           placeholder="Equipment"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                           }
+                                           ref={refEquipment}
+                                           onKeyDown={async (e) => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (driverEquipmentDropdownItems.length > 0) {
-                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (driverEquipmentDropdownItems.length > 0) {
+                                                           let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (driverEquipmentDropdownItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (driverEquipmentDropdownItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getEquipments').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                                    item.selected = (selectedDriver?.equipment?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedDriver?.equipment.id
-                                                                    return item;
-                                                                }))
+                                                           refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getEquipments').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                       item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedDriver?.equipment.id
+                                                                       return item;
+                                                                   }))
 
-                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting driver equipments', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting driver equipments', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (driverEquipmentDropdownItems.length > 0) {
-                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (driverEquipmentDropdownItems.length > 0) {
+                                                           let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
-                                                                if (selectedIndex === (driverEquipmentDropdownItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                                   if (selectedIndex === (driverEquipmentDropdownItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getEquipments').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                                    item.selected = (selectedDriver?.equipment?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedDriver?.equipment.id
-                                                                    return item;
-                                                                }))
+                                                           refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getEquipments').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                       item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedDriver?.equipment.id
+                                                                       return item;
+                                                                   }))
 
-                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting driver equipments', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting driver equipments', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setDriverEquipmentDropdownItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setDriverEquipmentDropdownItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedDriver({
-                                                            ...selectedDriver,
-                                                            equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
-                                                            equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id
-                                                        });
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                        setDriverEquipmentDropdownItems([]);
-                                                        refEquipment.current.focus();
-                                                    }
-                                                    break;
+                                                   case 13: // enter
+                                                       if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedDriver({
+                                                               ...selectedDriver,
+                                                               equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
+                                                               equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id
+                                                           });
+                                                           validateDriverForSaving({keyCode: 9});
+                                                           setDriverEquipmentDropdownItems([]);
+                                                           refEquipment.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (driverEquipmentDropdownItems.length > 0) {
-                                                        e.preventDefault();
-                                                        await setSelectedDriver({
-                                                            ...selectedDriver,
-                                                            equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
-                                                            equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id
-                                                        });
-                                                        validateDriverForSaving({ keyCode: 9 });
-                                                        setDriverEquipmentDropdownItems([]);
-                                                        refEquipment.current.focus();
-                                                    }
-                                                    break;
+                                                   case 9: // tab
+                                                       if (driverEquipmentDropdownItems.length > 0) {
+                                                           e.preventDefault();
+                                                           await setSelectedDriver({
+                                                               ...selectedDriver,
+                                                               equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
+                                                               equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id
+                                                           });
+                                                           validateDriverForSaving({keyCode: 9});
+                                                           setDriverEquipmentDropdownItems([]);
+                                                           refEquipment.current.focus();
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onBlur={async () => {
-                                            if ((selectedDriver?.equipment?.id || 0) === 0) {
-                                                await setSelectedDriver({ ...selectedDriver, equipment: {} });
-                                            }
-                                        }}
-                                        onInput={async (e) => {
-                                            let equipment = selectedDriver?.equipment || {};
-                                            equipment.id = 0;
-                                            equipment.name = e.target.value;
-                                            await setSelectedDriver({ ...selectedDriver, equipment: equipment });
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onBlur={async () => {
+                                               if ((selectedDriver?.equipment?.id || 0) === 0) {
+                                                   await setSelectedDriver({...selectedDriver, equipment: {}});
+                                               }
+                                           }}
+                                           onInput={async (e) => {
+                                               let equipment = selectedDriver?.equipment || {};
+                                               equipment.id = 0;
+                                               equipment.name = e.target.value;
+                                               await setSelectedDriver({...selectedDriver, equipment: equipment});
 
-                                            if (e.target.value.trim() === '') {
+                                               if (e.target.value.trim() === '') {
+                                                   setDriverEquipmentDropdownItems([]);
+                                               } else {
+                                                   axios.post(props.serverUrl + '/getEquipments', {
+                                                       name: e.target.value.trim()
+                                                   }).then(async res => {
+                                                       if (res.data.result === 'OK') {
+                                                           await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                               item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedDriver?.equipment.id
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(async e => {
+                                                       console.log('error getting driver equipments', e);
+                                                   })
+                                               }
+                                           }}
+                                           onChange={async (e) => {
+                                               let equipment = selectedDriver?.equipment || {};
+                                               equipment.id = 0;
+                                               equipment.name = e.target.value;
+                                               await setSelectedDriver({...selectedDriver, equipment: equipment});
+                                           }}
+                                           value={selectedDriver?.equipment?.name || ''}
+                                    />
+                                    {
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0) &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                            if (driverEquipmentDropdownItems.length > 0) {
                                                 setDriverEquipmentDropdownItems([]);
                                             } else {
-                                                axios.post(props.serverUrl + '/getEquipments', {
-                                                    name: e.target.value.trim()
-                                                }).then(async res => {
-                                                    if (res.data.result === 'OK') {
-                                                        await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedDriver?.equipment.id
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(async e => {
-                                                    console.log('error getting driver equipments', e);
-                                                })
+                                                if ((selectedDriver?.equipment?.id || 0) === 0 && (selectedDriver?.equipment?.name || '') !== '') {
+                                                    axios.post(props.serverUrl + '/getEquipments', {
+                                                        name: selectedDriver?.equipment.name
+                                                    }).then(async res => {
+                                                        if (res.data.result === 'OK') {
+                                                            await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedDriver?.equipment.id
+                                                                return item;
+                                                            }))
+
+                                                            refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(async e => {
+                                                        console.log('error getting driver equipments', e);
+                                                    })
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getEquipments').then(async res => {
+                                                        if (res.data.result === 'OK') {
+                                                            await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedDriver?.equipment.id
+                                                                return item;
+                                                            }))
+
+                                                            refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(async e => {
+                                                        console.log('error getting driver equipments', e);
+                                                    })
+                                                }
                                             }
-                                        }}
-                                        onChange={async (e) => {
-                                            let equipment = selectedDriver?.equipment || {};
-                                            equipment.id = 0;
-                                            equipment.name = e.target.value;
-                                            await setSelectedDriver({ ...selectedDriver, equipment: equipment });
-                                        }}
-                                        value={selectedDriver?.equipment?.name || ''}
-                                    />
-                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                        if (driverEquipmentDropdownItems.length > 0) {
-                                            setDriverEquipmentDropdownItems([]);
-                                        } else {
-                                            if ((selectedDriver?.equipment?.id || 0) === 0 && (selectedDriver?.equipment?.name || '') !== '') {
-                                                axios.post(props.serverUrl + '/getEquipments', {
-                                                    name: selectedDriver?.equipment.name
-                                                }).then(async res => {
-                                                    if (res.data.result === 'OK') {
-                                                        await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedDriver?.equipment.id
-                                                            return item;
-                                                        }))
 
-                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(async e => {
-                                                    console.log('error getting driver equipments', e);
-                                                })
-                                            } else {
-                                                axios.post(props.serverUrl + '/getEquipments').then(async res => {
-                                                    if (res.data.result === 'OK') {
-                                                        await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedDriver?.equipment.id
-                                                            return item;
-                                                        }))
-
-                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(async e => {
-                                                    console.log('error getting driver equipments', e);
-                                                })
-                                            }
-                                        }
-
-                                        refEquipment.current.focus();
-                                    }} />
+                                            refEquipment.current.focus();
+                                        }}/>
+                                    }
                                 </div>
                                 {
                                     equipmentTransition((style, item) => item && (
@@ -3710,7 +4209,7 @@ const Carriers = (props) => {
                                                                                 equipment: item,
                                                                                 equipment_id: item.id
                                                                             });
-                                                                            validateDriverForSaving({ keyCode: 9 });
+                                                                            validateDriverForSaving({keyCode: 9});
                                                                             setDriverEquipmentDropdownItems([]);
                                                                             refEquipment.current.focus();
                                                                         }}
@@ -3728,7 +4227,9 @@ const Carriers = (props) => {
                                                                         }
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -3746,85 +4247,100 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={97 + props.tabTimes} type="text" placeholder="Truck"
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({ ...selectedDriver, truck: e.target.value })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({ ...selectedDriver, truck: e.target.value })
-                                    }}
-                                    value={selectedDriver?.truck || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={validateDriverForSaving}
+                                       onInput={e => {
+                                           setSelectedDriver({...selectedDriver, truck: e.target.value})
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver({...selectedDriver, truck: e.target.value})
+                                       }}
+                                       value={selectedDriver?.truck || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={98 + props.tabTimes} type="text" placeholder="Trailer"
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({ ...selectedDriver, trailer: e.target.value })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({ ...selectedDriver, trailer: e.target.value })
-                                    }}
-                                    value={selectedDriver?.trailer || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={validateDriverForSaving}
+                                       onInput={e => {
+                                           setSelectedDriver({...selectedDriver, trailer: e.target.value})
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver({...selectedDriver, trailer: e.target.value})
+                                       }}
+                                       value={selectedDriver?.trailer || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={99 + props.tabTimes} type="text" placeholder="Notes"
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if (key === 9) {
-                                            if (selectedCarrier?.id || 0 > 0) {
-                                                let driver = { ...selectedDriver, carrier_id: selectedCarrier.id };
+                                           if (key === 9) {
+                                               if (selectedCarrier?.id || 0 > 0) {
+                                                   let driver = {...selectedDriver, carrier_id: selectedCarrier.id};
 
-                                                if ((driver.first_name || '').trim() !== '') {
-                                                    e.preventDefault();
+                                                   if ((driver.first_name || '').trim() !== '') {
+                                                       e.preventDefault();
 
-                                                    axios.post(props.serverUrl + '/saveCarrierDriver', driver).then(res => {
-                                                        if (res.data.result === 'OK') {
-                                                            setSelectedCarrier(selectedCarrier => {
-                                                                return {
-                                                                    ...selectedCarrier,
-                                                                    drivers: res.data.drivers
-                                                                }
-                                                            });
-                                                            setSelectedDriver({});
+                                                       axios.post(props.serverUrl + '/saveCarrierDriver', driver).then(res => {
+                                                           if (res.data.result === 'OK') {
+                                                               setSelectedCarrier(selectedCarrier => {
+                                                                   return {
+                                                                       ...selectedCarrier,
+                                                                       drivers: res.data.drivers
+                                                                   }
+                                                               });
+                                                               setSelectedDriver({});
 
-                                                            props.setSelectedCarrier({
-                                                                id: selectedCarrier.id,
-                                                                drivers: res.data.drivers,
-                                                                component_id: props.componentId
-                                                            })
+                                                               props.setSelectedCarrier({
+                                                                   id: selectedCarrier.id,
+                                                                   drivers: res.data.drivers,
+                                                                   component_id: props.componentId
+                                                               })
 
-                                                            refCarrierDriverFirstName.current.focus();
-                                                        }
+                                                               refCarrierDriverFirstName.current.focus();
+                                                           }
 
-                                                        setIsSavingDriver(false);
-                                                    }).catch(e => {
-                                                        console.log('error on saving carrier driver', e);
-                                                        setIsSavingDriver(false);
-                                                    });
-                                                } else {
-                                                    e.preventDefault();
-                                                    setIsSavingDriver(false);
-                                                    refCarrierCode.current.focus();
-                                                }
-                                            } else {
-                                                e.preventDefault();
-                                                setIsSavingDriver(false);
-                                                refCarrierCode.current.focus();
-                                            }
-                                        }
-                                    }}
-                                    onInput={e => {
-                                        setSelectedDriver({ ...selectedDriver, notes: e.target.value })
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({ ...selectedDriver, notes: e.target.value })
-                                    }}
-                                    value={selectedDriver?.notes || ''} />
+                                                           setIsSavingDriver(false);
+                                                       }).catch(e => {
+                                                           console.log('error on saving carrier driver', e);
+                                                           setIsSavingDriver(false);
+                                                       });
+                                                   } else {
+                                                       e.preventDefault();
+                                                       setIsSavingDriver(false);
+                                                       refCarrierCode.current.focus();
+                                                   }
+                                               } else {
+                                                   e.preventDefault();
+                                                   setIsSavingDriver(false);
+                                                   refCarrierCode.current.focus();
+                                               }
+                                           }
+                                       }}
+                                       onInput={e => {
+                                           setSelectedDriver({...selectedDriver, notes: e.target.value})
+                                       }}
+                                       onChange={e => {
+                                           setSelectedDriver({...selectedDriver, notes: e.target.value})
+                                       }}
+                                       value={selectedDriver?.notes || ''}/>
                             </div>
                         </div>
 
@@ -3835,7 +4351,12 @@ const Carriers = (props) => {
                             flexGrow: 1,
                             paddingBottom: 10
                         }}>
-                            <div className="mochi-button">
+                            <div className={
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0)
+                                    ? 'mochi-button disabled' : 'mochi-button'
+                            }>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">E-Mail Driver</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -3845,7 +4366,7 @@ const Carriers = (props) => {
                 </div>
             </div>
 
-            <div className="fields-container-row" style={{ marginTop: 10 }}>
+            <div className="fields-container-row" style={{marginTop: 10}}>
                 <div className="fields-container-col">
                     <div className="form-bordered-box" style={{
                         display: 'flex',
@@ -3858,7 +4379,12 @@ const Carriers = (props) => {
                             <div className="form-title">Mailing Address</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div className='mochi-button' onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if ((selectedCarrier.id || 0) > 0) {
                                         setShowingACHWiringInfo(true);
                                     } else {
@@ -3869,12 +4395,22 @@ const Carriers = (props) => {
                                     <div className='mochi-button-base'>ACH/Wiring Info</div>
                                     <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
                                 </div>
-                                <div className="mochi-button" onClick={remitToAddressBtn}>
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={remitToAddressBtn}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Remit to address is the same</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className="mochi-button" onClick={clearMailingAddressBtn}>
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={clearMailingAddressBtn}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -3885,8 +4421,9 @@ const Carriers = (props) => {
 
                         <div className="form-row">
                             <div className="input-box-container input-code">
-                                <input tabIndex={54 + props.tabTimes} type="text" placeholder="Code" maxLength="8" readOnly={true}
-                                    value={(selectedCarrier?.mailing_address?.code_number || 0) === 0 ? (selectedCarrier?.mailing_address?.code || '') : selectedCarrier?.mailing_address?.code + selectedCarrier?.mailing_address?.code_number}
+                                <input tabIndex={54 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
+                                       readOnly={true}
+                                       value={(selectedCarrier?.mailing_address?.code_number || 0) === 0 ? (selectedCarrier?.mailing_address?.code || '') : selectedCarrier?.mailing_address?.code + selectedCarrier?.mailing_address?.code_number}
                                 />
                             </div>
 
@@ -3894,81 +4431,102 @@ const Carriers = (props) => {
 
                             <div className="input-box-container grow">
                                 <input tabIndex={55 + props.tabTimes} type="text" placeholder="Name"
-                                    // onKeyDown={validateMailingAddressToSave} 
-                                    onChange={e => {
-                                        let mailing_address = selectedCarrier.mailing_address || {};
-                                        mailing_address.name = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedCarrier.mailing_address?.name || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let mailing_address = selectedCarrier.mailing_address || {};
+                                           mailing_address.name = e.target.value;
+                                           setSelectedCarrier({...selectedCarrier, mailing_address: mailing_address});
+                                       }}
+                                       value={selectedCarrier.mailing_address?.name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={56 + props.tabTimes} type="text" placeholder="Address 1"
-                                    // onKeyDown={validateMailingAddressToSave} 
-                                    onChange={e => {
-                                        let mailing_address = selectedCarrier.mailing_address || {};
-                                        mailing_address.address1 = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedCarrier.mailing_address?.address1 || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let mailing_address = selectedCarrier.mailing_address || {};
+                                           mailing_address.address1 = e.target.value;
+                                           setSelectedCarrier({...selectedCarrier, mailing_address: mailing_address});
+                                       }}
+                                       value={selectedCarrier.mailing_address?.address1 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={57 + props.tabTimes} type="text" placeholder="Address 2"
-                                    // onKeyDown={validateMailingAddressToSave} 
-                                    onChange={e => {
-                                        let mailing_address = selectedCarrier.mailing_address || {};
-                                        mailing_address.address2 = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedCarrier.mailing_address?.address2 || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let mailing_address = selectedCarrier.mailing_address || {};
+                                           mailing_address.address2 = e.target.value;
+                                           setSelectedCarrier({...selectedCarrier, mailing_address: mailing_address});
+                                       }}
+                                       value={selectedCarrier.mailing_address?.address2 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={58 + props.tabTimes} type="text" placeholder="City"
-                                    // onKeyDown={validateMailingAddressToSave} 
-                                    onChange={e => {
-                                        let mailing_address = selectedCarrier.mailing_address || {};
-                                        mailing_address.city = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedCarrier.mailing_address?.city || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let mailing_address = selectedCarrier.mailing_address || {};
+                                           mailing_address.city = e.target.value;
+                                           setSelectedCarrier({...selectedCarrier, mailing_address: mailing_address});
+                                       }}
+                                       value={selectedCarrier.mailing_address?.city || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-state">
                                 <input tabIndex={59 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                    // onKeyDown={validateMailingAddressToSave} 
-                                    onChange={e => {
-                                        let mailing_address = selectedCarrier.mailing_address || {};
-                                        mailing_address.state = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedCarrier.mailing_address?.state || ''} />
+                                    // onKeyDown={validateMailingAddressToSave}
+                                       onChange={e => {
+                                           let mailing_address = selectedCarrier.mailing_address || {};
+                                           mailing_address.state = e.target.value;
+                                           setSelectedCarrier({...selectedCarrier, mailing_address: mailing_address});
+                                       }}
+                                       value={selectedCarrier.mailing_address?.state || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-zip-code">
                                 <input tabIndex={60 + props.tabTimes} type="text" placeholder="Postal Code"
-                                    onKeyDown={validateMailingAddressToSave}
-                                    onChange={e => {
-                                        let mailing_address = selectedCarrier.mailing_address || {};
-                                        mailing_address.zip = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedCarrier.mailing_address?.zip || ''} />
+                                       onKeyDown={validateMailingAddressToSave}
+                                       onChange={e => {
+                                           let mailing_address = selectedCarrier.mailing_address || {};
+                                           mailing_address.zip = e.target.value;
+                                           setSelectedCarrier({...selectedCarrier, mailing_address: mailing_address});
+                                       }}
+                                       value={selectedCarrier.mailing_address?.zip || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input
+                                        readOnly={
+                                            (props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                        }
                                         tabIndex={61 + props.tabTimes}
                                         type="text" placeholder="Contact Name"
                                         ref={refMailingContactName}
@@ -3976,7 +4534,8 @@ const Carriers = (props) => {
                                             let key = e.keyCode || e.which;
 
                                             switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
+                                                case 37:
+                                                case 38: // arrow left | arrow up
                                                     e.preventDefault();
                                                     if (showMailingContactNames) {
                                                         let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
@@ -4030,7 +4589,8 @@ const Carriers = (props) => {
                                                     }
                                                     break;
 
-                                                case 39: case 40: // arrow right | arrow down
+                                                case 39:
+                                                case 40: // arrow right | arrow down
                                                     e.preventDefault();
                                                     if (showMailingContactNames) {
                                                         let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
@@ -4093,7 +4653,29 @@ const Carriers = (props) => {
                                                         await setSelectedCarrier({
                                                             ...selectedCarrier,
                                                             mailing_address: {
-                                                                ...selectedCarrier.mailing_address,
+                                                                ...(selectedCarrier?.mailing_address || {}),
+                                                                contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                    + ' '
+                                                                    + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                    : '',
+                                                                ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                            : '',
                                                                 mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
                                                                 mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
                                                                 mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
@@ -4110,7 +4692,7 @@ const Carriers = (props) => {
                                                             }
                                                         });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
+                                                        // validateMailingAddressToSave({keyCode: 9});
                                                         setShowMailingContactNames(false);
                                                         refMailingContactName.current.focus();
                                                     }
@@ -4122,7 +4704,29 @@ const Carriers = (props) => {
                                                         await setSelectedCarrier({
                                                             ...selectedCarrier,
                                                             mailing_address: {
-                                                                ...selectedCarrier.mailing_address,
+                                                                ...(selectedCarrier?.mailing_address || {}),
+                                                                contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                    + ' '
+                                                                    + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                    : '',
+                                                                ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                            : '',
                                                                 mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
                                                                 mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
                                                                 mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
@@ -4139,11 +4743,11 @@ const Carriers = (props) => {
                                                             }
                                                         });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
+                                                        // validateMailingAddressToSave({keyCode: 9});
                                                         setShowMailingContactNames(false);
                                                         refMailingContactName.current.focus();
                                                     } else {
-                                                        validateMailingAddressToSave({ keyCode: 9 });
+                                                        // validateMailingAddressToSave({keyCode: 9});
                                                     }
                                                     break;
 
@@ -4151,55 +4755,110 @@ const Carriers = (props) => {
                                                     break;
                                             }
                                         }}
+                                        onBlur={e => {
+                                            let contact = (selectedCarrier?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+
+                                            if (contact) {
+                                                setSelectedCarrier(selectedCarrier => {
+                                                    return {
+                                                        ...selectedCarrier,
+                                                        mailing_address: {
+                                                            ...(selectedCarrier?.mailing_address || {}),
+                                                            contact_phone: (contact.primary_phone || '') === 'work'
+                                                                ? (contact.phone_work || '')
+                                                                : (contact.primary_phone || '') === 'fax'
+                                                                    ? (contact.phone_work_fax || '')
+                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                        ? (contact.phone_mobile || '')
+                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                            ? (contact.phone_direct || '')
+                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                ? (contact.phone_other || '')
+                                                                                : '',
+                                                            ext: (contact.phone_ext || ''),
+                                                            email: (contact.primary_email || '') === 'work'
+                                                                ? (contact.email_work || '')
+                                                                : (contact.primary_email || '') === 'personal'
+                                                                    ? (contact.email_personal || '')
+                                                                    : (contact.primary_email || '') === 'other'
+                                                                        ? (contact.email_other || '')
+                                                                        : '',
+                                                            mailing_contact_id: contact.id
+                                                        }
+                                                    }
+                                                })
+                                            } else {
+                                                setSelectedCarrier(selectedCarrier => {
+                                                    return {
+                                                        ...selectedCarrier,
+                                                        mailing_address: {
+                                                            ...(selectedCarrier?.mailing_address || {}),
+                                                            mailing_contact_id: null,
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                        }}
                                         onInput={e => {
-                                            // let mailing_address = selectedCarrier.mailing_address || {};
-                                            // mailing_address.contact_name = e.target.value;
-                                            // setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
+                                            setSelectedCarrier(selectedCarrier => {
+                                                return {
+                                                    ...selectedCarrier,
+                                                    mailing_address: {
+                                                        ...(selectedCarrier?.mailing_address || {}),
+                                                        contact_name: e.target.value
+                                                    }
+                                                }
+                                            })
                                         }}
                                         onChange={e => {
-                                            // let mailing_address = selectedCarrier.mailing_address || {};
-                                            // mailing_address.contact_name = e.target.value;
-                                            // setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
+                                            setSelectedCarrier(selectedCarrier => {
+                                                return {
+                                                    ...selectedCarrier,
+                                                    mailing_address: {
+                                                        ...(selectedCarrier?.mailing_address || {}),
+                                                        contact_name: e.target.value
+                                                    }
+                                                }
+                                            })
                                         }}
-                                        value={
-                                            (selectedCarrier?.mailing_address?.mailing_contact?.first_name || '') +
-                                            ((selectedCarrier?.mailing_address?.mailing_contact?.last_name || '') === ''
-                                                ? ''
-                                                : ' ' + selectedCarrier?.mailing_address?.mailing_contact?.last_name)
-                                        }
+                                        value={selectedCarrier?.mailing_address?.contact_name || ''}
                                     />
 
                                     {
-                                        ((selectedCarrier?.contacts || []).length > 1 && (selectedCarrier?.mailing_address?.id !== undefined)) &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showMailingContactNames) {
-                                                setShowMailingContactNames(false);
-                                            } else {
-                                                if ((selectedCarrier?.contacts || []).length > 1) {
-                                                    await setMailingContactNameItems((selectedCarrier?.contacts || []).map((item, index) => {
-                                                        item.selected = index === 0
-                                                        return item;
-                                                    }))
+                                        ((selectedCarrier?.contacts || []).length > 0 && ((selectedCarrier?.mailing_address?.id || 0) > 0)) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 1)) &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showMailingContactNames) {
+                                                                 setShowMailingContactNames(false);
+                                                             } else {
+                                                                 if ((selectedCarrier?.contacts || []).length > 0) {
+                                                                     await setMailingContactNameItems((selectedCarrier?.contacts || []).map((item, index) => {
+                                                                         item.selected = index === 0
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowMailingContactNames(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowMailingContactNames(true);
 
-                                                        refMailingContactNamePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refMailingContactNamePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refMailingContactName.current.focus();
-                                        }} />
+                                                             refMailingContactName.current.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -4214,8 +4873,9 @@ const Carriers = (props) => {
                                             }}
                                             ref={refMailingContactNameDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             mailingContactNameItems.map((item, index) => {
@@ -4230,27 +4890,49 @@ const Carriers = (props) => {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedCarrier({
-                                                                                ...selectedCarrier,
-                                                                                mailing_address: {
-                                                                                    ...selectedCarrier.mailing_address,
-                                                                                    mailing_contact: item,
-                                                                                    mailing_contact_id: item.id,
-                                                                                    mailing_contact_primary_phone: (item.phone_work || '') !== ''
-                                                                                        ? 'work'
-                                                                                        : (item.phone_work_fax || '') !== ''
-                                                                                            ? 'fax'
-                                                                                            : (item.phone_mobile || '') !== ''
-                                                                                                ? 'mobile'
-                                                                                                : (item.phone_direct || '') !== ''
-                                                                                                    ? 'direct'
-                                                                                                    : (item.phone_other || '') !== ''
-                                                                                                        ? 'other' :
-                                                                                                        ''
+                                                                            await setSelectedCarrier(selectedCarrier => {
+                                                                                return {
+                                                                                    ...selectedCarrier,
+                                                                                    mailing_address: {
+                                                                                        ...(selectedCarrier?.mailing_address || {}),
+                                                                                        contact_name: (item.first_name + ' ' + item.last_name).trim(),
+                                                                                        contact_phone: (item.primary_phone || '') === 'work'
+                                                                                            ? (item.phone_work || '')
+                                                                                            : (item.primary_phone || '') === 'fax'
+                                                                                                ? (item.phone_work_fax || '')
+                                                                                                : (item.primary_phone || '') === 'mobile'
+                                                                                                    ? (item.phone_mobile || '')
+                                                                                                    : (item.primary_phone || '') === 'direct'
+                                                                                                        ? (item.phone_direct || '')
+                                                                                                        : (item.primary_phone || '') === 'other'
+                                                                                                            ? (item.phone_other || '')
+                                                                                                            : '',
+                                                                                        ext: (item.phone_ext || ''),
+                                                                                        email: (item.primary_email || '') === 'work'
+                                                                                            ? (item.email_work || '')
+                                                                                            : (item.primary_email || '') === 'personal'
+                                                                                                ? (item.email_personal || '')
+                                                                                                : (item.primary_email || '') === 'other'
+                                                                                                    ? (item.email_other || '')
+                                                                                                    : '',
+                                                                                        mailing_contact: item,
+                                                                                        mailing_contact_id: item.id,
+                                                                                        mailing_contact_primary_phone: (item.phone_work || '') !== ''
+                                                                                            ? 'work'
+                                                                                            : (item.phone_work_fax || '') !== ''
+                                                                                                ? 'fax'
+                                                                                                : (item.phone_mobile || '') !== ''
+                                                                                                    ? 'mobile'
+                                                                                                    : (item.phone_direct || '') !== ''
+                                                                                                        ? 'direct'
+                                                                                                        : (item.phone_other || '') !== ''
+                                                                                                            ? 'other' :
+                                                                                                            ''
+                                                                                    }
                                                                                 }
                                                                             });
 
-                                                                            validateMailingAddressToSave({ keyCode: 9 });
+                                                                            // validateMailingAddressToSave({keyCode: 9});
                                                                             setShowMailingContactNames(false);
                                                                             refMailingContactName.current.focus();
                                                                         }}
@@ -4262,7 +4944,9 @@ const Carriers = (props) => {
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -4279,183 +4963,196 @@ const Carriers = (props) => {
                             <div className="select-box-container input-phone">
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={62 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text" placeholder="Contact Phone"
-                                        ref={refMailingContactPhone}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                                 readOnly={
+                                                     (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                                 }
+                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={true}
+                                                 type="text" placeholder="Contact Phone"
+                                                 ref={refMailingContactPhone}
+                                                 onKeyDown={async (e) => {
+                                                     let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showMailingContactPhones) {
-                                                        let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
+                                                     switch (key) {
+                                                         case 37:
+                                                         case 38: // arrow left | arrow up
+                                                             e.preventDefault();
+                                                             if (showMailingContactPhones) {
+                                                                 let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (mailingContactPhoneItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === 0) {
+                                                                             item.selected = index === (mailingContactPhoneItems.length - 1);
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex - 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (mailingContactPhoneItems.length > 1) {
-                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
+                                                                 refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (mailingContactPhoneItems.length > 1) {
+                                                                     await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowMailingContactPhones(true);
+                                                                     setShowMailingContactPhones(true);
 
-                                                            refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showMailingContactPhones) {
-                                                        let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
+                                                         case 39:
+                                                         case 40: // arrow right | arrow down
+                                                             e.preventDefault();
+                                                             if (showMailingContactPhones) {
+                                                                 let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                if (selectedIndex === (mailingContactPhoneItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                                 if (selectedIndex === -1) {
+                                                                     await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
+                                                                 } else {
+                                                                     await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                         if (selectedIndex === (mailingContactPhoneItems.length - 1)) {
+                                                                             item.selected = index === 0;
+                                                                         } else {
+                                                                             item.selected = index === (selectedIndex + 1)
+                                                                         }
+                                                                         return item;
+                                                                     }))
+                                                                 }
 
-                                                        refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (mailingContactPhoneItems.length > 1) {
-                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
+                                                                 refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                     if (r && r.classList.contains('selected')) {
+                                                                         r.scrollIntoView({
+                                                                             behavior: 'auto',
+                                                                             block: 'center',
+                                                                             inline: 'nearest'
+                                                                         })
+                                                                     }
+                                                                     return true;
+                                                                 });
+                                                             } else {
+                                                                 if (mailingContactPhoneItems.length > 1) {
+                                                                     await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
 
-                                                            setShowMailingContactPhones(true);
+                                                                     setShowMailingContactPhones(true);
 
-                                                            refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                                     refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                         if (r && r.classList.contains('selected')) {
+                                                                             r.scrollIntoView({
+                                                                                 behavior: 'auto',
+                                                                                 block: 'center',
+                                                                                 inline: 'nearest'
+                                                                             })
+                                                                         }
+                                                                         return true;
+                                                                     });
+                                                                 }
+                                                             }
+                                                             break;
 
-                                                case 27: // escape
-                                                    setShowMailingContactPhones(false);
-                                                    break;
+                                                         case 27: // escape
+                                                             setShowMailingContactPhones(false);
+                                                             break;
 
-                                                case 13: // enter
-                                                    if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedCarrier({
-                                                            ...selectedCarrier,
-                                                            mailing_address: {
-                                                                ...selectedCarrier.mailing_address,
-                                                                mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 13: // enter
+                                                             if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                 await setSelectedCarrier({
+                                                                     ...selectedCarrier,
+                                                                     mailing_address: {
+                                                                         ...(selectedCarrier?.mailing_address || {}),
+                                                                         contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
+                                                                         mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
-                                                        setShowMailingContactPhones(false);
-                                                        refMailingContactPhone.current.inputElement.focus();
-                                                    }
-                                                    break;
+                                                                 // validateMailingAddressToSave({keyCode: 9});
+                                                                 setShowMailingContactPhones(false);
+                                                                 refMailingContactPhone.current.inputElement.focus();
+                                                             }
+                                                             break;
 
-                                                case 9: // tab
-                                                    if (showMailingContactPhones) {
-                                                        e.preventDefault();
-                                                        await setSelectedCarrier({
-                                                            ...selectedCarrier,
-                                                            mailing_address: {
-                                                                ...selectedCarrier.mailing_address,
-                                                                mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                         case 9: // tab
+                                                             if (showMailingContactPhones) {
+                                                                 e.preventDefault();
+                                                                 await setSelectedCarrier({
+                                                                     ...selectedCarrier,
+                                                                     mailing_address: {
+                                                                         ...(selectedCarrier?.mailing_address || {}),
+                                                                         contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
+                                                                         mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                                     }
+                                                                 });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
-                                                        setShowMailingContactPhones(false);
-                                                        refMailingContactPhone.current.inputElement.focus();
-                                                    } else {
-                                                        validateMailingAddressToSave({ keyCode: 9 });
-                                                    }
-                                                    break;
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={(e) => {
-
-                                        }}
-                                        onChange={(e) => {
-
-                                        }}
-                                        value={
-                                            (selectedCarrier?.mailing_address?.mailing_contact_primary_phone || '') === 'work'
-                                                ? (selectedCarrier?.mailing_address?.mailing_contact?.phone_work || '')
-                                                : (selectedCarrier?.mailing_address?.mailing_contact_primary_phone || '') === 'fax'
-                                                    ? (selectedCarrier?.mailing_address?.mailing_contact?.phone_work_fax || '')
-                                                    : (selectedCarrier?.mailing_address?.mailing_contact_primary_phone || '') === 'mobile'
-                                                        ? (selectedCarrier?.mailing_address?.mailing_contact?.phone_mobile || '')
-                                                        : (selectedCarrier?.mailing_address?.mailing_contact_primary_phone || '') === 'direct'
-                                                            ? (selectedCarrier?.mailing_address?.mailing_contact?.phone_direct || '')
-                                                            : (selectedCarrier?.mailing_address?.mailing_contact_primary_phone || '') === 'other'
-                                                                ? (selectedCarrier?.mailing_address?.mailing_contact?.phone_other || '')
-                                                                : ''
-                                        }
+                                                                 // validateMailingAddressToSave({keyCode: 9});
+                                                                 setShowMailingContactPhones(false);
+                                                                 refMailingContactPhone.current.inputElement.focus();
+                                                             } else {
+                                                                 // validateMailingAddressToSave({keyCode: 9});
+                                                             }
+                                                             break;
+                                                         default:
+                                                             break;
+                                                     }
+                                                 }}
+                                                 onInput={(e) => {
+                                                     setSelectedCarrier(selectedCarrier => {
+                                                         return {
+                                                             ...selectedCarrier,
+                                                             mailing_address: {
+                                                                 ...(selectedCarrier?.mailing_address || {}),
+                                                                 contact_phone: e.target.value
+                                                             }
+                                                         }
+                                                     })
+                                                 }}
+                                                 onChange={(e) => {
+                                                     setSelectedCarrier(selectedCarrier => {
+                                                         return {
+                                                             ...selectedCarrier,
+                                                             mailing_address: {
+                                                                 ...(selectedCarrier?.mailing_address || {}),
+                                                                 contact_phone: e.target.value
+                                                             }
+                                                         }
+                                                     })
+                                                 }}
+                                                 value={selectedCarrier?.mailing_address?.contact_phone}
                                     />
 
                                     {
@@ -4465,41 +5162,45 @@ const Carriers = (props) => {
                                                 'selected-mailing-contact-primary-phone': true,
                                                 'pushed': (mailingContactPhoneItems.length > 1)
                                             })}>
-                                            {selectedCarrier?.mailing_address?.mailing_contact_primary_phone || ''}
+                                            {selectedCarrier?.mailing_address?.mailing_contact_id ? (selectedCarrier?.mailing_address?.mailing_contact_primary_phone || '') : ''}
                                         </div>
                                     }
 
                                     {
-                                        mailingContactPhoneItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showMailingContactPhones) {
-                                                setShowMailingContactPhones(false);
-                                            } else {
-                                                if (mailingContactPhoneItems.length > 1) {
-                                                    await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                        item.selected = index === 0;
-                                                        return item;
-                                                    }))
+                                        (mailingContactPhoneItems.length > 1 && ((selectedCarrier?.mailing_address?.mailing_contact_id || 0) > 0)) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 1)) &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showMailingContactPhones) {
+                                                                 setShowMailingContactPhones(false);
+                                                             } else {
+                                                                 if (mailingContactPhoneItems.length > 1) {
+                                                                     await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowMailingContactPhones(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowMailingContactPhones(true);
 
-                                                        refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refMailingContactPhone.current.inputElement.focus();
-                                        }} />
+                                                             refMailingContactPhone.current.inputElement.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -4514,8 +5215,9 @@ const Carriers = (props) => {
                                             }}
                                             ref={refMailingContactPhoneDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             mailingContactPhoneItems.map((item, index) => {
@@ -4533,12 +5235,13 @@ const Carriers = (props) => {
                                                                             await setSelectedCarrier({
                                                                                 ...selectedCarrier,
                                                                                 mailing_address: {
-                                                                                    ...selectedCarrier.mailing_address,
+                                                                                    ...(selectedCarrier?.mailing_address || {}),
+                                                                                    contact_phone: item.phone,
                                                                                     mailing_contact_primary_phone: item.type
                                                                                 }
                                                                             });
 
-                                                                            validateMailingAddressToSave({ keyCode: 9 });
+                                                                            // validateMailingAddressToSave({keyCode: 9});
                                                                             setShowMailingContactPhones(false);
                                                                             refMailingContactPhone.current.inputElement.focus();
                                                                         }}
@@ -4553,18 +5256,20 @@ const Carriers = (props) => {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.phone
+                                                                                : item.type === 'fax' ? item.phone
+                                                                                    : item.type === 'mobile' ? item.phone
+                                                                                        : item.type === 'direct' ? item.phone
+                                                                                            : item.type === 'other' ? item.phone : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -4580,212 +5285,248 @@ const Carriers = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input tabIndex={63 + props.tabTimes} type="text" placeholder="Ext"
-                                    onKeyDown={validateMailingAddressToSave}
-                                    onChange={e => {
-                                        // let mailing_address = selectedCarrier.mailing_address || {};
-                                        // mailing_address.ext = e.target.value;
-                                        // setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedCarrier?.mailing_address?.mailing_contact?.phone_ext || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                       }
+                                       onInput={e => {
+                                           setSelectedCarrier(selectedCarrier => {
+                                               return {
+                                                   ...selectedCarrier,
+                                                   mailing_address: {
+                                                       ...(selectedCarrier?.mailing_address || {}),
+                                                       ext: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedCarrier(selectedCarrier => {
+                                               return {
+                                                   ...selectedCarrier,
+                                                   mailing_address: {
+                                                       ...(selectedCarrier?.mailing_address || {}),
+                                                       ext: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedCarrier?.mailing_address?.ext || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedCarrier?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                        setShowMailingContactEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedCarrier?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                        (selectedCarrier?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                        setShowMailingContactEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowMailingContactEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowMailingContactEmailCopyBtn(false);
-                                }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}
+                                 onMouseEnter={() => {
+                                     if ((selectedCarrier?.mailing_address?.email || '') !== '') {
+                                         setShowMailingContactEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onFocus={() => {
+                                     if ((selectedCarrier?.mailing_address?.email || '') !== '') {
+                                         setShowMailingContactEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onBlur={() => {
+                                     window.setTimeout(() => {
+                                         setShowMailingContactEmailCopyBtn(false);
+                                     }, 1000);
+                                 }}
+                                 onMouseLeave={() => {
+                                     setShowMailingContactEmailCopyBtn(false);
+                                 }}>
                                 <div className="select-box-wrapper">
-                                    <input tabIndex={64 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                        ref={refMailingContactEmail}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                    <input tabIndex={64 + props.tabTimes} type="text" placeholder="E-Mail"
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 0
+                                           }
+                                           style={{textTransform: 'lowercase'}}
+                                           ref={refMailingContactEmail}
+                                           onKeyDown={async (e) => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showMailingContactEmails) {
-                                                        let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (showMailingContactEmails) {
+                                                           let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (mailingContactEmailItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (mailingContactEmailItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (mailingContactEmailItems.length > 1) {
-                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
+                                                           refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (mailingContactEmailItems.length > 1) {
+                                                               await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
 
-                                                            setShowMailingContactEmails(true);
+                                                               setShowMailingContactEmails(true);
 
-                                                            refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showMailingContactEmails) {
-                                                        let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (showMailingContactEmails) {
+                                                           let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                if (selectedIndex === (mailingContactEmailItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                   if (selectedIndex === (mailingContactEmailItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (mailingContactEmailItems.length > 1) {
-                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
+                                                           refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           if (mailingContactEmailItems.length > 1) {
+                                                               await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
 
-                                                            setShowMailingContactEmails(true);
+                                                               setShowMailingContactEmails(true);
 
-                                                            refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
+                                                               refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                   if (r && r.classList.contains('selected')) {
+                                                                       r.scrollIntoView({
+                                                                           behavior: 'auto',
+                                                                           block: 'center',
+                                                                           inline: 'nearest'
+                                                                       })
+                                                                   }
+                                                                   return true;
+                                                               });
+                                                           }
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setShowMailingContactEmails(false);
-                                                    break;
+                                                   case 27: // escape
+                                                       setShowMailingContactEmails(false);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedCarrier({
-                                                            ...selectedCarrier,
-                                                            mailing_address: {
-                                                                ...selectedCarrier.mailing_address,
-                                                                mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 13: // enter
+                                                       if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedCarrier({
+                                                               ...selectedCarrier,
+                                                               mailing_address: {
+                                                                   ...(selectedCarrier?.mailing_address || {}),
+                                                                   email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
+                                                                   mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
-                                                        setShowMailingContactEmails(false);
-                                                        refMailingContactEmail.current.focus();
-                                                    }
-                                                    break;
+                                                           // validateMailingAddressToSave({keyCode: 9});
+                                                           setShowMailingContactEmails(false);
+                                                           refMailingContactEmail.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (showMailingContactEmails) {
-                                                        e.preventDefault();
-                                                        await setSelectedCarrier({
-                                                            ...selectedCarrier,
-                                                            mailing_address: {
-                                                                ...selectedCarrier.mailing_address,
-                                                                mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
-                                                            }
-                                                        });
+                                                   case 9: // tab
+                                                       if (showMailingContactEmails) {
+                                                           e.preventDefault();
+                                                           await setSelectedCarrier({
+                                                               ...selectedCarrier,
+                                                               mailing_address: {
+                                                                   ...(selectedCarrier?.mailing_address || {}),
+                                                                   email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
+                                                                   mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                               }
+                                                           });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
-                                                        setShowMailingContactEmails(false);
-                                                        refMailingContactEmail.current.focus();
-                                                    } else {
-                                                        validateMailingAddressToSave({ keyCode: 9 });
-                                                    }
-                                                    break;
+                                                           validateMailingAddressToSave({keyCode: 9});
+                                                           setShowMailingContactEmails(false);
+                                                           refMailingContactEmail.current.focus();
+                                                       } else {
+                                                           validateMailingAddressToSave({keyCode: 9});
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            // let mailing_address = selectedCarrier.mailing_address || {};
-                                            // mailing_address.email = e.target.value;
-                                            // setSelectedCarrier({ ...selectedCarrier, mailing_address: mailing_address });
-                                        }}
-                                        value={
-                                            (selectedCarrier?.mailing_address?.mailing_contact_primary_email || '') === 'work'
-                                                ? (selectedCarrier?.mailing_address?.mailing_contact?.email_work || '')
-                                                : (selectedCarrier?.mailing_address?.mailing_contact_primary_email || '') === 'personal'
-                                                    ? (selectedCarrier?.mailing_address?.mailing_contact?.email_personal || '')
-                                                    : (selectedCarrier?.mailing_address?.mailing_contact_primary_email || '') === 'other'
-                                                        ? (selectedCarrier?.mailing_address?.mailing_contact?.email_other || '')
-                                                        : ''
-                                        }
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onInput={e => {
+                                               setSelectedCarrier(selectedCarrier => {
+                                                   return {
+                                                       ...selectedCarrier,
+                                                       mailing_address: {
+                                                           ...(selectedCarrier?.mailing_address || {}),
+                                                           email: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }}
+                                           onChange={e => {
+                                               setSelectedCarrier(selectedCarrier => {
+                                                   return {
+                                                       ...selectedCarrier,
+                                                       mailing_address: {
+                                                           ...(selectedCarrier?.mailing_address || {}),
+                                                           email: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedCarrier?.mailing_address?.email || ''}
                                     />
 
                                     {
@@ -4795,7 +5536,7 @@ const Carriers = (props) => {
                                                 'selected-mailing-contact-primary-email': true,
                                                 'pushed': (mailingContactEmailItems.length > 1)
                                             })}>
-                                            {selectedCarrier?.mailing_address?.mailing_contact_primary_email || ''}
+                                            {(selectedCarrier?.mailing_address?.mailing_contact_id || 0) > 0 ? (selectedCarrier?.mailing_address?.mailing_contact_primary_email || '') : ''}
                                         </div>
                                     }
 
@@ -4815,40 +5556,44 @@ const Carriers = (props) => {
                                         }} icon={faCopy} onClick={(e) => {
                                             e.stopPropagation();
                                             navigator.clipboard.writeText(refMailingContactEmail.current.value);
-                                        }} />
+                                        }}/>
                                     }
 
                                     {
-                                        mailingContactEmailItems.length > 1 &&
-                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
-                                            if (showMailingContactEmails) {
-                                                setShowMailingContactEmails(false);
-                                            } else {
-                                                if (mailingContactEmailItems.length > 1) {
-                                                    await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                        item.selected = index === 0;
-                                                        return item;
-                                                    }))
+                                        (mailingContactEmailItems.length > 1 && ((selectedCarrier?.mailing_address?.mailing_contact_id || 0) > 0)) &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.edit || 0) === 1)) &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                                         onClick={async () => {
+                                                             if (showMailingContactEmails) {
+                                                                 setShowMailingContactEmails(false);
+                                                             } else {
+                                                                 if (mailingContactEmailItems.length > 1) {
+                                                                     await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                         item.selected = index === 0;
+                                                                         return item;
+                                                                     }))
 
-                                                    window.setTimeout(async () => {
-                                                        await setShowMailingContactEmails(true);
+                                                                     window.setTimeout(async () => {
+                                                                         await setShowMailingContactEmails(true);
 
-                                                        refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }, 0)
-                                                }
-                                            }
+                                                                         refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                             if (r && r.classList.contains('selected')) {
+                                                                                 r.scrollIntoView({
+                                                                                     behavior: 'auto',
+                                                                                     block: 'center',
+                                                                                     inline: 'nearest'
+                                                                                 })
+                                                                             }
+                                                                             return true;
+                                                                         });
+                                                                     }, 0)
+                                                                 }
+                                                             }
 
-                                            refMailingContactEmail.current.focus();
-                                        }} />
+                                                             refMailingContactEmail.current.focus();
+                                                         }}/>
                                     }
                                 </div>
                                 {
@@ -4863,8 +5608,9 @@ const Carriers = (props) => {
                                             }}
                                             ref={refMailingContactEmailDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             mailingContactEmailItems.map((item, index) => {
@@ -4879,15 +5625,18 @@ const Carriers = (props) => {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedCarrier({
-                                                                                ...selectedCarrier,
-                                                                                mailing_address: {
-                                                                                    ...selectedCarrier.mailing_address,
-                                                                                    mailing_contact_primary_email: item.type
+                                                                            await setSelectedCarrier(selectedCarrier => {
+                                                                                return {
+                                                                                    ...selectedCarrier,
+                                                                                    mailing_address: {
+                                                                                        ...(selectedCarrier?.mailing_address || {}),
+                                                                                        email: item.email,
+                                                                                        mailing_contact_primary_email: item.type
+                                                                                    }
                                                                                 }
                                                                             });
 
-                                                                            validateMailingAddressToSave({ keyCode: 9 });
+                                                                            validateMailingAddressToSave({keyCode: 9});
                                                                             setShowMailingContactEmails(false);
                                                                             refMailingContactEmail.current.focus();
                                                                         }}
@@ -4900,16 +5649,18 @@ const Carriers = (props) => {
                                                                         }
 
                                                                         (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                        {
+                                                                            item.type === 'work' ? item.email
+                                                                                : item.type === 'personal' ? item.email
+                                                                                    : item.type === 'other' ? item.email : ''
+                                                                        }
+                                                                    </b>)
 
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -4997,282 +5748,295 @@ const Carriers = (props) => {
                         </div>
 
                         <div className="form-row">
-                            <div className="select-box-container" style={{ width: '10rem' }}>
+                            <div className="select-box-container" style={{width: '10rem'}}>
                                 <div className="select-box-wrapper">
                                     <input type="text"
-                                        tabIndex={86 + props.tabTimes}
-                                        placeholder="Type"
-                                        ref={refInsuranceType}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                           tabIndex={86 + props.tabTimes}
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 0
+                                           }
+                                           placeholder="Type"
+                                           ref={refInsuranceType}
+                                           onKeyDown={async (e) => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (insuranceTypeDropdownItems.length > 0) {
-                                                        let selectedIndex = insuranceTypeDropdownItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (insuranceTypeDropdownItems.length > 0) {
+                                                           let selectedIndex = insuranceTypeDropdownItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (insuranceTypeDropdownItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (insuranceTypeDropdownItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refInsuranceTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getInsuranceTypes').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
-                                                                    item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedInsurance.insurance_type.id
-                                                                    return item;
-                                                                }))
+                                                           refInsuranceTypePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getInsuranceTypes').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
+                                                                       item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedInsurance.insurance_type.id
+                                                                       return item;
+                                                                   }))
 
-                                                                refInsuranceTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting insurance types', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refInsuranceTypePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting insurance types', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (insuranceTypeDropdownItems.length > 0) {
-                                                        let selectedIndex = insuranceTypeDropdownItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (insuranceTypeDropdownItems.length > 0) {
+                                                           let selectedIndex = insuranceTypeDropdownItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
-                                                                if (selectedIndex === (insuranceTypeDropdownItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setInsuranceTypeDropdownItems(insuranceTypeDropdownItems.map((item, index) => {
+                                                                   if (selectedIndex === (insuranceTypeDropdownItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refInsuranceTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getInsuranceTypes').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
-                                                                    item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedInsurance.insurance_type.id
-                                                                    return item;
-                                                                }))
+                                                           refInsuranceTypePopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getInsuranceTypes').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
+                                                                       item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
+                                                                           ? index === 0
+                                                                           : item.id === selectedInsurance.insurance_type.id
+                                                                       return item;
+                                                                   }))
 
-                                                                refInsuranceTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting insurance types', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refInsuranceTypePopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting insurance types', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setInsuranceTypeDropdownItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setInsuranceTypeDropdownItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (insuranceTypeDropdownItems.length > 0 && insuranceTypeDropdownItems.findIndex(item => item.selected) > -1) {
-                                                        let item = insuranceTypeDropdownItems[insuranceTypeDropdownItems.findIndex(item => item.selected)];
-                                                        await setSelectedInsurance({
-                                                            ...selectedInsurance,
-                                                            insurance_type: item,
-                                                            insurance_type_id: item.id,
-                                                            amount: (item.name || '').toLowerCase() === 'cargo'
-                                                                ? accounting.formatNumber(100000, 2, ',', '.')
-                                                                : (item.name || '').toLowerCase() === 'automotive liability'
-                                                                    ? accounting.formatNumber(1000000, 2, ',', '.')
-                                                                    : ''
-                                                        });
-                                                        validateInsuranceForSaving({ keyCode: 9 });
-                                                        setInsuranceTypeDropdownItems([]);
-                                                        refInsuranceCompany.current.focus();
-                                                    }
-                                                    break;
+                                                   case 13: // enter
+                                                       if (insuranceTypeDropdownItems.length > 0 && insuranceTypeDropdownItems.findIndex(item => item.selected) > -1) {
+                                                           let item = insuranceTypeDropdownItems[insuranceTypeDropdownItems.findIndex(item => item.selected)];
+                                                           await setSelectedInsurance({
+                                                               ...selectedInsurance,
+                                                               insurance_type: item,
+                                                               insurance_type_id: item.id,
+                                                               amount: (item.name || '').toLowerCase() === 'cargo'
+                                                                   ? accounting.formatNumber(100000, 2, ',', '.')
+                                                                   : (item.name || '').toLowerCase() === 'automotive liability'
+                                                                       ? accounting.formatNumber(1000000, 2, ',', '.')
+                                                                       : ''
+                                                           });
+                                                           validateInsuranceForSaving({keyCode: 9});
+                                                           setInsuranceTypeDropdownItems([]);
+                                                           refInsuranceCompany.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (insuranceTypeDropdownItems.length > 0) {
-                                                        e.preventDefault();
-                                                        let item = insuranceTypeDropdownItems[insuranceTypeDropdownItems.findIndex(item => item.selected)];
-                                                        await setSelectedInsurance({
-                                                            ...selectedInsurance,
-                                                            insurance_type: item,
-                                                            insurance_type_id: item.id,
-                                                            amount: (item.name || '').toLowerCase() === 'cargo'
-                                                                ? accounting.formatNumber(100000, 2, ',', '.')
-                                                                : (item.name || '').toLowerCase() === 'automotive liability'
-                                                                    ? accounting.formatNumber(1000000, 2, ',', '.')
-                                                                    : ''
-                                                        });
-                                                        validateInsuranceForSaving({ keyCode: 9 });
-                                                        setInsuranceTypeDropdownItems([]);
-                                                        refInsuranceCompany.current.focus();
-                                                    }
-                                                    break;
+                                                   case 9: // tab
+                                                       if (insuranceTypeDropdownItems.length > 0) {
+                                                           e.preventDefault();
+                                                           let item = insuranceTypeDropdownItems[insuranceTypeDropdownItems.findIndex(item => item.selected)];
+                                                           await setSelectedInsurance({
+                                                               ...selectedInsurance,
+                                                               insurance_type: item,
+                                                               insurance_type_id: item.id,
+                                                               amount: (item.name || '').toLowerCase() === 'cargo'
+                                                                   ? accounting.formatNumber(100000, 2, ',', '.')
+                                                                   : (item.name || '').toLowerCase() === 'automotive liability'
+                                                                       ? accounting.formatNumber(1000000, 2, ',', '.')
+                                                                       : ''
+                                                           });
+                                                           validateInsuranceForSaving({keyCode: 9});
+                                                           setInsuranceTypeDropdownItems([]);
+                                                           refInsuranceCompany.current.focus();
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onBlur={() => {
-                                            if ((selectedInsurance?.insurance_type?.id || 0) === 0) {
-                                                setSelectedInsurance(selectedInsurance => {
-                                                    return { ...selectedInsurance, insurance_type: {} }
-                                                });
-                                            }
-                                        }}
-                                        onInput={(e) => {
-                                            let insurance_type = selectedInsurance?.insurance_type || {};
-                                            insurance_type.id = 0;
-                                            insurance_type.name = e.target.value;
-                                            setSelectedInsurance(selectedInsurance => {
-                                                return { ...selectedInsurance, insurance_type: insurance_type }
-                                            });
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onBlur={() => {
+                                               if ((selectedInsurance?.insurance_type?.id || 0) === 0) {
+                                                   setSelectedInsurance(selectedInsurance => {
+                                                       return {...selectedInsurance, insurance_type: {}}
+                                                   });
+                                               }
+                                           }}
+                                           onInput={(e) => {
+                                               let insurance_type = selectedInsurance?.insurance_type || {};
+                                               insurance_type.id = 0;
+                                               insurance_type.name = e.target.value;
+                                               setSelectedInsurance(selectedInsurance => {
+                                                   return {...selectedInsurance, insurance_type: insurance_type}
+                                               });
 
-                                            if (e.target.value.trim() === '') {
+                                               if (e.target.value.trim() === '') {
+                                                   setInsuranceTypeDropdownItems([]);
+                                               } else {
+                                                   axios.post(props.serverUrl + '/getInsuranceTypes', {
+                                                       name: e.target.value.trim()
+                                                   }).then(res => {
+                                                       if (res.data.result === 'OK') {
+                                                           setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
+                                                               item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
+                                                                   ? index === 0
+                                                                   : item.id === selectedInsurance.insurance_type.id
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(async e => {
+                                                       console.log('error getting insurance types', e);
+                                                   })
+                                               }
+                                           }}
+                                           onChange={(e) => {
+                                               let insurance_type = selectedInsurance?.insurance_type || {};
+                                               insurance_type.id = 0;
+                                               insurance_type.name = e.target.value;
+                                               setSelectedInsurance(selectedInsurance => {
+                                                   return {...selectedInsurance, insurance_type: insurance_type}
+                                               });
+                                           }}
+                                           value={selectedInsurance?.insurance_type?.name || ''}
+                                    />
+                                    {
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 1)) &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                            if (insuranceTypeDropdownItems.length > 0) {
                                                 setInsuranceTypeDropdownItems([]);
                                             } else {
-                                                axios.post(props.serverUrl + '/getInsuranceTypes', {
-                                                    name: e.target.value.trim()
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
-                                                            item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedInsurance.insurance_type.id
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(async e => {
-                                                    console.log('error getting insurance types', e);
-                                                })
+                                                if ((selectedInsurance?.insurance_type?.id || 0) === 0 && (selectedInsurance?.insurance_type?.name || '') !== '') {
+                                                    axios.post(props.serverUrl + '/getInsuranceTypes', {
+                                                        name: selectedInsurance?.insurance_type.name
+                                                    }).then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
+                                                                item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedInsurance.insurance_type.id
+                                                                return item;
+                                                            }))
+
+                                                            refInsuranceTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting insurance types', e);
+                                                    })
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getInsuranceTypes').then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
+                                                                item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedInsurance.insurance_type.id
+                                                                return item;
+                                                            }))
+
+                                                            refInsuranceTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting insurance types', e);
+                                                    })
+                                                }
                                             }
-                                        }}
-                                        onChange={(e) => {
-                                            let insurance_type = selectedInsurance?.insurance_type || {};
-                                            insurance_type.id = 0;
-                                            insurance_type.name = e.target.value;
-                                            setSelectedInsurance(selectedInsurance => {
-                                                return { ...selectedInsurance, insurance_type: insurance_type }
-                                            });
-                                        }}
-                                        value={selectedInsurance?.insurance_type?.name || ''}
-                                    />
-                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                        if (insuranceTypeDropdownItems.length > 0) {
-                                            setInsuranceTypeDropdownItems([]);
-                                        } else {
-                                            if ((selectedInsurance?.insurance_type?.id || 0) === 0 && (selectedInsurance?.insurance_type?.name || '') !== '') {
-                                                axios.post(props.serverUrl + '/getInsuranceTypes', {
-                                                    name: selectedInsurance?.insurance_type.name
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
-                                                            item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedInsurance.insurance_type.id
-                                                            return item;
-                                                        }))
 
-                                                        refInsuranceTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting insurance types', e);
-                                                })
-                                            } else {
-                                                axios.post(props.serverUrl + '/getInsuranceTypes').then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setInsuranceTypeDropdownItems(res.data.types.map((item, index) => {
-                                                            item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedInsurance.insurance_type.id
-                                                            return item;
-                                                        }))
+                                            refInsuranceType.current.focus();
+                                        }}/>
+                                    }
 
-                                                        refInsuranceTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting insurance types', e);
-                                                })
-                                            }
-                                        }
-
-                                        refInsuranceType.current.focus();
-                                    }} />
                                 </div>
                                 {
                                     insuranceTypeTransition((style, item) => item && (
@@ -5286,8 +6050,9 @@ const Carriers = (props) => {
                                             }}
                                             ref={refInsuranceTypeDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             insuranceTypeDropdownItems.map((item, index) => {
@@ -5315,7 +6080,7 @@ const Carriers = (props) => {
                                                                                         ? accounting.formatNumber(1000000, 2, ',', '.')
                                                                                         : ''
                                                                             });
-                                                                            validateInsuranceForSaving({ keyCode: 9 });
+                                                                            validateInsuranceForSaving({keyCode: 9});
                                                                             setInsuranceTypeDropdownItems([]);
                                                                             refInsuranceCompany.current.focus();
                                                                         }}
@@ -5333,7 +6098,9 @@ const Carriers = (props) => {
                                                                         }
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -5347,185 +6114,198 @@ const Carriers = (props) => {
                                 }
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input type="text"
-                                        tabIndex={87 + props.tabTimes}
-                                        placeholder="Company"
-                                        ref={refInsuranceCompany}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                                           readOnly={
+                                               (props.user?.user_code?.is_admin || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 0
+                                           }
+                                           tabIndex={87 + props.tabTimes}
+                                           placeholder="Company"
+                                           ref={refInsuranceCompany}
+                                           onKeyDown={async (e) => {
+                                               let key = e.keyCode || e.which;
 
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (insuranceCompanyDropdownItems.length > 0) {
-                                                        let selectedIndex = insuranceCompanyDropdownItems.findIndex(item => item.selected);
+                                               switch (key) {
+                                                   case 37:
+                                                   case 38: // arrow left | arrow up
+                                                       e.preventDefault();
+                                                       if (insuranceCompanyDropdownItems.length > 0) {
+                                                           let selectedIndex = insuranceCompanyDropdownItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (insuranceCompanyDropdownItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
+                                                                   if (selectedIndex === 0) {
+                                                                       item.selected = index === (insuranceCompanyDropdownItems.length - 1);
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex - 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refInsuranceCompanyPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getInsuranceCompanies').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setInsuranceCompanyDropdownItems(res.data.companies.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
+                                                           refInsuranceCompanyPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getInsuranceCompanies').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setInsuranceCompanyDropdownItems(res.data.companies.map((item, index) => {
+                                                                       item.selected = index === 0;
+                                                                       return item;
+                                                                   }))
 
-                                                                refInsuranceCompanyPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting insurance companies', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refInsuranceCompanyPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting insurance companies', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (insuranceCompanyDropdownItems.length > 0) {
-                                                        let selectedIndex = insuranceCompanyDropdownItems.findIndex(item => item.selected);
+                                                   case 39:
+                                                   case 40: // arrow right | arrow down
+                                                       e.preventDefault();
+                                                       if (insuranceCompanyDropdownItems.length > 0) {
+                                                           let selectedIndex = insuranceCompanyDropdownItems.findIndex(item => item.selected);
 
-                                                        if (selectedIndex === -1) {
-                                                            await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
-                                                                if (selectedIndex === (insuranceCompanyDropdownItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
+                                                           if (selectedIndex === -1) {
+                                                               await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
+                                                                   item.selected = index === 0;
+                                                                   return item;
+                                                               }))
+                                                           } else {
+                                                               await setInsuranceCompanyDropdownItems(insuranceCompanyDropdownItems.map((item, index) => {
+                                                                   if (selectedIndex === (insuranceCompanyDropdownItems.length - 1)) {
+                                                                       item.selected = index === 0;
+                                                                   } else {
+                                                                       item.selected = index === (selectedIndex + 1)
+                                                                   }
+                                                                   return item;
+                                                               }))
+                                                           }
 
-                                                        refInsuranceCompanyPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getInsuranceCompanies').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setInsuranceCompanyDropdownItems(res.data.companies.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
+                                                           refInsuranceCompanyPopupItems.current.map((r, i) => {
+                                                               if (r && r.classList.contains('selected')) {
+                                                                   r.scrollIntoView({
+                                                                       behavior: 'auto',
+                                                                       block: 'center',
+                                                                       inline: 'nearest'
+                                                                   })
+                                                               }
+                                                               return true;
+                                                           });
+                                                       } else {
+                                                           axios.post(props.serverUrl + '/getInsuranceCompanies').then(async res => {
+                                                               if (res.data.result === 'OK') {
+                                                                   await setInsuranceCompanyDropdownItems(res.data.companies.map((item, index) => {
+                                                                       item.selected = index === 0;
+                                                                       return item;
+                                                                   }))
 
-                                                                refInsuranceCompanyPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting insurance companies', e);
-                                                        })
-                                                    }
-                                                    break;
+                                                                   refInsuranceCompanyPopupItems.current.map((r, i) => {
+                                                                       if (r && r.classList.contains('selected')) {
+                                                                           r.scrollIntoView({
+                                                                               behavior: 'auto',
+                                                                               block: 'center',
+                                                                               inline: 'nearest'
+                                                                           })
+                                                                       }
+                                                                       return true;
+                                                                   });
+                                                               }
+                                                           }).catch(async e => {
+                                                               console.log('error getting insurance companies', e);
+                                                           })
+                                                       }
+                                                       break;
 
-                                                case 27: // escape
-                                                    setInsuranceCompanyDropdownItems([]);
-                                                    break;
+                                                   case 27: // escape
+                                                       setInsuranceCompanyDropdownItems([]);
+                                                       break;
 
-                                                case 13: // enter
-                                                    if (insuranceCompanyDropdownItems.length > 0 && insuranceCompanyDropdownItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedInsurance({
-                                                            ...selectedInsurance,
-                                                            company: insuranceCompanyDropdownItems[insuranceCompanyDropdownItems.findIndex(item => item.selected)].company
-                                                        });
-                                                        validateInsuranceForSaving({ keyCode: 9 });
-                                                        setInsuranceCompanyDropdownItems([]);
-                                                        refInsuranceCompany.current.focus();
-                                                    }
-                                                    break;
+                                                   case 13: // enter
+                                                       if (insuranceCompanyDropdownItems.length > 0 && insuranceCompanyDropdownItems.findIndex(item => item.selected) > -1) {
+                                                           await setSelectedInsurance({
+                                                               ...selectedInsurance,
+                                                               company: insuranceCompanyDropdownItems[insuranceCompanyDropdownItems.findIndex(item => item.selected)].company
+                                                           });
+                                                           validateInsuranceForSaving({keyCode: 9});
+                                                           setInsuranceCompanyDropdownItems([]);
+                                                           refInsuranceCompany.current.focus();
+                                                       }
+                                                       break;
 
-                                                case 9: // tab
-                                                    if (insuranceCompanyDropdownItems.length > 0) {
-                                                        e.preventDefault();
-                                                        await setSelectedInsurance({
-                                                            ...selectedInsurance,
-                                                            company: insuranceCompanyDropdownItems[insuranceCompanyDropdownItems.findIndex(item => item.selected)].company
-                                                        });
-                                                        validateInsuranceForSaving({ keyCode: 9 });
-                                                        setInsuranceCompanyDropdownItems([]);
-                                                        refInsuranceCompany.current.focus();
-                                                    }
-                                                    break;
+                                                   case 9: // tab
+                                                       if (insuranceCompanyDropdownItems.length > 0) {
+                                                           e.preventDefault();
+                                                           await setSelectedInsurance({
+                                                               ...selectedInsurance,
+                                                               company: insuranceCompanyDropdownItems[insuranceCompanyDropdownItems.findIndex(item => item.selected)].company
+                                                           });
+                                                           validateInsuranceForSaving({keyCode: 9});
+                                                           setInsuranceCompanyDropdownItems([]);
+                                                           refInsuranceCompany.current.focus();
+                                                       }
+                                                       break;
 
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={async (e) => {
-                                            await setSelectedInsurance({ ...selectedInsurance, company: e.target.value });
+                                                   default:
+                                                       break;
+                                               }
+                                           }}
+                                           onInput={async (e) => {
+                                               await setSelectedInsurance({
+                                                   ...selectedInsurance,
+                                                   company: e.target.value
+                                               });
 
-                                            if (e.target.value.trim() === '') {
-                                                setInsuranceCompanyDropdownItems([]);
-                                            } else {
-                                                axios.post(props.serverUrl + '/getInsuranceCompanies', {
-                                                    company: e.target.value.trim()
-                                                }).then(async res => {
-                                                    if (res.data.result === 'OK') {
-                                                        await setInsuranceCompanyDropdownItems(res.data.companies.map((item, index) => {
-                                                            item.selected = index === 0;
-                                                            return item;
-                                                        }))
-                                                    }
-                                                }).catch(async e => {
-                                                    console.log('error getting insurance companies', e);
-                                                })
-                                            }
-                                        }}
-                                        onChange={async (e) => {
-                                            await setSelectedInsurance({ ...selectedInsurance, company: e.target.value });
-                                        }}
-                                        value={selectedInsurance?.company || ''}
+                                               if (e.target.value.trim() === '') {
+                                                   setInsuranceCompanyDropdownItems([]);
+                                               } else {
+                                                   axios.post(props.serverUrl + '/getInsuranceCompanies', {
+                                                       company: e.target.value.trim()
+                                                   }).then(async res => {
+                                                       if (res.data.result === 'OK') {
+                                                           await setInsuranceCompanyDropdownItems(res.data.companies.map((item, index) => {
+                                                               item.selected = index === 0;
+                                                               return item;
+                                                           }))
+                                                       }
+                                                   }).catch(async e => {
+                                                       console.log('error getting insurance companies', e);
+                                                   })
+                                               }
+                                           }}
+                                           onChange={async (e) => {
+                                               await setSelectedInsurance({
+                                                   ...selectedInsurance,
+                                                   company: e.target.value
+                                               });
+                                           }}
+                                           value={selectedInsurance?.company || ''}
                                     />
                                 </div>
                                 {
@@ -5540,8 +6320,9 @@ const Carriers = (props) => {
                                             }}
                                             ref={refInsuranceCompanyDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content"  >
+                                            <div className="mochi-contextual-popup vertical below"
+                                                 style={{height: 150}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         {
                                                             insuranceCompanyDropdownItems.map((item, index) => {
@@ -5559,8 +6340,11 @@ const Carriers = (props) => {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedInsurance({ ...selectedInsurance, company: item.company });
-                                                                            validateInsuranceForSaving({ keyCode: 9 });
+                                                                            await setSelectedInsurance({
+                                                                                ...selectedInsurance,
+                                                                                company: item.company
+                                                                            });
+                                                                            validateInsuranceForSaving({keyCode: 9});
                                                                             setInsuranceCompanyDropdownItems([]);
                                                                             refInsuranceCompany.current.focus();
                                                                         }}
@@ -5578,7 +6362,9 @@ const Carriers = (props) => {
                                                                         }
                                                                         {
                                                                             item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}/>
                                                                         }
                                                                     </div>
                                                                 )
@@ -5594,32 +6380,53 @@ const Carriers = (props) => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{ width: '8rem' }}>
+                            <div className="select-box-container" style={{width: '8rem'}}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput tabIndex={88 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={false}
-                                        type="text" placeholder="Expiration Date"
-                                        onKeyDown={validateInsuranceForSaving}
-                                        onBlur={e => setSelectedInsurance({ ...selectedInsurance, expiration_date: getFormattedDates(selectedInsurance?.expiration_date) })}
-                                        onInput={e => setSelectedInsurance({ ...selectedInsurance, expiration_date: e.target.value })}
-                                        onChange={e => setSelectedInsurance({ ...selectedInsurance, expiration_date: e.target.value })}
-                                        value={selectedInsurance.expiration_date || ''}
-                                        ref={refExpirationDate}
+                                                 readOnly={
+                                                     (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 0 &&
+                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 0
+                                                 }
+                                                 mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                                                 guide={false}
+                                                 type="text" placeholder="Expiration Date"
+                                                 onKeyDown={validateInsuranceForSaving}
+                                                 onBlur={e => setSelectedInsurance({
+                                                     ...selectedInsurance,
+                                                     expiration_date: getFormattedDates(selectedInsurance?.expiration_date)
+                                                 })}
+                                                 onInput={e => setSelectedInsurance({
+                                                     ...selectedInsurance,
+                                                     expiration_date: e.target.value
+                                                 })}
+                                                 onChange={e => setSelectedInsurance({
+                                                     ...selectedInsurance,
+                                                     expiration_date: e.target.value
+                                                 })}
+                                                 value={selectedInsurance.expiration_date || ''}
+                                                 ref={refExpirationDate}
                                     />
 
-                                    <FontAwesomeIcon className="dropdown-button calendar" icon={faCalendarAlt} onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsCalendarShown(true)
+                                    {
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 1)) &&
+                                        <FontAwesomeIcon className="dropdown-button calendar" icon={faCalendarAlt}
+                                                         onClick={(e) => {
+                                                             e.stopPropagation();
+                                                             setIsCalendarShown(true)
 
-                                        if (moment((selectedInsurance?.expiration_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedInsurance?.expiration_date || '').trim()) {
-                                            setPreSelectedExpirationDate(moment(selectedInsurance?.expiration_date, 'MM/DD/YYYY'));
-                                        } else {
-                                            setPreSelectedExpirationDate(moment());
-                                        }
+                                                             if (moment((selectedInsurance?.expiration_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedInsurance?.expiration_date || '').trim()) {
+                                                                 setPreSelectedExpirationDate(moment(selectedInsurance?.expiration_date, 'MM/DD/YYYY'));
+                                                             } else {
+                                                                 setPreSelectedExpirationDate(moment());
+                                                             }
 
-                                        refExpirationDate.current.inputElement.focus();
-                                    }} />
+                                                             refExpirationDate.current.inputElement.focus();
+                                                         }}/>
+                                    }
+
                                 </div>
                                 {
                                     calendarTransition((style, item) => item && (
@@ -5633,18 +6440,24 @@ const Carriers = (props) => {
                                             }}
                                             ref={refInsuranceCalendarDropDown}
                                         >
-                                            <div className="mochi-contextual-popup vertical below" style={{ height: 275 }}>
-                                                <div className="mochi-contextual-popup-content" >
+                                            <div className="mochi-contextual-popup vertical below"
+                                                 style={{height: 275}}>
+                                                <div className="mochi-contextual-popup-content">
                                                     <div className="mochi-contextual-popup-wrapper">
                                                         <Calendar
                                                             value={moment((selectedInsurance?.expiration_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedInsurance?.expiration_date || '').trim()
                                                                 ? moment(selectedInsurance?.expiration_date, 'MM/DD/YYYY')
                                                                 : moment()}
                                                             onChange={(day) => {
-                                                                setSelectedInsurance({ ...selectedInsurance, expiration_date: day.format('MM/DD/YYYY') });
-                                                                validateInsuranceForSaving({ keyCode: 9 });
+                                                                setSelectedInsurance({
+                                                                    ...selectedInsurance,
+                                                                    expiration_date: day.format('MM/DD/YYYY')
+                                                                });
+                                                                validateInsuranceForSaving({keyCode: 9});
                                                             }}
-                                                            closeCalendar={() => { setIsCalendarShown(false); }}
+                                                            closeCalendar={() => {
+                                                                setIsCalendarShown(false);
+                                                            }}
                                                             preDay={preSelectedExpirationDate}
                                                             onChangePreDay={(preDay) => {
                                                                 setPreSelectedExpirationDate(preDay);
@@ -5659,86 +6472,123 @@ const Carriers = (props) => {
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
-                                <span className="currency-symbol">{(selectedInsurance.amount || '') === '' ? '' : '$'}</span>
+                                <span
+                                    className="currency-symbol">{(selectedInsurance.amount || '') === '' ? '' : '$'}</span>
 
                                 <input tabIndex={89 + props.tabTimes}
-                                    className="currency"
-                                    type="text"
-                                    placeholder="Amount"
-                                    // onKeyDown={validateInsuranceForSaving}
-                                    onBlur={async (e) => { await setSelectedInsurance({ ...selectedInsurance, amount: accounting.formatNumber(e.target.value, 2, ',', '.') }) }}
-                                    onChange={e => setSelectedInsurance({ ...selectedInsurance, amount: e.target.value })}
-                                    value={(selectedInsurance?.amount || '')} />
+                                       className="currency"
+                                       type="text"
+                                       placeholder="Amount"
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 0
+                                       }
+                                       onBlur={async (e) => {
+                                           await setSelectedInsurance({
+                                               ...selectedInsurance,
+                                               amount: accounting.formatNumber(e.target.value, 2, ',', '.')
+                                           })
+                                       }}
+                                       onChange={e => setSelectedInsurance({
+                                           ...selectedInsurance,
+                                           amount: e.target.value
+                                       })}
+                                       value={(selectedInsurance?.amount || '')}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
-                                <span className="currency-symbol">{(selectedInsurance.deductible || '') === '' ? '' : '$'}</span>
+                                <span
+                                    className="currency-symbol">{(selectedInsurance.deductible || '') === '' ? '' : '$'}</span>
 
                                 <input tabIndex={90 + props.tabTimes}
-                                    className="currency"
-                                    type="text"
-                                    placeholder="Deductible"
-                                    // onKeyDown={validateInsuranceForSaving}
-                                    onBlur={async (e) => { await setSelectedInsurance({ ...selectedInsurance, deductible: accounting.formatNumber(e.target.value, 2, ',', '.') }) }}
-                                    onChange={e => setSelectedInsurance({ ...selectedInsurance, deductible: e.target.value })}
-                                    value={(selectedInsurance?.deductible || '')} />
+                                       className="currency"
+                                       type="text"
+                                       placeholder="Deductible"
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 0
+                                       }
+                                       onBlur={async (e) => {
+                                           await setSelectedInsurance({
+                                               ...selectedInsurance,
+                                               deductible: accounting.formatNumber(e.target.value, 2, ',', '.')
+                                           })
+                                       }}
+                                       onChange={e => setSelectedInsurance({
+                                           ...selectedInsurance,
+                                           deductible: e.target.value
+                                       })}
+                                       value={(selectedInsurance?.deductible || '')}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={91 + props.tabTimes} type="text" placeholder="Notes"
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={(e) => {
+                                           let key = e.keyCode || e.which;
 
-                                        if (key === 9) {
-                                            let insurance = { ...selectedInsurance, carrier_id: (selectedCarrier?.id || 0) };
+                                           if (key === 9) {
+                                               let insurance = {
+                                                   ...selectedInsurance,
+                                                   carrier_id: (selectedCarrier?.id || 0)
+                                               };
 
-                                            if ((insurance.insurance_type_id || 0) > 0 &&
-                                                (insurance.company || '') !== '' &&
-                                                (insurance.expiration_date || '') !== '' &&
-                                                (insurance.amount || '') !== '') {
+                                               if ((insurance.insurance_type_id || 0) > 0 &&
+                                                   (insurance.company || '') !== '' &&
+                                                   (insurance.expiration_date || '') !== '' &&
+                                                   (insurance.amount || '') !== '') {
 
-                                                insurance.expiration_date = getFormattedDates(insurance.expiration_date);
-                                                insurance.amount = accounting.unformat(insurance.amount);
-                                                insurance.deductible = accounting.unformat(insurance.deductible);
+                                                   insurance.expiration_date = getFormattedDates(insurance.expiration_date);
+                                                   insurance.amount = accounting.unformat(insurance.amount);
+                                                   insurance.deductible = accounting.unformat(insurance.deductible);
 
-                                                e.preventDefault();
+                                                   e.preventDefault();
 
-                                                axios.post(props.serverUrl + '/saveInsurance', insurance).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setSelectedCarrier(selectedCarrier => {
-                                                            return {
-                                                                ...selectedCarrier,
-                                                                insurances: res.data.insurances
-                                                            }
-                                                        });
+                                                   axios.post(props.serverUrl + '/saveInsurance', insurance).then(res => {
+                                                       if (res.data.result === 'OK') {
+                                                           setSelectedCarrier(selectedCarrier => {
+                                                               return {
+                                                                   ...selectedCarrier,
+                                                                   insurances: res.data.insurances
+                                                               }
+                                                           });
 
-                                                        setSelectedInsurance({});
+                                                           setSelectedInsurance({});
 
-                                                        props.setSelectedCarrier({
-                                                            id: selectedCarrier.id,
-                                                            insurances: res.data.insurances,
-                                                            component_id: props.componentId
-                                                        });
+                                                           props.setSelectedCarrier({
+                                                               id: selectedCarrier.id,
+                                                               insurances: res.data.insurances,
+                                                               component_id: props.componentId
+                                                           });
 
-                                                        refInsuranceType.current.focus();
-                                                    } else {
+                                                           refInsuranceType.current.focus();
+                                                       } else {
 
-                                                    }
+                                                       }
 
-                                                    setIsSavingInsurance(false);
-                                                }).catch(e => {
-                                                    console.log('error on saving carrier insurance', e);
-                                                    setIsSavingInsurance(false);
-                                                });
-                                            } else {
-                                                setIsSavingInsurance(false);
-                                            }
-                                        }
-                                    }}
-                                    onChange={e => setSelectedInsurance({ ...selectedInsurance, notes: e.target.value })}
-                                    value={selectedInsurance.notes || ''} />
+                                                       setIsSavingInsurance(false);
+                                                   }).catch(e => {
+                                                       console.log('error on saving carrier insurance', e);
+                                                       setIsSavingInsurance(false);
+                                                   });
+                                               } else {
+                                                   setIsSavingInsurance(false);
+                                               }
+                                           }
+                                       }}
+                                       onChange={e => setSelectedInsurance({
+                                           ...selectedInsurance,
+                                           notes: e.target.value
+                                       })}
+                                       value={selectedInsurance.notes || ''}/>
                             </div>
                         </div>
                     </div>
@@ -5755,7 +6605,8 @@ const Carriers = (props) => {
                         <div className="insurances-list-container">
                             {
                                 (selectedCarrier.insurances || []).length > 0 &&
-                                <div className={`insurances-list-header ${insurancesScrollBarVisible ? 'scrolling' : ''}`}>
+                                <div
+                                    className={`insurances-list-header ${insurancesScrollBarVisible ? 'scrolling' : ''}`}>
                                     <div className="contact-list-col tcol type">Type</div>
                                     <div className="contact-list-col tcol company">Company</div>
                                     <div className="contact-list-col tcol expiration-date">Exp. Date</div>
@@ -5763,7 +6614,8 @@ const Carriers = (props) => {
                                 </div>
                             }
 
-                            <div className="insurances-list-wrapper" id={props.panelName + '-insurances-list-wrapper'} ref={refInsurancesListWrapper}>
+                            <div className="insurances-list-wrapper" id={props.panelName + '-insurances-list-wrapper'}
+                                 ref={refInsurancesListWrapper}>
                                 {
                                     (selectedCarrier.insurances || []).map((insurance, index) => {
                                         const itemClasses = classnames({
@@ -5772,16 +6624,24 @@ const Carriers = (props) => {
                                         })
                                         return (
                                             <div className={itemClasses} key={index} onClick={() => {
-                                                setSelectedInsurance({ ...insurance });
+                                                if ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.save || 0) === 1 &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier insurances')?.pivot?.edit || 0) === 1)) {
+                                                    setSelectedInsurance({...insurance});
+                                                }
                                             }}>
-                                                <div className="insurances-list-col tcol type">{insurance.insurance_type.name}</div>
-                                                <div className="insurances-list-col tcol company">{insurance.company}</div>
-                                                <div className="insurances-list-col tcol expiration-date">{insurance.expiration_date}</div>
-                                                <div className="insurances-list-col tcol amount">{accounting.formatMoney(insurance.amount)}</div>
+                                                <div
+                                                    className="insurances-list-col tcol type">{insurance.insurance_type.name}</div>
+                                                <div
+                                                    className="insurances-list-col tcol company">{insurance.company}</div>
+                                                <div
+                                                    className="insurances-list-col tcol expiration-date">{insurance.expiration_date}</div>
+                                                <div
+                                                    className="insurances-list-col tcol amount">{accounting.formatMoney(insurance.amount)}</div>
                                                 {
                                                     (insurance.id === (selectedInsurance?.id || 0)) &&
                                                     <div className="insurances-list-col tcol insurances-selected">
-                                                        <FontAwesomeIcon icon={faPencilAlt} />
+                                                        <FontAwesomeIcon icon={faPencilAlt}/>
                                                     </div>
                                                 }
                                             </div>
@@ -5793,7 +6653,7 @@ const Carriers = (props) => {
                     </div>
                 </div>
 
-                <div className="fields-container-col" style={{ minWidth: '28%', maxWidth: '28%' }}>
+                <div className="fields-container-col" style={{minWidth: '28%', maxWidth: '28%'}}>
                     <div className="form-bordered-box" style={{
                         flexGrow: 1
                     }}>
@@ -5831,7 +6691,6 @@ const Carriers = (props) => {
                                     })
 
 
-
                                     printWindow(html);
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -5858,17 +6717,22 @@ const Carriers = (props) => {
                                     (selectedCarrier.drivers || []).map((driver, index) => {
                                         return (
                                             <div className="drivers-list-item" key={index} onClick={() => {
-                                                setSelectedDriver({ ...driver });
-                                                refCarrierDriverFirstName.current.focus();
+                                                if ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 1 &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 1)) {
+                                                    setSelectedDriver({...driver});
+                                                    refCarrierDriverFirstName.current.focus();
+                                                }
                                             }}>
-                                                <div className="driver-list-col tcol first-name">{driver.first_name}</div>
+                                                <div
+                                                    className="driver-list-col tcol first-name">{driver.first_name}</div>
                                                 <div className="driver-list-col tcol last-name">{driver.last_name}</div>
                                                 <div className="driver-list-col tcol phone">{driver.phone}</div>
                                                 <div className="driver-list-col tcol email">{driver.email}</div>
                                                 {
                                                     (driver.id === (selectedDriver?.id || 0)) &&
                                                     <div className="driver-list-col tcol driver-selected">
-                                                        <FontAwesomeIcon icon={faPencilAlt} />
+                                                        <FontAwesomeIcon icon={faPencilAlt}/>
                                                     </div>
                                                 }
                                             </div>
@@ -5882,7 +6746,7 @@ const Carriers = (props) => {
             </div>
 
 
-            <div className="fields-container-row" style={{ marginTop: 10 }}>
+            <div className="fields-container-row" style={{marginTop: 10}}>
                 <div className="fields-container-col">
                     <div className="form-bordered-box" style={{
                         display: 'flex',
@@ -5895,17 +6759,32 @@ const Carriers = (props) => {
                             <div className="form-title">Factoring Company</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div className="mochi-button" onClick={searchFactoringCompanyBtnClick}>
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={searchFactoringCompanyBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Search</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className="mochi-button" onClick={moreFactoringCompanyBtnClick}>
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={moreFactoringCompanyBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">More</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className="mochi-button" onClick={clearFactoringCompanyBtnClick}>
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={clearFactoringCompanyBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -5917,28 +6796,33 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container input-code">
                                 <input tabIndex={65 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                    ref={refFactoringCompanyCode}
-                                    onKeyDown={getFactoringCompanyByCode}
-                                    onInput={(e) => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: {
-                                                ...selectedCarrier.factoring_company,
-                                                code_number: 0,
-                                                code: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: {
-                                                ...selectedCarrier.factoring_company,
-                                                code: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={(selectedCarrier?.factoring_company?.code_number || 0) === 0 ? (selectedCarrier?.factoring_company?.code || '') : selectedCarrier?.factoring_company?.code + selectedCarrier?.factoring_company?.code_number}
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
+                                       }
+                                       ref={refFactoringCompanyCode}
+                                       onKeyDown={getFactoringCompanyByCode}
+                                       onInput={(e) => {
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: {
+                                                   ...selectedCarrier.factoring_company,
+                                                   code_number: 0,
+                                                   code: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       onChange={(e) => {
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: {
+                                                   ...selectedCarrier.factoring_company,
+                                                   code: e.target.value
+                                               }
+                                           })
+                                       }}
+                                       value={(selectedCarrier?.factoring_company?.code_number || 0) === 0 ? (selectedCarrier?.factoring_company?.code || '') : selectedCarrier?.factoring_company?.code + selectedCarrier?.factoring_company?.code_number}
                                 />
                             </div>
 
@@ -5946,147 +6830,207 @@ const Carriers = (props) => {
 
                             <div className="input-box-container grow">
                                 <input tabIndex={66 + props.tabTimes} type="text" placeholder="Name"
-                                    ref={refFactoringCompanyName}
-                                    // onKeyDown={validateFactoringCompanyToSave} 
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.name = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, factoring_company: factoring_company });
-                                    }} value={selectedCarrier.factoring_company?.name || ''} />
+                                       ref={refFactoringCompanyName}
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let factoring_company = selectedCarrier.factoring_company || {};
+                                           factoring_company.name = e.target.value;
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: factoring_company
+                                           });
+                                       }} value={selectedCarrier.factoring_company?.name || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={67 + props.tabTimes} type="text" placeholder="Address 1"
-                                    // onKeyDown={validateFactoringCompanyToSave} 
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.address1 = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, factoring_company: factoring_company });
-                                    }} value={selectedCarrier.factoring_company?.address1 || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let factoring_company = selectedCarrier.factoring_company || {};
+                                           factoring_company.address1 = e.target.value;
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: factoring_company
+                                           });
+                                       }} value={selectedCarrier.factoring_company?.address1 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={68 + props.tabTimes} type="text" placeholder="Address 2"
-                                    // onKeyDown={validateFactoringCompanyToSave} 
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.address2 = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, factoring_company: factoring_company });
-                                    }} value={selectedCarrier.factoring_company?.address2 || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let factoring_company = selectedCarrier.factoring_company || {};
+                                           factoring_company.address2 = e.target.value;
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: factoring_company
+                                           });
+                                       }} value={selectedCarrier.factoring_company?.address2 || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={69 + props.tabTimes} type="text" placeholder="City"
-                                    // onKeyDown={validateFactoringCompanyToSave} 
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.city = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, factoring_company: factoring_company });
-                                    }} value={selectedCarrier.factoring_company?.city || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let factoring_company = selectedCarrier.factoring_company || {};
+                                           factoring_company.city = e.target.value;
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: factoring_company
+                                           });
+                                       }} value={selectedCarrier.factoring_company?.city || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-state">
                                 <input tabIndex={70 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                    // onKeyDown={validateFactoringCompanyToSave} 
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.state = e.target.value;
-                                        setSelectedCarrier({ ...selectedCarrier, factoring_company: factoring_company });
-                                    }} value={selectedCarrier.factoring_company?.state || ''} />
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onChange={e => {
+                                           let factoring_company = selectedCarrier.factoring_company || {};
+                                           factoring_company.state = e.target.value;
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: factoring_company
+                                           });
+                                       }} value={selectedCarrier.factoring_company?.state || ''}/>
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-zip-code">
-                                <input tabIndex={71 + props.tabTimes} type="text" placeholder="Postal Code" onKeyDown={validateFactoringCompanyToSave} onChange={e => {
-                                    let factoring_company = selectedCarrier.factoring_company || {};
-                                    factoring_company.zip = e.target.value;
-                                    setSelectedCarrier({ ...selectedCarrier, factoring_company: factoring_company });
-                                }} value={selectedCarrier.factoring_company?.zip || ''} />
+                                <input tabIndex={71 + props.tabTimes} type="text" placeholder="Postal Code"
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onKeyDown={validateFactoringCompanyToSave}
+                                       onChange={e => {
+                                           let factoring_company = selectedCarrier.factoring_company || {};
+                                           factoring_company.zip = e.target.value;
+                                           setSelectedCarrier({
+                                               ...selectedCarrier,
+                                               factoring_company: factoring_company
+                                           });
+                                       }}
+                                       value={selectedCarrier.factoring_company?.zip || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={72 + props.tabTimes} type="text" placeholder="Contact Name"
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    contact_name: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    contact_name: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.contact_name || '')
-                                            // ? ''
-                                            : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).last_name
-                                    }
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onInput={(e) => {
+                                           if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                               setSelectedCarrier(selectedCarrier => {
+                                                   return {
+                                                       ...selectedCarrier,
+                                                       factoring_company: {
+                                                           ...(selectedCarrier?.factoring_company || {}),
+                                                           contact_name: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                               setSelectedCarrier(selectedCarrier => {
+                                                   return {
+                                                       ...selectedCarrier,
+                                                       factoring_company: {
+                                                           ...(selectedCarrier?.factoring_company || {}),
+                                                           contact_name: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }
+                                       }}
+                                       value={
+                                           (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.factoring_company?.contact_name || '')
+                                               // ? ''
+                                               : selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).last_name
+                                       }
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="input-box-container input-phone" style={{ position: 'relative' }}>
+                            <div className="input-box-container input-phone" style={{position: 'relative'}}>
                                 <MaskedInput tabIndex={73 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text" placeholder="Contact Phone"
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    contact_phone: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    contact_phone: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.contact_phone || '')
-                                            // ? ''
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
-                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
-                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
-                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
-                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                                        : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
-                                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_direct
-                                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
-                                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_other
-                                                                : ''
-                                    }
+                                             readOnly={
+                                                 (props.user?.user_code?.is_admin || 0) === 0 &&
+                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                             }
+                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                             guide={true}
+                                             type="text" placeholder="Contact Phone"
+                                             onInput={(e) => {
+                                                 if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                                     setSelectedCarrier({
+                                                         ...selectedCarrier,
+                                                         factoring_company: {
+                                                             ...(selectedCarrier?.factoring_company || {}),
+                                                             contact_phone: e.target.value
+                                                         }
+                                                     })
+                                                 }
+                                             }}
+                                             onChange={(e) => {
+                                                 if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                                     setSelectedCarrier({
+                                                         ...selectedCarrier,
+                                                         factoring_company: {
+                                                             ...(selectedCarrier?.factoring_company || {}),
+                                                             contact_phone: e.target.value
+                                                         }
+                                                     })
+                                                 }
+                                             }}
+                                             value={
+                                                 (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                                     ? (selectedCarrier?.factoring_company?.contact_phone || '')
+                                                     // ? ''
+                                                     : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
+                                                         ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
+                                                         : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
+                                                             ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work_fax
+                                                             : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
+                                                                 ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_mobile
+                                                                 : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
+                                                                     ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_direct
+                                                                     : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
+                                                                         ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_other
+                                                                         : ''
+                                             }
                                 />
 
                                 {
@@ -6103,95 +7047,106 @@ const Carriers = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input tabIndex={74 + props.tabTimes} type="text" placeholder="Ext"
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    ext: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    ext: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.ext || '')
-                                            // ? ''
-                                            : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
-                                    }
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       onInput={(e) => {
+                                           if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                               setSelectedCarrier({
+                                                   ...selectedCarrier,
+                                                   factoring_company: {
+                                                       ...(selectedCarrier?.factoring_company || {}),
+                                                       ext: e.target.value
+                                                   }
+                                               })
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                               setSelectedCarrier({
+                                                   ...selectedCarrier,
+                                                   factoring_company: {
+                                                       ...(selectedCarrier?.factoring_company || {}),
+                                                       ext: e.target.value
+                                                   }
+                                               })
+                                           }
+                                       }}
+                                       value={
+                                           (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.factoring_company?.ext || '')
+                                               // ? ''
+                                               : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
+                                       }
                                 />
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedCarrier?.factoring_company?.email || '') !== '') {
-                                        setShowFactoringCompanyEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedCarrier?.factoring_company?.email || '') !== '') {
-                                        setShowFactoringCompanyEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowFactoringCompanyEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowFactoringCompanyEmailCopyBtn(false);
-                                }}>
-                                <input tabIndex={75 + props.tabTimes} type="text" placeholder="E-Mail" style={{ textTransform: 'lowercase' }}
-                                    ref={refFactoringCompanyEmail}
-                                    onKeyDown={validateFactoringCompanyToSave}
-                                    onInput={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    email: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...selectedCarrier?.factoring_company || {},
-                                                    email: e.target.value
-                                                }
-                                            })
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? (selectedCarrier?.factoring_company?.email || '')
-                                            // ? ''
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
-                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
-                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
-                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_personal
-                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'other'
-                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_other
-                                                        : ''
-                                    }
+                            <div className="input-box-container" style={{position: 'relative', flexGrow: 1}}
+                                 onMouseEnter={() => {
+                                     if ((selectedCarrier?.factoring_company?.email || '') !== '') {
+                                         setShowFactoringCompanyEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onFocus={() => {
+                                     if ((selectedCarrier?.factoring_company?.email || '') !== '') {
+                                         setShowFactoringCompanyEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onBlur={() => {
+                                     window.setTimeout(() => {
+                                         setShowFactoringCompanyEmailCopyBtn(false);
+                                     }, 1000);
+                                 }}
+                                 onMouseLeave={() => {
+                                     setShowFactoringCompanyEmailCopyBtn(false);
+                                 }}>
+                                <input tabIndex={75 + props.tabTimes} type="text" placeholder="E-Mail"
+                                       style={{textTransform: 'lowercase'}}
+                                       readOnly={
+                                           (props.user?.user_code?.is_admin || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                           ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0
+                                       }
+                                       ref={refFactoringCompanyEmail}
+                                       onKeyDown={validateFactoringCompanyToSave}
+                                       onInput={(e) => {
+                                           if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                               setSelectedCarrier({
+                                                   ...selectedCarrier,
+                                                   factoring_company: {
+                                                       ...(selectedCarrier?.factoring_company || {}),
+                                                       email: e.target.value
+                                                   }
+                                               })
+                                           }
+                                       }}
+                                       onChange={(e) => {
+                                           if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                               setSelectedCarrier({
+                                                   ...selectedCarrier,
+                                                   factoring_company: {
+                                                       ...(selectedCarrier?.factoring_company || {}),
+                                                       email: e.target.value
+                                                   }
+                                               })
+                                           }
+                                       }}
+                                       value={
+                                           (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                               ? (selectedCarrier?.factoring_company?.email || '')
+                                               // ? ''
+                                               : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
+                                                   ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
+                                                   : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
+                                                       ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_personal
+                                                       : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === 'other'
+                                                           ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_other
+                                                           : ''
+                                       }
                                 />
 
                                 {
@@ -6221,7 +7176,7 @@ const Carriers = (props) => {
                                     }} icon={faCopy} onClick={(e) => {
                                         e.stopPropagation();
                                         navigator.clipboard.writeText(refFactoringCompanyEmail.current.value);
-                                    }} />
+                                    }}/>
                                 }
                             </div>
                         </div>
@@ -6231,19 +7186,24 @@ const Carriers = (props) => {
 
                 </div>
                 <div className="fields-container-col">
-                    <div className="form-bordered-box" >
+                    <div className="form-bordered-box">
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Notes</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div className="mochi-button" onClick={() => {
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier notes')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier notes')?.pivot?.edit || 0) === 0)
+                                    ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={() => {
                                     if ((selectedCarrier.id || 0) === 0) {
                                         window.alert('You must select a carrier first!');
                                         return;
                                     }
 
-                                    setSelectedNote({ id: 0, carrier_id: selectedCarrier.id })
+                                    setSelectedNote({id: 0, carrier_id: selectedCarrier.id})
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Add note</div>
@@ -6278,12 +7238,13 @@ const Carriers = (props) => {
                                 {
                                     (selectedCarrier.notes || []).map((note, index) => {
                                         return (
-                                            <div className="notes-list-item" key={index} onClick={() => setSelectedNote(note)}>
+                                            <div className="notes-list-item" key={index}
+                                                 onClick={() => setSelectedNote(note)}>
                                                 <div className="notes-list-col tcol note-text">{note.text}</div>
                                                 {
                                                     (note.id === (selectedNote?.id || 0)) &&
                                                     <div className="notes-list-col tcol notes-selected">
-                                                        <FontAwesomeIcon icon={faPencilAlt} />
+                                                        <FontAwesomeIcon icon={faPencilAlt}/>
                                                     </div>
                                                 }
                                             </div>
@@ -6294,8 +7255,8 @@ const Carriers = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="fields-container-col" style={{ minWidth: '28%', maxWidth: '28%' }}>
-                    <div className="form-bordered-box" >
+                <div className="fields-container-col" style={{minWidth: '28%', maxWidth: '28%'}}>
+                    <div className="form-bordered-box">
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Past Orders</div>
@@ -6346,18 +7307,22 @@ const Carriers = (props) => {
 
                                                 props.openPanel(panel, props.origin);
                                             }}>
-                                                <span style={{ color: "#4682B4", fontWeight: 'bold', marginRight: 5 }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
-                                                    ? order.routing[0].type === 'pickup'
-                                                        ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
-                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+                                                <span style={{
+                                                    color: "#4682B4",
+                                                    fontWeight: 'bold',
+                                                    marginRight: 5
+                                                }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
+                                                ? order.routing[0].type === 'pickup'
+                                                    ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
+                                                        ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                            ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                            (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
 
-                                                        : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
-                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-                                                    : ''}
+                                                    : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
+                                                        ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                            ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                            (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+                                                : ''}
                                             </div>
                                         )
                                     })
@@ -6367,9 +7332,9 @@ const Carriers = (props) => {
 
                         {
                             loadingCarrierOrdersTransition((style, item) => item &&
-                                <animated.div className='loading-container' style={style} >
+                                <animated.div className='loading-container' style={style}>
                                     <div className="loading-container-wrapper">
-                                        <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                                        <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
                                     </div>
                                 </animated.div>
                             )
@@ -6386,14 +7351,21 @@ const Carriers = (props) => {
                             setSelectedData={setSelectedNote}
                             selectedParent={selectedCarrier}
                             setSelectedParent={(data) => {
-                                setSelectedCarrier({ ...selectedCarrier, notes: data.notes });
-                                props.setSelectedCarrier({ ...selectedCarrier, notes: data.notes })
+                                setSelectedCarrier({...selectedCarrier, notes: data.notes});
+                                props.setSelectedCarrier({...selectedCarrier, notes: data.notes})
                             }}
                             savingDataUrl='/saveCarrierNote'
                             deletingDataUrl='/deleteCarrierNote'
                             type='note'
-                            isEditable={props.isAdmin}
-                            isDeletable={props.isAdmin}
+                            isEditable={
+                                (props.user?.user_code?.is_admin || 0) === 1 ||
+                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier notes')?.pivot?.save || 0) === 1 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier notes')?.pivot?.edit || 0) === 1)
+                            }
+                            isDeletable={
+                                (props.user?.user_code?.is_admin || 0) === 1 ||
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier notes')?.pivot?.delete || 0) === 1
+                            }
                             isPrintable={true}
                             isAdding={selectedNote.id === 0}
                         />
@@ -6451,6 +7423,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

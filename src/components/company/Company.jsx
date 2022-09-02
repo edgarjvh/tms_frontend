@@ -633,7 +633,7 @@ function Company(props) {
                     <div className="menu-bar">
                         <div className="section">
                             {
-                                (props.user?.type || '') === 'employee' &&
+                                (props.user?.user_code?.is_admin || 0) === 1 &&
                                 <div className="mochi-button" onClick={userClick} style={{
                                     marginRight: 20
                                 }}>
@@ -765,7 +765,7 @@ function Company(props) {
                         </div>
                     </div>
                 }
-                <div className="screen-content">
+                <div className="screen-content" >
                     <div className="pages-container" style={{
                         position: 'absolute',
                         display: 'flex',

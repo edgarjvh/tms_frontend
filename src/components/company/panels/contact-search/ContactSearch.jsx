@@ -72,6 +72,7 @@ const ContactSearch = (props) => {
                         deletingContactUrl={`/delete${ownerType}Contact`}
                         uploadAvatarUrl={`/upload${ownerType}Avatar`}
                         removeAvatarUrl={`/remove${ownerType}Avatar`}
+                        permissionName={props.suborigin.replace('-', ' ') + ' contacts'}
                         suborigin={props.suborigin}
                         origin={props.origin}
                         owner={props.owner}

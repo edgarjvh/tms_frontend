@@ -235,6 +235,20 @@ const FactoringCompany = (props) => {
 
     useEffect(() => {
         if (isSavingFactoringCompany) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedFactoringCompany?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.edit || 0) === 0) {
+                        setIsSavingFactoringCompany(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.save || 0) === 0) {
+                        setIsSavingFactoringCompany(false);
+                        return;
+                    }
+                }
+            }
+            
             let company = selectedFactoringCompany || {};
 
             if (company.id === undefined) {
@@ -318,6 +332,20 @@ const FactoringCompany = (props) => {
 
     useEffect(() => {
         if (isSavingFactoringCompanyContact) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedFactoringCompany?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.edit || 0) === 0) {
+                        setIsSavingFactoringCompanyContact(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.save || 0) === 0) {
+                        setIsSavingFactoringCompanyContact(false);
+                        return;
+                    }
+                }
+            }
+            
             if ((selectedFactoringCompany.id || 0) === 0) {
                 setIsSavingFactoringCompanyContact(false);
                 return;
@@ -393,6 +421,20 @@ const FactoringCompany = (props) => {
 
     useEffect(() => {
         if (isSavingFactoringCompanyMailingAddress) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedFactoringCompany?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.edit || 0) === 0) {
+                        setIsSavingFactoringCompanyMailingAddress(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.save || 0) === 0) {
+                        setIsSavingFactoringCompanyMailingAddress(false);
+                        return;
+                    }
+                }
+            }
+            
             if ((selectedFactoringCompany.id || 0) > 0) {
                 let mailing_address = selectedFactoringCompany.mailing_address || {};
 
@@ -928,8 +970,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedFactoringCompany?.contact_name || '')
-                                            ? ''
+                                            ? (selectedFactoringCompany?.contact_name || '')
+                                            // ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).last_name
                                     }
                                 />
@@ -952,8 +994,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedFactoringCompany?.contact_phone || '')
-                                            ? ''
+                                            ? (selectedFactoringCompany?.contact_phone || '')
+                                            // ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
                                                 ? selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).phone_work
                                                 : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
@@ -994,8 +1036,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedFactoringCompany?.ext || '')
-                                            ? ''
+                                            ? (selectedFactoringCompany?.ext || '')
+                                            // ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).phone_ext
                                     }
                                 />
@@ -1038,8 +1080,8 @@ const FactoringCompany = (props) => {
                                     }}
                                     value={
                                         (selectedFactoringCompany?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            // ? (selectedFactoringCompany?.email || '')
-                                            ? ''
+                                            ? (selectedFactoringCompany?.email || '')
+                                            // ? ''
                                             : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
                                                 ? selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).email_work
                                                 : selectedFactoringCompany?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
@@ -1427,7 +1469,29 @@ const FactoringCompany = (props) => {
                                                         await setSelectedFactoringCompany({
                                                             ...selectedFactoringCompany,
                                                             mailing_address: {
-                                                                ...selectedFactoringCompany.mailing_address,
+                                                                ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                    + ' '
+                                                                    + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                    : '',
+                                                                ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                            : '',
                                                                 mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
                                                                 mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
                                                                 mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
@@ -1456,7 +1520,29 @@ const FactoringCompany = (props) => {
                                                         await setSelectedFactoringCompany({
                                                             ...selectedFactoringCompany,
                                                             mailing_address: {
-                                                                ...selectedFactoringCompany.mailing_address,
+                                                                ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                    + ' '
+                                                                    + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                    : '',
+                                                                ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                            : '',
                                                                 mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
                                                                 mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
                                                                 mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
@@ -1485,27 +1571,82 @@ const FactoringCompany = (props) => {
                                                     break;
                                             }
                                         }}
-                                        onInput={e => {
+                                           onBlur={e => {
+                                               let contact = (selectedFactoringCompany?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
 
-                                        }}
-                                        onChange={e => {
-
-                                        }}
-                                        value={
-                                            (selectedFactoringCompany?.mailing_address?.mailing_contact?.first_name || '') +
-                                            ((selectedFactoringCompany?.mailing_address?.mailing_contact?.last_name || '') === ''
-                                                ? ''
-                                                : ' ' + selectedFactoringCompany?.mailing_address?.mailing_contact?.last_name)
-                                        }
+                                               if (contact) {
+                                                   setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                       return {
+                                                           ...selectedFactoringCompany,
+                                                           mailing_address: {
+                                                               ...(selectedFactoringCompany?.mailing_address || {}),
+                                                               contact_phone: (contact.primary_phone || '') === 'work'
+                                                                   ? (contact.phone_work || '')
+                                                                   : (contact.primary_phone || '') === 'fax'
+                                                                       ? (contact.phone_work_fax || '')
+                                                                       : (contact.primary_phone || '') === 'mobile'
+                                                                           ? (contact.phone_mobile || '')
+                                                                           : (contact.primary_phone || '') === 'direct'
+                                                                               ? (contact.phone_direct || '')
+                                                                               : (contact.primary_phone || '') === 'other'
+                                                                                   ? (contact.phone_other || '')
+                                                                                   : '',
+                                                               ext: (contact.phone_ext || ''),
+                                                               email: (contact.primary_email || '') === 'work'
+                                                                   ? (contact.email_work || '')
+                                                                   : (contact.primary_email || '') === 'personal'
+                                                                       ? (contact.email_personal || '')
+                                                                       : (contact.primary_email || '') === 'other'
+                                                                           ? (contact.email_other || '')
+                                                                           : '',
+                                                               mailing_contact_id: contact.id
+                                                           }
+                                                       }
+                                                   })
+                                               } else {
+                                                   setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                       return {
+                                                           ...selectedFactoringCompany,
+                                                           mailing_address: {
+                                                               ...(selectedFactoringCompany?.mailing_address || {}),
+                                                               mailing_contact_id: null,
+                                                           }
+                                                       }
+                                                   })
+                                               }
+                                           }}
+                                           onInput={e => {
+                                               setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                   return {
+                                                       ...selectedFactoringCompany,
+                                                       mailing_address: {
+                                                           ...(selectedFactoringCompany?.mailing_address || {}),
+                                                           contact_name: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }}
+                                           onChange={e => {
+                                               setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                   return {
+                                                       ...selectedFactoringCompany,
+                                                       mailing_address: {
+                                                           ...(selectedFactoringCompany?.mailing_address || {}),
+                                                           contact_name: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedFactoringCompany?.mailing_address?.contact_name || ''}
                                     />
 
                                     {
-                                        ((selectedFactoringCompany?.contacts || []).length > 1 && (selectedFactoringCompany?.mailing_address?.id !== undefined)) &&
+                                        ((selectedFactoringCompany?.contacts || []).length > 0 && (selectedFactoringCompany?.mailing_address?.id !== undefined)) &&
                                         <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={async () => {
                                             if (showMailingContactNames) {
                                                 setShowMailingContactNames(false);
                                             } else {
-                                                if ((selectedFactoringCompany?.contacts || []).length > 1) {
+                                                if ((selectedFactoringCompany?.contacts || []).length > 0) {
                                                     await setMailingContactNameItems((selectedFactoringCompany?.contacts || []).map((item, index) => {
                                                         item.selected = index === 0
                                                         return item;
@@ -1560,23 +1701,45 @@ const FactoringCompany = (props) => {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedFactoringCompany({
-                                                                                ...selectedFactoringCompany,
-                                                                                mailing_address: {
-                                                                                    ...selectedFactoringCompany.mailing_address,
-                                                                                    mailing_contact: item,
-                                                                                    mailing_contact_id: item.id,
-                                                                                    mailing_contact_primary_phone: (item.phone_work || '') !== ''
-                                                                                        ? 'work'
-                                                                                        : (item.phone_work_fax || '') !== ''
-                                                                                            ? 'fax'
-                                                                                            : (item.phone_mobile || '') !== ''
-                                                                                                ? 'mobile'
-                                                                                                : (item.phone_direct || '') !== ''
-                                                                                                    ? 'direct'
-                                                                                                    : (item.phone_other || '') !== ''
-                                                                                                        ? 'other' :
-                                                                                                        ''
+                                                                            await setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                                                return {
+                                                                                    ...selectedFactoringCompany,
+                                                                                    mailing_address: {
+                                                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                                        contact_name: (item.first_name + ' ' + item.last_name).trim(),
+                                                                                        contact_phone: (item.primary_phone || '') === 'work'
+                                                                                            ? (item.phone_work || '')
+                                                                                            : (item.primary_phone || '') === 'fax'
+                                                                                                ? (item.phone_work_fax || '')
+                                                                                                : (item.primary_phone || '') === 'mobile'
+                                                                                                    ? (item.phone_mobile || '')
+                                                                                                    : (item.primary_phone || '') === 'direct'
+                                                                                                        ? (item.phone_direct || '')
+                                                                                                        : (item.primary_phone || '') === 'other'
+                                                                                                            ? (item.phone_other || '')
+                                                                                                            : '',
+                                                                                        ext: (item.phone_ext || ''),
+                                                                                        email: (item.primary_email || '') === 'work'
+                                                                                            ? (item.email_work || '')
+                                                                                            : (item.primary_email || '') === 'personal'
+                                                                                                ? (item.email_personal || '')
+                                                                                                : (item.primary_email || '') === 'other'
+                                                                                                    ? (item.email_other || '')
+                                                                                                    : '',
+                                                                                        mailing_contact: item,
+                                                                                        mailing_contact_id: item.id,
+                                                                                        mailing_contact_primary_phone: (item.phone_work || '') !== ''
+                                                                                            ? 'work'
+                                                                                            : (item.phone_work_fax || '') !== ''
+                                                                                                ? 'fax'
+                                                                                                : (item.phone_mobile || '') !== ''
+                                                                                                    ? 'mobile'
+                                                                                                    : (item.phone_direct || '') !== ''
+                                                                                                        ? 'direct'
+                                                                                                        : (item.phone_other || '') !== ''
+                                                                                                            ? 'other' :
+                                                                                                            ''
+                                                                                    }
                                                                                 }
                                                                             });
 
@@ -1731,15 +1894,18 @@ const FactoringCompany = (props) => {
 
                                                 case 13: // enter
                                                     if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedFactoringCompany({
-                                                            ...selectedFactoringCompany,
-                                                            mailing_address: {
-                                                                ...selectedFactoringCompany.mailing_address,
-                                                                mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                        await setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                            return {
+                                                                ...selectedFactoringCompany,
+                                                                mailing_address: {
+                                                                    ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                    contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
+                                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                                }
                                                             }
                                                         });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
+                                                        // validateMailingAddressToSave({ keyCode: 9 });
                                                         setShowMailingContactPhones(false);
                                                         refMailingContactPhone.current.inputElement.focus();
                                                     }
@@ -1748,19 +1914,22 @@ const FactoringCompany = (props) => {
                                                 case 9: // tab
                                                     if (showMailingContactPhones) {
                                                         e.preventDefault();
-                                                        await setSelectedFactoringCompany({
-                                                            ...selectedFactoringCompany,
-                                                            mailing_address: {
-                                                                ...selectedFactoringCompany.mailing_address,
-                                                                mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                        await setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                            return {
+                                                                ...selectedFactoringCompany,
+                                                                mailing_address: {
+                                                                    ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                    contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
+                                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                                }
                                                             }
                                                         });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
+                                                        // validateMailingAddressToSave({ keyCode: 9 });
                                                         setShowMailingContactPhones(false);
                                                         refMailingContactPhone.current.inputElement.focus();
                                                     } else {
-                                                        validateMailingAddressToSave({ keyCode: 9 });
+                                                        // validateMailingAddressToSave({ keyCode: 9 });
                                                     }
                                                     break;
                                                 default:
@@ -1768,24 +1937,28 @@ const FactoringCompany = (props) => {
                                             }
                                         }}
                                         onInput={(e) => {
-
+                                            setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                return {
+                                                    ...selectedFactoringCompany,
+                                                    mailing_address: {
+                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                        contact_phone: e.target.value
+                                                    }
+                                                }
+                                            })
                                         }}
                                         onChange={(e) => {
-
+                                            setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                return {
+                                                    ...selectedFactoringCompany,
+                                                    mailing_address: {
+                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                        contact_phone: e.target.value
+                                                    }
+                                                }
+                                            })
                                         }}
-                                        value={
-                                            (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_phone || '') === 'work'
-                                                ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.phone_work || '')
-                                                : (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_phone || '') === 'fax'
-                                                    ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.phone_work_fax || '')
-                                                    : (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_phone || '') === 'mobile'
-                                                        ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.phone_mobile || '')
-                                                        : (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_phone || '') === 'direct'
-                                                            ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.phone_direct || '')
-                                                            : (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_phone || '') === 'other'
-                                                                ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.phone_other || '')
-                                                                : ''
-                                        }
+                                        value={selectedFactoringCompany?.mailing_address?.contact_phone}
                                     />
 
                                     {
@@ -1795,7 +1968,7 @@ const FactoringCompany = (props) => {
                                                 'selected-mailing-contact-primary-phone': true,
                                                 'pushed': (mailingContactPhoneItems.length > 1)
                                             })}>
-                                            {selectedFactoringCompany?.mailing_address?.mailing_contact_primary_phone || ''}
+                                            {selectedFactoringCompany?.mailing_address?.mailing_contact_id ? (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_phone || '') : ''}
                                         </div>
                                     }
 
@@ -1860,15 +2033,18 @@ const FactoringCompany = (props) => {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedFactoringCompany({
-                                                                                ...selectedFactoringCompany,
-                                                                                mailing_address: {
-                                                                                    ...selectedFactoringCompany.mailing_address,
-                                                                                    mailing_contact_primary_phone: item.type
+                                                                            await setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                                                return {
+                                                                                    ...selectedFactoringCompany,
+                                                                                    mailing_address: {
+                                                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                                        contact_phone: item.phone,
+                                                                                        mailing_contact_primary_phone: item.type
+                                                                                    }
                                                                                 }
                                                                             });
 
-                                                                            validateMailingAddressToSave({ keyCode: 9 });
+                                                                            // validateMailingAddressToSave({ keyCode: 9 });
                                                                             setShowMailingContactPhones(false);
                                                                             refMailingContactPhone.current.inputElement.focus();
                                                                         }}
@@ -1910,32 +2086,44 @@ const FactoringCompany = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input type="text" placeholder="Ext"
-                                    // onKeyDown={validateMailingAddressToSave}
-                                    onChange={e => {
-                                        // let mailing_address = selectedFactoringCompany.mailing_address || {};
-                                        // mailing_address.ext = e.target.value;
-                                        // setSelectedFactoringCompany({ ...selectedFactoringCompany, mailing_address: mailing_address });
-                                    }}
-                                    value={selectedFactoringCompany?.mailing_address?.mailing_contact?.phone_ext || ''} />
+                                       onInput={e => {
+                                           setSelectedFactoringCompany(selectedFactoringCompany => {
+                                               return {
+                                                   ...selectedFactoringCompany,
+                                                   mailing_address: {
+                                                       ...(selectedFactoringCompany?.mailing_address || {}),
+                                                       ext: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       onChange={e => {
+                                           setSelectedFactoringCompany(selectedFactoringCompany => {
+                                               return {
+                                                   ...selectedFactoringCompany,
+                                                   mailing_address: {
+                                                       ...(selectedFactoringCompany?.mailing_address || {}),
+                                                       ext: e.target.value
+                                                   }
+                                               }
+                                           })
+                                       }}
+                                       value={selectedFactoringCompany?.mailing_address?.ext || ''}/>
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="select-box-container" style={{ flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedFactoringCompany?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                        setShowMailingContactEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedFactoringCompany?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                        (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                        setShowMailingContactEmailCopyBtn(true);
-                                    }
-                                }}
+                                 onMouseEnter={() => {
+                                     if ((selectedFactoringCompany?.mailing_address?.email || '') !== '') {
+                                         setShowMailingContactEmailCopyBtn(true);
+                                     }
+                                 }}
+                                 onFocus={() => {
+                                     if ((selectedFactoringCompany?.mailing_address?.email || '') !== '') {
+                                         setShowMailingContactEmailCopyBtn(true);
+                                     }
+                                 }}
                                 onBlur={() => {
                                     window.setTimeout(() => {
                                         setShowMailingContactEmailCopyBtn(false);
@@ -2065,15 +2253,18 @@ const FactoringCompany = (props) => {
 
                                                 case 13: // enter
                                                     if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedFactoringCompany({
-                                                            ...selectedFactoringCompany,
-                                                            mailing_address: {
-                                                                ...selectedFactoringCompany.mailing_address,
-                                                                mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                        await setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                            return {
+                                                                ...selectedFactoringCompany,
+                                                                mailing_address: {
+                                                                    ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                    email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
+                                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                                }
                                                             }
                                                         });
 
-                                                        validateMailingAddressToSave({ keyCode: 9 });
+                                                        // validateMailingAddressToSave({ keyCode: 9 });
                                                         setShowMailingContactEmails(false);
                                                         refMailingContactEmail.current.focus();
                                                     }
@@ -2082,11 +2273,14 @@ const FactoringCompany = (props) => {
                                                 case 9: // tab
                                                     if (showMailingContactEmails) {
                                                         e.preventDefault();
-                                                        await setSelectedFactoringCompany({
-                                                            ...selectedFactoringCompany,
-                                                            mailing_address: {
-                                                                ...selectedFactoringCompany.mailing_address,
-                                                                mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                        await setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                            return {
+                                                                ...selectedFactoringCompany,
+                                                                mailing_address: {
+                                                                    ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                    email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
+                                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                                }
                                                             }
                                                         });
 
@@ -2102,18 +2296,29 @@ const FactoringCompany = (props) => {
                                                     break;
                                             }
                                         }}
-                                        onChange={e => {
-
-                                        }}
-                                        value={
-                                            (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_email || '') === 'work'
-                                                ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_work || '')
-                                                : (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_email || '') === 'personal'
-                                                    ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_personal || '')
-                                                    : (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_email || '') === 'other'
-                                                        ? (selectedFactoringCompany?.mailing_address?.mailing_contact?.email_other || '')
-                                                        : ''
-                                        }
+                                           onInput={e => {
+                                               setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                   return {
+                                                       ...selectedFactoringCompany,
+                                                       mailing_address: {
+                                                           ...(selectedFactoringCompany?.mailing_address || {}),
+                                                           email: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }}
+                                           onChange={e => {
+                                               setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                   return {
+                                                       ...selectedFactoringCompany,
+                                                       mailing_address: {
+                                                           ...(selectedFactoringCompany?.mailing_address || {}),
+                                                           email: e.target.value
+                                                       }
+                                                   }
+                                               })
+                                           }}
+                                           value={selectedFactoringCompany?.mailing_address?.email || ''}
                                     />
 
                                     {
@@ -2123,7 +2328,7 @@ const FactoringCompany = (props) => {
                                                 'selected-mailing-contact-primary-email': true,
                                                 'pushed': (mailingContactEmailItems.length > 1)
                                             })}>
-                                            {selectedFactoringCompany?.mailing_address?.mailing_contact_primary_email || ''}
+                                            {(selectedFactoringCompany?.mailing_address?.mailing_contact_id || 0) > 0 ? (selectedFactoringCompany?.mailing_address?.mailing_contact_primary_email || '') : ''}
                                         </div>
                                     }
 
@@ -2207,11 +2412,14 @@ const FactoringCompany = (props) => {
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
                                                                         onClick={async () => {
-                                                                            await setSelectedFactoringCompany({
-                                                                                ...selectedFactoringCompany,
-                                                                                mailing_address: {
-                                                                                    ...selectedFactoringCompany.mailing_address,
-                                                                                    mailing_contact_primary_email: item.type
+                                                                            await setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                                                return {
+                                                                                    ...selectedFactoringCompany,
+                                                                                    mailing_address: {
+                                                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                                                        email: item.email,
+                                                                                        mailing_contact_primary_email: item.type
+                                                                                    }
                                                                                 }
                                                                             });
 
@@ -3871,6 +4079,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

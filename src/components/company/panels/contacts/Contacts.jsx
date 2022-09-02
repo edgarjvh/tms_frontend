@@ -56,11 +56,11 @@ const Contacts = (props) => {
     });
 
     const newPasswordTransition = useTransition(newPassword !== '', {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
+        from: {opacity: 0},
+        enter: {opacity: 1},
+        leave: {opacity: 0},
         reverse: newPassword !== '',
-        config: { duration: 100 }
+        config: {duration: 100}
     });
 
     useEffect(async () => {
@@ -390,7 +390,10 @@ const Contacts = (props) => {
                         }
 
                         if (props.owner === 'owner-operator') {
-                            props.setSelectedOwnerOperator({...props.selectedOwnerOperator, contacts: res.data.contacts});
+                            props.setSelectedOwnerOperator({
+                                ...props.selectedOwnerOperator,
+                                contacts: res.data.contacts
+                            });
                         }
 
                         await setContactSearchCustomer({
@@ -456,7 +459,7 @@ const Contacts = (props) => {
 
     const setContactPassword = () => {
         if (window.confirm('Are you sure you want to proceed?')) {
-            axios.post(props.serverUrl + '/resetAgentContactPassword', { id: (contactSearchCustomer?.selectedContact?.id || 0) }).then(res => {
+            axios.post(props.serverUrl + '/resetAgentContactPassword', {id: (contactSearchCustomer?.selectedContact?.id || 0)}).then(res => {
                 if (res.data.result === 'OK') {
                     setNewPassword(res.data.newpass);
                 } else {
@@ -663,7 +666,12 @@ const Contacts = (props) => {
                                     }
                                     {
                                         isEditingContact &&
-                                        <div className="mochi-button" onClick={saveContact}>
+                                        <div className={
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                                ? 'mochi-button disabled' : 'mochi-button'
+                                        } onClick={saveContact}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Save</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -671,7 +679,11 @@ const Contacts = (props) => {
                                     }
                                     {
                                         !isEditingContact &&
-                                        <div className="mochi-button" onClick={() => {
+                                        <div className={
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0)
+                                                ? 'mochi-button disabled' : 'mochi-button'
+                                        } onClick={() => {
                                             setIsEditingContact(true);
                                             setTempSelectedContact({...contactSearchCustomer?.selectedContact});
                                         }} style={{
@@ -684,9 +696,20 @@ const Contacts = (props) => {
                                         </div>
                                     }
 
-                                    <div className="mochi-button" onClick={deleteContact} style={{
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={deleteContact} style={{
                                         marginLeft: '0.2rem',
-                                        pointerEvents: (contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) ? 'all' : 'none'
+                                        pointerEvents: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 1))
+                                            ? 'all' : 'none',
+                                        cursor: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 1))
+                                            ? 'pointer' : 'not-allowed'
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base"
@@ -704,15 +727,16 @@ const Contacts = (props) => {
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base" style={{
                                                 color: (contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) ? 'rgba(138,8,8,1)' : 'rgba(138,8,8,0.5)'
-                                            }}>New Password</div>
+                                            }}>New Password
+                                            </div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                         </div>
                                     }
                                 </div>
 
                                 {
-                                   ((contactSearchCustomer?.selectedContact?.agent_id || 0) > 0) &&
-                                    <div className="mochi-button" style={{ margin: '5px 0' }} onClick={() => {
+                                    ((contactSearchCustomer?.selectedContact?.agent_id || 0) > 0) &&
+                                    <div className="mochi-button" style={{margin: '5px 0'}} onClick={() => {
 
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -1265,7 +1289,7 @@ const Contacts = (props) => {
                                 (contactSearchCustomer?.selectedContact?.agent_id || 0) === 0 &&
 
                                 <div className="col-contact-emails">
-                                <div className="col-title">E-mails</div>
+                                    <div className="col-title">E-mails</div>
                                 </div>
                             }
 
@@ -1276,7 +1300,11 @@ const Contacts = (props) => {
 
                 <div className="footer">
                     <div className="left-buttons">
-                        <div className="mochi-button" onClick={() => {
+                        <div className={
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0)
+                                ? 'mochi-button disabled' : 'mochi-button'
+                        } onClick={() => {
                             switch (props.owner) {
                                 case 'customer':
                                     setContactSearchCustomer({
@@ -1443,7 +1471,7 @@ const Contacts = (props) => {
 
             {
                 newPasswordTransition((style, item) => item && (
-                    <animated.div style={{ ...style }}>
+                    <animated.div style={{...style}}>
                         <PassModal
                             title="New Password"
                             text={newPassword}
@@ -1463,6 +1491,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

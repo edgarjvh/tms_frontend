@@ -123,6 +123,7 @@ const RateConf = (props) => {
                                     selectedCarrierInfoContact={(props.selectedOrder.carrier?.contacts || []).find(c => c.is_primary === 1) || {}}
                                     selectedCustomerInfo={props.selectedOrder.bill_to_company}
                                     selectedCustomerInfoContact={(props.selectedOrder.bill_to_company?.contacts || []).find(c => c.is_primary === 1) || {}}
+                                    selectedCompany={props.selectedCompany}
                                 />
                             </animated.div>
                         ))
@@ -137,6 +138,7 @@ const RateConf = (props) => {
                                     selectedCarrierInfoContact={(props.selectedOrder.carrier?.contacts || []).find(c => c.is_primary === 1) || {}}
                                     selectedCustomerInfo={props.selectedOrder.bill_to_company}
                                     selectedCustomerInfoContact={(props.selectedOrder.bill_to_company?.contacts || []).find(c => c.is_primary === 1) || {}}
+                                    selectedCompany={props.selectedCompany}
                                 />
                             </animated.div>
                         ))
@@ -153,6 +155,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        selectedCompany: state.companySetupReducers.selectedCompany,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

@@ -227,7 +227,7 @@ const Documents = (props) => {
         formData.append("invoice_id", selectedOwner.id);
         formData.append("order_id", selectedOwner.id);
         formData.append("division_id", selectedOwner.id);
-        formData.append("user_code_id", props.suborigin === 'company-agent' ? selectedOwner?.id : props.user.user_code);
+        formData.append("user_code_id", props.user.user_code.id);
         formData.append("date_entered", selectedOwnerDocument.date_entered);
         formData.append("title", selectedOwnerDocument.title);
         formData.append("subject", selectedOwnerDocument.subject);
@@ -523,7 +523,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -538,7 +547,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' && props.origin === 'invoice') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -553,7 +571,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing' && props.origin === 'invoice') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -568,7 +595,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -583,7 +619,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -598,7 +643,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -613,7 +667,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -628,7 +691,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -643,7 +715,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -658,7 +739,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring.company') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -673,7 +763,16 @@ const Documents = (props) => {
 
                         {
                             (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
-                            <div className={quickTypeLinkClasses} onClick={() => {
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
                                 setSelectedOwnerDocument({
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -690,14 +789,20 @@ const Documents = (props) => {
                     <div className="documents-fields-row">
                         <div className="input-box-container">
                             <input
+                                readOnly={
+                                    (selectedOwnerDocument.id || 0) > 0 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                }
                                 ref={refTitleInput}
                                 type="text"
                                 placeholder="Title"
                                 value={selectedOwnerDocument.title || ''}
                                 onChange={(e) => {
                                     setSelectedOwnerDocument({...selectedOwnerDocument, title: e.target.value})
-                                }}
-                                readOnly={(selectedOwnerDocument.id || 0) > 0}/>
+                                }}/>
+
                         </div>
 
                         <div className="input-box-container">
@@ -708,7 +813,12 @@ const Documents = (props) => {
                                 onChange={(e) => {
                                     setSelectedOwnerDocument({...selectedOwnerDocument, subject: e.target.value})
                                 }}
-                                readOnly={(selectedOwnerDocument.id || 0) > 0}/>
+                                readOnly={
+                                    (selectedOwnerDocument.id || 0) > 0 ||
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                }/>
                         </div>
 
                         <div className="input-box-container tags" style={{
@@ -758,29 +868,54 @@ const Documents = (props) => {
                                    onInput={(e) => {
                                        setSelectedOwnerDocumentTags(e.target.value)
                                    }}
-                                   readOnly={(selectedOwnerDocument.id || 0) > 0}/>
+                                   readOnly={
+                                       (selectedOwnerDocument.id || 0) > 0 ||
+                                       ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                           (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                               ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                   }/>
                         </div>
                     </div>
                 </div>
 
                 <div className="documents-right-side">
-                    <div className="mochi-button" style={{
+                    <div className={
+                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                            (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                            ? 'mochi-button disabled' : 'mochi-button'
+                    } style={{
                         fontSize: '1.5rem'
                     }}>
                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                         <div className="mochi-button-base">Search Documents</div>
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                     </div>
-                    <div className="mochi-button" style={{
+                    <div className={
+                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                            (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                            ? 'mochi-button disabled' : 'mochi-button'
+                    } style={{
                         fontSize: '1.5rem'
                     }}>
                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                         <div className="mochi-button-base">E-Mail Documents</div>
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                     </div>
-                    <div className="mochi-button" style={{
+                    <div className={
+                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                            (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                            ? 'mochi-button disabled' : 'mochi-button'
+                    } style={{
                         fontSize: '1.5rem',
-                        pointerEvents: (selectedOwnerDocument.id || 0) > 0 ? 'none' : 'all'
+                        pointerEvents: (selectedOwnerDocument.id || 0) > 0 ||
+                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                            (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                            ? 'none' : 'all'
+
                     }} onClick={uploadDocumentBtnClick}>
                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                         <div className="mochi-button-base"
@@ -872,7 +1007,7 @@ const Documents = (props) => {
                                             doc_id: document.id,
                                         }).then(res => {
                                             if (res.data.result === 'OK') {
-                                                document.notes = [...res.data.notes]
+                                                document.notes = [...res.data.documentNotes]
                                             }
 
                                             setSelectedOwnerDocument(document);
@@ -892,162 +1027,166 @@ const Documents = (props) => {
                                                 <FontAwesomeIcon icon={faPencilAlt}/>
                                             }
                                         </div>
-                                        <div className="item-btn" onClick={(e) => {
-                                            e.stopPropagation();
+                                        {
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 1)) &&
+                                            <div className="item-btn" style={{marginLeft: 5}} onClick={(e) => {
+                                                e.stopPropagation();
 
-                                            if (window.confirm('Are you sure to delete this document?')) {
+                                                if (window.confirm('Are you sure to delete this document?')) {
 
-                                                axios.post(props.serverUrl + deletingDocumentUrl, {
-                                                    doc_id: document.doc_id,
-                                                    order_id: selectedOwner.id,
-                                                    employee_id: selectedOwner.id,
-                                                    agent_id: selectedOwner.id,
-                                                    driver_id: selectedOwner.id,
-                                                    operator_id: selectedOwner.id,
-                                                    division_id: selectedOwner.id,
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
+                                                    axios.post(props.serverUrl + deletingDocumentUrl, {
+                                                        doc_id: document.doc_id,
+                                                        order_id: selectedOwner.id,
+                                                        employee_id: selectedOwner.id,
+                                                        agent_id: selectedOwner.id,
+                                                        driver_id: selectedOwner.id,
+                                                        operator_id: selectedOwner.id,
+                                                        division_id: selectedOwner.id,
+                                                    }).then(res => {
+                                                        if (res.data.result === 'OK') {
 
-                                                        if (props.suborigin === 'company-employee') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
+                                                            if (props.suborigin === 'company-employee') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
 
-                                                            props.setSelectedEmployee({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
+                                                                props.setSelectedEmployee({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
 
-                                                        if (props.suborigin === 'company-agent') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
+                                                            if (props.suborigin === 'company-agent') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
 
-                                                            props.setSelectedAgent({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
+                                                                props.setSelectedAgent({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
 
-                                                        if (props.suborigin === 'company-driver') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
+                                                            if (props.suborigin === 'company-driver') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
 
-                                                            props.setSelectedCompanyDriver({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
+                                                                props.setSelectedCompanyDriver({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
 
-                                                        if (props.suborigin === 'company-operator') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
+                                                            if (props.suborigin === 'company-operator') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
 
-                                                            props.setSelectedOwnerOperator({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
+                                                                props.setSelectedOwnerOperator({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
 
-                                                        if (props.suborigin === 'customer') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
+                                                            if (props.suborigin === 'customer') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
 
-                                                            props.setSelectedCustomer({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
+                                                                props.setSelectedCustomer({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
 
-                                                        if (props.suborigin === 'division') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
+                                                            if (props.suborigin === 'division') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
 
-                                                            props.setSelectedDivision({
-                                                                ...selectedOwner,
-                                                                documents: res.data.documents
-                                                            });
-                                                        }
-
-                                                        if (props.suborigin === 'carrier') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
-
-                                                            props.setSelectedCarrier({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
-
-                                                        if (props.suborigin === 'factoring-company') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
-
-                                                            props.setSelectedFactoringCompany({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
-
-                                                        if (props.suborigin === 'order') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {...selectedOwner, documents: res.data.documents}
-                                                            })
-
-                                                            props.setSelectedOrder({
-                                                                id: selectedOwner.id,
-                                                                documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
-                                                        }
-
-                                                        if (props.suborigin === 'order-billing') {
-                                                            setSelectedOwner(selectedOwner => {
-                                                                return {
+                                                                props.setSelectedDivision({
                                                                     ...selectedOwner,
-                                                                    billing_documents: res.data.documents
-                                                                }
-                                                            })
+                                                                    documents: res.data.documents
+                                                                });
+                                                            }
 
-                                                            props.setSelectedOrder({
-                                                                id: selectedOwner.id,
-                                                                billing_documents: res.data.documents,
-                                                                component_id: props.componentId
-                                                            });
+                                                            if (props.suborigin === 'carrier') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
+
+                                                                props.setSelectedCarrier({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
+                                                            if (props.suborigin === 'factoring-company') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
+
+                                                                props.setSelectedFactoringCompany({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
+                                                            if (props.suborigin === 'order') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {...selectedOwner, documents: res.data.documents}
+                                                                })
+
+                                                                props.setSelectedOrder({
+                                                                    id: selectedOwner.id,
+                                                                    documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
+                                                            if (props.suborigin === 'order-billing') {
+                                                                setSelectedOwner(selectedOwner => {
+                                                                    return {
+                                                                        ...selectedOwner,
+                                                                        billing_documents: res.data.documents
+                                                                    }
+                                                                })
+
+                                                                props.setSelectedOrder({
+                                                                    id: selectedOwner.id,
+                                                                    billing_documents: res.data.documents,
+                                                                    component_id: props.componentId
+                                                                });
+                                                            }
+
+
+                                                            if ((selectedOwnerDocument.id || 0) === document.id) {
+                                                                setSelectedOwnerDocument({
+                                                                    id: 0,
+                                                                    user_id: Math.floor(Math.random() * (15 - 1)) + 1,
+                                                                    date_entered: moment().format('MM/DD/YYYY')
+                                                                });
+
+                                                                refTitleInput.current.focus();
+                                                            }
                                                         }
+                                                    })
+                                                }
+                                            }}>
 
+                                                <FontAwesomeIcon icon={faTrashAlt}/>
 
-                                                        if ((selectedOwnerDocument.id || 0) === document.id) {
-                                                            setSelectedOwnerDocument({
-                                                                id: 0,
-                                                                user_id: Math.floor(Math.random() * (15 - 1)) + 1,
-                                                                date_entered: moment().format('MM/DD/YYYY')
-                                                            });
-
-                                                            refTitleInput.current.focus();
-                                                        }
-                                                    }
-                                                })
-                                            }
-                                        }}>
-
-                                            <FontAwesomeIcon icon={faTrashAlt}/>
-
-                                        </div>
+                                            </div>
+                                        }
                                     </div>
                                 )
                             })
@@ -1063,7 +1202,12 @@ const Documents = (props) => {
                         <div className="form-title">Notes</div>
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
-                            <div className="mochi-button" onClick={() => {
+                            <div className={
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'mochi-button disabled' : 'mochi-button'
+                            } onClick={() => {
                                 if ((selectedOwnerDocument.id || 0) > 0) {
                                     setSelectedOwnerDocumentNote({
                                         id: 0,
@@ -1074,7 +1218,11 @@ const Documents = (props) => {
                                 }
                             }}
                                  style={{
-                                     pointerEvents: (selectedOwnerDocument.id || 0) > 0 ? 'all' : 'none',
+                                     pointerEvents: (selectedOwnerDocument.id || 0) > 0 &&
+                                     ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                         (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 1 &&
+                                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 1))
+                                         ? 'all' : 'none'
                                  }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base"
@@ -1191,7 +1339,7 @@ const Documents = (props) => {
                         setSelectedParent={(data) => {
                             setSelectedOwnerDocument({
                                 ...selectedOwnerDocument,
-                                notes: data.notes
+                                notes: data.data
                             });
 
                             setSelectedOwnerDocumentNote({});
@@ -1202,7 +1350,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedEmployee.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1215,7 +1363,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedAgent.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1228,7 +1376,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedDriver.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1241,7 +1389,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedOperator.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1254,7 +1402,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedCustomer.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1267,7 +1415,7 @@ const Documents = (props) => {
                                         ...selectedOwner,
                                         documents: selectedOwner.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         })
@@ -1279,7 +1427,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedCarrier.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1292,7 +1440,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selectedFactoringCompany.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1305,7 +1453,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         documents: props.selected_order.documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1318,7 +1466,7 @@ const Documents = (props) => {
                                         id: selectedOwner.id,
                                         billing_documents: props.selected_order.billing_documents.map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
-                                                document.notes = data.notes;
+                                                document.notes = data.data;
                                             }
                                             return document;
                                         }),
@@ -1335,8 +1483,15 @@ const Documents = (props) => {
                         savingDataUrl={savingDocumentNoteUrl}
                         deletingDataUrl=''
                         type='note'
-                        isEditable={props.isAdmin}
-                        isDeletable={props.isAdmin}
+                        isEditable={
+                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 1 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 1))
+                        }
+                        isDeletable={
+                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 1))
+                        }
                         isAdding={selectedOwnerDocumentNote.id === 0}/>
                 </animated.div>
             }

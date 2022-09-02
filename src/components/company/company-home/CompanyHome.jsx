@@ -26,10 +26,7 @@ const CompanyHome = (props) => {
 
     return (
         <div>
-            {
-                (props.user?.id || 0) === 0 &&
-                <Login />
-            }
+
         </div>
     )
 }

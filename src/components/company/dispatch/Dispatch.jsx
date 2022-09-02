@@ -7007,7 +7007,7 @@ const Dispatch = (props) => {
                                                 <Carriers
                                                     pageName={"Carrier"}
                                                     title={"Carrier"}
-                                                    panelName={"carrier"}
+                                                    panelName={props.panelName + '-carrier'}
                                                     tabTimes={3000 + props.tabTimes}
                                                     screenFocused={props.carrierScreenFocused}
                                                     componentId={moment().format("x")}
@@ -9546,6 +9546,7 @@ const Dispatch = (props) => {
                                         deletingDocumentUrl="/deleteOrderDocument"
                                         savingDocumentNoteUrl="/saveOrderDocumentNote"
                                         serverDocumentsFolder="/order-documents/"
+                                        permissionName='dispatch documents'
                                     />
                                 ),
                             };
