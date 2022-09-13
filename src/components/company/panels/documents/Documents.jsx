@@ -146,7 +146,7 @@ const Documents = (props) => {
             unit = 'GB'
         } else if (size > (1024 ** 2)) {
             unit = 'MB'
-        } else if (size > (1024 * 1)) {
+        } else if (size > 1024) {
             unit = 'KB'
         }
 
@@ -162,8 +162,8 @@ const Documents = (props) => {
             newSize = (size / (1024 ** 3)).toFixed(2)
         } else if (size > (1024 ** 2)) {
             newSize = (size / (1024 ** 2)).toFixed(2)
-        } else if (size > (1024 * 1)) {
-            newSize = (size / (1024 * 1)).toFixed(2)
+        } else if (size > 1024) {
+            newSize = (size / 1024).toFixed(2)
         }
 
         return isNaN(newSize) ? 0 : newSize;
@@ -1043,6 +1043,9 @@ const Documents = (props) => {
                                                         driver_id: selectedOwner.id,
                                                         operator_id: selectedOwner.id,
                                                         division_id: selectedOwner.id,
+                                                        customer_id: selectedOwner.id,
+                                                        carrier_id: selectedOwner.id,
+                                                        factoring_company_id: selectedOwner.id,
                                                     }).then(res => {
                                                         if (res.data.result === 'OK') {
 

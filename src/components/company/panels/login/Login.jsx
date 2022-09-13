@@ -83,8 +83,8 @@ const Login = (props) => {
                 email: '',
                 password: ''
             });
-            console.error(error.response);
-            setMessage(error.response.data.message);
+            console.log(error);
+            // setMessage(error);
             refEmail.current.focus();
         });
     }

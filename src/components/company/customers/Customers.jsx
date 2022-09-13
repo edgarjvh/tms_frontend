@@ -104,6 +104,8 @@ const Customers = (props) => {
         }
     });
     const refCustomerContactEmailPopupItems = useRef([]);
+    const refCustomerContactNotes = useRef();
+    const refCustomerContactSearchFirstName = useRef();
 
     const refMailingContactName = useRef();
     const [mailingContactNameItems, setMailingContactNameItems] = useState([]);
@@ -435,7 +437,7 @@ const Customers = (props) => {
 
                 selectedCustomer.credit_limit_total = Number((selectedCustomer?.credit_limit_total || '').toString().replace(',', ''));
 
-                if (props.user?.user_code?.type === 'agent'){
+                if (props.user?.user_code?.type === 'agent') {
                     selectedCustomer.agent_code = props.user?.user_code?.code || '';
                 }
 
@@ -1325,25 +1327,25 @@ const Customers = (props) => {
 
         let customer = selectedCustomer || {};
 
-        if ((customer.mailing_address?.bill_to_code || '') !== '') {
-            customer.mailing_address = {
-                ...customer.mailing_address,
+        if ((customer.bill_to_code || '') !== '') {
+            customer = {
+                ...customer,
                 bill_to_code: '',
                 bill_to_code_number: 0,
             }
         } else {
-            if ((customer.mailing_address?.code || '') !== '') {
-                customer.mailing_address = {
-                    ...customer.mailing_address,
-                    bill_to_code: (customer.mailing_address?.code || ''),
-                    bill_to_code_number: (customer.mailing_address?.code_number || 0)
+            if ((customer.code || '') !== '') {
+                customer = {
+                    ...customer,
+                    bill_to_code: (customer?.code || ''),
+                    bill_to_code_number: (customer?.code_number || 0)
                 }
             }
         }
 
         setSelectedCustomer(customer);
 
-        validateMailingAddressForSaving({keyCode: 9});
+        validateCustomerForSaving({keyCode: 9});
     }
 
     const validateContactForSaving = (e) => {
@@ -2900,7 +2902,7 @@ const Customers = (props) => {
                                         ))
                                     }
                                 </div>
-                                
+
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={27 + props.tabTimes} type="text" placeholder="Ext"
@@ -3298,7 +3300,7 @@ const Customers = (props) => {
                         <div className="form-borderless-box" style={{width: '170px', marginLeft: '10px',}}>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={32 + props.tabTimes} type="text"
+                                    <input tabIndex={29 + props.tabTimes} type="text"
                                            style={{textTransform: 'uppercase'}} placeholder="Bill To"
                                            readOnly={
                                                (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -3326,7 +3328,7 @@ const Customers = (props) => {
                                     <div className="select-box-wrapper">
                                         <input
                                             type="text"
-                                            tabIndex={33 + props.tabTimes}
+                                            tabIndex={30 + props.tabTimes}
                                             placeholder="Division"
                                             ref={refDivision}
                                             readOnly={
@@ -3338,7 +3340,7 @@ const Customers = (props) => {
                                                 let key = e.keyCode || e.which;
 
                                                 if (!props.isAdmin) {
-                                                    e.preventDefault();
+
                                                 } else {
                                                     switch (key) {
                                                         case 37:
@@ -3447,8 +3449,8 @@ const Customers = (props) => {
                                                                         await setDivisionItems(res.data.divisions.map(
                                                                                 (item, index) => {
                                                                                     item.selected = (selectedCustomer?.division?.id || 0) === 0
-                                                                                            ? index === 0
-                                                                                            : item.id === selectedCustomer.division.id;
+                                                                                        ? index === 0
+                                                                                        : item.id === selectedCustomer.division.id;
                                                                                     return item;
                                                                                 }
                                                                             )
@@ -3485,7 +3487,7 @@ const Customers = (props) => {
                                                                     }
                                                                 })
 
-                                                                validateCustomerForSaving({keyCode: 9});
+                                                                // validateCustomerForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
                                                                 refDivision.current.focus();
                                                             }
@@ -3502,7 +3504,7 @@ const Customers = (props) => {
                                                                     }
                                                                 })
 
-                                                                validateCustomerForSaving({keyCode: 9});
+                                                                // validateCustomerForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
                                                                 refDivision.current.focus();
                                                             }
@@ -3683,7 +3685,7 @@ const Customers = (props) => {
                                                                             })
 
                                                                             window.setTimeout(() => {
-                                                                                validateCustomerForSaving({keyCode: 9});
+                                                                                // validateCustomerForSaving({keyCode: 9});
                                                                                 setDivisionItems([]);
                                                                                 refDivision.current.focus();
                                                                             }, 0);
@@ -3718,18 +3720,13 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={34 + props.tabTimes} type="text" placeholder="Agent Code"
+                                    <input tabIndex={31 + props.tabTimes} type="text" placeholder="Agent Code"
                                            style={{textTransform: 'uppercase'}}
                                            readOnly={
                                                (props.user?.user_code?.is_admin || 0) === 0 &&
                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer agent code')?.pivot?.save || 0) === 0 &&
                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer agent code')?.pivot?.edit || 0) === 0
                                            }
-                                           onKeyDown={e => {
-                                               if (props.isAdmin){
-                                                   validateCustomerForSaving(e);
-                                               }
-                                           }}
                                            onInput={e => {
                                                setSelectedCustomer(selectedCustomer => {
                                                    return {
@@ -3761,14 +3758,14 @@ const Customers = (props) => {
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer salesman')?.pivot?.save || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer salesman')?.pivot?.edit || 0) === 0
                                             }
-                                            tabIndex={35 + props.tabTimes}
+                                            tabIndex={32 + props.tabTimes}
                                             placeholder="Salesman"
                                             ref={refSalesman}
                                             onKeyDown={async (e) => {
                                                 let key = e.keyCode || e.which;
 
                                                 if (!props.isAdmin) {
-                                                    e.preventDefault();
+
                                                 } else {
                                                     switch (key) {
                                                         case 37:
@@ -3915,7 +3912,7 @@ const Customers = (props) => {
                                                                     }
                                                                 })
 
-                                                                validateCustomerForSaving({keyCode: 9});
+                                                                // validateCustomerForSaving({keyCode: 9});
                                                                 setSalesmanItems([]);
                                                                 refSalesman.current.focus();
                                                             }
@@ -3932,7 +3929,7 @@ const Customers = (props) => {
                                                                     }
                                                                 })
 
-                                                                validateCustomerForSaving({keyCode: 9});
+                                                                // validateCustomerForSaving({keyCode: 9});
                                                                 setSalesmanItems([]);
                                                                 refSalesman.current.focus();
                                                             }
@@ -4113,7 +4110,7 @@ const Customers = (props) => {
                                                                             })
 
                                                                             window.setTimeout(() => {
-                                                                                validateCustomerForSaving({keyCode: 9});
+                                                                                // validateCustomerForSaving({keyCode: 9});
                                                                                 setSalesmanItems([]);
                                                                                 refSalesman.current.focus();
                                                                             }, 0);
@@ -4148,7 +4145,7 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={36 + props.tabTimes} type="text" placeholder="FID"
+                                    <input tabIndex={33 + props.tabTimes} type="text" placeholder="FID"
                                            readOnly={
                                                (props.user?.user_code?.is_admin || 0) === 0 &&
                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer fid')?.pivot?.save || 0) === 0 &&
@@ -4200,7 +4197,7 @@ const Customers = (props) => {
                                                onKeyDown={async (e) => {
                                                    let key = e.keyCode || e.which;
                                                    if (!props.isAdmin) {
-                                                       e.preventDefault();
+
                                                    } else {
                                                        switch (key) {
                                                            case 37:
@@ -4335,7 +4332,7 @@ const Customers = (props) => {
                                                                        }
                                                                    })
 
-                                                                   validateCustomerForSaving({keyCode: 9});
+                                                                   // validateCustomerForSaving({keyCode: 9});
                                                                    setTermsItems([]);
                                                                    refTerms.current.focus();
                                                                }
@@ -4352,7 +4349,7 @@ const Customers = (props) => {
                                                                        }
                                                                    })
 
-                                                                   validateCustomerForSaving({keyCode: 9});
+                                                                   // validateCustomerForSaving({keyCode: 9});
                                                                    setTermsItems([]);
                                                                    refTerms.current.focus();
                                                                }
@@ -4526,7 +4523,7 @@ const Customers = (props) => {
                                                                                 })
 
                                                                                 window.setTimeout(() => {
-                                                                                    validateCustomerForSaving({keyCode: 9});
+                                                                                    // validateCustomerForSaving({keyCode: 9});
                                                                                     setTermsItems([]);
                                                                                     refTerms.current.focus();
                                                                                 }, 0);
@@ -4563,9 +4560,16 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Credit Limit $</div>
+                                <div className="input-box-container grow"
+                                     style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <div style={{
+                                        fontSize: '0.7rem',
+                                        color: 'rgba(0,0,0,0.7)',
+                                        whiteSpace: 'nowrap'
+                                    }}>Credit Limit $
+                                    </div>
                                     <MaskedInput
+                                        tabIndex={38 + props.tabTimes}
                                         className={classnames({
                                             'disabled': !props.isAdmin
                                         })}
@@ -4574,13 +4578,13 @@ const Customers = (props) => {
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer division')?.pivot?.save || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer division')?.pivot?.edit || 0) === 0
                                         }
-                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        style={{textAlign: 'right', fontWeight: 'bold'}}
                                         mask={numberMask}
                                         type="text"
                                         guide={false}
                                         value={selectedCustomer?.credit_limit_total || 0}
                                         onKeyDown={(e) => {
-                                            if (props.isAdmin){
+                                            if (props.isAdmin) {
                                                 validateCustomerForSaving(e)
                                             }
                                         }}
@@ -4617,14 +4621,18 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Credit Ordered $</div>
+                                <div className="input-box-container grow"
+                                     style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <div style={{
+                                        fontSize: '0.7rem',
+                                        color: 'rgba(0,0,0,0.7)',
+                                        whiteSpace: 'nowrap'
+                                    }}>Credit Ordered $
+                                    </div>
                                     <MaskedInput
-                                        className={classnames({
-                                            'disabled': true
-                                        })}
+                                        tabIndex={39 + props.tabTimes}
                                         readOnly={true}
-                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        style={{textAlign: 'right', fontWeight: 'bold'}}
                                         mask={numberMask}
                                         type="text"
                                         guide={false}
@@ -4634,14 +4642,18 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Credit Invoiced $</div>
+                                <div className="input-box-container grow"
+                                     style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <div style={{
+                                        fontSize: '0.7rem',
+                                        color: 'rgba(0,0,0,0.7)',
+                                        whiteSpace: 'nowrap'
+                                    }}>Credit Invoiced $
+                                    </div>
                                     <MaskedInput
-                                        className={classnames({
-                                            'disabled': true
-                                        })}
+                                        tabIndex={40 + props.tabTimes}
                                         readOnly={true}
-                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        style={{textAlign: 'right', fontWeight: 'bold'}}
                                         mask={numberMask}
                                         type="text"
                                         guide={false}
@@ -4651,18 +4663,22 @@ const Customers = (props) => {
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Available Credit $</div>
+                                <div className="input-box-container grow"
+                                     style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <div style={{
+                                        fontSize: '0.7rem',
+                                        color: 'rgba(0,0,0,0.7)',
+                                        whiteSpace: 'nowrap'
+                                    }}>Available Credit $
+                                    </div>
                                     <MaskedInput
-                                        className={classnames({
-                                            'disabled': true
-                                        })}
+                                        tabIndex={41 + props.tabTimes}
                                         readOnly={true}
-                                        style={{ textAlign: 'right', fontWeight: 'bold' }}
+                                        style={{textAlign: 'right', fontWeight: 'bold'}}
                                         mask={numberMask}
                                         type="text"
                                         guide={false}
-                                        value={Number((selectedCustomer?.credit_limit_total || '').toString().replace(',','')) - (selectedCustomer?.credit_ordered || 0) - (selectedCustomer?.credit_invoiced || 0)}
+                                        value={Number((selectedCustomer?.credit_limit_total || '').toString().replace(',', '')) - (selectedCustomer?.credit_ordered || 0) - (selectedCustomer?.credit_invoiced || 0)}
                                     />
                                 </div>
                             </div>
@@ -4678,9 +4694,9 @@ const Customers = (props) => {
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
                                     <div className={
-                                       ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)
-                                        ? 'mochi-button disabled' : 'mochi-button'
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
                                     } onClick={async () => {
                                         if (selectedCustomer?.id === undefined) {
                                             window.alert('You must select a customer first!');
@@ -5221,7 +5237,7 @@ const Customers = (props) => {
                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
                                                }
-                                               // onKeyDown={validateContactForSaving}
+                                            // onKeyDown={validateContactForSaving}
                                                onChange={e => setSelectedContact({
                                                    ...selectedContact,
                                                    phone_ext: e.target.value
@@ -5669,6 +5685,7 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={17 + props.tabTimes} type="text" placeholder="Notes"
+                                           ref={refCustomerContactNotes}
                                            readOnly={
                                                (props.user?.user_code?.is_admin || 0) === 0 &&
                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
@@ -5696,9 +5713,9 @@ const Customers = (props) => {
                                 <div className="form-buttons">
                                     <div className={
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0)
-                                        ? 'mochi-button disabled' : 'mochi-button'
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
                                     } onClick={() => {
                                         if ((selectedCustomer?.id || 0) === 0) {
                                             window.alert('You must select a customer first!');
@@ -5841,7 +5858,7 @@ const Customers = (props) => {
                                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
                                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0
                                                        }
-                                                       tabIndex={29 + props.tabTimes}
+                                                       tabIndex={34 + props.tabTimes}
                                                        placeholder="E-Mail To"
                                                        ref={refAutomaticEmailsTo}
                                                        onKeyDown={async (e) => {
@@ -6231,7 +6248,7 @@ const Customers = (props) => {
                                             }
                                             <SwiperSlide>
                                                 <input type="text"
-                                                       tabIndex={30 + props.tabTimes}
+                                                       tabIndex={35 + props.tabTimes}
                                                        readOnly={
                                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
@@ -6633,7 +6650,7 @@ const Customers = (props) => {
                                             }
                                             <SwiperSlide>
                                                 <input type="text"
-                                                       tabIndex={31 + props.tabTimes}
+                                                       tabIndex={36 + props.tabTimes}
                                                        readOnly={
                                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
@@ -7025,7 +7042,10 @@ const Customers = (props) => {
                                 <div className="form-buttons">
                                     {
                                         showingContactList &&
-                                        <div className="mochi-button" onClick={() => setShowingContactList(false)}>
+                                        <div className="mochi-button" onClick={() => {
+                                            setShowingContactList(false);
+                                            refCustomerContactSearchFirstName.current.focus();
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Search</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -7033,7 +7053,10 @@ const Customers = (props) => {
                                     }
                                     {
                                         !showingContactList &&
-                                        <div className="mochi-button" onClick={() => setShowingContactList(true)}>
+                                        <div className="mochi-button" onClick={() => {
+                                            setShowingContactList(true);
+                                            refCustomerContactNotes.current.focus();
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Cancel</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -7074,7 +7097,7 @@ const Customers = (props) => {
                                                         <div className="contact-list-item" key={index}
                                                              onDoubleClick={async () => {
                                                                  if (((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)){
+                                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)) {
                                                                      return;
                                                                  }
 
@@ -7145,6 +7168,19 @@ const Customers = (props) => {
                                         <div className="form-row">
                                             <div className="input-box-container grow">
                                                 <input type="text" placeholder="First Name"
+                                                       tabIndex={50 + props.tabTimes}
+                                                       ref={refCustomerContactSearchFirstName}
+                                                       onKeyDown={e => {
+                                                           let key = e.keyCode || e.which;
+
+                                                           if (key === 9){
+                                                               if (e.shiftKey){
+                                                                   e.preventDefault();
+                                                                   setShowingContactList(true);
+                                                                   refCustomerContactNotes.current.focus();
+                                                               }
+                                                           }
+                                                       }}
                                                        onChange={e => setContactSearch({
                                                            ...contactSearch,
                                                            first_name: e.target.value
@@ -7152,7 +7188,9 @@ const Customers = (props) => {
                                             </div>
                                             <div className="form-h-sep"></div>
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Last Name" onFocus={() => {
+                                                <input type="text" placeholder="Last Name"
+                                                       tabIndex={51 + props.tabTimes}
+                                                       onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -7163,7 +7201,9 @@ const Customers = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 1" onFocus={() => {
+                                                <input type="text" placeholder="Address 1"
+                                                       tabIndex={52 + props.tabTimes}
+                                                       onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -7174,7 +7214,9 @@ const Customers = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 2" onFocus={() => {
+                                                <input type="text" placeholder="Address 2"
+                                                       tabIndex={53 + props.tabTimes}
+                                                       onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -7185,7 +7227,9 @@ const Customers = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="City" onFocus={() => {
+                                                <input type="text" placeholder="City"
+                                                       tabIndex={54 + props.tabTimes}
+                                                       onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -7194,7 +7238,9 @@ const Customers = (props) => {
                                             </div>
                                             <div className="form-h-sep"></div>
                                             <div className="input-box-container input-state">
-                                                <input type="text" placeholder="State" maxLength="2" onFocus={() => {
+                                                <input type="text" placeholder="State" maxLength="2"
+                                                       tabIndex={55 + props.tabTimes}
+                                                       onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -7204,9 +7250,11 @@ const Customers = (props) => {
                                             <div className="form-h-sep"></div>
                                             <div className="input-box-container grow">
                                                 <MaskedInput
+                                                    tabIndex={56 + props.tabTimes}
                                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                     guide={true}
-                                                    type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
+                                                    type="text" placeholder="Phone (Work/Mobile/Fax)"
+                                                    onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -7218,20 +7266,15 @@ const Customers = (props) => {
                                         <div className="form-row">
                                             <div className="input-box-container grow">
                                                 <input type="text" placeholder="E-Mail"
+                                                       tabIndex={57 + props.tabTimes}
                                                        style={{textTransform: 'lowercase'}}
                                                        onKeyDown={(e) => {
-                                                           e.preventDefault();
                                                            let key = e.keyCode || e.which;
 
                                                            if (key === 9) {
-                                                               let elems = document.getElementsByTagName('input');
-
-                                                               for (var i = elems.length; i--;) {
-                                                                   if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                       elems[i].focus();
-                                                                       break;
-                                                                   }
-                                                               }
+                                                               e.preventDefault();
+                                                               setShowingContactList(true)
+                                                               refCustomerMailingCode.current.focus();
                                                            }
                                                        }}
                                                        onFocus={() => {
@@ -7266,7 +7309,7 @@ const Customers = (props) => {
                                             return <div className="automatic-email-item" key={index} onClick={() => {
                                                 if ((props.user?.user_code?.is_admin || 0) === 0 &&
                                                     (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.save || 0) === 0 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0)){
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.edit || 0) === 0)) {
                                                     return;
                                                 }
 
@@ -7319,7 +7362,7 @@ const Customers = (props) => {
 
                                                 {
                                                     ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.delete || 1) === 0) &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer automatic emails')?.pivot?.delete || 1) === 0) &&
                                                     <FontAwesomeIcon icon={faTrashAlt} style={{marginLeft: '0.3rem'}}
                                                                      onClick={(e) => {
                                                                          e.stopPropagation();
@@ -7357,7 +7400,8 @@ const Customers = (props) => {
                             justifyContent: 'space-between',
                             flexGrow: 1
                         }}>
-                            <div className="form-bordered-box" style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
+                            <div className="form-bordered-box"
+                                 style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
                                 <div className="form-header">
                                     <div className="top-border top-border-left"></div>
                                     <div className="form-title">Hours</div>
@@ -7367,7 +7411,7 @@ const Customers = (props) => {
 
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
-                                        <input tabIndex={39 + props.tabTimes} type="text" placeholder="Open"
+                                        <input tabIndex={42 + props.tabTimes} type="text" placeholder="Open"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
@@ -7383,7 +7427,7 @@ const Customers = (props) => {
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
-                                        <input tabIndex={40 + props.tabTimes} type="text" placeholder="Close"
+                                        <input tabIndex={43 + props.tabTimes} type="text" placeholder="Close"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
@@ -7401,7 +7445,7 @@ const Customers = (props) => {
 
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
-                                        <input tabIndex={41 + props.tabTimes} type="text" placeholder="Open"
+                                        <input tabIndex={44 + props.tabTimes} type="text" placeholder="Open"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
@@ -7417,7 +7461,7 @@ const Customers = (props) => {
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
-                                        <input tabIndex={42 + props.tabTimes} type="text" placeholder="Close"
+                                        <input tabIndex={45 + props.tabTimes} type="text" placeholder="Close"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer hours')?.pivot?.save || 0) === 0 &&
@@ -7434,7 +7478,8 @@ const Customers = (props) => {
                                 </div>
                             </div>
 
-                            <div className="form-bordered-box" style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
+                            <div className="form-bordered-box"
+                                 style={{maxHeight: 'calc(50% - 5px)', justifyContent: 'space-around'}}>
                                 <div className="form-header">
                                     <div className="top-border top-border-left"></div>
                                     <div className="form-title">Delivery Hours</div>
@@ -7444,7 +7489,7 @@ const Customers = (props) => {
 
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
-                                        <input tabIndex={43 + props.tabTimes} type="text" placeholder="Open"
+                                        <input tabIndex={46 + props.tabTimes} type="text" placeholder="Open"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
@@ -7460,7 +7505,7 @@ const Customers = (props) => {
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
-                                        <input tabIndex={44 + props.tabTimes} type="text" placeholder="Close"
+                                        <input tabIndex={47 + props.tabTimes} type="text" placeholder="Close"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
@@ -7478,7 +7523,7 @@ const Customers = (props) => {
 
                                 <div className="form-row" style={{justifyContent: 'space-around'}}>
                                     <div className="input-box-container ">
-                                        <input tabIndex={45 + props.tabTimes} type="text" placeholder="Open"
+                                        <input tabIndex={48 + props.tabTimes} type="text" placeholder="Open"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
@@ -7494,7 +7539,7 @@ const Customers = (props) => {
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className="input-box-container ">
-                                        <input tabIndex={46 + props.tabTimes} type="text" placeholder="Close"
+                                        <input tabIndex={49 + props.tabTimes} type="text" placeholder="Close"
                                                readOnly={
                                                    (props.user?.user_code?.is_admin || 0) === 0 &&
                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer delivery hours')?.pivot?.save || 0) === 0 &&
@@ -7542,8 +7587,8 @@ const Customers = (props) => {
                                 <div className="form-buttons">
                                     <div className={
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                        (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer notes')?.pivot?.edit || 0) === 0))
-                                        ? 'mochi-button disabled' : 'mochi-button'
+                                            (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer notes')?.pivot?.edit || 0) === 0))
+                                            ? 'mochi-button disabled' : 'mochi-button'
                                     } onClick={() => {
                                         if ((selectedCustomer?.id || 0) === 0) {
                                             window.alert('You must select a customer first!');

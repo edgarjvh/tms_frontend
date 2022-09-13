@@ -483,7 +483,7 @@ const Contacts = (props) => {
                         <div className="contact-list-wrapper">
                             {
                                 (contactSearchCustomer.contacts || []).map((contact, index) => {
-                                    let curLetter = contact.last_name.substring(0, 1).toLowerCase();
+                                    let curLetter = contact.first_name.substring(0, 1).toLowerCase();
                                     if (curLetter !== lastLetter) {
                                         lastLetter = curLetter;
                                         return (

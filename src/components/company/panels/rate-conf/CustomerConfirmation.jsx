@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import moment from 'moment';
 import './CustomerConfirmation.css';
 import NumberFormat from 'react-number-format';
-
+import MaskedInput from 'react-text-mask';
 
 export default class CustomerConfirmation extends Component {
     constructor(props) {
@@ -115,17 +115,51 @@ export default class CustomerConfirmation extends Component {
                                         + ' '
                                         + ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.last_name || '')).trim()
                                     : (this.props.selected_order?.user_code?.type || '') === 'employee'
-                                        ? ((this.props.selected_order.user_code?.employee?.first_name || '') + ' ' + (this.props.selected_order.user_code?.employee?.first_name || '')).trim()
+                                        ? ((this.props.selected_order.user_code?.employee?.first_name || '') + ' ' + (this.props.selected_order.user_code?.employee?.last_name || '')).trim()
                                         : ''
                             }
-                        </span> at <span style={{...this.styleFieldDataBold, fontSize: '1rem'}}>
-                            {
+                        </span> at <span>
+                            <MaskedInput
+                                style={{
+                                    ...this.styleFieldDataBold,
+                                    fontSize: '1rem',
+                                    fontStyle: 'italic',
+                                    maxWidth: 105,
+                                    border: 0
+                                }}
+                                readOnly={true}
+                                mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                guide={true}
+                                type='label'
+                                placeholder="Phone (Work/Mobile/Fax)"
+                                value={
                                 (this.props.selected_order?.user_code?.type || '') === 'agent'
-                                    ? ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.phone_work || '')
+                                    ? ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'work'
+                                        ? ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.phone_work || '')
+                                        : ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'fax'
+                                            ? ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.phone_work_fax || '')
+                                            : ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'mobile'
+                                                ? ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.phone_mobile || '')
+                                                : ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'direct'
+                                                    ? ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.phone_direct || '')
+                                                    : ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'other'
+                                                        ? ((this.props.selected_order.user_code?.agent?.contacts || []).find(x => x.id === (this.props.selected_order.user_code?.agent_contact_id || 0))?.phone_other || '')
+                                                        : ''
                                     : (this.props.selected_order?.user_code?.type || '') === 'employee'
-                                        ? (this.props.selected_order.user_code?.employee?.phone_work || '')
+                                        ? (this.props.selected_order.user_code?.employee?.primary_phone || '') === 'work'
+                                            ? (this.props.selected_order.user_code?.employee?.phone_work || '')
+                                            : (this.props.selected_order.user_code?.employee?.primary_phone || '') === 'fax'
+                                                ? (this.props.selected_order.user_code?.employee?.phone_work_fax || '')
+                                                : (this.props.selected_order.user_code?.employee?.primary_phone || '') === 'mobile'
+                                                    ? (this.props.selected_order.user_code?.employee?.phone_mobile || '')
+                                                    : (this.props.selected_order.user_code?.employee?.primary_phone || '') === 'direct'
+                                                        ? (this.props.selected_order.user_code?.employee?.phone_direct || '')
+                                                        : (this.props.selected_order.user_code?.employee?.primary_phone || '') === 'other'
+                                                            ? (this.props.selected_order.user_code?.employee?.phone_other || '')
+                                                            : ''
                                         : ''
-                            }
+                            }/>
+
                         </span> if
                             you have any questions.
                         </div>

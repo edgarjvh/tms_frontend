@@ -334,12 +334,12 @@ const FactoringCompany = (props) => {
         if (isSavingFactoringCompanyContact) {
             if ((props.user?.is_admin || 0) === 0) {
                 if ((selectedFactoringCompany?.id || 0) > 0) {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.edit || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0) {
                         setIsSavingFactoringCompanyContact(false);
                         return;
                     }
                 } else {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.save || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0) {
                         setIsSavingFactoringCompanyContact(false);
                         return;
                     }
@@ -887,7 +887,10 @@ const FactoringCompany = (props) => {
                                     <div className="mochi-button-base">Search</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className="mochi-button" onClick={setInitialValues}>
+                                <div className="mochi-button" onClick={() => {
+                                    setInitialValues();
+                                    refFactoringCompanyCode.current.focus();
+                                }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -3393,7 +3396,16 @@ const FactoringCompany = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="Notes"
-                                    onKeyDown={validateContactForSaving}
+                                    onKeyDown={(e) => {
+                                        validateContactForSaving(e);
+
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9){
+                                            e.preventDefault();
+                                            refFactoringCompanyCode.current.focus();
+                                        }
+                                    }}
                                     onChange={e => setSelectedFactoringCompanyContact({ ...selectedFactoringCompanyContact, notes: e.target.value })}
                                     value={selectedFactoringCompanyContact.notes || ''} />
                             </div>
