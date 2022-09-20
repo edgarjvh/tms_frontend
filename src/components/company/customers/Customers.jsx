@@ -1596,6 +1596,9 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name"
+                                            style={{
+                                                textTransform: 'capitalize'
+                                            }}
                                            ref={refCustomerName}
                                            readOnly={
                                                (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -2154,7 +2157,7 @@ const Customers = (props) => {
                                                 switch (key) {
                                                     case 37:
                                                     case 38: // arrow left | arrow up
-                                                        e.preventDefault();
+                                                        // e.preventDefault();
                                                         if (showMailingContactNames) {
                                                             let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
 
@@ -2185,7 +2188,7 @@ const Customers = (props) => {
                                                                 return true;
                                                             });
                                                         } else {
-                                                            if (mailingContactNameItems.length > 1) {
+                                                            if ((selectedCustomer?.contacts || []).length > 0) {
                                                                 await setMailingContactNameItems((selectedCustomer?.contacts || []).map((item, index) => {
                                                                     item.selected = index === 0
                                                                     return item;
@@ -2209,7 +2212,7 @@ const Customers = (props) => {
 
                                                     case 39:
                                                     case 40: // arrow right | arrow down
-                                                        e.preventDefault();
+                                                        // e.preventDefault();
                                                         if (showMailingContactNames) {
                                                             let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
 
@@ -2240,7 +2243,7 @@ const Customers = (props) => {
                                                                 return true;
                                                             });
                                                         } else {
-                                                            if (mailingContactNameItems.length > 1) {
+                                                            if ((selectedCustomer?.contacts || []).length > 0) {
                                                                 await setMailingContactNameItems((selectedCustomer?.contacts || []).map((item, index) => {
                                                                     item.selected = index === 0
                                                                     return item;
@@ -2598,7 +2601,6 @@ const Customers = (props) => {
                                                          switch (key) {
                                                              case 37:
                                                              case 38: // arrow left | arrow up
-                                                                 e.preventDefault();
                                                                  if (showMailingContactPhones) {
                                                                      let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
 
@@ -2653,7 +2655,6 @@ const Customers = (props) => {
 
                                                              case 39:
                                                              case 40: // arrow right | arrow down
-                                                                 e.preventDefault();
                                                                  if (showMailingContactPhones) {
                                                                      let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
 

@@ -98,6 +98,7 @@ const Bol = (props) => {
                         ref={toPrintRef}
                         serverUrl={props.serverUrl}
                         selectedOrder={props.selectedOrder}
+                        selectedCompany={props.selectedCompany}
                     />
                 </div>
             </div>
@@ -109,6 +110,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        selectedCompany: state.companySetupReducers.selectedCompany,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

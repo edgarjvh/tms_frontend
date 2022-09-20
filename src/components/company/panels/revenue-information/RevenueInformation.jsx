@@ -27,6 +27,7 @@ import {
 } from './../../../../actions';
 
 import {
+    Customers,
     Dispatch
 } from './../../../company';
 
@@ -1411,7 +1412,7 @@ const RevenueInformation = (props) => {
                         <div className="order-info-wrapper">
                             {
                                 (orders || []).map((groupOrder, index1) => {
-                                    const {code, code_number, name, city, state} = groupOrder.billToCustomer;
+                                    const {id, code, code_number, name, city, state} = groupOrder.billToCustomer;
                                     const {dateGroup} = groupOrder;
                                     const customerOrdersClasses = classnames({
                                         'customer-orders': true,
@@ -1422,7 +1423,28 @@ const RevenueInformation = (props) => {
                                         <div className="customer-container" key={index1}>
                                             <div className="customer-info">
                                                 <span>Bill To</span>
-                                                <span>{code}{code_number > 0 ? code_number : ''}</span>-
+                                                <span className="customer-bill-to-code" onClick={() => {
+                                                    let panel = {
+                                                        panelName: `${props.panelName}-customer`,
+                                                        component: (
+                                                            <Customers
+                                                                pageName={"Customer"}
+                                                                title={"Bill-To Company"}
+                                                                panelName={`${props.panelName}-customer`}
+                                                                tabTimes={200025 + props.tabTimes}
+                                                                componentId={moment().format("x")}
+                                                                isOnPanel={true}
+                                                                isAdmin={props.isAdmin}
+                                                                origin={props.origin}
+                                                                openPanel={props.openPanel}
+                                                                closePanel={props.closePanel}
+                                                                customer_id={id}
+                                                            />
+                                                        ),
+                                                    };
+
+                                                    props.openPanel(panel, props.origin);
+                                                }}>{code}{code_number > 0 ? code_number : ''}</span>-
                                                 <span>{name}</span>-
                                                 <span>{city}, {state}</span>
 

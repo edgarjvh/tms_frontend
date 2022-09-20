@@ -5,37 +5,57 @@
     top: 0;
     left: 0;
     background-color: rgba(0, 0, 0, 0.3);
+    perspective: 1000px;
+
+    .main-logo-container{
+        width: 380px;
+        height: 450px;
+        overflow: hidden;
+        border-radius: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(calc(-50% - 220px), -50%);
+        box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.8);
+
+        img{
+            width: 100%;
+            height: 100%;
+        }
+    }
 
     .login-main-container-wrapper {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: absolute;
+        width: 380px;
+        height: 430px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
 
         .login-form-container {
             position: relative;
             overflow: hidden;
-            width: 90%;
-            max-width: 400px;
+            width: 380px;
+            height: 430px;
             padding: 10px;
             border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: #090A73;
             display: flex;
             flex-direction: column;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
 
             .company-logo {
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 align-self: center;
-                width: 160px;
-                height: 160px;
+                width: 250px;
+                height: 250px;
+                overflow: hidden;
 
                 img {
                     width: 100%;
+                    transform: scale(1.4);
                 }
             }
 
@@ -58,6 +78,8 @@
                     input,
                     label {
                         cursor: pointer;
+                        color: #CBA660;
+                        font-weight: bold;
                     }
                 }
             }
@@ -76,7 +98,17 @@
 
             .login-button-row{
                 display: flex;
-                justify-content: center;                
+                justify-content: center;
+
+                .mochi-button{
+                    .mochi-button-decorator, .mochi-button-base{
+                        color: #CBA660;
+                    }
+
+                    .mochi-button-base{
+                        font-weight: bold;
+                    }
+                }
             }
             
 
@@ -96,11 +128,11 @@
                 a {
                     font-size: 14px;
                     text-decoration: underline;
-                    color: #4682B4;
+                    color: #CBA660;
                     font-weight: bold;
 
                     &:visited {
-                        color: #4682B4;
+                        color: #CBA660;
                     }
 
                 }

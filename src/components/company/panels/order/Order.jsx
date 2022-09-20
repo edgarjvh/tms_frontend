@@ -100,7 +100,16 @@ const Order = (props) => {
 
                     <ToPrint
                         ref={componentRef}
+                        panelName={`${props.panelName}-print-order`}
+                        tabTimes={50006 + props.tabTimes}
+                        screenFocused={props.invoiceScreenFocused}
+                        isOnPanel={true}
+                        origin={props.origin}
+                        openPanel={props.openPanel}
+                        closePanel={props.closePanel}
                         selectedOrder={props.selectedOrder}
+                        selectedCompany={props.selectedCompany}
+                        invoiceScreenFocused={true}
                     />
                 </div>
             </div>
@@ -115,6 +124,7 @@ const mapStateToProps = (state) => {
         carrierOpenedPanels: state.carrierReducers.carrierOpenedPanels,
         loadBoardOpenedPanels: state.loadBoardReducers.loadBoardOpenedPanels,
         invoiceOpenedPanels: state.invoiceReducers.invoiceOpenedPanels,
+        selectedCompany: state.companySetupReducers.selectedCompany
     }
 }
 

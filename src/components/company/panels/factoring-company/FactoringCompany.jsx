@@ -231,18 +231,22 @@ const FactoringCompany = (props) => {
                 console.log('error getting factoring company by id', e);
             })
         }
+
+        refFactoringCompanyCode.current.focus({
+            preventScroll: true
+        });
     }, [])
 
     useEffect(() => {
         if (isSavingFactoringCompany) {
             if ((props.user?.is_admin || 0) === 0) {
                 if ((selectedFactoringCompany?.id || 0) > 0) {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.edit || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0) {
                         setIsSavingFactoringCompany(false);
                         return;
                     }
                 } else {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.save || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0) {
                         setIsSavingFactoringCompany(false);
                         return;
                     }
@@ -423,12 +427,12 @@ const FactoringCompany = (props) => {
         if (isSavingFactoringCompanyMailingAddress) {
             if ((props.user?.is_admin || 0) === 0) {
                 if ((selectedFactoringCompany?.id || 0) > 0) {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.edit || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0) {
                         setIsSavingFactoringCompanyMailingAddress(false);
                         return;
                     }
                 } else {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring_company')?.pivot?.save || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0) {
                         setIsSavingFactoringCompanyMailingAddress(false);
                         return;
                     }

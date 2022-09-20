@@ -16,6 +16,7 @@ const Login = (props) => {
     const refEmail = useRef();
     const refPass = useRef();
     const [message, setMessage] = useState('');
+    const [doAnimate, setDoAnimate] = useState(false);
 
     const [loginData, setLoginData] = useState({
         userType: 'employee',
@@ -75,7 +76,7 @@ const Login = (props) => {
             // });
             // setIsLoading(false);
             // setMessage('');
-        }).catch(error => {
+        }).catch(e => {
             setIsLoading(false);
             props.setUser({});
             setLoginData({
@@ -83,8 +84,7 @@ const Login = (props) => {
                 email: '',
                 password: ''
             });
-            console.log(error);
-            // setMessage(error);
+            setMessage(e.response?.data?.message || '');
             refEmail.current.focus();
         });
     }
@@ -99,6 +99,26 @@ const Login = (props) => {
         });
     }
 
+    useEffect(() => {
+        setDoAnimate(true);
+    }, [])
+
+    const transitionImage = useTransition(doAnimate, {
+        from: {opacity: 0, x: -380, y: -190, transform: 'rotateY(0deg)'},
+        enter: {opacity: 1, x: -400, y: -190, transform: 'rotateY(15deg)'},
+        leave: {opacity: 0},
+        config: {duration: 1000},
+        delay: 500
+    });
+
+    const transitionLogin = useTransition(doAnimate, {
+        from: {opacity: 0, x: -190, y: -235},
+        enter: {opacity: 1, x: -190, y: -215},
+        leave: {opacity: 0},
+        config: {duration: 500},
+        delay: 500
+    });
+
     return (
         <div className="login-main-container" onKeyDown={e => {
             let key = e.keyCode || e.which;
@@ -112,236 +132,261 @@ const Login = (props) => {
                 }
             }
         }}>
-            <div className="login-main-container-wrapper">
-                <div className="login-form-container">
-                    {
-                        loadingTransition((style, item) => item &&
-                            <animated.div className='loading-container' style={style}>
-                                <div className="loading-container-wrapper" style={{
-                                    justifyContent: 'flex-start',
-                                    alignItems: 'flex-end',
-                                    paddingBottom: 5,
-                                    paddingLeft: 10
-                                }}>
-                                    <Loader type="Circles" color="#009bdd" height={20} width={20} visible={item}/>
-                                </div>
-                            </animated.div>
-                        )
-                    }
 
-                    <div className="company-logo"
-                         onKeyDown={e => {
-                             let key = e.keyCode || e.which;
+            <img src="/img/anchor_logo.png" alt="" style={{
+                width: '100%',
+                height: '100%',
+                opacity: 0.1,
+                transform: 'scale(1.5)'
 
-                             if (key === 9) {
-                                 e.preventDefault();
-                                 if (e.shiftKey){
-                                     refPass.current.focus();
-                                 }else{
-                                     refEmail.current.focus();
-                                 }
-                             }
-                         }}>
-                        <img
-                            onKeyDown={e => {
-                                let key = e.keyCode || e.which;
+            }}/>
 
-                                if (key === 9) {
-                                    e.preventDefault();
-                                    if (e.shiftKey){
-                                        refPass.current.focus();
-                                    }else{
-                                        refEmail.current.focus();
-                                    }
+            {/*{*/}
+            {/*    transitionImage((style, item) =>*/}
+            {/*        item && (*/}
+            {/*        <animated.div style={{...style}} className="main-logo-container">*/}
+            {/*            <img src="/img/anchor_logo.png" alt="AnchorTMS Logo"/>*/}
+            {/*        </animated.div>*/}
+            {/*    ))*/}
+            {/*}*/}
+
+            {
+                transitionLogin((style, item) =>
+                    item && (
+                        <animated.div style={{...style}} className="login-main-container-wrapper">
+                            <div className="login-form-container">
+                                {
+                                    loadingTransition((style, item) => item &&
+                                        <animated.div className='loading-container' style={style}>
+                                            <div className="loading-container-wrapper" style={{
+                                                justifyContent: 'flex-start',
+                                                alignItems: 'flex-end',
+                                                paddingBottom: 5,
+                                                paddingLeft: 10
+                                            }}>
+                                                <Loader type="Circles" color="#009bdd" height={20} width={20} visible={item}/>
+                                            </div>
+                                        </animated.div>
+                                    )
                                 }
-                            }}
-                            src={((props.selectedCompany?.id || 0) > 0 && (props.selectedCompany?.logo || '') !== '') ? props.serverUrl + '/company-logo/' + props.selectedCompany.logo : 'img/company-logo-default.png'}
-                            alt="Company Logo"/>
-                    </div>
 
-                    <div className="company-name"
-                         onKeyDown={e => {
-                             let key = e.keyCode || e.which;
+                                <div className="company-logo"
+                                     onKeyDown={e => {
+                                         let key = e.keyCode || e.which;
 
-                             if (key === 9) {
-                                 e.preventDefault();
-                                 if (e.shiftKey){
-                                     refPass.current.focus();
-                                 }else{
-                                     refEmail.current.focus();
-                                 }
-                             }
-                         }}>{props.selectedCompany?.name || ''}</div>
+                                         if (key === 9) {
+                                             e.preventDefault();
+                                             if (e.shiftKey){
+                                                 refPass.current.focus();
+                                             }else{
+                                                 refEmail.current.focus();
+                                             }
+                                         }
+                                     }}>
+                                    <img
+                                        onKeyDown={e => {
+                                            let key = e.keyCode || e.which;
 
-                    <div className="user-type-row">
-                        <div className="user-type employee">
-                            <input type="radio" name="user-type" id="user-type-employee"
-                                   onKeyDown={e => {
-                                       let key = e.keyCode || e.which;
+                                            if (key === 9) {
+                                                e.preventDefault();
+                                                if (e.shiftKey){
+                                                    refPass.current.focus();
+                                                }else{
+                                                    refEmail.current.focus();
+                                                }
+                                            }
+                                        }}
+                                        src="/img/anchor_logo.png"
+                                        alt="Anchor TMS"/>
+                                </div>
 
-                                       if (key === 9) {
-                                           e.preventDefault();
-                                           if (e.shiftKey){
-                                               refPass.current.focus();
-                                           }else{
-                                               refEmail.current.focus();
+                                {/*<div className="company-name"*/}
+                                {/*     onKeyDown={e => {*/}
+                                {/*         let key = e.keyCode || e.which;*/}
+
+                                {/*         if (key === 9) {*/}
+                                {/*             e.preventDefault();*/}
+                                {/*             if (e.shiftKey){*/}
+                                {/*                 refPass.current.focus();*/}
+                                {/*             }else{*/}
+                                {/*                 refEmail.current.focus();*/}
+                                {/*             }*/}
+                                {/*         }*/}
+                                {/*     }}>{props.selectedCompany?.name || ''}</div>*/}
+
+                                <div className="user-type-row">
+                                    <div className="user-type employee">
+                                        <input type="radio" name="user-type" id="user-type-employee"
+                                               onKeyDown={e => {
+                                                   let key = e.keyCode || e.which;
+
+                                                   if (key === 9) {
+                                                       e.preventDefault();
+                                                       if (e.shiftKey){
+                                                           refPass.current.focus();
+                                                       }else{
+                                                           refEmail.current.focus();
+                                                       }
+                                                   }
+                                               }}
+                                               onChange={(e) => {
+                                                   setLoginData(loginData => {
+                                                       return {
+                                                           ...loginData,
+                                                           userType: e.target.checked && 'employee'
+                                                       }
+                                                   })
+                                               }}
+                                               checked={(loginData?.userType || '') === 'employee'}
+                                        />
+                                        <label htmlFor="user-type-employee">Employee</label>
+                                    </div>
+
+                                    <div className="user-type agent">
+                                        <input type="radio" name="user-type" id="user-type-agent"
+                                               onKeyDown={e => {
+                                                   let key = e.keyCode || e.which;
+
+                                                   if (key === 9) {
+                                                       e.preventDefault();
+                                                       if (e.shiftKey){
+                                                           refPass.current.focus();
+                                                       }else{
+                                                           refEmail.current.focus();
+                                                       }
+                                                   }
+                                               }}
+                                               onChange={(e) => {
+                                                   setLoginData(loginData => {
+                                                       return {
+                                                           ...loginData,
+                                                           userType: e.target.checked && 'agent'
+                                                       }
+                                                   })
+                                               }}
+                                               checked={(loginData?.userType || '') === 'agent'}
+                                        />
+                                        <label htmlFor="user-type-agent">Agent</label>
+                                    </div>
+                                </div>
+
+                                <div className="login-form">
+                                    <div className="input-box-container">
+                                        <input tabIndex={1} type="text" placeholder="E-mail" id="txt-email"
+                                               style={{
+                                                   textTransform: 'lowercase'
+                                               }}
+                                               autoFocus={true}
+                                               ref={refEmail}
+                                               readOnly={isLoading}
+                                               onKeyDown={e => {
+                                                   e.stopPropagation();
+
+                                                   let key = e.keyCode || e.which;
+
+                                                   if (key === 9) {
+                                                       e.preventDefault();
+                                                       if (e.shiftKey){
+                                                           refPass.current.focus();
+                                                       }else{
+                                                           refPass.current.focus();
+                                                       }
+                                                   }
+
+                                                   if (key === 13) {
+                                                       submitLogin();
+                                                   }
+                                               }}
+                                               onInput={e => {
+                                                   setLoginData(loginData => {
+                                                       return {
+                                                           ...loginData,
+                                                           email: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               onChange={e => {
+                                                   setLoginData(loginData => {
+                                                       return {
+                                                           ...loginData,
+                                                           email: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               value={loginData?.email || ''}/>
+                                    </div>
+
+                                    <div className="input-box-container">
+                                        <input tabIndex={2} type="password" placeholder="Password" id="txt-password"
+                                               ref={refPass}
+                                               readOnly={isLoading}
+                                               onKeyDown={e => {
+                                                   e.stopPropagation();
+                                                   let key = e.keyCode || e.which;
+
+                                                   if (key === 9) {
+                                                       e.preventDefault();
+                                                       if (e.shiftKey){
+                                                           refEmail.current.focus();
+                                                       }else{
+                                                           refEmail.current.focus();
+                                                       }
+                                                   }
+
+                                                   if (key === 13) {
+                                                       submitLogin();
+                                                   }
+                                               }}
+                                               onInput={e => {
+                                                   setLoginData(loginData => {
+                                                       return {
+                                                           ...loginData,
+                                                           password: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               onChange={e => {
+                                                   setLoginData(loginData => {
+                                                       return {
+                                                           ...loginData,
+                                                           password: e.target.value
+                                                       }
+                                                   })
+                                               }}
+                                               value={loginData?.password || ''}/>
+                                    </div>
+                                </div>
+
+                                <div className="login-button-row">
+                                    <div className="mochi-button" onClick={submitLogin}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Log In</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                </div>
+
+                                <div className="forgot-password-row">
+                                    <div className="login-message">{message}</div>
+                                    <a href="#"
+                                       onKeyDown={e => {
+                                           let key = e.keyCode || e.which;
+
+                                           if (key === 9) {
+                                               e.preventDefault();
+                                               if (e.shiftKey){
+                                                   refPass.current.focus();
+                                               }else{
+                                                   refEmail.current.focus();
+                                               }
                                            }
-                                       }
-                                   }}
-                                   onChange={(e) => {
-                                       setLoginData(loginData => {
-                                           return {
-                                               ...loginData,
-                                               userType: e.target.checked && 'employee'
-                                           }
-                                       })
-                                   }}
-                                   checked={(loginData?.userType || '') === 'employee'}
-                            />
-                            <label htmlFor="user-type-employee">Employee</label>
-                        </div>
+                                       }}>Forgot your password?</a>
+                                </div>
+                            </div>
+                        </animated.div>
+                    ))
+            }
 
-                        <div className="user-type agent">
-                            <input type="radio" name="user-type" id="user-type-agent"
-                                   onKeyDown={e => {
-                                       let key = e.keyCode || e.which;
 
-                                       if (key === 9) {
-                                           e.preventDefault();
-                                           if (e.shiftKey){
-                                               refPass.current.focus();
-                                           }else{
-                                               refEmail.current.focus();
-                                           }
-                                       }
-                                   }}
-                                   onChange={(e) => {
-                                       setLoginData(loginData => {
-                                           return {
-                                               ...loginData,
-                                               userType: e.target.checked && 'agent'
-                                           }
-                                       })
-                                   }}
-                                   checked={(loginData?.userType || '') === 'agent'}
-                            />
-                            <label htmlFor="user-type-agent">Agent</label>
-                        </div>
-                    </div>
-
-                    <div className="login-form">
-                        <div className="input-box-container">
-                            <input tabIndex={1} type="text" placeholder="E-mail" id="txt-email"
-                                   style={{
-                                       textTransform: 'lowercase'
-                                   }}
-                                   autoFocus={true}
-                                   ref={refEmail}
-                                   readOnly={isLoading}
-                                   onKeyDown={e => {
-                                       e.stopPropagation();
-
-                                       let key = e.keyCode || e.which;
-
-                                       if (key === 9) {
-                                           e.preventDefault();
-                                           if (e.shiftKey){
-                                               refPass.current.focus();
-                                           }else{
-                                               refPass.current.focus();
-                                           }
-                                       }
-
-                                       if (key === 13) {
-                                           submitLogin();
-                                       }
-                                   }}
-                                   onInput={e => {
-                                       setLoginData(loginData => {
-                                           return {
-                                               ...loginData,
-                                               email: e.target.value
-                                           }
-                                       })
-                                   }}
-                                   onChange={e => {
-                                       setLoginData(loginData => {
-                                           return {
-                                               ...loginData,
-                                               email: e.target.value
-                                           }
-                                       })
-                                   }}
-                                   value={loginData?.email || ''}/>
-                        </div>
-
-                        <div className="input-box-container">
-                            <input tabIndex={2} type="password" placeholder="Password" id="txt-password"
-                                   ref={refPass}
-                                   readOnly={isLoading}
-                                   onKeyDown={e => {
-                                       e.stopPropagation();
-                                       let key = e.keyCode || e.which;
-
-                                       if (key === 9) {
-                                           e.preventDefault();
-                                           if (e.shiftKey){
-                                               refEmail.current.focus();
-                                           }else{
-                                               refEmail.current.focus();
-                                           }
-                                       }
-
-                                       if (key === 13) {
-                                           submitLogin();
-                                       }
-                                   }}
-                                   onInput={e => {
-                                       setLoginData(loginData => {
-                                           return {
-                                               ...loginData,
-                                               password: e.target.value
-                                           }
-                                       })
-                                   }}
-                                   onChange={e => {
-                                       setLoginData(loginData => {
-                                           return {
-                                               ...loginData,
-                                               password: e.target.value
-                                           }
-                                       })
-                                   }}
-                                   value={loginData?.password || ''}/>
-                        </div>
-                    </div>
-
-                    <div className="login-button-row">
-                        <div className="mochi-button" onClick={submitLogin}>
-                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                            <div className="mochi-button-base">Log In</div>
-                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                        </div>
-                    </div>
-
-                    <div className="forgot-password-row">
-                        <div className="login-message">{message}</div>
-                        <a href="#"
-                           onKeyDown={e => {
-                               let key = e.keyCode || e.which;
-
-                               if (key === 9) {
-                                   e.preventDefault();
-                                   if (e.shiftKey){
-                                       refPass.current.focus();
-                                   }else{
-                                       refEmail.current.focus();
-                                   }
-                               }
-                           }}>Forgot your password?</a>
-                    </div>
-                </div>
-            </div>
         </div>
     )
 }

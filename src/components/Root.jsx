@@ -93,6 +93,17 @@ function Root(props) {
                             <Login />
                     : ''
             }
+
+            {
+                isLoading &&
+                <img src="/img/anchor_logo.png" alt="" style={{
+                    width: '100%',
+                    height: '100%',
+                    opacity: 0.1,
+                    transform: 'scale(1.5)'
+
+                }}/>
+            }
         </div>
     )
 }

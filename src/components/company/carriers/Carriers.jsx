@@ -985,6 +985,22 @@ const Carriers = (props) => {
             {
                 field: 'E-Mail',
                 data: (selectedCarrier.email || '').toLowerCase()
+            },
+            {
+                field: 'MC Number',
+                data: (selectedCarrier.mc_number || '').toLowerCase()
+            },
+            {
+                field: 'DOT Number',
+                data: (selectedCarrier.dot_number || '').toLowerCase()
+            },
+            {
+                field: 'SCAC',
+                data: (selectedCarrier.scac || '').toLowerCase()
+            },
+            {
+                field: 'FID',
+                data: (selectedCarrier.fid || '').toLowerCase()
             }
         ]
 
@@ -1414,6 +1430,27 @@ const Carriers = (props) => {
                 setIsSavingFactoringCompany(true);
             }
         }
+    }
+
+    const addFactoringCompanyBtnClick = () => {
+        let panel = {
+            panelName: `${props.panelName}-factoring-company`,
+            fixedWidthPercentage: 70,
+            component: <FactoringCompany
+                panelName={`${props.panelName}-factoring-company`}
+                title='Factoring Company'
+                tabTimes={11000 + props.tabTimes}
+                origin={props.origin}
+                openPanel={props.openPanel}
+                closePanel={props.closePanel}
+                componentId={moment().format('x')}
+
+                factoringCompanyId={0}
+                selectedCarrier={{}}
+            />
+        }
+
+        props.openPanel(panel, props.origin);
     }
 
     const searchFactoringCompanyBtnClick = () => {
@@ -6759,6 +6796,16 @@ const Carriers = (props) => {
                             <div className="form-title">Factoring Company</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
+                                <div className={
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.edit || 0) === 0)
+                                        ? 'mochi-button disabled' : 'mochi-button'
+                                } onClick={addFactoringCompanyBtnClick}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Add Factoring Company</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
                                 <div className={
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&

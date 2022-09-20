@@ -335,18 +335,21 @@ export default class ToPrint extends Component {
                                 <div style={{ ...this.styleFieldData, padding: 10 }}>
                                     <div>
                                         <div>
-                                            ET3 Logistics LLC
+                                            {(this.props.selectedCompany?.mailing_address?.name || '')}
                                         </div>
                                         <div>
-                                            P.O. Box 610129
+                                            {(this.props.selectedCompany?.mailing_address?.address1 || '')}
+                                        </div>
+                                        <div>
+                                            {(this.props.selectedCompany?.mailing_address?.address2 || '')}
                                         </div>
                                         <div>
                                             <span>
-                                                Dallas
+                                                {(this.props.selectedCompany?.mailing_address?.city || '')}
                                             </span>, <span>
-                                                TX
+                                                {(this.props.selectedCompany?.mailing_address?.state || '').toUpperCase()}
                                             </span> <span>
-                                                75261
+                                                {(this.props.selectedCompany?.mailing_address?.zip || '')}
                                             </span>
                                         </div>
                                     </div>

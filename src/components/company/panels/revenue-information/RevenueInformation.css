@@ -209,6 +209,12 @@
   font-weight: normal;
   color: black;
 }
+.order-info-container .form-bordered-box .order-info-wrapper .customer-container .customer-info span.customer-bill-to-code {
+  cursor: pointer;
+}
+.order-info-container .form-bordered-box .order-info-wrapper .customer-container .customer-info span.customer-bill-to-code:hover {
+  text-decoration: underline;
+}
 .order-info-container .form-bordered-box .order-info-wrapper .customer-container .customer-orders {
   overflow: hidden;
   max-height: 50000px;

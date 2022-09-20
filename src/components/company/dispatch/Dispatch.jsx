@@ -78,6 +78,46 @@ const Dispatch = (props) => {
     const [selectedNoteForCarrier, setSelectedNoteForCarrier] = useState({});
     const [selectedNoteForDriver, setSelectedNoteForDriver] = useState({});
 
+    const refShipperContactName = useRef();
+    const [shipperContactNameItems, setShipperContactNameItems] = useState([]);
+    const [showShipperContactNames, setShowShipperContactNames] = useState(false);
+    const refShipperContactNameDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowShipperContactNames(false)
+        }
+    });
+    const refShipperContactNamePopupItems = useRef([]);
+
+    const refShipperContactPhone = useRef();
+    const [shipperContactPhoneItems, setShipperContactPhoneItems] = useState([]);
+    const [showShipperContactPhones, setShowShipperContactPhones] = useState(false);
+    const refShipperContactPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowShipperContactPhones(false)
+        }
+    });
+    const refShipperContactPhonePopupItems = useRef([]);
+
+    const refConsigneeContactName = useRef();
+    const [consigneeContactNameItems, setConsigneeContactNameItems] = useState([]);
+    const [showConsigneeContactNames, setShowConsigneeContactNames] = useState(false);
+    const refConsigneeContactNameDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowConsigneeContactNames(false)
+        }
+    });
+    const refConsigneeContactNamePopupItems = useRef([]);
+
+    const refConsigneeContactPhone = useRef();
+    const [consigneeContactPhoneItems, setConsigneeContactPhoneItems] = useState([]);
+    const [showConsigneeContactPhones, setShowConsigneeContactPhones] = useState(false);
+    const refConsigneeContactPhoneDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowConsigneeContactPhones(false)
+        }
+    });
+    const refConsigneeContactPhonePopupItems = useRef([]);
+
     const [shipperBolNumber, setShipperBolNumber] = useState("");
     const [shipperPoNumber, setShipperPoNumber] = useState("");
     const [shipperRefNumber, setShipperRefNumber] = useState("");
@@ -668,6 +708,22 @@ const Dispatch = (props) => {
         reverse: isShowingShipperSecondPage,
     });
 
+    const shipperContactNamesTransition = useTransition(showShipperContactNames, {
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
+        reverse: showShipperContactNames
+    });
+
+    const shipperContactPhonesTransition = useTransition(showShipperContactPhones, {
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
+        reverse: showShipperContactPhones
+    });
+
     const consigneeFirstPageTransition = useTransition(!isShowingConsigneeSecondPage, {
         from: {opacity: 0, left: "0%", width: "0%"},
         enter: {opacity: 1, left: "0%", width: "100%"},
@@ -682,6 +738,22 @@ const Dispatch = (props) => {
         leave: {opacity: 0, left: "100%", width: "0%"},
         config: {duration: 300},
         reverse: isShowingConsigneeSecondPage,
+    });
+
+    const consigneeContactNamesTransition = useTransition(showConsigneeContactNames, {
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
+        reverse: showConsigneeContactNames
+    });
+
+    const consigneeContactPhonesTransition = useTransition(showConsigneeContactPhones, {
+        from: {opacity: 0, top: 'calc(100% + 7px)'},
+        enter: {opacity: 1, top: 'calc(100% + 12px)'},
+        leave: {opacity: 0, top: 'calc(100% + 7px)'},
+        config: {duration: 100},
+        reverse: showConsigneeContactPhones
     });
 
     const puDate1Transition = useTransition(isPickupDate1CalendarShown, {
@@ -892,149 +964,112 @@ const Dispatch = (props) => {
 
         if (key === 9) {
             if (e.target.value !== "") {
-                axios
-                    .post(props.serverUrl + "/customers", {
-                        code: e.target.value.toLowerCase(),
-                    })
-                    .then((res) => {
-                        if (res.data.result === "OK") {
-                            if (res.data.customers.length > 0) {
-                                if ((selectedOrder?.id || 0) > 0) {
-                                    setSelectedOrder((selectedOrder) => {
-                                        return {
-                                            ...selectedOrder,
-                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
-                                                if (
-                                                    p.id === (selectedShipperCustomer?.pickup_id || 0)
-                                                ) {
-                                                    p.order_id = selectedOrder.id;
-                                                    p.customer = res.data.customers[0];
-                                                    p.customer_id = res.data.customers[0].id;
+                axios.post(props.serverUrl + "/customers", {
+                    code: e.target.value.toLowerCase(),
+                }).then((res) => {
+                    if (res.data.result === "OK") {
+                        if (res.data.customers.length > 0) {
+                            if ((selectedOrder?.id || 0) > 0) {
+                                setSelectedOrder((selectedOrder) => {
+                                    return {
+                                        ...selectedOrder,
+                                        pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                            if (p.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                p.order_id = selectedOrder.id;
+                                                p.customer = res.data.customers[0];
+                                                p.customer_id = res.data.customers[0].id;
 
-                                                    setSelectedShipperCustomer({
-                                                        ...res.data.customers[0],
-                                                        ...p,
-                                                        customer: {},
-                                                        pickup_id: p.id,
+                                                setSelectedShipperCustomer({
+                                                    ...res.data.customers[0],
+                                                    ...p,
+                                                    customer: {},
+                                                    pickup_id: p.id,
+                                                });
+
+                                                setSelectedShipperCustomerContact((res.data.customers[0].contacts || []).find((c) => c.is_primary === 1) || {});
+
+                                                setIsSavingPickupId(p.id);
+                                            }
+                                            return p;
+                                        }),
+                                    };
+                                });
+
+                                new Promise((resolve, reject) => {
+                                    setIsShowingShipperSecondPage(true);
+                                    resolve("OK");
+                                }).then((response) => {
+                                    refPickupDate1.current.inputElement.focus();
+                                }).catch((e) => {
+                                });
+                            } else {
+                                setSelectedOrder((selectedOrder) => {
+                                    return {
+                                        ...selectedOrder,
+                                        pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                            if (p.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                p.customer = res.data.customers[0];
+                                                p.customer_id = res.data.customers[0].id;
+
+                                                setSelectedShipperCustomer({
+                                                    ...res.data.customers[0],
+                                                    ...p,
+                                                    customer: {},
+                                                    pickup_id: p.id,
+                                                });
+
+                                                setSelectedShipperCustomerContact((res.data.customers[0].contacts || []).find((c) => c.is_primary === 1) || {});
+                                            }
+                                            return p;
+                                        }),
+                                    };
+                                });
+
+                                if ((selectedOrder?.pickups || []).length <= 1 && (selectedBillToCustomer?.id || 0) === 0) {
+                                    if ((res.data.customers[0]?.bill_to_code || "") !== "") {
+                                        axios.post(props.serverUrl + "/customers", {
+                                            code: (res.data.customers[0]?.bill_to_code || "") + ((res.data.customers[0]?.bill_to_code_number || 0) === 0 ? "" : res.data.customers[0].bill_to_code_number),
+                                        }).then((res) => {
+                                            if (res.data.result === "OK") {
+                                                if (res.data.customers.length > 0) {
+                                                    setSelectedBillToCustomer(res.data.customers[0]);
+                                                    setSelectedBillToCustomerContact((res.data.customers[0].contacts || []).find((c) => c.is_primary === 1) || {});
+
+                                                    setSelectedOrder({
+                                                        ...selectedOrder,
+                                                        bill_to_customer_id: res.data.customers[0].id,
+                                                        pickups: (selectedOrder?.pickups || []).map((pickup) => {
+                                                            pickup.toSave = pickup.id === 0;
+                                                            return pickup;
+                                                        })
                                                     });
 
-                                                    setSelectedShipperCustomerContact(
-                                                        (res.data.customers[0].contacts || []).find(
-                                                            (c) => c.is_primary === 1
-                                                        ) || {}
-                                                    );
-
-                                                    setIsSavingPickupId(p.id);
+                                                    validateOrderForSaving({keyCode: 9});
                                                 }
-                                                return p;
-                                            }),
-                                        };
-                                    });
 
-                                    new Promise((resolve, reject) => {
-                                        setIsShowingShipperSecondPage(true);
-                                        resolve("OK");
-                                    })
-                                        .then((response) => {
-                                            refPickupDate1.current.inputElement.focus();
-                                        })
-                                        .catch((e) => {
-
+                                                refPickupDate1.current.inputElement.focus();
+                                            }
+                                        }).catch((e) => {
+                                            console.log("error getting customers", e);
                                         });
-                                } else {
-                                    setSelectedOrder((selectedOrder) => {
-                                        return {
-                                            ...selectedOrder,
-                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
-                                                if (
-                                                    p.id === (selectedShipperCustomer?.pickup_id || 0)
-                                                ) {
-                                                    p.customer = res.data.customers[0];
-                                                    p.customer_id = res.data.customers[0].id;
-
-                                                    setSelectedShipperCustomer({
-                                                        ...res.data.customers[0],
-                                                        ...p,
-                                                        customer: {},
-                                                        pickup_id: p.id,
-                                                    });
-
-                                                    setSelectedShipperCustomerContact(
-                                                        (res.data.customers[0].contacts || []).find(
-                                                            (c) => c.is_primary === 1
-                                                        ) || {}
-                                                    );
-                                                }
-                                                return p;
-                                            }),
-                                        };
-                                    });
-
-                                    if (
-                                        (selectedOrder?.pickups || []).length <= 1 &&
-                                        (selectedBillToCustomer?.id || 0) === 0
-                                    ) {
-                                        if (
-                                            (res.data.customers[0].mailing_address?.bill_to_code ||
-                                                "") !== ""
-                                        ) {
-                                            axios.post(props.serverUrl + "/customers", {
-                                                code:
-                                                    (res.data.customers[0].mailing_address
-                                                        ?.bill_to_code || "") +
-                                                    ((res.data.customers[0].mailing_address
-                                                        ?.bill_to_code_number || 0) === 0
-                                                        ? ""
-                                                        : res.data.customers[0].mailing_address
-                                                            .bill_to_code_number),
-                                            }).then((res) => {
-                                                if (res.data.result === "OK") {
-                                                    if (res.data.customers.length > 0) {
-                                                        setSelectedBillToCustomer(res.data.customers[0]);
-                                                        setSelectedBillToCustomerContact(
-                                                            (res.data.customers[0].contacts || []).find(
-                                                                (c) => c.is_primary === 1
-                                                            ) || {}
-                                                        );
-
-                                                        setSelectedOrder({
-                                                            ...selectedOrder,
-                                                            bill_to_customer_id: res.data.customers[0].id,
-                                                            pickups: (selectedOrder?.pickups || []).map(
-                                                                (pickup) => {
-                                                                    pickup.toSave = pickup.id === 0;
-                                                                    return pickup;
-                                                                }
-                                                            ),
-                                                        });
-
-                                                        validateOrderForSaving({keyCode: 9});
-                                                    }
-
-                                                    refPickupDate1.current.inputElement.focus();
-                                                }
-                                            }).catch((e) => {
-                                                console.log("error getting customers", e);
-                                            });
-                                        } else {
-                                            refPickupDate1.current.inputElement.focus();
-                                        }
                                     } else {
                                         refPickupDate1.current.inputElement.focus();
                                     }
+                                } else {
+                                    refPickupDate1.current.inputElement.focus();
                                 }
-                            } else {
-                                setSelectedShipperCustomer({});
-                                setSelectedShipperCustomerContact({});
                             }
                         } else {
                             setSelectedShipperCustomer({});
                             setSelectedShipperCustomerContact({});
                         }
-                    })
-                    .catch((e) => {
-                        console.log("error getting customers", e);
-                    });
+                    } else {
+                        setSelectedShipperCustomer({});
+                        setSelectedShipperCustomerContact({});
+                    }
+                }).catch((e) => {
+                    console.log("error getting customers", e);
+                });
             }
         }
     };
@@ -1122,32 +1157,36 @@ const Dispatch = (props) => {
     const billToCompanySearch = () => {
         let companySearch = [
             {
+                field: "Code",
+                data: (selectedBillToCustomer?.code || "").toLowerCase(),
+            },
+            {
                 field: "Name",
-                data: (selectedBillToCustomer.name || "").toLowerCase(),
+                data: (selectedBillToCustomer?.name || "").toLowerCase(),
             },
             {
                 field: "City",
-                data: (selectedBillToCustomer.city || "").toLowerCase(),
+                data: (selectedBillToCustomer?.city || "").toLowerCase(),
             },
             {
                 field: "State",
-                data: (selectedBillToCustomer.state || "").toLowerCase(),
+                data: (selectedBillToCustomer?.state || "").toLowerCase(),
             },
             {
                 field: "Postal Code",
-                data: selectedBillToCustomer.zip || "",
+                data: selectedBillToCustomer?.zip || "",
             },
             {
                 field: "Contact Name",
-                data: (selectedBillToCustomer.contact_name || "").toLowerCase(),
+                data: (selectedBillToCustomer?.contact_name || "").toLowerCase(),
             },
             {
                 field: "Contact Phone",
-                data: selectedBillToCustomer.contact_phone || "",
+                data: selectedBillToCustomer?.contact_phone || "",
             },
             {
                 field: "E-Mail",
-                data: (selectedBillToCustomer.email || "").toLowerCase(),
+                data: (selectedBillToCustomer?.email || "").toLowerCase(),
             },
         ];
 
@@ -1163,48 +1202,57 @@ const Dispatch = (props) => {
                     closePanel={props.closePanel}
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
-                    callback={(customer) => {
+                    callback={(id) => {
                         new Promise((resolve, reject) => {
-                            if (customer) {
-                                setSelectedBillToCustomer(customer);
-                                setSelectedBillToCustomerContact(
-                                    (customer.contacts || []).find((c) => c.is_primary === 1) ||
-                                    {}
-                                );
+                            if ((id || 0) > 0) {
+                                axios.post(props.serverUrl + '/getCustomerById', {id: id}).then(res => {
+                                    if (res.data.result === 'OK') {
+                                        let customer = res.data.customer;
 
-                                let selected_order = {...selectedOrder} || {
-                                    order_number: 0,
-                                };
-                                selected_order.bill_to_customer_id = customer.id;
+                                        if (customer) {
+                                            setSelectedBillToCustomer(customer);
+                                            setSelectedBillToCustomerContact((customer.contacts || []).find((c) => c.is_primary === 1) || {});
 
-                                setSelectedOrder(selected_order);
+                                            let selected_order = {...selectedOrder} || {
+                                                order_number: 0,
+                                            };
+                                            selected_order.bill_to_customer_id = customer.id;
 
-                                setIsLoading(true);
-                                validateOrderForSaving({keyCode: 9});
-                                refShipperCompanyCode.current.focus();
+                                            setSelectedOrder(selected_order);
 
-                                resolve("OK");
+                                            setIsLoading(true);
+                                            validateOrderForSaving({keyCode: 9});
+                                            refShipperCompanyCode.current.focus();
+
+                                            resolve("OK");
+                                        } else {
+                                            reject("no customer");
+                                        }
+                                    } else {
+                                        reject("no customer");
+                                    }
+                                }).catch(e => {
+                                    reject("no customer");
+                                })
                             } else {
                                 reject("no customer");
                             }
-                        })
-                            .then((response) => {
-                                if (response === "OK") {
-                                    props.closePanel(
-                                        `${props.panelName}-customer-search`,
-                                        props.origin
-                                    );
-                                }
-                            })
-                            .catch((e) => {
+                        }).then((response) => {
+                            if (response === "OK") {
                                 props.closePanel(
                                     `${props.panelName}-customer-search`,
                                     props.origin
                                 );
-                                setSelectedBillToCustomer({});
-                                setSelectedBillToCustomerContact({});
-                                refBillToCompanyCode.current.focus();
-                            });
+                            }
+                        }).catch((e) => {
+                            props.closePanel(
+                                `${props.panelName}-customer-search`,
+                                props.origin
+                            );
+                            setSelectedBillToCustomer({});
+                            setSelectedBillToCustomerContact({});
+                            refBillToCompanyCode.current.focus();
+                        });
                     }}
                 />
             ),
@@ -1216,32 +1264,36 @@ const Dispatch = (props) => {
     const shipperCompanySearch = () => {
         let companySearch = [
             {
+                field: 'Code',
+                data: (selectedShipperCustomer?.code || '').toLowerCase()
+            },
+            {
                 field: "Name",
-                data: (selectedShipperCustomer.name || "").toLowerCase(),
+                data: (selectedShipperCustomer?.name || "").toLowerCase(),
             },
             {
                 field: "City",
-                data: (selectedShipperCustomer.city || "").toLowerCase(),
+                data: (selectedShipperCustomer?.city || "").toLowerCase(),
             },
             {
                 field: "State",
-                data: (selectedShipperCustomer.state || "").toLowerCase(),
+                data: (selectedShipperCustomer?.state || "").toLowerCase(),
             },
             {
                 field: "Postal Code",
-                data: selectedShipperCustomer.zip || "",
+                data: selectedShipperCustomer?.zip || "",
             },
             {
                 field: "Contact Name",
-                data: (selectedShipperCustomer.contact_name || "").toLowerCase(),
+                data: (selectedShipperCustomer?.contact_name || "").toLowerCase(),
             },
             {
                 field: "Contact Phone",
-                data: selectedShipperCustomer.contact_phone || "",
+                data: selectedShipperCustomer?.contact_phone || "",
             },
             {
                 field: "E-Mail",
-                data: (selectedShipperCustomer.email || "").toLowerCase(),
+                data: (selectedShipperCustomer?.email || "").toLowerCase(),
             },
         ];
 
@@ -1257,26 +1309,59 @@ const Dispatch = (props) => {
                     closePanel={props.closePanel}
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
-                    callback={(customer) => {
+                    callback={(id) => {
                         new Promise((resolve, reject) => {
-                            if (customer) {
-                                if ((selectedOrder?.id || 0) > 0) {
-                                    setSelectedOrder((selectedOrder) => {
-                                        return {
-                                            ...selectedOrder,
-                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
-                                                if (
-                                                    p.id === (selectedShipperCustomer?.pickup_id || 0)
-                                                ) {
-                                                    p.order_id = selectedOrder.id;
-                                                    p.customer = customer;
-                                                    p.customer_id = customer.id;
+                            if ((id || 0) > 0) {
+                                axios.post(props.serverUrl + '/getCustomerById', {id: id}).then(res => {
+                                    if (res.data.result === 'OK') {
+                                        let customer = res.data.customer;
+
+                                        if (customer) {
+                                            if ((selectedOrder?.id || 0) > 0) {
+                                                setSelectedOrder((selectedOrder) => {
+                                                    return {
+                                                        ...selectedOrder,
+                                                        pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                            if (p.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                p.order_id = selectedOrder.id;
+                                                                p.customer = customer;
+                                                                p.customer_id = customer.id;
+
+                                                                setSelectedShipperCustomer({
+                                                                    ...customer,
+                                                                    ...p,
+                                                                    customer: {},
+                                                                    pickup_id: p.id,
+                                                                });
+
+                                                                setSelectedShipperCustomerContact((customer.contacts || []).find((c) => c.is_primary === 1) || {});
+                                                                setIsSavingPickupId(p.id);
+                                                            }
+                                                            return p;
+                                                        }),
+                                                    };
+                                                });
+
+                                                setIsShowingShipperSecondPage(true);
+                                            } else {
+                                                if ((selectedOrder?.pickups || []).length === 0) {
+                                                    setSelectedOrder((selectedOrder) => {
+                                                        return {
+                                                            ...selectedOrder,
+                                                            pickups: [
+                                                                {
+                                                                    id: 0,
+                                                                    customer: {...customer},
+                                                                    customer_id: customer.id,
+                                                                },
+                                                            ],
+                                                        };
+                                                    });
 
                                                     setSelectedShipperCustomer({
                                                         ...customer,
-                                                        ...p,
                                                         customer: {},
-                                                        pickup_id: p.id,
+                                                        pickup_id: 0,
                                                     });
 
                                                     setSelectedShipperCustomerContact(
@@ -1284,141 +1369,104 @@ const Dispatch = (props) => {
                                                             (c) => c.is_primary === 1
                                                         ) || {}
                                                     );
+                                                } else {
+                                                    setSelectedOrder((selectedOrder) => {
+                                                        return {
+                                                            ...selectedOrder,
+                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                if (
+                                                                    p.id === (selectedShipperCustomer?.pickup_id || 0)
+                                                                ) {
+                                                                    p.customer = customer;
+                                                                    p.customer_id = customer.id;
 
-                                                    setIsSavingPickupId(p.id);
+                                                                    setSelectedShipperCustomer({
+                                                                        ...customer,
+                                                                        ...p,
+                                                                        customer: {},
+                                                                        pickup_id: p.id,
+                                                                    });
+
+                                                                    setSelectedShipperCustomerContact(
+                                                                        (customer.contacts || []).find(
+                                                                            (c) => c.is_primary === 1
+                                                                        ) || {}
+                                                                    );
+                                                                }
+                                                                return p;
+                                                            }),
+                                                        };
+                                                    });
                                                 }
-                                                return p;
-                                            }),
-                                        };
-                                    });
 
-                                    setIsShowingShipperSecondPage(true);
-                                } else {
-                                    if ((selectedOrder?.pickups || []).length === 0) {
-                                        setSelectedOrder((selectedOrder) => {
-                                            return {
-                                                ...selectedOrder,
-                                                pickups: [
-                                                    {
-                                                        id: 0,
-                                                        customer: {...customer},
-                                                        customer_id: customer.id,
-                                                    },
-                                                ],
-                                            };
-                                        });
+                                                if (
+                                                    (selectedOrder?.pickups || []).length <= 1 &&
+                                                    (selectedBillToCustomer?.id || 0) === 0
+                                                ) {
+                                                    if ((customer?.bill_to_code || "") !== "") {
+                                                        setIsLoading(true);
+                                                        axios.post(props.serverUrl + "/customers", {
+                                                            code: (customer?.bill_to_code || "") + ((customer?.bill_to_code_number || 0) === 0 ? "" : customer.bill_to_code_number)
+                                                        }).then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                if (res.data.customers.length > 0) {
+                                                                    setSelectedBillToCustomer(res.data.customers[0]);
+                                                                    setSelectedBillToCustomerContact((res.data.customers[0].contacts || []).find((c) => c.is_primary === 1) || {});
 
-                                        setSelectedShipperCustomer({
-                                            ...customer,
-                                            customer: {},
-                                            pickup_id: 0,
-                                        });
+                                                                    setSelectedOrder((selectedOrder) => {
+                                                                        return {
+                                                                            ...selectedOrder,
+                                                                            bill_to_customer_id: res.data.customers[0].id,
+                                                                            pickups: (selectedOrder?.pickups || []).map((pickup) => {
+                                                                                pickup.toSave = pickup.id === 0;
+                                                                                return pickup;
+                                                                            })
+                                                                        };
+                                                                    });
 
-                                        setSelectedShipperCustomerContact(
-                                            (customer.contacts || []).find(
-                                                (c) => c.is_primary === 1
-                                            ) || {}
-                                        );
-                                    } else {
-                                        setSelectedOrder((selectedOrder) => {
-                                            return {
-                                                ...selectedOrder,
-                                                pickups: (selectedOrder?.pickups || []).map((p, i) => {
-                                                    if (
-                                                        p.id === (selectedShipperCustomer?.pickup_id || 0)
-                                                    ) {
-                                                        p.customer = customer;
-                                                        p.customer_id = customer.id;
+                                                                    validateOrderForSaving({keyCode: 9});
+                                                                }
 
-                                                        setSelectedShipperCustomer({
-                                                            ...customer,
-                                                            ...p,
-                                                            customer: {},
-                                                            pickup_id: p.id,
+                                                                setIsShowingShipperSecondPage(true);
+                                                            }
+                                                            setIsLoading(false);
+                                                        }).catch((e) => {
+                                                            console.log("error getting customers", e);
+                                                            setIsLoading(false);
                                                         });
-
-                                                        setSelectedShipperCustomerContact(
-                                                            (customer.contacts || []).find(
-                                                                (c) => c.is_primary === 1
-                                                            ) || {}
-                                                        );
+                                                    } else {
+                                                        setIsShowingShipperSecondPage(true);
                                                     }
-                                                    return p;
-                                                }),
-                                            };
-                                        });
-                                    }
-
-                                    if (
-                                        (selectedOrder?.pickups || []).length <= 1 &&
-                                        (selectedBillToCustomer?.id || 0) === 0
-                                    ) {
-                                        if ((customer.mailing_address?.bill_to_code || "") !== "") {
-                                            setIsLoading(true);
-                                            axios.post(props.serverUrl + "/customers", {
-                                                code:
-                                                    (customer.mailing_address?.bill_to_code || "") +
-                                                    ((customer.mailing_address?.bill_to_code_number ||
-                                                        0) === 0
-                                                        ? ""
-                                                        : customer.mailing_address.bill_to_code_number),
-                                            }).then((res) => {
-                                                if (res.data.result === "OK") {
-                                                    if (res.data.customers.length > 0) {
-                                                        setSelectedBillToCustomer(res.data.customers[0]);
-                                                        setSelectedBillToCustomerContact(
-                                                            (res.data.customers[0].contacts || []).find(
-                                                                (c) => c.is_primary === 1
-                                                            ) || {}
-                                                        );
-
-                                                        setSelectedOrder((selectedOrder) => {
-                                                            return {
-                                                                ...selectedOrder,
-                                                                bill_to_customer_id: res.data.customers[0].id,
-                                                                pickups: (selectedOrder?.pickups || []).map(
-                                                                    (pickup) => {
-                                                                        pickup.toSave = pickup.id === 0;
-                                                                        return pickup;
-                                                                    }
-                                                                ),
-                                                            };
-                                                        });
-
-                                                        validateOrderForSaving({keyCode: 9});
-                                                    }
-
+                                                } else {
                                                     setIsShowingShipperSecondPage(true);
                                                 }
-                                                setIsLoading(false);
-                                            }).catch((e) => {
-                                                console.log("error getting customers", e);
-                                                setIsLoading(false);
-                                            });
+                                            }
+
+                                            resolve("OK");
                                         } else {
-                                            setIsShowingShipperSecondPage(true);
+                                            reject("no customer");
                                         }
                                     } else {
-                                        setIsShowingShipperSecondPage(true);
+                                        reject("no customer");
                                     }
-                                }
-
-                                resolve("OK");
+                                }).catch(e => {
+                                    reject("no customer");
+                                })
                             } else {
                                 reject("no customer");
                             }
-                        })
-                            .then((response) => {
-                                props.closePanel(
-                                    `${props.panelName}-customer-search`,
-                                    props.origin
-                                );
-                            })
-                            .catch((e) => {
-                                setSelectedShipperCustomer({});
-                                setSelectedShipperCustomerContact({});
-                                refShipperCompanyCode.current.focus();
-                            });
+
+
+                        }).then((response) => {
+                            props.closePanel(
+                                `${props.panelName}-customer-search`,
+                                props.origin
+                            );
+                        }).catch((e) => {
+                            setSelectedShipperCustomer({});
+                            setSelectedShipperCustomerContact({});
+                            refShipperCompanyCode.current.focus();
+                        });
                     }}
                 />
             ),
@@ -1440,32 +1488,36 @@ const Dispatch = (props) => {
 
         let companySearch = [
             {
+                field: "Code",
+                data: (selectedConsigneeCustomer?.code || "").toLowerCase(),
+            },
+            {
                 field: "Name",
-                data: (selectedConsigneeCustomer.name || "").toLowerCase(),
+                data: (selectedConsigneeCustomer?.name || "").toLowerCase(),
             },
             {
                 field: "City",
-                data: (selectedConsigneeCustomer.city || "").toLowerCase(),
+                data: (selectedConsigneeCustomer?.city || "").toLowerCase(),
             },
             {
                 field: "State",
-                data: (selectedConsigneeCustomer.state || "").toLowerCase(),
+                data: (selectedConsigneeCustomer?.state || "").toLowerCase(),
             },
             {
                 field: "Postal Code",
-                data: selectedConsigneeCustomer.zip || "",
+                data: selectedConsigneeCustomer?.zip || "",
             },
             {
                 field: "Contact Name",
-                data: (selectedConsigneeCustomer.contact_name || "").toLowerCase(),
+                data: (selectedConsigneeCustomer?.contact_name || "").toLowerCase(),
             },
             {
                 field: "Contact Phone",
-                data: selectedConsigneeCustomer.contact_phone || "",
+                data: selectedConsigneeCustomer?.contact_phone || "",
             },
             {
                 field: "E-Mail",
-                data: (selectedConsigneeCustomer.email || "").toLowerCase(),
+                data: (selectedConsigneeCustomer?.email || "").toLowerCase(),
             },
         ];
 
@@ -1482,65 +1534,70 @@ const Dispatch = (props) => {
                     suborigin={"customer"}
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
-                    callback={(customer) => {
+                    callback={(id) => {
                         new Promise((resolve, reject) => {
-                            if (customer) {
-                                let delivery_id = -1;
+                            if ((id || 0) > 0) {
+                                axios.post(props.serverUrl + '/getCustomerById', {id: id}).then(res => {
+                                    if (res.data.result === 'OK') {
+                                        let customer = res.data.customer;
 
-                                setSelectedOrder({
-                                    ...selectedOrder,
-                                    deliveries: (selectedOrder?.deliveries || []).map((d, i) => {
-                                        if (
-                                            d.id === (selectedConsigneeCustomer?.delivery_id || 0)
-                                        ) {
-                                            d.order_id = selectedOrder.id;
-                                            d.customer = customer;
-                                            d.customer_id = customer.id;
+                                        if (customer) {
+                                            let delivery_id = -1;
 
-                                            let consignee = {...customer};
-                                            consignee = {...consignee, ...d};
-                                            consignee.customer = {};
-                                            consignee.delivery_id = d.id;
+                                            setSelectedOrder({
+                                                ...selectedOrder,
+                                                deliveries: (selectedOrder?.deliveries || []).map((d, i) => {
+                                                    if (d.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                        d.order_id = selectedOrder.id;
+                                                        d.customer = customer;
+                                                        d.customer_id = customer.id;
 
-                                            setSelectedConsigneeCustomer(consignee);
-                                            setSelectedConsigneeCustomerContact(
-                                                (consignee.contacts || []).find(
-                                                    (c) => c.is_primary === 1
-                                                ) || {}
-                                            );
+                                                        let consignee = {...customer};
+                                                        consignee = {...consignee, ...d};
+                                                        consignee.customer = {};
+                                                        consignee.delivery_id = d.id;
 
-                                            delivery_id = d.id;
+                                                        setSelectedConsigneeCustomer(consignee);
+                                                        setSelectedConsigneeCustomerContact((consignee.contacts || []).find((c) => c.is_primary === 1) || {});
+
+                                                        delivery_id = d.id;
+                                                    }
+                                                    return d;
+                                                }),
+                                            });
+
+                                            setIsSavingDeliveryId(delivery_id);
+                                            refDeliveryDate1.current.inputElement.focus();
+
+                                            resolve("OK");
+                                        } else {
+                                            reject("no customer");
                                         }
-                                        return d;
-                                    }),
-                                });
-
-                                setIsSavingDeliveryId(delivery_id);
-
-                                refDeliveryDate1.current.inputElement.focus();
-
-                                resolve("OK");
+                                    } else {
+                                        reject("no customer");
+                                    }
+                                }).catch(e => {
+                                    reject("no customer");
+                                })
                             } else {
                                 reject("no customer");
                             }
-                        })
-                            .then((response) => {
-                                if (response === "OK") {
-                                    props.closePanel(
-                                        `${props.panelName}-customer-search`,
-                                        props.origin
-                                    );
-                                }
-                            })
-                            .catch((e) => {
+                        }).then((response) => {
+                            if (response === "OK") {
                                 props.closePanel(
                                     `${props.panelName}-customer-search`,
                                     props.origin
                                 );
-                                setSelectedConsigneeCustomer({});
-                                setSelectedConsigneeCustomerContact({});
-                                refConsigneeCompanyCode.current.focus();
-                            });
+                            }
+                        }).catch((e) => {
+                            props.closePanel(
+                                `${props.panelName}-customer-search`,
+                                props.origin
+                            );
+                            setSelectedConsigneeCustomer({});
+                            setSelectedConsigneeCustomerContact({});
+                            refConsigneeCompanyCode.current.focus();
+                        });
                     }}
                 />
             ),
@@ -3353,6 +3410,8 @@ const Dispatch = (props) => {
             if ((selectedOrder?.id || 0) > 0) {
                 let pickup = (selectedOrder?.pickups || []).find((p) => p.id === isSavingPickupId);
 
+                console.log(isSavingPickupId, pickup);
+
                 if (pickup !== undefined) {
                     if ((pickup.customer?.id || 0) > 0) {
                         if (!isCreatingTemplate && !isEditingTemplate) {
@@ -3360,6 +3419,9 @@ const Dispatch = (props) => {
                                 id: isSavingPickupId,
                                 order_id: selectedOrder?.id || 0,
                                 customer_id: pickup.customer.id,
+                                contact_name: pickup.contact_name || "",
+                                contact_phone: pickup.contact_phone || "",
+                                contact_phone_ext: pickup.contact_phone_ext || "",
                                 pu_date1: pickup.pu_date1 || "",
                                 pu_date2: pickup.pu_date2 || "",
                                 pu_time1: pickup.pu_time1 || "",
@@ -3636,6 +3698,9 @@ const Dispatch = (props) => {
                             id: isSavingDeliveryId,
                             order_id: selectedOrder?.id || 0,
                             customer_id: delivery.customer.id,
+                            contact_name: delivery.contact_name || "",
+                            contact_phone: delivery.contact_phone || "",
+                            contact_phone_ext: delivery.contact_phone_ext || "",
                             delivery_date1: delivery.delivery_date1 || "",
                             delivery_date2: delivery.delivery_date2 || "",
                             delivery_time1: delivery.delivery_time1 || "",
@@ -3937,6 +4002,9 @@ const Dispatch = (props) => {
                                 : {
                                     ...pickup.customer,
                                     pickup_id: pickup.id,
+                                    contact_name: pickup.contact_name,
+                                    contact_phone: pickup.contact_phone,
+                                    contact_phone_ext: pickup.contact_phone_ext,
                                     pu_date1: pickup.pu_date1,
                                     pu_date2: pickup.pu_date2,
                                     pu_time1: pickup.pu_time1,
@@ -3962,6 +4030,9 @@ const Dispatch = (props) => {
                                 : {
                                     ...delivery.customer,
                                     delivery_id: delivery.id,
+                                    contact_name: delivery.contact_name,
+                                    contact_phone: delivery.contact_phone,
+                                    contact_phone_ext: delivery.contact_phone_ext,
                                     delivery_date1: delivery.delivery_date1,
                                     delivery_date2: delivery.delivery_date2,
                                     delivery_time1: delivery.delivery_time1,
@@ -6281,13 +6352,15 @@ const Dispatch = (props) => {
                                                         }).then((response) => {
                                                             new Promise((resolve, reject) => {
                                                                 if ((selected_order?.pickups || []).length > 0) {
-                                                                    (selected_order?.pickups || []).map(
-                                                                        async (pickup, index) => {
+                                                                    (selected_order?.pickups || []).map(async (pickup, index) => {
                                                                             await axios.post(props.serverUrl + "/saveOrderPickup",
                                                                                 {
                                                                                     id: 0,
                                                                                     order_id: res.data.order.id,
                                                                                     customer_id: pickup.customer.id,
+                                                                                    contact_name: "",
+                                                                                    contact_phone: "",
+                                                                                    contact_phone_ext: "",
                                                                                     pu_date1: "",
                                                                                     pu_date2: "",
                                                                                     pu_time1: "",
@@ -6321,6 +6394,9 @@ const Dispatch = (props) => {
                                                                                         id: 0,
                                                                                         order_id: res.data.order.id,
                                                                                         customer_id: delivery.customer.id,
+                                                                                        contact_name: "",
+                                                                                        contact_phone: "",
+                                                                                        contact_phone_ext: "",
                                                                                         delivery_date1: "",
                                                                                         delivery_date2: "",
                                                                                         delivery_time1: "",
@@ -9463,6 +9539,8 @@ const Dispatch = (props) => {
                                         tabTimes={37000 + props.tabTimes}
                                         panelName={`${props.panelName}-order`}
                                         origin={props.origin}
+                                        openPanel={props.openPanel}
+                                        closePanel={props.closePanel}
                                         componentId={moment().format("x")}
                                         selectedOrder={selectedOrder}
                                     />
@@ -9496,6 +9574,8 @@ const Dispatch = (props) => {
                                         tabTimes={40000 + props.tabTimes}
                                         panelName={`${props.panelName}-bol`}
                                         origin={props.origin}
+                                        openPanel={props.openPanel}
+                                        closePanel={props.closePanel}
                                         componentId={moment().format("x")}
                                         selectedOrder={selectedOrder}
                                     />
@@ -10404,9 +10484,9 @@ const Dispatch = (props) => {
                             props.openPanel(panel, props.origin);
                         }}
                     >
-                        <div className="mochi-button-decorator mochi-button-decorator-left">                            (                        </div>
+                        <div className="mochi-button-decorator mochi-button-decorator-left"> (</div>
                         <div className="mochi-button-base">Routing</div>
-                        <div className="mochi-button-decorator mochi-button-decorator-right">                            )                        </div>
+                        <div className="mochi-button-decorator mochi-button-decorator-right"> )</div>
                     </div>
                     <div className="form-h-sep"></div>
                     <div className="deliveries-container" style={{display: "flex", flexDirection: "row"}}>
@@ -10414,7 +10494,8 @@ const Dispatch = (props) => {
                             <span className="fas fa-chevron-left"></span>
                         </div>
 
-                        <Swiper slidesPerView={5} navigation={{prevEl: ".swiper-delivery-prev-btn", nextEl: ".swiper-delivery-next-btn"}}>
+                        <Swiper slidesPerView={5}
+                                navigation={{prevEl: ".swiper-delivery-prev-btn", nextEl: ".swiper-delivery-next-btn"}}>
                             {[
                                 ...getDeliveriesOnRouting(),
                                 ...(selectedOrder?.deliveries || []).filter(
@@ -11089,7 +11170,7 @@ const Dispatch = (props) => {
                             component: <Invoice
                                 pageName={'Invoice'}
                                 title={'Invoice'}
-                                panelName={'invoice'}
+                                panelName={`${props.panelName}-invoice`}
                                 tabTimes={5000 + props.tabTimes}
                                 screenFocused={props.invoiceScreenFocused}
                                 componentId={moment().format('x')}
@@ -12222,45 +12303,496 @@ const Dispatch = (props) => {
                                                 </div>
 
                                                 <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input
-                                                            tabIndex={23 + props.tabTimes}
-                                                            type="text"
-                                                            placeholder="Contact Name"
-                                                            // onKeyDown={validateShipperCompanyContactForSaving}
-                                                            onChange={(e) => {
-                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
-                                                                    if (
-                                                                        (selectedOrder?.pickups || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: [
-                                                                                ...(selectedOrder?.pickups || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
+                                                    <div className="select-box-container" style={{flexGrow: 1}}>
+                                                        <div className="select-box-wrapper">
+                                                            <input
+                                                                tabIndex={23 + props.tabTimes}
+                                                                type="text"
+                                                                placeholder="Contact Name"
+                                                                ref={refShipperContactName}
+                                                                onKeyDown={async (e) => {
+                                                                    let key = e.keyCode || e.which;
+
+                                                                    switch (key) {
+                                                                        case 37:
+                                                                        case 38: // arrow left | arrow up
+                                                                            if (showShipperContactNames) {
+                                                                                let selectedIndex = shipperContactNameItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setShipperContactNameItems(shipperContactNameItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setShipperContactNameItems(shipperContactNameItems.map((item, index) => {
+                                                                                        if (selectedIndex === 0) {
+                                                                                            item.selected = index === (shipperContactNameItems.length - 1);
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex - 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refShipperContactNamePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if ((selectedShipperCustomer?.contacts || []).length > 0) {
+                                                                                    await setShipperContactNameItems((selectedShipperCustomer?.contacts || []).map((item, index) => {
+                                                                                        item.selected = index === 0
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowShipperContactNames(true);
+
+                                                                                    refShipperContactNamePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 39:
+                                                                        case 40: // arrow right | arrow down
+
+                                                                            if (showShipperContactNames) {
+                                                                                let selectedIndex = shipperContactNameItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setShipperContactNameItems(shipperContactNameItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setShipperContactNameItems(shipperContactNameItems.map((item, index) => {
+                                                                                        if (selectedIndex === (shipperContactNameItems.length - 1)) {
+                                                                                            item.selected = index === 0;
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex + 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refShipperContactNamePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if ((selectedShipperCustomer?.contacts || []).length > 0) {
+                                                                                    await setShipperContactNameItems((selectedShipperCustomer?.contacts || []).map((item, index) => {
+                                                                                        item.selected = index === 0
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowShipperContactNames(true);
+
+                                                                                    refShipperContactNamePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 27: // escape
+                                                                            setShowShipperContactNames(false);
+                                                                            break;
+
+                                                                        case 13: // enter
+                                                                            if (showShipperContactNames && shipperContactNameItems.findIndex(item => item.selected) > -1) {
+                                                                                let _contact_name = ((shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                                    + ' '
+                                                                                    + (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].last_name || '')).trim();
+
+                                                                                let _contact_phone = (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                                    ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                                    : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                                        ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                                        : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                            ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                            : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                                ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                                : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                                    ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                                    : '';
+                                                                                let _contact_phone_ext = (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_ext || '');
+
+                                                                                let _contact_primary_phone = (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                                    ? 'work'
+                                                                                    : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                                        ? 'fax'
+                                                                                        : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                                            ? 'mobile'
+                                                                                            : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                                                ? 'direct'
+                                                                                                : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                                    ? 'other' :
+                                                                                                    ''
+
+
+                                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: [
+                                                                                                ...(selectedOrder?.pickups || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_name: _contact_name,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedShipperCustomer({
+                                                                                    ...selectedShipperCustomer,
+                                                                                    contact_name: _contact_name,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowShipperContactNames(false);
+                                                                                refShipperContactName.current.focus();
+                                                                            }
+                                                                            break;
+
+                                                                        case 9: // tab
+                                                                            if (showShipperContactNames && shipperContactNameItems.findIndex(item => item.selected) > -1) {
+                                                                                e.preventDefault();
+                                                                                let _contact_name = ((shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                                    + ' '
+                                                                                    + (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].last_name || '')).trim();
+                                                                                let _contact_phone = (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                                    ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                                    : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                                        ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                                        : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                            ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                            : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                                ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                                : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                                    ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                                    : '';
+                                                                                let _contact_phone_ext = (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_ext || '');
+                                                                                let _email = (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                                    ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                                    : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                                        ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                                        : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                                            ? (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                                            : '';
+                                                                                let _contact_primary_phone = (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                                    ? 'work'
+                                                                                    : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                                        ? 'fax'
+                                                                                        : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                                            ? 'mobile'
+                                                                                            : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                                                ? 'direct'
+                                                                                                : (shipperContactNameItems[shipperContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                                    ? 'other' :
+                                                                                                    ''
+
+
+                                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: [
+                                                                                                ...(selectedOrder?.pickups || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_name: _contact_name,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedShipperCustomer({
+                                                                                    ...selectedShipperCustomer,
+                                                                                    contact_name: _contact_name,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowShipperContactNames(false);
+                                                                                refShipperContactName.current.focus();
+                                                                            } else {
+
+                                                                            }
+                                                                            break;
+                                                                        default:
+                                                                            break;
+                                                                    }
+                                                                }}
+                                                                onBlur={e => {
+                                                                    let contact = (selectedShipperCustomer?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+
+                                                                    if (contact) {
+                                                                        if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                            if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    pickups: [
+                                                                                        ...(selectedOrder?.pickups || []),
+                                                                                        {
+                                                                                            id: 0,
+                                                                                            contact_phone: (contact.primary_phone || '') === 'work'
+                                                                                                ? (contact.phone_work || '')
+                                                                                                : (contact.primary_phone || '') === 'fax'
+                                                                                                    ? (contact.phone_work_fax || '')
+                                                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                                                        ? (contact.phone_mobile || '')
+                                                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                                                            ? (contact.phone_direct || '')
+                                                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                                                ? (contact.phone_other || '')
+                                                                                                                : '',
+                                                                                            contact_phone_ext: (contact.phone_ext || '')
+                                                                                        }
+                                                                                    ],
+                                                                                });
+                                                                            } else {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                        if (p.id === 0) {
+                                                                                            p.contact_phone = (contact.primary_phone || '') === 'work'
+                                                                                                ? (contact.phone_work || '')
+                                                                                                : (contact.primary_phone || '') === 'fax'
+                                                                                                    ? (contact.phone_work_fax || '')
+                                                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                                                        ? (contact.phone_mobile || '')
+                                                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                                                            ? (contact.phone_direct || '')
+                                                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                                                ? (contact.phone_other || '')
+                                                                                                                : '';
+                                                                                            p.contact_phone_ext = (contact.phone_ext || '');
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            setSelectedOrder(_selectedOrder => {
+                                                                                return {
+                                                                                    ..._selectedOrder,
+                                                                                    pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                        if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                            p.contact_phone = (contact.primary_phone || '') === 'work'
+                                                                                                ? (contact.phone_work || '')
+                                                                                                : (contact.primary_phone || '') === 'fax'
+                                                                                                    ? (contact.phone_work_fax || '')
+                                                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                                                        ? (contact.phone_mobile || '')
+                                                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                                                            ? (contact.phone_direct || '')
+                                                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                                                ? (contact.phone_other || '')
+                                                                                                                : '';
+                                                                                            p.contact_phone_ext = (contact.phone_ext || '');
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        setSelectedShipperCustomer(_selectedShipperCustomer => {
+                                                                            return {
+                                                                                ..._selectedShipperCustomer,
+                                                                                contact_phone: (contact.primary_phone || '') === 'work'
+                                                                                    ? (contact.phone_work || '')
+                                                                                    : (contact.primary_phone || '') === 'fax'
+                                                                                        ? (contact.phone_work_fax || '')
+                                                                                        : (contact.primary_phone || '') === 'mobile'
+                                                                                            ? (contact.phone_mobile || '')
+                                                                                            : (contact.primary_phone || '') === 'direct'
+                                                                                                ? (contact.phone_direct || '')
+                                                                                                : (contact.primary_phone || '') === 'other'
+                                                                                                    ? (contact.phone_other || '')
+                                                                                                    : '',
+                                                                                contact_phone_ext: (contact.phone_ext || '')
+                                                                            }
+                                                                        })
+                                                                    } else {
+                                                                        if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                            if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    pickups: [
+                                                                                        ...(selectedOrder?.pickups || []),
+                                                                                        {
+                                                                                            id: 0,
+                                                                                            contact_primary_phone: ''
+                                                                                        }
+                                                                                    ],
+                                                                                });
+                                                                            } else {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                        if (p.id === 0) {
+                                                                                            p.contact_primary_phone = '';
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            setSelectedOrder(_selectedOrder => {
+                                                                                return {
+                                                                                    ..._selectedOrder,
+                                                                                    pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                        if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                            p.contact_primary_phone = '';
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        setSelectedShipperCustomer(_selectedShipperCustomer => {
+                                                                            return {
+                                                                                ..._selectedShipperCustomer,
+                                                                                contact_primary_phone: ''
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                }}
+                                                                onChange={(e) => {
+                                                                    if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: [
+                                                                                    ...(selectedOrder?.pickups || []),
+                                                                                    {
+                                                                                        id: 0,
                                                                                         contact_name: e.target.value,
                                                                                     },
-                                                                                },
-                                                                            ],
-                                                                        });
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
                                                                     } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === selectedShipperCustomer.pickup_id) {
+
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
                                                                         });
                                                                     }
 
@@ -12268,66 +12800,43 @@ const Dispatch = (props) => {
                                                                         ...selectedShipperCustomer,
                                                                         contact_name: e.target.value,
                                                                     });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedShipperCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
-
-                                                                        setSelectedShipperCustomer({
-                                                                            ...selectedShipperCustomer,
-                                                                            contact_name: e.target.value,
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }}
-                                                            onInput={(e) => {
-                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
-                                                                    if (
-                                                                        (selectedOrder?.pickups || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: [
-                                                                                ...(selectedOrder?.pickups || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
+                                                                }}
+                                                                onInput={(e) => {
+                                                                    if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: [
+                                                                                    ...(selectedOrder?.pickups || []),
+                                                                                    {
+                                                                                        id: 0,
                                                                                         contact_name: e.target.value,
                                                                                     },
-                                                                                },
-                                                                            ],
-                                                                        });
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
                                                                     } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === selectedShipperCustomer.pickup_id) {
+
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
                                                                         });
                                                                     }
 
@@ -12335,260 +12844,683 @@ const Dispatch = (props) => {
                                                                         ...selectedShipperCustomer,
                                                                         contact_name: e.target.value,
                                                                     });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedShipperCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
+                                                                }}
+                                                                value={selectedShipperCustomer?.contact_name || ""}
+                                                            />
 
-                                                                        setSelectedShipperCustomer({
-                                                                            ...selectedShipperCustomer,
-                                                                            contact_name: e.target.value,
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }}
-                                                            value={
-                                                                (selectedShipperCustomer?.contacts || []).find(
-                                                                    (c) => c.is_primary === 1
-                                                                ) === undefined
-                                                                    ? selectedShipperCustomer?.contact_name || ""
-                                                                    : selectedShipperCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).first_name +
-                                                                    " " +
-                                                                    selectedShipperCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).last_name
+                                                            {
+                                                                <FontAwesomeIcon className="dropdown-button"
+                                                                                 icon={faCaretDown}
+                                                                                 onClick={async () => {
+                                                                                     if (showShipperContactNames) {
+                                                                                         setShowShipperContactNames(false);
+                                                                                     } else {
+                                                                                         if ((selectedShipperCustomer?.contacts || []).length > 0) {
+                                                                                             await setShipperContactNameItems((selectedShipperCustomer?.contacts || []).map((item, index) => {
+                                                                                                 item.selected = index === 0
+                                                                                                 return item;
+                                                                                             }))
+
+                                                                                             window.setTimeout(async () => {
+                                                                                                 await setShowShipperContactNames(true);
+
+                                                                                                 refShipperContactNamePopupItems.current.map((r, i) => {
+                                                                                                     if (r && r.classList.contains('selected')) {
+                                                                                                         r.scrollIntoView({
+                                                                                                             behavior: 'auto',
+                                                                                                             block: 'center',
+                                                                                                             inline: 'nearest'
+                                                                                                         })
+                                                                                                     }
+                                                                                                     return true;
+                                                                                                 });
+                                                                                             }, 0)
+                                                                                         }
+                                                                                     }
+
+                                                                                     refShipperContactName.current.focus();
+                                                                                 }}/>
                                                             }
-                                                        />
+                                                        </div>
+                                                        {
+                                                            shipperContactNamesTransition((style, item) => item && (
+                                                                <animated.div
+                                                                    className="mochi-contextual-container"
+                                                                    id="mochi-contextual-container-contact-names"
+                                                                    style={{
+                                                                        ...style,
+                                                                        left: '0',
+                                                                        display: 'block'
+                                                                    }}
+                                                                    ref={refShipperContactNameDropDown}
+                                                                >
+                                                                    <div
+                                                                        className="mochi-contextual-popup vertical below right"
+                                                                        style={{height: 150}}>
+                                                                        <div className="mochi-contextual-popup-content">
+                                                                            <div className="mochi-contextual-popup-wrapper">
+                                                                                {
+                                                                                    shipperContactNameItems.map((item, index) => {
+                                                                                        const mochiItemClasses = classnames({
+                                                                                            'mochi-item': true,
+                                                                                            'selected': item.selected
+                                                                                        });
+
+                                                                                        return (
+                                                                                            <div
+                                                                                                key={index}
+                                                                                                className={mochiItemClasses}
+                                                                                                id={item.id}
+                                                                                                onClick={() => {
+                                                                                                    let _contact_name = ((item.first_name || '')
+                                                                                                        + ' '
+                                                                                                        + (item.last_name || '')).trim();
+
+                                                                                                    let _contact_phone = (item.primary_phone || '') === 'work'
+                                                                                                        ? (item.phone_work || '')
+                                                                                                        : (item.primary_phone || '') === 'fax'
+                                                                                                            ? (item.phone_work_fax || '')
+                                                                                                            : (item.primary_phone || '') === 'mobile'
+                                                                                                                ? (item.phone_mobile || '')
+                                                                                                                : (item.primary_phone || '') === 'direct'
+                                                                                                                    ? (item.phone_direct || '')
+                                                                                                                    : (item.primary_phone || '') === 'other'
+                                                                                                                        ? (item.phone_other || '')
+                                                                                                                        : '';
+                                                                                                    let _contact_phone_ext = (item.phone_ext || '');
+
+                                                                                                    let _contact_primary_phone = (item.phone_work || '') !== ''
+                                                                                                        ? 'work'
+                                                                                                        : (item.phone_work_fax || '') !== ''
+                                                                                                            ? 'fax'
+                                                                                                            : (item.phone_mobile || '') !== ''
+                                                                                                                ? 'mobile'
+                                                                                                                : (item.phone_direct || '') !== ''
+                                                                                                                    ? 'direct'
+                                                                                                                    : (item.phone_other || '') !== ''
+                                                                                                                        ? 'other' :
+                                                                                                                        ''
+
+
+                                                                                                    if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                                                        if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                pickups: [
+                                                                                                                    ...(selectedOrder?.pickups || []),
+                                                                                                                    {
+                                                                                                                        id: 0,
+                                                                                                                        contact_name: _contact_name,
+                                                                                                                        contact_phone: _contact_phone,
+                                                                                                                        contact_phone_ext: _contact_phone_ext,
+                                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                                    },
+                                                                                                                ],
+                                                                                                            });
+                                                                                                        } else {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                                    if (p.id === 0) {
+                                                                                                                        p.contact_name = _contact_name;
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_phone_ext = _contact_phone_ext;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            });
+                                                                                                        }
+                                                                                                    } else {
+                                                                                                        setSelectedOrder(_selectedOrder => {
+                                                                                                            return {
+                                                                                                                ..._selectedOrder,
+                                                                                                                pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                                    if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                                                        p.contact_name = _contact_name;
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_phone_ext = _contact_phone_ext;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+
+                                                                                                    setSelectedShipperCustomer({
+                                                                                                        ...selectedShipperCustomer,
+                                                                                                        contact_name: _contact_name,
+                                                                                                        contact_phone: _contact_phone,
+                                                                                                        contact_phone_ext: _contact_phone_ext,
+                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                    });
+
+                                                                                                    setShowShipperContactNames(false);
+                                                                                                    refShipperContactName.current.focus();
+                                                                                                }}
+                                                                                                ref={ref => refShipperContactNamePopupItems.current.push(ref)}
+                                                                                            >
+                                                                                                {
+                                                                                                    item.first_name + ((item.last_name || '') === '' ? '' : ' ' + item.last_name)
+                                                                                                }
+
+                                                                                                {
+                                                                                                    item.selected &&
+                                                                                                    <FontAwesomeIcon
+                                                                                                        className="dropdown-selected"
+                                                                                                        icon={faCaretRight}/>
+                                                                                                }
+                                                                                            </div>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </animated.div>
+                                                            ))
+                                                        }
                                                     </div>
                                                     <div className="form-h-sep"></div>
-                                                    <div
-                                                        className="input-box-container input-phone"
-                                                        style={{position: "relative"}}
-                                                    >
-                                                        <MaskedInput
-                                                            tabIndex={24 + props.tabTimes}
-                                                            mask={[
-                                                                /[0-9]/,
-                                                                /\d/,
-                                                                /\d/,
-                                                                "-",
-                                                                /\d/,
-                                                                /\d/,
-                                                                /\d/,
-                                                                "-",
-                                                                /\d/,
-                                                                /\d/,
-                                                                /\d/,
-                                                                /\d/,
-                                                            ]}
-                                                            guide={true}
-                                                            type="text"
-                                                            placeholder="Contact Phone"
-                                                            // onKeyDown={validateShipperCompanyContactForSaving}
-                                                            onInput={(e) => {
-                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
-                                                                    if (
-                                                                        (selectedOrder?.pickups || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: [
-                                                                                ...(selectedOrder?.pickups || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
-                                                                                        contact_phone: e.target.value,
+                                                    <div className="select-box-container input-phone" style={{width: '10.3rem'}}>
+                                                        <div className="select-box-wrapper">
+                                                            <MaskedInput
+                                                                tabIndex={24 + props.tabTimes}
+                                                                mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/,]}
+                                                                guide={true}
+                                                                type="text"
+                                                                placeholder="Contact Phone"
+                                                                ref={refShipperContactPhone}
+                                                                onKeyDown={async (e) => {
+                                                                    let key = e.keyCode || e.which;
+
+                                                                    switch (key) {
+                                                                        case 37:
+                                                                        case 38: // arrow left | arrow up
+                                                                            if (showShipperContactPhones) {
+                                                                                let selectedIndex = shipperContactPhoneItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setShipperContactPhoneItems(shipperContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setShipperContactPhoneItems(shipperContactPhoneItems.map((item, index) => {
+                                                                                        if (selectedIndex === 0) {
+                                                                                            item.selected = index === (shipperContactPhoneItems.length - 1);
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex - 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refShipperContactPhonePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if (shipperContactPhoneItems.length > 1) {
+                                                                                    await setShipperContactPhoneItems(shipperContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowShipperContactPhones(true);
+
+                                                                                    refShipperContactPhonePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 39:
+                                                                        case 40: // arrow right | arrow down
+                                                                            if (showShipperContactPhones) {
+                                                                                let selectedIndex = shipperContactPhoneItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setShipperContactPhoneItems(shipperContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setShipperContactPhoneItems(shipperContactPhoneItems.map((item, index) => {
+                                                                                        if (selectedIndex === (shipperContactPhoneItems.length - 1)) {
+                                                                                            item.selected = index === 0;
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex + 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refShipperContactPhonePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if (shipperContactPhoneItems.length > 1) {
+                                                                                    await setShipperContactPhoneItems(shipperContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowShipperContactPhones(true);
+
+                                                                                    refShipperContactPhonePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 27: // escape
+                                                                            setShowShipperContactPhones(false);
+                                                                            break;
+
+                                                                        case 13: // enter
+                                                                            if (showShipperContactPhones && shipperContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                                let _contact_phone = shipperContactPhoneItems[shipperContactPhoneItems.findIndex(item => item.selected)].phone;
+                                                                                let _contact_primary_phone = shipperContactPhoneItems[shipperContactPhoneItems.findIndex(item => item.selected)].type;
+
+                                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: [
+                                                                                                ...(selectedOrder?.pickups || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedShipperCustomer({
+                                                                                    ...selectedShipperCustomer,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowShipperContactPhones(false);
+                                                                                refShipperContactPhone.current.inputElement.focus();
+                                                                            }
+                                                                            break;
+
+                                                                        case 9: // tab
+                                                                            if (showShipperContactPhones && shipperContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                                e.preventDefault();
+                                                                                let _contact_phone = shipperContactPhoneItems[shipperContactPhoneItems.findIndex(item => item.selected)].phone;
+                                                                                let _contact_primary_phone = shipperContactPhoneItems[shipperContactPhoneItems.findIndex(item => item.selected)].type;
+
+                                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: [
+                                                                                                ...(selectedOrder?.pickups || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedShipperCustomer({
+                                                                                    ...selectedShipperCustomer,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowShipperContactPhones(false);
+                                                                                refShipperContactPhone.current.inputElement.focus();
+                                                                            }
+                                                                            break;
+                                                                        default:
+                                                                            break;
+                                                                    }
+                                                                }}
+                                                                onInput={(e) => {
+                                                                    if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: [
+                                                                                    ...(selectedOrder?.pickups || []),
+                                                                                    {
+                                                                                        id: 0,
+                                                                                        contact_phone: e.target.value
                                                                                     },
-                                                                                },
-                                                                            ],
-                                                                        });
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
                                                                     } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
                                                                         });
                                                                     }
 
-                                                                    setSelectedShipperCustomer({
-                                                                        ...selectedShipperCustomer,
-                                                                        contact_phone: e.target.value,
-                                                                    });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedShipperCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
-
-                                                                        setSelectedShipperCustomer({
-                                                                            ...selectedShipperCustomer,
-                                                                            contact_phone: e.target.value,
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }}
-                                                            onChange={(e) => {
-                                                                if ((selectedShipperCustomer?.id || 0) === 0) {
-                                                                    if (
-                                                                        (selectedOrder?.pickups || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: [
-                                                                                ...(selectedOrder?.pickups || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
-                                                                                        contact_phone: e.target.value,
+                                                                    setSelectedShipperCustomer(_selectedShipperCustomer => {
+                                                                        return {
+                                                                            ..._selectedShipperCustomer,
+                                                                            contact_phone: e.target.value
+                                                                        }
+                                                                    })
+                                                                }}
+                                                                onChange={(e) => {
+                                                                    if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: [
+                                                                                    ...(selectedOrder?.pickups || []),
+                                                                                    {
+                                                                                        id: 0,
+                                                                                        contact_phone: e.target.value
                                                                                     },
-                                                                                },
-                                                                            ],
-                                                                        });
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
                                                                     } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                    if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
                                                                         });
                                                                     }
 
-                                                                    setSelectedShipperCustomer({
-                                                                        ...selectedShipperCustomer,
-                                                                        contact_phone: e.target.value,
-                                                                    });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedShipperCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
+                                                                    setSelectedShipperCustomer(_selectedShipperCustomer => {
+                                                                        return {
+                                                                            ..._selectedShipperCustomer,
+                                                                            contact_phone: e.target.value
+                                                                        }
+                                                                    })
+                                                                }}
+                                                                value={selectedShipperCustomer?.contact_phone || ''}
+                                                            />
+                                                            {((selectedShipperCustomer?.id || 0) > 0 && (selectedShipperCustomer?.id !== undefined)) && (
+                                                                <div className={
+                                                                    classnames({
+                                                                        "selected-customer-contact-primary-phone": true,
+                                                                        'pushed': (shipperContactPhoneItems.length > 0)
+                                                                    })}
+                                                                >
+                                                                    {selectedShipperCustomer?.contact_primary_phone || ''}
+                                                                </div>
+                                                            )}
 
-                                                                        setSelectedShipperCustomer({
-                                                                            ...selectedShipperCustomer,
-                                                                            contact_phone: e.target.value,
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }}
-                                                            value={
-                                                                (selectedShipperCustomer?.contacts || []).find((c) => c.is_primary === 1) === undefined
-                                                                    ? selectedShipperCustomer?.contact_phone || ""
-                                                                    : selectedShipperCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).primary_phone === "work"
-                                                                        ? selectedShipperCustomer?.contacts.find(
-                                                                            (c) => c.is_primary === 1
-                                                                        ).phone_work
-                                                                        : selectedShipperCustomer?.contacts.find(
-                                                                            (c) => c.is_primary === 1
-                                                                        ).primary_phone === "fax"
-                                                                            ? selectedShipperCustomer?.contacts.find(
-                                                                                (c) => c.is_primary === 1
-                                                                            ).phone_work_fax
-                                                                            : selectedShipperCustomer?.contacts.find(
-                                                                                (c) => c.is_primary === 1
-                                                                            ).primary_phone === "mobile"
-                                                                                ? selectedShipperCustomer?.contacts.find(
-                                                                                    (c) => c.is_primary === 1
-                                                                                ).phone_mobile
-                                                                                : selectedShipperCustomer?.contacts.find(
-                                                                                    (c) => c.is_primary === 1
-                                                                                ).primary_phone === "direct"
-                                                                                    ? selectedShipperCustomer?.contacts.find(
-                                                                                        (c) => c.is_primary === 1
-                                                                                    ).phone_direct
-                                                                                    : selectedShipperCustomer?.contacts.find(
-                                                                                        (c) => c.is_primary === 1
-                                                                                    ).primary_phone === "other"
-                                                                                        ? selectedShipperCustomer?.contacts.find(
-                                                                                            (c) => c.is_primary === 1
-                                                                                        ).phone_other
-                                                                                        : ""
+                                                            {
+                                                                shipperContactPhoneItems.length > 0 && (
+                                                                    <FontAwesomeIcon
+                                                                        className="dropdown-button" icon={faCaretDown}
+                                                                        onClick={async () => {
+                                                                            if (showShipperContactPhones) {
+                                                                                setShowShipperContactPhones(false);
+                                                                            } else {
+                                                                                if (shipperContactPhoneItems.length > 1) {
+                                                                                    await setShipperContactPhoneItems(shipperContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    window.setTimeout(async () => {
+                                                                                        await setShowShipperContactPhones(true);
+
+                                                                                        refShipperContactPhonePopupItems.current.map((r, i) => {
+                                                                                            if (r && r.classList.contains('selected')) {
+                                                                                                r.scrollIntoView({
+                                                                                                    behavior: 'auto',
+                                                                                                    block: 'center',
+                                                                                                    inline: 'nearest'
+                                                                                                })
+                                                                                            }
+                                                                                            return true;
+                                                                                        });
+                                                                                    }, 0)
+                                                                                }
+                                                                            }
+
+                                                                            refShipperContactPhone.current.inputElement.focus();
+                                                                        }}/>
+                                                                )
                                                             }
-                                                        />
+                                                        </div>
+                                                        {
+                                                            shipperContactPhonesTransition((style, item) => item && (
+                                                                <animated.div
+                                                                    className="mochi-contextual-container"
+                                                                    id="mochi-contextual-container-contact-phone"
+                                                                    style={{
+                                                                        ...style,
+                                                                        left: '0',
+                                                                        display: 'block'
+                                                                    }}
+                                                                    ref={refShipperContactPhoneDropDown}
+                                                                >
+                                                                    <div
+                                                                        className="mochi-contextual-popup vertical below right"
+                                                                        style={{height: 150}}>
+                                                                        <div className="mochi-contextual-popup-content">
+                                                                            <div className="mochi-contextual-popup-wrapper">
+                                                                                {
+                                                                                    shipperContactPhoneItems.map((item, index) => {
+                                                                                        const mochiItemClasses = classnames({
+                                                                                            'mochi-item': true,
+                                                                                            'selected': item.selected
+                                                                                        });
 
-                                                        {(selectedShipperCustomer?.contacts || []).find(
-                                                            (c) => c.is_primary === 1
-                                                        ) !== undefined && (
-                                                            <div
-                                                                className={classnames({
-                                                                    "selected-customer-contact-primary-phone": true,
-                                                                    pushed: false,
-                                                                })}
-                                                            >
-                                                                {
-                                                                    selectedShipperCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).primary_phone
-                                                                }
-                                                            </div>
-                                                        )}
+                                                                                        return (
+                                                                                            <div
+                                                                                                key={index}
+                                                                                                className={mochiItemClasses}
+                                                                                                id={item.id}
+                                                                                                onClick={() => {
+                                                                                                    let _contact_phone = item.phone;
+                                                                                                    let _contact_primary_phone = item.type;
+
+                                                                                                    if ((selectedShipperCustomer?.id || 0) === 0) {
+                                                                                                        if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                pickups: [
+                                                                                                                    ...(selectedOrder?.pickups || []),
+                                                                                                                    {
+                                                                                                                        id: 0,
+                                                                                                                        contact_phone: _contact_phone,
+                                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                                    },
+                                                                                                                ],
+                                                                                                            });
+                                                                                                        } else {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                pickups: (selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                                    if (p.id === 0) {
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            });
+                                                                                                        }
+                                                                                                    } else {
+                                                                                                        setSelectedOrder(_selectedOrder => {
+                                                                                                            return {
+                                                                                                                ..._selectedOrder,
+                                                                                                                pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                                                    if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+
+                                                                                                    setSelectedShipperCustomer({
+                                                                                                        ...selectedShipperCustomer,
+                                                                                                        contact_phone: _contact_phone,
+                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                    });
+
+                                                                                                    setShowShipperContactPhones(false);
+                                                                                                    refShipperContactPhone.current.inputElement.focus();
+                                                                                                }}
+                                                                                                ref={ref => refShipperContactPhonePopupItems.current.push(ref)}
+                                                                                            >
+                                                                                                {
+                                                                                                    item.type === 'work' ? `Phone Work `
+                                                                                                        : item.type === 'fax' ? `Phone Work Fax `
+                                                                                                            : item.type === 'mobile' ? `Phone Mobile `
+                                                                                                                : item.type === 'direct' ? `Phone Direct `
+                                                                                                                    : item.type === 'other' ? `Phone Other ` : ''
+                                                                                                }
+
+                                                                                                (<b>
+                                                                                                {
+                                                                                                    item.type === 'work' ? item.phone
+                                                                                                        : item.type === 'fax' ? item.phone
+                                                                                                            : item.type === 'mobile' ? item.phone
+                                                                                                                : item.type === 'direct' ? item.phone
+                                                                                                                    : item.type === 'other' ? item.phone : ''
+                                                                                                }
+                                                                                            </b>)
+
+                                                                                                {
+                                                                                                    item.selected &&
+                                                                                                    <FontAwesomeIcon
+                                                                                                        className="dropdown-selected"
+                                                                                                        icon={faCaretRight}/>
+                                                                                                }
+                                                                                            </div>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </animated.div>
+                                                            ))
+                                                        }
                                                     </div>
                                                     <div className="form-h-sep"></div>
                                                     <div className="input-box-container input-phone-ext">
@@ -12596,150 +13528,104 @@ const Dispatch = (props) => {
                                                             tabIndex={25 + props.tabTimes}
                                                             type="text"
                                                             placeholder="Ext"
-                                                            // onKeyDown={validateShipperCompanyContactForSaving}
-                                                            onInput={(e) => {
+                                                            onKeyDown={e => {
+                                                                let key = e.keyCode || e.which;
+
+                                                                if (key === 9) {
+                                                                    setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
+                                                                }
+                                                            }}
+                                                            onInput={e => {
                                                                 if ((selectedShipperCustomer?.id || 0) === 0) {
-                                                                    if (
-                                                                        (selectedOrder?.pickups || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
+                                                                    if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
                                                                             pickups: [
                                                                                 ...(selectedOrder?.pickups || []),
                                                                                 {
                                                                                     id: 0,
-                                                                                    customer: {
-                                                                                        ext: e.target.value,
-                                                                                    },
+                                                                                    contact_phone_ext: e.target.value
                                                                                 },
                                                                             ],
                                                                         });
                                                                     } else {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
+                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
                                                                                 if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
                                                                         });
                                                                     }
-
-                                                                    setSelectedShipperCustomer({
-                                                                        ...selectedShipperCustomer,
-                                                                        ext: e.target.value,
-                                                                    });
                                                                 } else {
-                                                                    if (
-                                                                        (selectedShipperCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
+                                                                    setSelectedOrder(_selectedOrder => {
+                                                                        return {
+                                                                            ..._selectedOrder,
+                                                                            pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
-                                                                        });
-
-                                                                        setSelectedShipperCustomer({
-                                                                            ...selectedShipperCustomer,
-                                                                            ext: e.target.value,
-                                                                        });
-                                                                    }
+                                                                        }
+                                                                    });
                                                                 }
+
+                                                                setSelectedShipperCustomer(_selectedShipperCustomer => {
+                                                                    return {
+                                                                        ..._selectedShipperCustomer,
+                                                                        contact_phone_ext: e.target.value
+                                                                    }
+                                                                })
                                                             }}
-                                                            onChange={(e) => {
+                                                            onChange={e => {
                                                                 if ((selectedShipperCustomer?.id || 0) === 0) {
-                                                                    if (
-                                                                        (selectedOrder?.pickups || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
+                                                                    if ((selectedOrder?.pickups || []).find((p) => p.id === 0) === undefined) {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
                                                                             pickups: [
                                                                                 ...(selectedOrder?.pickups || []),
                                                                                 {
                                                                                     id: 0,
-                                                                                    customer: {
-                                                                                        ext: e.target.value,
-                                                                                    },
+                                                                                    contact_phone_ext: e.target.value
                                                                                 },
                                                                             ],
                                                                         });
                                                                     } else {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
+                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
                                                                                 if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
                                                                         });
                                                                     }
-
-                                                                    setSelectedShipperCustomer({
-                                                                        ...selectedShipperCustomer,
-                                                                        ext: e.target.value,
-                                                                    });
                                                                 } else {
-                                                                    if (
-                                                                        (selectedShipperCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.pickups || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
+                                                                    setSelectedOrder(_selectedOrder => {
+                                                                        return {
+                                                                            ..._selectedOrder,
+                                                                            pickups: (_selectedOrder?.pickups || []).map((p, i) => {
+                                                                                if (p.id === selectedShipperCustomer.pickup_id) {
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
-                                                                        });
-
-                                                                        setSelectedShipperCustomer({
-                                                                            ...selectedShipperCustomer,
-                                                                            ext: e.target.value,
-                                                                        });
-                                                                    }
+                                                                        }
+                                                                    });
                                                                 }
+
+                                                                setSelectedShipperCustomer(_selectedShipperCustomer => {
+                                                                    return {
+                                                                        ..._selectedShipperCustomer,
+                                                                        contact_phone_ext: e.target.value
+                                                                    }
+                                                                })
                                                             }}
-                                                            value={
-                                                                (selectedShipperCustomer?.contacts || []).find(
-                                                                    (c) => c.is_primary === 1
-                                                                ) === undefined
-                                                                    ? selectedShipperCustomer?.ext || ""
-                                                                    : selectedShipperCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).phone_ext
-                                                            }
+                                                            value={selectedShipperCustomer?.contact_phone_ext || ''}
                                                         />
                                                     </div>
                                                 </div>
@@ -13155,26 +14041,13 @@ const Dispatch = (props) => {
                                                     >
                                                         To
                                                     </div>
-                                                    <div
-                                                        className="select-box-container"
-                                                        style={{flexGrow: 1, position: "relative"}}
-                                                    >
+                                                    <div className="select-box-container"
+                                                         style={{flexGrow: 1, position: "relative"}}>
                                                         <div className="select-box-wrapper">
                                                             <MaskedInput
                                                                 tabIndex={28 + props.tabTimes}
                                                                 ref={refPickupDate2}
-                                                                mask={[
-                                                                    /[0-9]/,
-                                                                    /\d/,
-                                                                    "/",
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    "/",
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                    /\d/,
-                                                                ]}
+                                                                mask={[/[0-9]/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/,]}
                                                                 guide={false}
                                                                 type="text"
                                                                 placeholder="PU Date 2"
@@ -13183,25 +14056,16 @@ const Dispatch = (props) => {
                                                                     let key = e.keyCode || e.which;
                                                                     await setPuDate2KeyCode(key);
 
-                                                                    let puDate2 =
-                                                                        e.target.value.trim() === ""
-                                                                            ? moment()
-                                                                            : moment(
-                                                                                getFormattedDates(
-                                                                                    selectedShipperCustomer?.pu_date2 ||
-                                                                                    ""
-                                                                                ),
-                                                                                "MM/DD/YYYY"
-                                                                            );
+                                                                    let puDate2 = e.target.value.trim() === ""
+                                                                        ? moment()
+                                                                        : moment(getFormattedDates(selectedShipperCustomer?.pu_date2 || ""), "MM/DD/YYYY");
                                                                     await setPreSelectedPickupDate2(puDate2);
 
                                                                     if (key === 13) {
                                                                         if (isPickupDate2CalendarShown) {
                                                                             await setSelectedShipperCustomer({
                                                                                 ...selectedShipperCustomer,
-                                                                                pu_date2: preSelectedPickupDate2
-                                                                                    .clone()
-                                                                                    .format("MM/DD/YYYY"),
+                                                                                pu_date2: preSelectedPickupDate2.clone().format("MM/DD/YYYY")
                                                                             });
 
                                                                             await setSelectedOrder({
@@ -13209,14 +14073,8 @@ const Dispatch = (props) => {
                                                                                 pickups: (
                                                                                     selectedOrder?.pickups || []
                                                                                 ).map((pu, i) => {
-                                                                                    if (
-                                                                                        pu.id ===
-                                                                                        (selectedShipperCustomer?.pickup_id ||
-                                                                                            0)
-                                                                                    ) {
-                                                                                        pu.pu_date2 = preSelectedPickupDate2
-                                                                                            .clone()
-                                                                                            .format("MM/DD/YYYY");
+                                                                                    if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                        pu.pu_date2 = preSelectedPickupDate2.clone().format("MM/DD/YYYY");
                                                                                         setIsSavingPickupId(-1);
                                                                                         setIsSavingPickupId(pu.id);
                                                                                     }
@@ -13224,18 +14082,10 @@ const Dispatch = (props) => {
                                                                                 }),
                                                                             });
 
-                                                                            await setIsPickupDate1CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsPickupDate2CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsDeliveryDate1CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsDeliveryDate2CalendarShown(
-                                                                                false
-                                                                            );
+                                                                            await setIsPickupDate1CalendarShown(false);
+                                                                            await setIsPickupDate2CalendarShown(false);
+                                                                            await setIsDeliveryDate1CalendarShown(false);
+                                                                            await setIsDeliveryDate2CalendarShown(false);
 
                                                                             refPickupTime2.current.focus();
                                                                         }
@@ -13247,53 +14097,29 @@ const Dispatch = (props) => {
 
                                                                             if (key === 37) {
                                                                                 // left - minus 1
-                                                                                setPreSelectedPickupDate2(
-                                                                                    preSelectedPickupDate2
-                                                                                        .clone()
-                                                                                        .subtract(1, "day")
-                                                                                );
+                                                                                setPreSelectedPickupDate2(preSelectedPickupDate2.clone().subtract(1, "day"));
                                                                             }
 
                                                                             if (key === 38) {
                                                                                 // up - minus 7
-                                                                                setPreSelectedPickupDate2(
-                                                                                    preSelectedPickupDate2
-                                                                                        .clone()
-                                                                                        .subtract(7, "day")
-                                                                                );
+                                                                                setPreSelectedPickupDate2(preSelectedPickupDate2.clone().subtract(7, "day"));
                                                                             }
 
                                                                             if (key === 39) {
                                                                                 // right - plus 1
-                                                                                setPreSelectedPickupDate2(
-                                                                                    preSelectedPickupDate2
-                                                                                        .clone()
-                                                                                        .add(1, "day")
-                                                                                );
+                                                                                setPreSelectedPickupDate2(preSelectedPickupDate2.clone().add(1, "day"));
                                                                             }
 
                                                                             if (key === 40) {
                                                                                 // down - plus 7
-                                                                                setPreSelectedPickupDate2(
-                                                                                    preSelectedPickupDate2
-                                                                                        .clone()
-                                                                                        .add(7, "day")
-                                                                                );
+                                                                                setPreSelectedPickupDate2(preSelectedPickupDate2.clone().add(7, "day"));
                                                                             }
 
                                                                             await setSelectedOrder({
                                                                                 ...selectedOrder,
-                                                                                pickups: (
-                                                                                    selectedOrder?.pickups || []
-                                                                                ).map((pu, i) => {
-                                                                                    if (
-                                                                                        pu.id ===
-                                                                                        (selectedShipperCustomer?.pickup_id ||
-                                                                                            0)
-                                                                                    ) {
-                                                                                        pu.pu_date2 = preSelectedPickupDate2
-                                                                                            .clone()
-                                                                                            .format("MM/DD/YYYY");
+                                                                                pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                                    if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                        pu.pu_date2 = preSelectedPickupDate2.clone().format("MM/DD/YYYY");
                                                                                     }
                                                                                     return pu;
                                                                                 }),
@@ -13316,14 +14142,8 @@ const Dispatch = (props) => {
                                                                             pu_date2: formatted,
                                                                         });
 
-                                                                        let pickups = (
-                                                                            selectedOrder?.pickups || []
-                                                                        ).map((pu, i) => {
-                                                                            if (
-                                                                                pu.id ===
-                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                    0)
-                                                                            ) {
+                                                                        let pickups = (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                 pu.pu_date2 = formatted;
                                                                                 setIsSavingPickupId(-1);
                                                                                 setIsSavingPickupId(pu.id);
@@ -13345,23 +14165,17 @@ const Dispatch = (props) => {
                                                                 onInput={(e) => {
                                                                     setSelectedShipperCustomer({
                                                                         ...selectedShipperCustomer,
-                                                                        pu_date2: e.target.value,
+                                                                        pu_date2: e.target.value
                                                                     });
 
                                                                     setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        pickups: (selectedOrder?.pickups || []).map(
-                                                                            (pu, i) => {
-                                                                                if (
-                                                                                    pu.id ===
-                                                                                    (selectedShipperCustomer?.pickup_id ||
-                                                                                        0)
-                                                                                ) {
-                                                                                    pu.pu_date2 = e.target.value;
-                                                                                }
-                                                                                return pu;
+                                                                        pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                pu.pu_date2 = e.target.value;
                                                                             }
-                                                                        ),
+                                                                            return pu;
+                                                                        })
                                                                     });
                                                                 }}
                                                                 onChange={(e) => {
@@ -13372,18 +14186,12 @@ const Dispatch = (props) => {
 
                                                                     setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        pickups: (selectedOrder?.pickups || []).map(
-                                                                            (pu, i) => {
-                                                                                if (
-                                                                                    pu.id ===
-                                                                                    (selectedShipperCustomer?.pickup_id ||
-                                                                                        0)
-                                                                                ) {
-                                                                                    pu.pu_date2 = e.target.value;
-                                                                                }
-                                                                                return pu;
+                                                                        pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                pu.pu_date2 = e.target.value;
                                                                             }
-                                                                        ),
+                                                                            return pu;
+                                                                        })
                                                                     });
                                                                 }}
                                                                 value={selectedShipperCustomer?.pu_date2 || ""}
@@ -13397,23 +14205,8 @@ const Dispatch = (props) => {
                                                                     setIsDeliveryDate1CalendarShown(false);
                                                                     setIsDeliveryDate2CalendarShown(false);
 
-                                                                    if (
-                                                                        moment(
-                                                                            (
-                                                                                selectedShipperCustomer?.pu_date2 || ""
-                                                                            ).trim(),
-                                                                            "MM/DD/YYYY"
-                                                                        ).format("MM/DD/YYYY") ===
-                                                                        (
-                                                                            selectedShipperCustomer?.pu_date2 || ""
-                                                                        ).trim()
-                                                                    ) {
-                                                                        setPreSelectedPickupDate2(
-                                                                            moment(
-                                                                                selectedShipperCustomer?.pu_date2,
-                                                                                "MM/DD/YYYY"
-                                                                            )
-                                                                        );
+                                                                    if (moment((selectedShipperCustomer?.pu_date2 || "").trim(), "MM/DD/YYYY").format("MM/DD/YYYY") === (selectedShipperCustomer?.pu_date2 || "").trim()) {
+                                                                        setPreSelectedPickupDate2(moment(selectedShipperCustomer?.pu_date2, "MM/DD/YYYY"));
                                                                     } else {
                                                                         setPreSelectedPickupDate2(moment());
                                                                     }
@@ -13440,27 +14233,13 @@ const Dispatch = (props) => {
                                                                     >
                                                                         <div
                                                                             className="mochi-contextual-popup vertical below right"
-                                                                            style={{height: 275}}
-                                                                        >
+                                                                            style={{height: 275}}>
                                                                             <div className="mochi-contextual-popup-content">
                                                                                 <div className="mochi-contextual-popup-wrapper">
                                                                                     <Calendar
                                                                                         value={
-                                                                                            moment(
-                                                                                                (
-                                                                                                    selectedShipperCustomer?.pu_date2 ||
-                                                                                                    ""
-                                                                                                ).trim(),
-                                                                                                "MM/DD/YYYY"
-                                                                                            ).format("MM/DD/YYYY") ===
-                                                                                            (
-                                                                                                selectedShipperCustomer?.pu_date2 ||
-                                                                                                ""
-                                                                                            ).trim()
-                                                                                                ? moment(
-                                                                                                    selectedShipperCustomer?.pu_date2,
-                                                                                                    "MM/DD/YYYY"
-                                                                                                )
+                                                                                            moment((selectedShipperCustomer?.pu_date2 || "").trim(), "MM/DD/YYYY").format("MM/DD/YYYY") === (selectedShipperCustomer?.pu_date2 || "").trim()
+                                                                                                ? moment(selectedShipperCustomer?.pu_date2, "MM/DD/YYYY")
                                                                                                 : moment()
                                                                                         }
                                                                                         onChange={(day) => {
@@ -13474,25 +14253,12 @@ const Dispatch = (props) => {
                                                                                                 }
                                                                                             );
 
-                                                                                            setSelectedOrder(
-                                                                                                (selectedOrder) => {
+                                                                                            setSelectedOrder((selectedOrder) => {
                                                                                                     return {
                                                                                                         ...selectedOrder,
-                                                                                                        pickups: (
-                                                                                                            selectedOrder?.pickups ||
-                                                                                                            []
-                                                                                                        ).map((pu, i) => {
-                                                                                                            if (
-                                                                                                                pu.id ===
-                                                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                                                    0)
-                                                                                                            ) {
-                                                                                                                pu.pu_date2 =
-                                                                                                                    preSelectedPickupDate1
-                                                                                                                        .clone()
-                                                                                                                        .format(
-                                                                                                                            "MM/DD/YYYY"
-                                                                                                                        );
+                                                                                                        pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                                                pu.pu_date2 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
                                                                                                                 setIsSavingPickupId(-1);
                                                                                                                 setIsSavingPickupId(
                                                                                                                     pu.id
@@ -13504,25 +14270,15 @@ const Dispatch = (props) => {
                                                                                                 }
                                                                                             );
 
-                                                                                            setIsPickupDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsPickupDate2CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate2CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsPickupDate1CalendarShown(false);
+                                                                                            setIsPickupDate2CalendarShown(false);
+                                                                                            setIsDeliveryDate1CalendarShown(false);
+                                                                                            setIsDeliveryDate2CalendarShown(false);
 
                                                                                             refPickupTime2.current.focus();
                                                                                         }}
                                                                                         closeCalendar={() => {
-                                                                                            setIsPickupDate2CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsPickupDate2CalendarShown(false);
                                                                                         }}
                                                                                         preDay={preSelectedPickupDate2}
                                                                                         onChangePreDay={(preDay) => {
@@ -13967,12 +14723,8 @@ const Dispatch = (props) => {
 
                                                                 if (key === 9) {
                                                                     e.preventDefault();
-                                                                    setIsSavingPickupId(
-                                                                        selectedShipperCustomer?.pickup_id || 0
-                                                                    );
-                                                                    goToTabindex(
-                                                                        (35 + props.tabTimes).toString()
-                                                                    );
+                                                                    setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
+                                                                    refConsigneeCompanyCode.current.focus();
                                                                     setIsShowingShipperSecondPage(false);
                                                                 }
                                                             }}
@@ -15156,47 +15908,496 @@ const Dispatch = (props) => {
                                                 </div>
 
                                                 <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input
-                                                            tabIndex={42 + props.tabTimes}
-                                                            type="text"
-                                                            placeholder="Contact Name"
-                                                            // onKeyDown={validateConsigneeCompanyContactForSaving}
-                                                            onChange={(e) => {
-                                                                if (
-                                                                    (selectedConsigneeCustomer?.id || 0) === 0
-                                                                ) {
-                                                                    if (
-                                                                        (selectedOrder?.deliveries || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: [
-                                                                                ...(selectedOrder?.deliveries || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
+                                                    <div className="select-box-container" style={{flexGrow: 1}}>
+                                                        <div className="select-box-wrapper">
+                                                            <input
+                                                                tabIndex={42 + props.tabTimes}
+                                                                type="text"
+                                                                placeholder="Contact Name"
+                                                                ref={refConsigneeContactName}
+                                                                onKeyDown={async (e) => {
+                                                                    let key = e.keyCode || e.which;
+
+                                                                    switch (key) {
+                                                                        case 37:
+                                                                        case 38: // arrow left | arrow up
+                                                                            if (showConsigneeContactNames) {
+                                                                                let selectedIndex = consigneeContactNameItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setConsigneeContactNameItems(consigneeContactNameItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setConsigneeContactNameItems(consigneeContactNameItems.map((item, index) => {
+                                                                                        if (selectedIndex === 0) {
+                                                                                            item.selected = index === (consigneeContactNameItems.length - 1);
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex - 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refConsigneeContactNamePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if ((selectedConsigneeCustomer?.contacts || []).length > 0) {
+                                                                                    await setConsigneeContactNameItems((selectedConsigneeCustomer?.contacts || []).map((item, index) => {
+                                                                                        item.selected = index === 0
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowConsigneeContactNames(true);
+
+                                                                                    refConsigneeContactNamePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 39:
+                                                                        case 40: // arrow right | arrow down
+
+                                                                            if (showConsigneeContactNames) {
+                                                                                let selectedIndex = consigneeContactNameItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setConsigneeContactNameItems(consigneeContactNameItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setConsigneeContactNameItems(consigneeContactNameItems.map((item, index) => {
+                                                                                        if (selectedIndex === (consigneeContactNameItems.length - 1)) {
+                                                                                            item.selected = index === 0;
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex + 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refConsigneeContactNamePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if ((selectedConsigneeCustomer?.contacts || []).length > 0) {
+                                                                                    await setConsigneeContactNameItems((selectedConsigneeCustomer?.contacts || []).map((item, index) => {
+                                                                                        item.selected = index === 0
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowConsigneeContactNames(true);
+
+                                                                                    refConsigneeContactNamePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 27: // escape
+                                                                            setShowConsigneeContactNames(false);
+                                                                            break;
+
+                                                                        case 13: // enter
+                                                                            if (showConsigneeContactNames && consigneeContactNameItems.findIndex(item => item.selected) > -1) {
+                                                                                let _contact_name = ((consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                                    + ' '
+                                                                                    + (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].last_name || '')).trim();
+
+                                                                                let _contact_phone = (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                                    ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                                    : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                                        ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                                        : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                            ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                            : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                                ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                                : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                                    ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                                    : '';
+                                                                                let _contact_phone_ext = (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_ext || '');
+
+                                                                                let _contact_primary_phone = (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                                    ? 'work'
+                                                                                    : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                                        ? 'fax'
+                                                                                        : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                                            ? 'mobile'
+                                                                                            : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                                                ? 'direct'
+                                                                                                : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                                    ? 'other' :
+                                                                                                    ''
+
+
+                                                                                if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: [
+                                                                                                ...(selectedOrder?.deliveries || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_name: _contact_name,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedConsigneeCustomer({
+                                                                                    ...selectedConsigneeCustomer,
+                                                                                    contact_name: _contact_name,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowConsigneeContactNames(false);
+                                                                                refConsigneeContactName.current.focus();
+                                                                            }
+                                                                            break;
+
+                                                                        case 9: // tab
+                                                                            if (showConsigneeContactNames && consigneeContactNameItems.findIndex(item => item.selected) > -1) {
+                                                                                e.preventDefault();
+                                                                                let _contact_name = ((consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                                    + ' '
+                                                                                    + (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].last_name || '')).trim();
+                                                                                let _contact_phone = (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                                    ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                                    : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                                        ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                                        : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                            ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                            : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                                ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                                : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                                    ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                                    : '';
+                                                                                let _contact_phone_ext = (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_ext || '');
+                                                                                let _email = (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                                    ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                                    : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                                        ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                                        : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                                            ? (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                                            : '';
+                                                                                let _contact_primary_phone = (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                                    ? 'work'
+                                                                                    : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                                        ? 'fax'
+                                                                                        : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                                            ? 'mobile'
+                                                                                            : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                                                ? 'direct'
+                                                                                                : (consigneeContactNameItems[consigneeContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                                    ? 'other' :
+                                                                                                    ''
+
+
+                                                                                if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: [
+                                                                                                ...(selectedOrder?.deliveries || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_name: _contact_name,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                                    p.contact_name = _contact_name;
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_phone_ext = _contact_phone_ext;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedConsigneeCustomer({
+                                                                                    ...selectedConsigneeCustomer,
+                                                                                    contact_name: _contact_name,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_phone_ext: _contact_phone_ext,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowConsigneeContactNames(false);
+                                                                                refConsigneeContactName.current.focus();
+                                                                            } else {
+
+                                                                            }
+                                                                            break;
+                                                                        default:
+                                                                            break;
+                                                                    }
+                                                                }}
+                                                                onBlur={e => {
+                                                                    let contact = (selectedConsigneeCustomer?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+
+                                                                    if (contact) {
+                                                                        if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                            if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    deliveries: [
+                                                                                        ...(selectedOrder?.deliveries || []),
+                                                                                        {
+                                                                                            id: 0,
+                                                                                            contact_phone: (contact.primary_phone || '') === 'work'
+                                                                                                ? (contact.phone_work || '')
+                                                                                                : (contact.primary_phone || '') === 'fax'
+                                                                                                    ? (contact.phone_work_fax || '')
+                                                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                                                        ? (contact.phone_mobile || '')
+                                                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                                                            ? (contact.phone_direct || '')
+                                                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                                                ? (contact.phone_other || '')
+                                                                                                                : '',
+                                                                                            contact_phone_ext: (contact.phone_ext || '')
+                                                                                        }
+                                                                                    ],
+                                                                                });
+                                                                            } else {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                        if (p.id === 0) {
+                                                                                            p.contact_phone = (contact.primary_phone || '') === 'work'
+                                                                                                ? (contact.phone_work || '')
+                                                                                                : (contact.primary_phone || '') === 'fax'
+                                                                                                    ? (contact.phone_work_fax || '')
+                                                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                                                        ? (contact.phone_mobile || '')
+                                                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                                                            ? (contact.phone_direct || '')
+                                                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                                                ? (contact.phone_other || '')
+                                                                                                                : '';
+                                                                                            p.contact_phone_ext = (contact.phone_ext || '');
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            setSelectedOrder(_selectedOrder => {
+                                                                                return {
+                                                                                    ..._selectedOrder,
+                                                                                    deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                        if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                            p.contact_phone = (contact.primary_phone || '') === 'work'
+                                                                                                ? (contact.phone_work || '')
+                                                                                                : (contact.primary_phone || '') === 'fax'
+                                                                                                    ? (contact.phone_work_fax || '')
+                                                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                                                        ? (contact.phone_mobile || '')
+                                                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                                                            ? (contact.phone_direct || '')
+                                                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                                                ? (contact.phone_other || '')
+                                                                                                                : '';
+                                                                                            p.contact_phone_ext = (contact.phone_ext || '');
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        setSelectedConsigneeCustomer(_selectedConsigneeCustomer => {
+                                                                            return {
+                                                                                ..._selectedConsigneeCustomer,
+                                                                                contact_phone: (contact.primary_phone || '') === 'work'
+                                                                                    ? (contact.phone_work || '')
+                                                                                    : (contact.primary_phone || '') === 'fax'
+                                                                                        ? (contact.phone_work_fax || '')
+                                                                                        : (contact.primary_phone || '') === 'mobile'
+                                                                                            ? (contact.phone_mobile || '')
+                                                                                            : (contact.primary_phone || '') === 'direct'
+                                                                                                ? (contact.phone_direct || '')
+                                                                                                : (contact.primary_phone || '') === 'other'
+                                                                                                    ? (contact.phone_other || '')
+                                                                                                    : '',
+                                                                                contact_phone_ext: (contact.phone_ext || '')
+                                                                            }
+                                                                        })
+                                                                    } else {
+                                                                        if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                            if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    deliveries: [
+                                                                                        ...(selectedOrder?.deliveries || []),
+                                                                                        {
+                                                                                            id: 0,
+                                                                                            contact_primary_phone: ''
+                                                                                        }
+                                                                                    ],
+                                                                                });
+                                                                            } else {
+                                                                                setSelectedOrder({
+                                                                                    ...selectedOrder,
+                                                                                    deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                        if (p.id === 0) {
+                                                                                            p.contact_primary_phone = '';
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            setSelectedOrder(_selectedOrder => {
+                                                                                return {
+                                                                                    ..._selectedOrder,
+                                                                                    deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                        if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                            p.contact_primary_phone = '';
+                                                                                        }
+                                                                                        return p;
+                                                                                    }),
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        setSelectedConsigneeCustomer(_selectedConsigneeCustomer => {
+                                                                            return {
+                                                                                ..._selectedConsigneeCustomer,
+                                                                                contact_primary_phone: ''
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                }}
+                                                                onChange={(e) => {
+                                                                    if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: [
+                                                                                    ...(selectedOrder?.deliveries || []),
+                                                                                    {
+                                                                                        id: 0,
                                                                                         contact_name: e.target.value,
                                                                                     },
-                                                                                },
-                                                                            ],
-                                                                        });
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
                                                                     } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === selectedConsigneeCustomer.delivery_id) {
+
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
                                                                         });
                                                                     }
 
@@ -15204,68 +16405,43 @@ const Dispatch = (props) => {
                                                                         ...selectedConsigneeCustomer,
                                                                         contact_name: e.target.value,
                                                                     });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedConsigneeCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
-
-                                                                        setSelectedConsigneeCustomer({
-                                                                            ...selectedConsigneeCustomer,
-                                                                            contact_name: e.target.value,
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }}
-                                                            onInput={(e) => {
-                                                                if (
-                                                                    (selectedConsigneeCustomer?.id || 0) === 0
-                                                                ) {
-                                                                    if (
-                                                                        (selectedOrder?.deliveries || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: [
-                                                                                ...(selectedOrder?.deliveries || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
+                                                                }}
+                                                                onInput={(e) => {
+                                                                    if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: [
+                                                                                    ...(selectedOrder?.deliveries || []),
+                                                                                    {
+                                                                                        id: 0,
                                                                                         contact_name: e.target.value,
                                                                                     },
-                                                                                },
-                                                                            ],
-                                                                        });
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
                                                                     } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === selectedConsigneeCustomer.delivery_id) {
+
+                                                                                        p.contact_name = e.target.value
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
                                                                         });
                                                                     }
 
@@ -15273,51 +16449,698 @@ const Dispatch = (props) => {
                                                                         ...selectedConsigneeCustomer,
                                                                         contact_name: e.target.value,
                                                                     });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedConsigneeCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_name: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
+                                                                }}
+                                                                value={selectedConsigneeCustomer?.contact_name || ""}
+                                                            />
 
-                                                                        setSelectedConsigneeCustomer({
-                                                                            ...selectedConsigneeCustomer,
-                                                                            contact_name: e.target.value,
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }}
-                                                            value={
-                                                                (selectedConsigneeCustomer?.contacts || []).find((c) => c.is_primary === 1) === undefined
-                                                                    ? selectedConsigneeCustomer?.contact_name || ""
-                                                                    : selectedConsigneeCustomer?.contacts.find((c) => c.is_primary === 1).first_name + " " + selectedConsigneeCustomer?.contacts.find((c) => c.is_primary === 1).last_name
+                                                            {
+                                                                <FontAwesomeIcon className="dropdown-button"
+                                                                                 icon={faCaretDown}
+                                                                                 onClick={async () => {
+                                                                                     if (showConsigneeContactNames) {
+                                                                                         setShowConsigneeContactNames(false);
+                                                                                     } else {
+                                                                                         if ((selectedConsigneeCustomer?.contacts || []).length > 0) {
+                                                                                             await setConsigneeContactNameItems((selectedConsigneeCustomer?.contacts || []).map((item, index) => {
+                                                                                                 item.selected = index === 0
+                                                                                                 return item;
+                                                                                             }))
+
+                                                                                             window.setTimeout(async () => {
+                                                                                                 await setShowConsigneeContactNames(true);
+
+                                                                                                 refConsigneeContactNamePopupItems.current.map((r, i) => {
+                                                                                                     if (r && r.classList.contains('selected')) {
+                                                                                                         r.scrollIntoView({
+                                                                                                             behavior: 'auto',
+                                                                                                             block: 'center',
+                                                                                                             inline: 'nearest'
+                                                                                                         })
+                                                                                                     }
+                                                                                                     return true;
+                                                                                                 });
+                                                                                             }, 0)
+                                                                                         }
+                                                                                     }
+
+                                                                                     refConsigneeContactName.current.focus();
+                                                                                 }}/>
                                                             }
-                                                        />
+                                                        </div>
+                                                        {
+                                                            consigneeContactNamesTransition((style, item) => item && (
+                                                                <animated.div
+                                                                    className="mochi-contextual-container"
+                                                                    id="mochi-contextual-container-contact-names"
+                                                                    style={{
+                                                                        ...style,
+                                                                        left: '0',
+                                                                        display: 'block'
+                                                                    }}
+                                                                    ref={refConsigneeContactNameDropDown}
+                                                                >
+                                                                    <div
+                                                                        className="mochi-contextual-popup vertical below right"
+                                                                        style={{height: 150}}>
+                                                                        <div className="mochi-contextual-popup-content">
+                                                                            <div className="mochi-contextual-popup-wrapper">
+                                                                                {
+                                                                                    consigneeContactNameItems.map((item, index) => {
+                                                                                        const mochiItemClasses = classnames({
+                                                                                            'mochi-item': true,
+                                                                                            'selected': item.selected
+                                                                                        });
+
+                                                                                        return (
+                                                                                            <div
+                                                                                                key={index}
+                                                                                                className={mochiItemClasses}
+                                                                                                id={item.id}
+                                                                                                onClick={() => {
+                                                                                                    let _contact_name = ((item.first_name || '')
+                                                                                                        + ' '
+                                                                                                        + (item.last_name || '')).trim();
+
+                                                                                                    let _contact_phone = (item.primary_phone || '') === 'work'
+                                                                                                        ? (item.phone_work || '')
+                                                                                                        : (item.primary_phone || '') === 'fax'
+                                                                                                            ? (item.phone_work_fax || '')
+                                                                                                            : (item.primary_phone || '') === 'mobile'
+                                                                                                                ? (item.phone_mobile || '')
+                                                                                                                : (item.primary_phone || '') === 'direct'
+                                                                                                                    ? (item.phone_direct || '')
+                                                                                                                    : (item.primary_phone || '') === 'other'
+                                                                                                                        ? (item.phone_other || '')
+                                                                                                                        : '';
+                                                                                                    let _contact_phone_ext = (item.phone_ext || '');
+
+                                                                                                    let _contact_primary_phone = (item.phone_work || '') !== ''
+                                                                                                        ? 'work'
+                                                                                                        : (item.phone_work_fax || '') !== ''
+                                                                                                            ? 'fax'
+                                                                                                            : (item.phone_mobile || '') !== ''
+                                                                                                                ? 'mobile'
+                                                                                                                : (item.phone_direct || '') !== ''
+                                                                                                                    ? 'direct'
+                                                                                                                    : (item.phone_other || '') !== ''
+                                                                                                                        ? 'other' :
+                                                                                                                        ''
+
+
+                                                                                                    if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                                                        if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                deliveries: [
+                                                                                                                    ...(selectedOrder?.deliveries || []),
+                                                                                                                    {
+                                                                                                                        id: 0,
+                                                                                                                        contact_name: _contact_name,
+                                                                                                                        contact_phone: _contact_phone,
+                                                                                                                        contact_phone_ext: _contact_phone_ext,
+                                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                                    },
+                                                                                                                ],
+                                                                                                            });
+                                                                                                        } else {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                                    if (p.id === 0) {
+                                                                                                                        p.contact_name = _contact_name;
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_phone_ext = _contact_phone_ext;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            });
+                                                                                                        }
+                                                                                                    } else {
+                                                                                                        setSelectedOrder(_selectedOrder => {
+                                                                                                            return {
+                                                                                                                ..._selectedOrder,
+                                                                                                                deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                                    if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                                                        p.contact_name = _contact_name;
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_phone_ext = _contact_phone_ext;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+
+                                                                                                    setSelectedConsigneeCustomer({
+                                                                                                        ...selectedConsigneeCustomer,
+                                                                                                        contact_name: _contact_name,
+                                                                                                        contact_phone: _contact_phone,
+                                                                                                        contact_phone_ext: _contact_phone_ext,
+                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                    });
+
+                                                                                                    setShowConsigneeContactNames(false);
+                                                                                                    refConsigneeContactName.current.focus();
+                                                                                                }}
+                                                                                                ref={ref => refConsigneeContactNamePopupItems.current.push(ref)}
+                                                                                            >
+                                                                                                {
+                                                                                                    item.first_name + ((item.last_name || '') === '' ? '' : ' ' + item.last_name)
+                                                                                                }
+
+                                                                                                {
+                                                                                                    item.selected &&
+                                                                                                    <FontAwesomeIcon
+                                                                                                        className="dropdown-selected"
+                                                                                                        icon={faCaretRight}/>
+                                                                                                }
+                                                                                            </div>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </animated.div>
+                                                            ))
+                                                        }
                                                     </div>
                                                     <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-phone"
-                                                         style={{position: "relative"}}>
-                                                        <MaskedInput
-                                                            tabIndex={43 + props.tabTimes}
-                                                            mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
-                                                            guide={true}
+                                                    <div className="select-box-container input-phone" style={{width: '10.3rem'}}>
+                                                        <div className="select-box-wrapper">
+                                                            <MaskedInput
+                                                                tabIndex={43 + props.tabTimes}
+                                                                mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/,]}
+                                                                guide={true}
+                                                                type="text"
+                                                                placeholder="Contact Phone"
+                                                                ref={refConsigneeContactPhone}
+                                                                onKeyDown={async (e) => {
+                                                                    let key = e.keyCode || e.which;
+
+                                                                    switch (key) {
+                                                                        case 37:
+                                                                        case 38: // arrow left | arrow up
+                                                                            if (showConsigneeContactPhones) {
+                                                                                let selectedIndex = consigneeContactPhoneItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setConsigneeContactPhoneItems(consigneeContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setConsigneeContactPhoneItems(consigneeContactPhoneItems.map((item, index) => {
+                                                                                        if (selectedIndex === 0) {
+                                                                                            item.selected = index === (consigneeContactPhoneItems.length - 1);
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex - 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refConsigneeContactPhonePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if (consigneeContactPhoneItems.length > 1) {
+                                                                                    await setConsigneeContactPhoneItems(consigneeContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowConsigneeContactPhones(true);
+
+                                                                                    refConsigneeContactPhonePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 39:
+                                                                        case 40: // arrow right | arrow down
+                                                                            if (showConsigneeContactPhones) {
+                                                                                let selectedIndex = consigneeContactPhoneItems.findIndex(item => item.selected);
+
+                                                                                if (selectedIndex === -1) {
+                                                                                    await setConsigneeContactPhoneItems(consigneeContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+                                                                                } else {
+                                                                                    await setConsigneeContactPhoneItems(consigneeContactPhoneItems.map((item, index) => {
+                                                                                        if (selectedIndex === (consigneeContactPhoneItems.length - 1)) {
+                                                                                            item.selected = index === 0;
+                                                                                        } else {
+                                                                                            item.selected = index === (selectedIndex + 1)
+                                                                                        }
+                                                                                        return item;
+                                                                                    }))
+                                                                                }
+
+                                                                                refConsigneeContactPhonePopupItems.current.map((r, i) => {
+                                                                                    if (r && r.classList.contains('selected')) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: 'auto',
+                                                                                            block: 'center',
+                                                                                            inline: 'nearest'
+                                                                                        })
+                                                                                    }
+                                                                                    return true;
+                                                                                });
+                                                                            } else {
+                                                                                if (consigneeContactPhoneItems.length > 1) {
+                                                                                    await setConsigneeContactPhoneItems(consigneeContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    setShowConsigneeContactPhones(true);
+
+                                                                                    refConsigneeContactPhonePopupItems.current.map((r, i) => {
+                                                                                        if (r && r.classList.contains('selected')) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: 'auto',
+                                                                                                block: 'center',
+                                                                                                inline: 'nearest'
+                                                                                            })
+                                                                                        }
+                                                                                        return true;
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                            break;
+
+                                                                        case 27: // escape
+                                                                            setShowConsigneeContactPhones(false);
+                                                                            break;
+
+                                                                        case 13: // enter
+                                                                            if (showConsigneeContactPhones && consigneeContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                                let _contact_phone = consigneeContactPhoneItems[consigneeContactPhoneItems.findIndex(item => item.selected)].phone;
+                                                                                let _contact_primary_phone = consigneeContactPhoneItems[consigneeContactPhoneItems.findIndex(item => item.selected)].type;
+
+                                                                                if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: [
+                                                                                                ...(selectedOrder?.deliveries || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedConsigneeCustomer({
+                                                                                    ...selectedConsigneeCustomer,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowConsigneeContactPhones(false);
+                                                                                refConsigneeContactPhone.current.inputElement.focus();
+                                                                            }
+                                                                            break;
+
+                                                                        case 9: // tab
+                                                                            if (showConsigneeContactPhones && consigneeContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                                                e.preventDefault();
+                                                                                let _contact_phone = consigneeContactPhoneItems[consigneeContactPhoneItems.findIndex(item => item.selected)].phone;
+                                                                                let _contact_primary_phone = consigneeContactPhoneItems[consigneeContactPhoneItems.findIndex(item => item.selected)].type;
+
+                                                                                if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                                    if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: [
+                                                                                                ...(selectedOrder?.deliveries || []),
+                                                                                                {
+                                                                                                    id: 0,
+                                                                                                    contact_phone: _contact_phone,
+                                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                                },
+                                                                                            ],
+                                                                                        });
+                                                                                    } else {
+                                                                                        setSelectedOrder({
+                                                                                            ...selectedOrder,
+                                                                                            deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === 0) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    setSelectedOrder(_selectedOrder => {
+                                                                                        return {
+                                                                                            ..._selectedOrder,
+                                                                                            deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                                    p.contact_phone = _contact_phone;
+                                                                                                    p.contact_primary_phone = _contact_primary_phone;
+                                                                                                }
+                                                                                                return p;
+                                                                                            }),
+                                                                                        }
+                                                                                    });
+                                                                                }
+
+                                                                                setSelectedConsigneeCustomer({
+                                                                                    ...selectedConsigneeCustomer,
+                                                                                    contact_phone: _contact_phone,
+                                                                                    contact_primary_phone: _contact_primary_phone
+                                                                                });
+
+                                                                                setShowConsigneeContactPhones(false);
+                                                                                refConsigneeContactPhone.current.inputElement.focus();
+                                                                            }
+                                                                            break;
+                                                                        default:
+                                                                            break;
+                                                                    }
+                                                                }}
+                                                                onInput={(e) => {
+                                                                    if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: [
+                                                                                    ...(selectedOrder?.deliveries || []),
+                                                                                    {
+                                                                                        id: 0,
+                                                                                        contact_phone: e.target.value
+                                                                                    },
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
+                                                                    } else {
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    setSelectedConsigneeCustomer(_selectedConsigneeCustomer => {
+                                                                        return {
+                                                                            ..._selectedConsigneeCustomer,
+                                                                            contact_phone: e.target.value
+                                                                        }
+                                                                    })
+                                                                }}
+                                                                onChange={(e) => {
+                                                                    if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                        if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: [
+                                                                                    ...(selectedOrder?.deliveries || []),
+                                                                                    {
+                                                                                        id: 0,
+                                                                                        contact_phone: e.target.value
+                                                                                    },
+                                                                                ],
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedOrder({
+                                                                                ...selectedOrder,
+                                                                                deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === 0) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            });
+                                                                        }
+                                                                    } else {
+                                                                        setSelectedOrder(_selectedOrder => {
+                                                                            return {
+                                                                                ..._selectedOrder,
+                                                                                deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                    if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                        p.contact_phone = e.target.value;
+                                                                                    }
+                                                                                    return p;
+                                                                                }),
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    setSelectedConsigneeCustomer(_selectedConsigneeCustomer => {
+                                                                        return {
+                                                                            ..._selectedConsigneeCustomer,
+                                                                            contact_phone: e.target.value
+                                                                        }
+                                                                    })
+                                                                }}
+                                                                value={selectedConsigneeCustomer?.contact_phone || ''}
+                                                            />
+                                                            {((selectedConsigneeCustomer?.id || 0) > 0 && (selectedConsigneeCustomer?.id !== undefined)) && (
+                                                                <div className={
+                                                                    classnames({
+                                                                        "selected-customer-contact-primary-phone": true,
+                                                                        'pushed': (consigneeContactPhoneItems.length > 0)
+                                                                    })}
+                                                                >
+                                                                    {selectedConsigneeCustomer?.contact_primary_phone || ''}
+                                                                </div>
+                                                            )}
+
+                                                            {
+                                                                consigneeContactPhoneItems.length > 0 && (
+                                                                    <FontAwesomeIcon
+                                                                        className="dropdown-button" icon={faCaretDown}
+                                                                        onClick={async () => {
+                                                                            if (showConsigneeContactPhones) {
+                                                                                setShowConsigneeContactPhones(false);
+                                                                            } else {
+                                                                                if (consigneeContactPhoneItems.length > 1) {
+                                                                                    await setConsigneeContactPhoneItems(consigneeContactPhoneItems.map((item, index) => {
+                                                                                        item.selected = index === 0;
+                                                                                        return item;
+                                                                                    }))
+
+                                                                                    window.setTimeout(async () => {
+                                                                                        await setShowConsigneeContactPhones(true);
+
+                                                                                        refConsigneeContactPhonePopupItems.current.map((r, i) => {
+                                                                                            if (r && r.classList.contains('selected')) {
+                                                                                                r.scrollIntoView({
+                                                                                                    behavior: 'auto',
+                                                                                                    block: 'center',
+                                                                                                    inline: 'nearest'
+                                                                                                })
+                                                                                            }
+                                                                                            return true;
+                                                                                        });
+                                                                                    }, 0)
+                                                                                }
+                                                                            }
+
+                                                                            refConsigneeContactPhone.current.inputElement.focus();
+                                                                        }}/>
+                                                                )
+                                                            }
+                                                        </div>
+                                                        {
+                                                            consigneeContactPhonesTransition((style, item) => item && (
+                                                                <animated.div
+                                                                    className="mochi-contextual-container"
+                                                                    id="mochi-contextual-container-contact-phone"
+                                                                    style={{
+                                                                        ...style,
+                                                                        left: '0',
+                                                                        display: 'block'
+                                                                    }}
+                                                                    ref={refConsigneeContactPhoneDropDown}
+                                                                >
+                                                                    <div
+                                                                        className="mochi-contextual-popup vertical below right"
+                                                                        style={{height: 150}}>
+                                                                        <div className="mochi-contextual-popup-content">
+                                                                            <div className="mochi-contextual-popup-wrapper">
+                                                                                {
+                                                                                    consigneeContactPhoneItems.map((item, index) => {
+                                                                                        const mochiItemClasses = classnames({
+                                                                                            'mochi-item': true,
+                                                                                            'selected': item.selected
+                                                                                        });
+
+                                                                                        return (
+                                                                                            <div
+                                                                                                key={index}
+                                                                                                className={mochiItemClasses}
+                                                                                                id={item.id}
+                                                                                                onClick={() => {
+                                                                                                    let _contact_phone = item.phone;
+                                                                                                    let _contact_primary_phone = item.type;
+
+                                                                                                    if ((selectedConsigneeCustomer?.id || 0) === 0) {
+                                                                                                        if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                deliveries: [
+                                                                                                                    ...(selectedOrder?.deliveries || []),
+                                                                                                                    {
+                                                                                                                        id: 0,
+                                                                                                                        contact_phone: _contact_phone,
+                                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                                    },
+                                                                                                                ],
+                                                                                                            });
+                                                                                                        } else {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selectedOrder,
+                                                                                                                deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                                    if (p.id === 0) {
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            });
+                                                                                                        }
+                                                                                                    } else {
+                                                                                                        setSelectedOrder(_selectedOrder => {
+                                                                                                            return {
+                                                                                                                ..._selectedOrder,
+                                                                                                                deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                                                    if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                                                        p.contact_phone = _contact_phone;
+                                                                                                                        p.contact_primary_phone = _contact_primary_phone;
+                                                                                                                    }
+                                                                                                                    return p;
+                                                                                                                }),
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+
+                                                                                                    setSelectedConsigneeCustomer({
+                                                                                                        ...selectedConsigneeCustomer,
+                                                                                                        contact_phone: _contact_phone,
+                                                                                                        contact_primary_phone: _contact_primary_phone
+                                                                                                    });
+
+                                                                                                    setShowConsigneeContactPhones(false);
+                                                                                                    refConsigneeContactPhone.current.inputElement.focus();
+                                                                                                }}
+                                                                                                ref={ref => refConsigneeContactPhonePopupItems.current.push(ref)}
+                                                                                            >
+                                                                                                {
+                                                                                                    item.type === 'work' ? `Phone Work `
+                                                                                                        : item.type === 'fax' ? `Phone Work Fax `
+                                                                                                            : item.type === 'mobile' ? `Phone Mobile `
+                                                                                                                : item.type === 'direct' ? `Phone Direct `
+                                                                                                                    : item.type === 'other' ? `Phone Other ` : ''
+                                                                                                }
+
+                                                                                                (<b>
+                                                                                                {
+                                                                                                    item.type === 'work' ? item.phone
+                                                                                                        : item.type === 'fax' ? item.phone
+                                                                                                            : item.type === 'mobile' ? item.phone
+                                                                                                                : item.type === 'direct' ? item.phone
+                                                                                                                    : item.type === 'other' ? item.phone : ''
+                                                                                                }
+                                                                                            </b>)
+
+                                                                                                {
+                                                                                                    item.selected &&
+                                                                                                    <FontAwesomeIcon
+                                                                                                        className="dropdown-selected"
+                                                                                                        icon={faCaretRight}/>
+                                                                                                }
+                                                                                            </div>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </animated.div>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                    <div className="form-h-sep"></div>
+                                                    <div className="input-box-container input-phone-ext">
+                                                        <input
+                                                            tabIndex={44 + props.tabTimes}
                                                             type="text"
-                                                            placeholder="Contact Phone"
-                                                            // onKeyDown={validateConsigneeCompanyContactForSaving}
-                                                            onInput={(e) => {
+                                                            placeholder="Ext"
+                                                            onKeyDown={e => {
+                                                                let key = e.keyCode || e.which;
+
+                                                                if (key === 9) {
+                                                                    setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+                                                                }
+                                                            }}
+                                                            onInput={e => {
                                                                 if ((selectedConsigneeCustomer?.id || 0) === 0) {
                                                                     if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
                                                                         setSelectedOrder({
@@ -15326,9 +17149,7 @@ const Dispatch = (props) => {
                                                                                 ...(selectedOrder?.deliveries || []),
                                                                                 {
                                                                                     id: 0,
-                                                                                    customer: {
-                                                                                        contact_phone: e.target.value,
-                                                                                    },
+                                                                                    contact_phone_ext: e.target.value
                                                                                 },
                                                                             ],
                                                                         });
@@ -15337,43 +17158,34 @@ const Dispatch = (props) => {
                                                                             ...selectedOrder,
                                                                             deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
                                                                                 if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
                                                                         });
                                                                     }
-
-                                                                    setSelectedConsigneeCustomer({
-                                                                        ...selectedConsigneeCustomer,
-                                                                        contact_phone: e.target.value,
-                                                                    });
                                                                 } else {
-                                                                    if ((selectedConsigneeCustomer?.contacts || []).length === 0) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (selectedOrder?.pickups || []).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
+                                                                    setSelectedOrder(_selectedOrder => {
+                                                                        return {
+                                                                            ..._selectedOrder,
+                                                                            deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
-                                                                        });
-
-                                                                        setSelectedConsigneeCustomer({
-                                                                            ...selectedConsigneeCustomer,
-                                                                            contact_phone: e.target.value,
-                                                                        });
-                                                                    }
+                                                                        }
+                                                                    });
                                                                 }
+
+                                                                setSelectedConsigneeCustomer(_selectedConsigneeCustomer => {
+                                                                    return {
+                                                                        ..._selectedConsigneeCustomer,
+                                                                        contact_phone_ext: e.target.value
+                                                                    }
+                                                                })
                                                             }}
-                                                            onChange={(e) => {
+                                                            onChange={e => {
                                                                 if ((selectedConsigneeCustomer?.id || 0) === 0) {
                                                                     if ((selectedOrder?.deliveries || []).find((p) => p.id === 0) === undefined) {
                                                                         setSelectedOrder({
@@ -15382,273 +17194,43 @@ const Dispatch = (props) => {
                                                                                 ...(selectedOrder?.deliveries || []),
                                                                                 {
                                                                                     id: 0,
-                                                                                    customer: {
-                                                                                        contact_phone: e.target.value,
-                                                                                    },
+                                                                                    contact_phone_ext: e.target.value
                                                                                 },
                                                                             ],
                                                                         });
                                                                     } else {
                                                                         setSelectedOrder({
                                                                             ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
+                                                                            deliveries: (selectedOrder?.deliveries || []).map((p, i) => {
                                                                                 if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
                                                                         });
                                                                     }
-
-                                                                    setSelectedConsigneeCustomer({
-                                                                        ...selectedConsigneeCustomer,
-                                                                        contact_phone: e.target.value,
-                                                                    });
                                                                 } else {
-                                                                    if (
-                                                                        (selectedConsigneeCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            pickups: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        contact_phone: e.target.value,
-                                                                                    };
+                                                                    setSelectedOrder(_selectedOrder => {
+                                                                        return {
+                                                                            ..._selectedOrder,
+                                                                            deliveries: (_selectedOrder?.deliveries || []).map((p, i) => {
+                                                                                if (p.id === selectedConsigneeCustomer.delivery_id) {
+                                                                                    p.contact_phone_ext = e.target.value;
                                                                                 }
                                                                                 return p;
                                                                             }),
-                                                                        });
-
-                                                                        setSelectedConsigneeCustomer({
-                                                                            ...selectedConsigneeCustomer,
-                                                                            contact_phone: e.target.value,
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }}
-                                                            value={
-                                                                (
-                                                                    selectedConsigneeCustomer?.contacts || []
-                                                                ).find((c) => c.is_primary === 1) === undefined
-                                                                    ? selectedConsigneeCustomer?.contact_phone ||
-                                                                    ""
-                                                                    : selectedConsigneeCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).primary_phone === "work"
-                                                                        ? selectedConsigneeCustomer?.contacts.find(
-                                                                            (c) => c.is_primary === 1
-                                                                        ).phone_work
-                                                                        : selectedConsigneeCustomer?.contacts.find(
-                                                                            (c) => c.is_primary === 1
-                                                                        ).primary_phone === "fax"
-                                                                            ? selectedConsigneeCustomer?.contacts.find(
-                                                                                (c) => c.is_primary === 1
-                                                                            ).phone_work_fax
-                                                                            : selectedConsigneeCustomer?.contacts.find(
-                                                                                (c) => c.is_primary === 1
-                                                                            ).primary_phone === "mobile"
-                                                                                ? selectedConsigneeCustomer?.contacts.find(
-                                                                                    (c) => c.is_primary === 1
-                                                                                ).phone_mobile
-                                                                                : selectedConsigneeCustomer?.contacts.find(
-                                                                                    (c) => c.is_primary === 1
-                                                                                ).primary_phone === "direct"
-                                                                                    ? selectedConsigneeCustomer?.contacts.find(
-                                                                                        (c) => c.is_primary === 1
-                                                                                    ).phone_direct
-                                                                                    : selectedConsigneeCustomer?.contacts.find(
-                                                                                        (c) => c.is_primary === 1
-                                                                                    ).primary_phone === "other"
-                                                                                        ? selectedConsigneeCustomer?.contacts.find(
-                                                                                            (c) => c.is_primary === 1
-                                                                                        ).phone_other
-                                                                                        : ""
-                                                            }
-                                                        />
-
-                                                        {(selectedConsigneeCustomer?.contacts || []).find(
-                                                            (c) => c.is_primary === 1
-                                                        ) !== undefined && (
-                                                            <div
-                                                                className={classnames({
-                                                                    "selected-customer-contact-primary-phone": true,
-                                                                    pushed: false,
-                                                                })}
-                                                            >
-                                                                {
-                                                                    selectedConsigneeCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).primary_phone
-                                                                }
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-phone-ext">
-                                                        <input
-                                                            tabIndex={44 + props.tabTimes}
-                                                            type="text"
-                                                            placeholder="Ext"
-                                                            onKeyDown={
-                                                                validateConsigneeCompanyContactForSaving
-                                                            }
-                                                            onInput={(e) => {
-                                                                if (
-                                                                    (selectedConsigneeCustomer?.id || 0) === 0
-                                                                ) {
-                                                                    if (
-                                                                        (selectedOrder?.deliveries || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: [
-                                                                                ...(selectedOrder?.deliveries || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
-                                                                                        ext: e.target.value,
-                                                                                    },
-                                                                                },
-                                                                            ],
-                                                                        });
-                                                                    } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
-                                                                    }
-
-                                                                    setSelectedConsigneeCustomer({
-                                                                        ...selectedConsigneeCustomer,
-                                                                        ext: e.target.value,
+                                                                        }
                                                                     });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedConsigneeCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
-
-                                                                        setSelectedConsigneeCustomer({
-                                                                            ...selectedConsigneeCustomer,
-                                                                            ext: e.target.value,
-                                                                        });
-                                                                    }
                                                                 }
-                                                            }}
-                                                            onChange={(e) => {
-                                                                if (
-                                                                    (selectedConsigneeCustomer?.id || 0) === 0
-                                                                ) {
-                                                                    if (
-                                                                        (selectedOrder?.deliveries || []).find(
-                                                                            (p) => p.id === 0
-                                                                        ) === undefined
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: [
-                                                                                ...(selectedOrder?.deliveries || []),
-                                                                                {
-                                                                                    id: 0,
-                                                                                    customer: {
-                                                                                        ext: e.target.value,
-                                                                                    },
-                                                                                },
-                                                                            ],
-                                                                        });
-                                                                    } else {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
-                                                                    }
 
-                                                                    setSelectedConsigneeCustomer({
-                                                                        ...selectedConsigneeCustomer,
-                                                                        ext: e.target.value,
-                                                                    });
-                                                                } else {
-                                                                    if (
-                                                                        (selectedConsigneeCustomer?.contacts || [])
-                                                                            .length === 0
-                                                                    ) {
-                                                                        setSelectedOrder({
-                                                                            ...selectedOrder,
-                                                                            deliveries: (
-                                                                                selectedOrder?.deliveries || []
-                                                                            ).map((p, i) => {
-                                                                                if (p.id === 0) {
-                                                                                    p.customer = {
-                                                                                        ...p.customer,
-                                                                                        ext: e.target.value,
-                                                                                    };
-                                                                                }
-                                                                                return p;
-                                                                            }),
-                                                                        });
-
-                                                                        setSelectedConsigneeCustomer({
-                                                                            ...selectedConsigneeCustomer,
-                                                                            ext: e.target.value,
-                                                                        });
+                                                                setSelectedConsigneeCustomer(_selectedConsigneeCustomer => {
+                                                                    return {
+                                                                        ..._selectedConsigneeCustomer,
+                                                                        contact_phone_ext: e.target.value
                                                                     }
-                                                                }
+                                                                })
                                                             }}
-                                                            value={
-                                                                (
-                                                                    selectedConsigneeCustomer?.contacts || []
-                                                                ).find((c) => c.is_primary === 1) === undefined
-                                                                    ? selectedConsigneeCustomer?.ext || ""
-                                                                    : selectedConsigneeCustomer?.contacts.find(
-                                                                        (c) => c.is_primary === 1
-                                                                    ).phone_ext
-                                                            }
+                                                            value={selectedConsigneeCustomer?.contact_phone_ext || ''}
                                                         />
                                                     </div>
                                                 </div>
