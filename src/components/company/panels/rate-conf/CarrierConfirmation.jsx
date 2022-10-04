@@ -751,7 +751,7 @@ export default class CarrierConfirmation extends Component {
                     {/* PAGE BLOCK */}
                     <div
                         className="page-block"
-                        style={{paddingTop: "2rem", pageBreakBefore: "always"}}
+                        style={{paddingTop: "2rem"}}
                     >
                         <div
                             style={{...this.styleFieldName, textDecoration: "underline"}}

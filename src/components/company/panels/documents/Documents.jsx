@@ -738,7 +738,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring.company') &&
+                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring-company') &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -783,6 +783,30 @@ const Documents = (props) => {
                                 });
                                 refTagInput.current.focus();
                             }}>SCAC</div>
+                        }
+
+                        {
+                            (props.suborigin === 'carrier' || props.suborigin === 'factoring-company') &&
+                            <div className={quickTypeLinkClasses} style={{
+                                pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'none' : 'all',
+                                color: ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,1)'
+                            }} onClick={() => {
+                                setSelectedOwnerDocument({
+                                    id: 0,
+                                    user_id: Math.floor(Math.random() * (15 - 1)) + 1,
+                                    date_entered: moment().format('MM/DD/YYYY'),
+                                    title: 'ACH',
+                                    subject: 'Signed ACH Form',
+                                    tags: 'ACH'
+                                });
+                                refTagInput.current.focus();
+                            }}>ACH</div>
                         }
                     </div>
 

@@ -49,6 +49,19 @@ const OrderImport = (props) => {
         reverse: isLoading,
     });
 
+    const ExcelDateToJSDate = (date) => {
+        let converted_date = new Date(Math.round((date - 25569) * 864e5));
+        converted_date = String(converted_date).slice(4, 15)
+        date = converted_date.split(" ")
+        let day = date[1];
+        let month = date[0];
+        month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(month) / 3 + 1
+        if (month.toString().length <= 1)
+            month = '0' + month
+        let year = date[2];
+        return String(day + '-' + month + '-' + year.slice(2, 4))
+    }
+
     const inputFileChange = (e) => {
         let file = e.target.files[0];
         const maxSize = 104857600;
@@ -59,14 +72,13 @@ const OrderImport = (props) => {
                 refInputFile.current.value = '';
                 return;
             }
+            setIsLoading(true);
 
             const promise = new Promise((resolve, reject) => {
-                setIsLoading(false);
-
                 const fileReader = new FileReader();
                 fileReader.readAsArrayBuffer(file);
 
-                fileReader.onload = (e) => {
+                fileReader.onload = async (e) => {
                     const bufferArray = e.target.result;
 
                     const wb = XLSX.read(bufferArray, { type: 'buffer' });
@@ -75,7 +87,7 @@ const OrderImport = (props) => {
 
                     const ws = wb.Sheets[wsname];
 
-                    const data = XLSX.utils.sheet_to_json(ws);
+                    const data = await XLSX.utils.sheet_to_json(ws, { raw: false });
 
                     resolve(data);
                 }
@@ -107,207 +119,1189 @@ const OrderImport = (props) => {
                     let rateTypes = ordersRelatedData.rateTypes;
                     let eventTypes = ordersRelatedData.eventTypes;
 
-                    let list = (res || []).map((item, index) => {
-                        let status = [];
-                        let order = item[Object.keys(item).find(key => ['order', 'order_number'].includes(key.toLowerCase()))] || '';
-                        let trip = item[Object.keys(item).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '';
-                        let loadType = (loadTypes || []).find(l => l.name.toLowerCase() === (item[Object.keys(item).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
-                        let hazMat = (item[Object.keys(item).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (item[Object.keys(item).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
-                        let expedited = (item[Object.keys(item).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (item[Object.keys(item).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
-                        let miles = item[Object.keys(item).find(key => key.toLowerCase() === 'miles')] || 0;
-                        let creation_date = (item[Object.keys(item).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString();
-                        let orderDateTime = moment(creation_date.trim(), 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                    let last_order_number = '';
+                    let order_group = [];
+                    let order_list = [];
+
+                    (res || []).map((row, index) => {
+                        let order_number = (row[Object.keys(row).find(key => ['order', 'order_number'].includes(key.toLowerCase()))] || '').trim();
+
+                        if (last_order_number === '') {
+                            order_group.push(row);
+                            last_order_number = order_number;
+
+                            if (index === (order_list.length - 1)) {
+                                let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
+
+                                if (bill_to_customer) {
+                                    let order = {};
+                                    let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
+                                    let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
+                                    let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
+                                    let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
+                                    let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+
+                                    let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                    let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
+
+                                    let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+
+                                    order.order_number = last_order_number;
+                                    order.trip_number = trip_number;
+                                    order.load_type = load_type;
+                                    order.load_type_id = load_type?.id || null;
+                                    order.bill_to_customer = bill_to_customer;
+                                    order.carrier = carrier;
+                                    order.equipment_id = equipment_id;
+                                    order.haz_mat = haz_mat;
+                                    order.expedited = expedited;
+                                    order.miles = miles;
+                                    order.order_date_time = creation_date;
+                                    order.user_code_id = props.user?.user_code?.id;
+                                    order.customer_rating = [];
+                                    order.carrier_rating = [];
+                                    order.pickups = [];
+                                    order.deliveries = [];
+                                    order.events = [];
+                                    order.internal_notes = [];
+
+                                    //handle internal notes
+                                    order_comments = order_comments.split(':');
+
+                                    if (order_comments.length === 3) {
+                                        let message = order_comments.pop();
+                                        order_comments = order_comments.join(':');
+                                        order_comments = order_comments.split(' ');
+                                        order_comments.shift();
+                                        order_comments.pop();
+                                        let date_time = order_comments.join(' ');
+
+                                        order.internal_notes.push({
+                                            date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
+                                            text: message.trim(),
+                                            user_code_id: props.user?.user_code?.id
+                                        });
+                                    } else if (order_comments.length === 4) {
+                                        let message = order_comments.pop();
+                                        order_comments = order_comments.join(':');
+                                        order_comments = order_comments.split(' ');
+                                        order_comments.shift();
+                                        order_comments.pop();
+                                        let date_time = order_comments.join(' ');
+
+                                        order.internal_notes.push({
+                                            date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
+                                            text: message.trim(),
+                                            user_code_id: props.user?.user_code?.id
+                                        });
+                                    }
+
+                                    // handle order ratings
+                                    order_group.map((item, x) => {
+                                        let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+
+                                        if (check_call.toLowerCase() === 'begin segment') {
+                                            let customer_rate = {};
+                                            let carrier_rate = {};
+                                            let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
+                                            let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                            let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                            let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
+                                            let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
+                                            let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
+
+                                            if (description !== '') {
+                                                if (charges > 0) {
+                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                    customer_rate.description = description;
+                                                    customer_rate.total_charges = charges;
+
+                                                    if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                        customer_rate.pieces = pieces;
+                                                        customer_rate.pieces_unit = pieces_unit;
+                                                        customer_rate.weight = weight;
+                                                    }
+
+                                                    if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                        carrier_rate.description = description;
+                                                        carrier_rate.total_charges = cost;
+                                                        carrier_rate.pieces = pieces;
+                                                        carrier_rate.pieces_unit = pieces_unit;
+                                                        carrier_rate.weight = weight;
+                                                    } else {
+                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        carrier_rate.description = description;
+                                                    }
+
+                                                } else {
+                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                    customer_rate.description = description;
+
+                                                    carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                    carrier_rate.description = description;
+                                                }
+
+                                                order.customer_rating.push(customer_rate);
+                                                order.carrier_rating.push(carrier_rate);
+                                            }
+                                        }
 
 
+                                        return item;
+                                    });
 
-                        let billToCode = (item[Object.keys(item).find(key => key.toLowerCase() === 'bill_to_code')] || '').toUpperCase();
-                        let billtoCustomer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === billToCode);
+                                    // handle pickups, deliveries and events
+                                    let shipper_data = [];
+                                    let consignee_data = [];
+                                    let carrier_data = [];
+                                    let comment_data = [];
+                                    let routing_position = 0;
+                                    let po_data = '';
+                                    let bol_data = '';
 
-                        if (billtoCustomer === undefined) {
-                            status.push('BILL-TO DOESN\'T EXIST');
-                        }
+                                    order_group.map((item, i) => {
+                                        let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
+                                        let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+                                        let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
+                                        let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
+                                        po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
+                                        bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                        let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
 
-                        let carrierCode = item[Object.keys(item).find(key => key.toLowerCase() === 'carrier_code')];
-                        let carrierCustomer = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrierCode);
-                        let equipment = (equipments || []).find(e => e.name.toLowerCase() === ((item[Object.keys(item).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase());
+                                        if (customer_code !== '') {
+                                            if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                check_call.toLowerCase().indexOf('pickup') > -1) {
+                                                shipper_data.push({ customer_code, check_call_date });
 
-                        if (carrierCustomer === undefined) {
-                            status.push('CARRIER DOESN\'T EXIST');
-                        }
+                                                let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
-                        let refNumbers = item[Object.keys(item).find(key => key.toLowerCase() === 'reference_number1')] || '';
-                        let refNumber2 = item[Object.keys(item).find(key => key.toLowerCase() === 'reference_number2')] || '';
+                                                if (shipper_customer) {
+                                                    routing_position = routing_position + 1;
 
-                        if (refNumber2 !== '') {
-                            if (refNumbers === '') {
-                                refNumbers = refNumber2;
+                                                    order.pickups.push({
+                                                        customer_id: shipper_customer.id,
+                                                        code: customer_code,
+                                                        name: shipper_customer.name,
+                                                        routing_position: routing_position
+                                                    })
+
+                                                    order.events.push({
+                                                        event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
+                                                        shipper_id: shipper_customer.id,
+                                                        time: event_time,
+                                                        event_time: event_time,
+                                                        date: event_date,
+                                                        event_date: event_date,
+                                                        event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
+                                                        event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
+                                                        user_code_id: props.user?.user_code?.id
+                                                    })
+                                                }
+                                            }
+
+                                            if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                check_call.toLowerCase().indexOf('delivered') > -1) {
+                                                consignee_data.push({ customer_code, check_call_date });
+
+                                                let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
+
+                                                if (consignee_customer) {
+                                                    routing_position = routing_position + 1;
+
+                                                    order.deliveries.push({
+                                                        customer_id: consignee_customer.id,
+                                                        code: customer_code,
+                                                        name: consignee_customer.name,
+                                                        routing_position: routing_position
+                                                    })
+
+                                                    order.events.push({
+                                                        event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
+                                                        consignee_id: consignee_customer.id,
+                                                        time: event_time,
+                                                        event_time: event_time,
+                                                        date: event_date,
+                                                        event_date: event_date,
+                                                        event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
+                                                        event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
+                                                        user_code_id: props.user?.user_code?.id
+                                                    })
+                                                }
+                                            }
+                                        }
+
+                                        if (carrier_data.filter(x => x.check_call_comment === check_call_comment && x.check_call_date === check_call_date).length === 0 &&
+                                            check_call.toLowerCase().indexOf('changed carrier') > -1) {
+                                            carrier_data.push({ check_call_comment, check_call_date });
+
+                                            let carrier_codes = check_call_comment.split(' ').filter(x => x === x.toUpperCase());
+                                            let old_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[0].toLowerCase() || ''));
+                                            let new_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[1].toLowerCase() || ''));
+
+                                            order.events.push({
+                                                event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'changed carrier').id,
+                                                old_carrier_id: old_carrier?.id || null,
+                                                new_carrier_id: new_carrier?.id || null,
+                                                time: event_time,
+                                                event_time: event_time,
+                                                date: event_date,
+                                                event_date: event_date,
+                                                event_location: '',
+                                                event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
+                                                user_code_id: props.user?.user_code?.id
+                                            })
+                                        }
+
+                                        if (comment_data.filter(x => x.check_call_date === check_call_date).length === 0 && check_call.toLowerCase().indexOf('comment') > -1) {
+                                            comment_data.push({ check_call_date });
+
+                                            order.events.push({
+                                                event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'general comment').id,
+                                                time: event_time,
+                                                event_time: event_time,
+                                                date: event_date,
+                                                event_date: event_date,
+                                                event_location: '',
+                                                event_notes: check_call_comment,
+                                                user_code_id: props.user?.user_code?.id
+                                            })
+                                        }
+
+                                    });
+
+                                    if (po_data !== '') {
+                                        if (order.pickups.length === 1) {
+                                            po_data = po_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                if (i === 0) {
+                                                    p.po_numbers = po_data;
+                                                }
+
+                                                return p;
+                                            })
+                                        } else if (order.pickups.length > 1) {
+                                            po_data = po_data.split('/');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                p.po_numbers = (po_data[i] || '').trim();
+                                                return p;
+                                            })
+                                        }
+                                    }
+
+                                    if (bol_data !== '') {
+                                        if (order.pickups.length === 1) {
+                                            bol_data = bol_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                if (i === 0) {
+                                                    p.bol_numbers = (bol_data || '');
+                                                }
+
+                                                return p;
+                                            })
+                                        } else if (order.pickups.length > 1) {
+                                            bol_data = bol_data.split('/');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                p.bol_numbers = (bol_data[i] || '').trim();
+                                                return p;
+                                            })
+                                        }
+                                    }
+
+                                    order_list.push(order);
+                                }
+                            }
+                        } else {
+                            if (last_order_number === order_number) {
+                                order_group.push(row);
+
+                                if (index === (order_list.length - 1)) {
+                                    let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                    let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
+
+                                    if (bill_to_customer) {
+                                        let order = {};
+                                        let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
+                                        let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
+                                        let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
+                                        let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
+                                        let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+
+                                        let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                        let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
+
+                                        let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+
+                                        order.order_number = last_order_number;
+                                        order.trip_number = trip_number;
+                                        order.load_type = load_type;
+                                        order.load_type_id = load_type?.id || null;
+                                        order.bill_to_customer = bill_to_customer;
+                                        order.carrier = carrier;
+                                        order.equipment_id = equipment_id;
+                                        order.haz_mat = haz_mat;
+                                        order.expedited = expedited;
+                                        order.miles = miles;
+                                        order.order_date_time = creation_date;
+                                        order.user_code_id = props.user?.user_code?.id;
+                                        order.customer_rating = [];
+                                        order.carrier_rating = [];
+                                        order.pickups = [];
+                                        order.deliveries = [];
+                                        order.events = [];
+                                        order.internal_notes = [];
+
+                                        //handle internal notes
+                                        order_comments = order_comments.split(':');
+
+                                        if (order_comments.length === 3) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = order_comments.join(' ');
+
+                                            order.internal_notes.push({
+                                                date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (order_comments.length === 4) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = order_comments.join(' ');
+
+                                            order.internal_notes.push({
+                                                date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        }
+
+                                        // handle order ratings
+                                        order_group.map((item, x) => {
+                                            let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+
+                                            if (check_call.toLowerCase() === 'begin segment') {
+                                                let customer_rate = {};
+                                                let carrier_rate = {};
+                                                let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
+                                                let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                                let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                                let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
+                                                let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
+                                                let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
+
+                                                if (description !== '') {
+                                                    if (charges > 0) {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                        customer_rate.description = description;
+                                                        customer_rate.total_charges = charges;
+
+                                                        if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            customer_rate.pieces = pieces;
+                                                            customer_rate.pieces_unit = pieces_unit;
+                                                            customer_rate.weight = weight;
+                                                        }
+
+                                                        if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                            carrier_rate.description = description;
+                                                            carrier_rate.total_charges = cost;
+                                                            carrier_rate.pieces = pieces;
+                                                            carrier_rate.pieces_unit = pieces_unit;
+                                                            carrier_rate.weight = weight;
+                                                        } else {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                            carrier_rate.description = description;
+                                                        }
+
+                                                    } else {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        customer_rate.description = description;
+
+                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        carrier_rate.description = description;
+                                                    }
+
+                                                    order.customer_rating.push(customer_rate);
+                                                    order.carrier_rating.push(carrier_rate);
+                                                }
+                                            }
+
+
+                                            return item;
+                                        });
+
+                                        // handle pickups, deliveries and events
+                                        let shipper_data = [];
+                                        let consignee_data = [];
+                                        let carrier_data = [];
+                                        let comment_data = [];
+                                        let routing_position = 0;
+                                        let po_data = '';
+                                        let bol_data = '';
+
+                                        order_group.map((item, i) => {
+                                            let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
+                                            let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+                                            let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
+                                            let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
+                                            po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
+                                            bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                            let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+
+                                            if (customer_code !== '') {
+                                                if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                    check_call.toLowerCase().indexOf('pickup') > -1) {
+                                                    shipper_data.push({ customer_code, check_call_date });
+
+                                                    let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
+
+                                                    if (shipper_customer) {
+                                                        routing_position = routing_position + 1;
+
+                                                        order.pickups.push({
+                                                            customer_id: shipper_customer.id,
+                                                            code: customer_code,
+                                                            name: shipper_customer.name,
+                                                            routing_position: routing_position
+                                                        })
+
+                                                        order.events.push({
+                                                            event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
+                                                            shipper_id: shipper_customer.id,
+                                                            time: event_time,
+                                                            event_time: event_time,
+                                                            date: event_date,
+                                                            event_date: event_date,
+                                                            event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
+                                                            event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
+                                                            user_code_id: props.user?.user_code?.id
+                                                        })
+                                                    }
+                                                }
+
+                                                if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                    check_call.toLowerCase().indexOf('delivered') > -1) {
+                                                    consignee_data.push({ customer_code, check_call_date });
+
+                                                    let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
+
+                                                    if (consignee_customer) {
+                                                        routing_position = routing_position + 1;
+
+                                                        order.deliveries.push({
+                                                            customer_id: consignee_customer.id,
+                                                            code: customer_code,
+                                                            name: consignee_customer.name,
+                                                            routing_position: routing_position
+                                                        })
+
+                                                        order.events.push({
+                                                            event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
+                                                            consignee_id: consignee_customer.id,
+                                                            time: event_time,
+                                                            event_time: event_time,
+                                                            date: event_date,
+                                                            event_date: event_date,
+                                                            event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
+                                                            event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
+                                                            user_code_id: props.user?.user_code?.id
+                                                        })
+                                                    }
+                                                }
+                                            }
+
+                                            if (carrier_data.filter(x => x.check_call_comment === check_call_comment && x.check_call_date === check_call_date).length === 0 &&
+                                                check_call.toLowerCase().indexOf('changed carrier') > -1) {
+                                                carrier_data.push({ check_call_comment, check_call_date });
+
+                                                let carrier_codes = check_call_comment.split(' ').filter(x => x === x.toUpperCase());
+                                                let old_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[0].toLowerCase() || ''));
+                                                let new_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[1].toLowerCase() || ''));
+
+                                                order.events.push({
+                                                    event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'changed carrier').id,
+                                                    old_carrier_id: old_carrier?.id || null,
+                                                    new_carrier_id: new_carrier?.id || null,
+                                                    time: event_time,
+                                                    event_time: event_time,
+                                                    date: event_date,
+                                                    event_date: event_date,
+                                                    event_location: '',
+                                                    event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
+                                                    user_code_id: props.user?.user_code?.id
+                                                })
+                                            }
+
+                                            if (comment_data.filter(x => x.check_call_date === check_call_date).length === 0 && check_call.toLowerCase().indexOf('comment') > -1) {
+                                                comment_data.push({ check_call_date });
+
+                                                order.events.push({
+                                                    event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'general comment').id,
+                                                    time: event_time,
+                                                    event_time: event_time,
+                                                    date: event_date,
+                                                    event_date: event_date,
+                                                    event_location: '',
+                                                    event_notes: check_call_comment,
+                                                    user_code_id: props.user?.user_code?.id
+                                                })
+                                            }
+
+                                        });
+
+                                        if (po_data !== '') {
+                                            if (order.pickups.length === 1) {
+                                                po_data = po_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    if (i === 0) {
+                                                        p.po_numbers = po_data;
+                                                    }
+
+                                                    return p;
+                                                })
+                                            } else if (order.pickups.length > 1) {
+                                                po_data = po_data.split('/');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    p.po_numbers = (po_data[i] || '').trim();
+                                                    return p;
+                                                })
+                                            }
+                                        }
+
+                                        if (bol_data !== '') {
+                                            if (order.pickups.length === 1) {
+                                                bol_data = bol_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    if (i === 0) {
+                                                        p.bol_numbers = (bol_data || '');
+                                                    }
+
+                                                    return p;
+                                                })
+                                            } else if (order.pickups.length > 1) {
+                                                bol_data = bol_data.split('/');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    p.bol_numbers = (bol_data[i] || '').trim();
+                                                    return p;
+                                                })
+                                            }
+                                        }
+
+                                        order_list.push(order);
+                                    }
+                                }
                             } else {
-                                refNumbers += ' ' + refNumber2;
+                                let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
+
+                                if (bill_to_customer) {
+                                    let order = {};
+                                    let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
+                                    let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
+                                    let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
+                                    let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
+                                    let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+
+                                    let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                    let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
+
+                                    let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+
+                                    order.order_number = last_order_number;
+                                    order.trip_number = trip_number;
+                                    order.load_type = load_type;
+                                    order.load_type_id = load_type?.id || null;
+                                    order.bill_to_customer = bill_to_customer;
+                                    order.carrier = carrier;
+                                    order.equipment_id = equipment_id;
+                                    order.haz_mat = haz_mat;
+                                    order.expedited = expedited;
+                                    order.miles = miles;
+                                    order.order_date_time = creation_date;
+                                    order.user_code_id = props.user?.user_code?.id;
+                                    order.customer_rating = [];
+                                    order.carrier_rating = [];
+                                    order.pickups = [];
+                                    order.deliveries = [];
+                                    order.events = [];
+                                    order.internal_notes = [];
+
+                                    //handle internal notes
+                                    order_comments = order_comments.split(':');
+
+                                    if (order_comments.length === 3) {
+                                        let message = order_comments.pop();
+                                        order_comments = order_comments.join(':');
+                                        order_comments = order_comments.split(' ');
+                                        order_comments.shift();
+                                        order_comments.pop();
+                                        let date_time = order_comments.join(' ');
+
+                                        order.internal_notes.push({
+                                            date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
+                                            text: message.trim(),
+                                            user_code_id: props.user?.user_code?.id
+                                        });
+                                    } else if (order_comments.length === 4) {
+                                        let message = order_comments.pop();
+                                        order_comments = order_comments.join(':');
+                                        order_comments = order_comments.split(' ');
+                                        order_comments.shift();
+                                        order_comments.pop();
+                                        let date_time = order_comments.join(' ');
+
+                                        order.internal_notes.push({
+                                            date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
+                                            text: message.trim(),
+                                            user_code_id: props.user?.user_code?.id
+                                        });
+                                    }
+
+                                    // handle order ratings
+                                    order_group.map((item, x) => {
+                                        let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+
+                                        if (check_call.toLowerCase() === 'begin segment') {
+                                            let customer_rate = {};
+                                            let carrier_rate = {};
+                                            let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
+                                            let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                            let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                            let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
+                                            let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
+                                            let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
+
+                                            if (description !== '') {
+                                                if (charges > 0) {
+                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                    customer_rate.description = description;
+                                                    customer_rate.total_charges = charges;
+
+                                                    if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                        customer_rate.pieces = pieces;
+                                                        customer_rate.pieces_unit = pieces_unit;
+                                                        customer_rate.weight = weight;
+                                                    }
+
+                                                    if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                        carrier_rate.description = description;
+                                                        carrier_rate.total_charges = cost;
+                                                        carrier_rate.pieces = pieces;
+                                                        carrier_rate.pieces_unit = pieces_unit;
+                                                        carrier_rate.weight = weight;
+                                                    } else {
+                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        carrier_rate.description = description;
+                                                    }
+
+                                                } else {
+                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                    customer_rate.description = description;
+
+                                                    carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                    carrier_rate.description = description;
+                                                }
+
+                                                order.customer_rating.push(customer_rate);
+                                                order.carrier_rating.push(carrier_rate);
+                                            }
+                                        }
+
+
+                                        return item;
+                                    });
+
+                                    // handle pickups, deliveries and events
+                                    let shipper_data = [];
+                                    let consignee_data = [];
+                                    let carrier_data = [];
+                                    let comment_data = [];
+                                    let routing_position = 0;
+                                    let po_data = '';
+                                    let bol_data = '';
+
+                                    order_group.map((item, i) => {
+                                        let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
+                                        let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+                                        let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
+                                        let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
+                                        po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
+                                        bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                        let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+
+                                        if (customer_code !== '') {
+                                            if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                check_call.toLowerCase().indexOf('pickup') > -1) {
+                                                shipper_data.push({ customer_code, check_call_date });
+
+                                                let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
+
+                                                if (shipper_customer) {
+                                                    routing_position = routing_position + 1;
+
+                                                    order.pickups.push({
+                                                        customer_id: shipper_customer.id,
+                                                        code: customer_code,
+                                                        name: shipper_customer.name,
+                                                        routing_position: routing_position
+                                                    })
+
+                                                    order.events.push({
+                                                        event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
+                                                        shipper_id: shipper_customer.id,
+                                                        time: event_time,
+                                                        event_time: event_time,
+                                                        date: event_date,
+                                                        event_date: event_date,
+                                                        event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
+                                                        event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
+                                                        user_code_id: props.user?.user_code?.id
+                                                    })
+                                                }
+                                            }
+
+                                            if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                check_call.toLowerCase().indexOf('delivered') > -1) {
+                                                consignee_data.push({ customer_code, check_call_date });
+
+                                                let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
+
+                                                if (consignee_customer) {
+                                                    routing_position = routing_position + 1;
+
+                                                    order.deliveries.push({
+                                                        customer_id: consignee_customer.id,
+                                                        code: customer_code,
+                                                        name: consignee_customer.name,
+                                                        routing_position: routing_position
+                                                    })
+
+                                                    order.events.push({
+                                                        event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
+                                                        consignee_id: consignee_customer.id,
+                                                        time: event_time,
+                                                        event_time: event_time,
+                                                        date: event_date,
+                                                        event_date: event_date,
+                                                        event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
+                                                        event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
+                                                        user_code_id: props.user?.user_code?.id
+                                                    })
+                                                }
+                                            }
+                                        }
+
+                                        if (carrier_data.filter(x => x.check_call_comment === check_call_comment && x.check_call_date === check_call_date).length === 0 &&
+                                            check_call.toLowerCase().indexOf('changed carrier') > -1) {
+                                            carrier_data.push({ check_call_comment, check_call_date });
+
+                                            let carrier_codes = check_call_comment.split(' ').filter(x => x === x.toUpperCase());
+                                            let old_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[0].toLowerCase() || ''));
+                                            let new_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[1].toLowerCase() || ''));
+
+                                            order.events.push({
+                                                event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'changed carrier').id,
+                                                old_carrier_id: old_carrier?.id || null,
+                                                new_carrier_id: new_carrier?.id || null,
+                                                time: event_time,
+                                                event_time: event_time,
+                                                date: event_date,
+                                                event_date: event_date,
+                                                event_location: '',
+                                                event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
+                                                user_code_id: props.user?.user_code?.id
+                                            })
+                                        }
+
+                                        if (comment_data.filter(x => x.check_call_date === check_call_date).length === 0 && check_call.toLowerCase().indexOf('comment') > -1) {
+                                            comment_data.push({ check_call_date });
+
+                                            order.events.push({
+                                                event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'general comment').id,
+                                                time: event_time,
+                                                event_time: event_time,
+                                                date: event_date,
+                                                event_date: event_date,
+                                                event_location: '',
+                                                event_notes: check_call_comment,
+                                                user_code_id: props.user?.user_code?.id
+                                            })
+                                        }
+
+                                    });
+
+                                    if (po_data !== '') {
+                                        if (order.pickups.length === 1) {
+                                            po_data = po_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                if (i === 0) {
+                                                    p.po_numbers = po_data;
+                                                }
+
+                                                return p;
+                                            })
+                                        } else if (order.pickups.length > 1) {
+                                            po_data = po_data.split('/');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                p.po_numbers = (po_data[i] || '').trim();
+                                                return p;
+                                            })
+                                        }
+                                    }
+
+                                    if (bol_data !== '') {
+                                        if (order.pickups.length === 1) {
+                                            bol_data = bol_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                if (i === 0) {
+                                                    p.bol_numbers = (bol_data || '');
+                                                }
+
+                                                return p;
+                                            })
+                                        } else if (order.pickups.length > 1) {
+                                            bol_data = bol_data.split('/');
+
+                                            order.pickups = order.pickups.map((p, i) => {
+                                                p.bol_numbers = (bol_data[i] || '').trim();
+                                                return p;
+                                            })
+                                        }
+                                    }
+
+                                    order_list.push(order);
+                                }
+
+                                last_order_number = order_number;
+                                order_group = [];
+                                order_group.push(row);
+
+                                if (index === (order_list.length - 1)) {
+                                    let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                    let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
+
+                                    if (bill_to_customer) {
+                                        let order = {};
+                                        let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
+                                        let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
+                                        let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
+                                        let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
+                                        let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+
+                                        let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                        let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
+
+                                        let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+
+                                        order.order_number = last_order_number;
+                                        order.trip_number = trip_number;
+                                        order.load_type = load_type;
+                                        order.load_type_id = load_type?.id || null;
+                                        order.bill_to_customer = bill_to_customer;
+                                        order.carrier = carrier;
+                                        order.equipment_id = equipment_id;
+                                        order.haz_mat = haz_mat;
+                                        order.expedited = expedited;
+                                        order.miles = miles;
+                                        order.order_date_time = creation_date;
+                                        order.user_code_id = props.user?.user_code?.id;
+                                        order.customer_rating = [];
+                                        order.carrier_rating = [];
+                                        order.pickups = [];
+                                        order.deliveries = [];
+                                        order.events = [];
+                                        order.internal_notes = [];
+
+                                        //handle internal notes
+                                        order_comments = order_comments.split(':');
+
+                                        if (order_comments.length === 3) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = order_comments.join(' ');
+
+                                            order.internal_notes.push({
+                                                date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (order_comments.length === 4) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = order_comments.join(' ');
+
+                                            order.internal_notes.push({
+                                                date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        }
+
+                                        // handle order ratings
+                                        order_group.map((item, x) => {
+                                            let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+
+                                            if (check_call.toLowerCase() === 'begin segment') {
+                                                let customer_rate = {};
+                                                let carrier_rate = {};
+                                                let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
+                                                let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                                let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                                let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
+                                                let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
+                                                let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
+
+                                                if (description !== '') {
+                                                    if (charges > 0) {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                        customer_rate.description = description;
+                                                        customer_rate.total_charges = charges;
+
+                                                        if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            customer_rate.pieces = pieces;
+                                                            customer_rate.pieces_unit = pieces_unit;
+                                                            customer_rate.weight = weight;
+                                                        }
+
+                                                        if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                            carrier_rate.description = description;
+                                                            carrier_rate.total_charges = cost;
+                                                            carrier_rate.pieces = pieces;
+                                                            carrier_rate.pieces_unit = pieces_unit;
+                                                            carrier_rate.weight = weight;
+                                                        } else {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                            carrier_rate.description = description;
+                                                        }
+
+                                                    } else {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        customer_rate.description = description;
+
+                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        carrier_rate.description = description;
+                                                    }
+
+                                                    order.customer_rating.push(customer_rate);
+                                                    order.carrier_rating.push(carrier_rate);
+                                                }
+                                            }
+
+
+                                            return item;
+                                        });
+
+                                        // handle pickups, deliveries and events
+                                        let shipper_data = [];
+                                        let consignee_data = [];
+                                        let carrier_data = [];
+                                        let comment_data = [];
+                                        let routing_position = 0;
+                                        let po_data = '';
+                                        let bol_data = '';
+
+                                        order_group.map((item, i) => {
+                                            let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
+                                            let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
+                                            let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
+                                            let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
+                                            po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
+                                            bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                            let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+
+                                            if (customer_code !== '') {
+                                                if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                    check_call.toLowerCase().indexOf('pickup') > -1) {
+                                                    shipper_data.push({ customer_code, check_call_date });
+
+                                                    let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
+
+                                                    if (shipper_customer) {
+                                                        routing_position = routing_position + 1;
+
+                                                        order.pickups.push({
+                                                            customer_id: shipper_customer.id,
+                                                            code: customer_code,
+                                                            name: shipper_customer.name,
+                                                            routing_position: routing_position
+                                                        })
+
+                                                        order.events.push({
+                                                            event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
+                                                            shipper_id: shipper_customer.id,
+                                                            time: event_time,
+                                                            event_time: event_time,
+                                                            date: event_date,
+                                                            event_date: event_date,
+                                                            event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
+                                                            event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
+                                                            user_code_id: props.user?.user_code?.id
+                                                        })
+                                                    }
+                                                }
+
+                                                if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                    check_call.toLowerCase().indexOf('delivered') > -1) {
+                                                    consignee_data.push({ customer_code, check_call_date });
+
+                                                    let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
+
+                                                    if (consignee_customer) {
+                                                        routing_position = routing_position + 1;
+
+                                                        order.deliveries.push({
+                                                            customer_id: consignee_customer.id,
+                                                            code: customer_code,
+                                                            name: consignee_customer.name,
+                                                            routing_position: routing_position
+                                                        })
+
+                                                        order.events.push({
+                                                            event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
+                                                            consignee_id: consignee_customer.id,
+                                                            time: event_time,
+                                                            event_time: event_time,
+                                                            date: event_date,
+                                                            event_date: event_date,
+                                                            event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
+                                                            event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
+                                                            user_code_id: props.user?.user_code?.id
+                                                        })
+                                                    }
+                                                }
+                                            }
+
+                                            if (carrier_data.filter(x => x.check_call_comment === check_call_comment && x.check_call_date === check_call_date).length === 0 &&
+                                                check_call.toLowerCase().indexOf('changed carrier') > -1) {
+                                                carrier_data.push({ check_call_comment, check_call_date });
+
+                                                let carrier_codes = check_call_comment.split(' ').filter(x => x === x.toUpperCase());
+                                                let old_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[0].toLowerCase() || ''));
+                                                let new_carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === (carrier_codes[1].toLowerCase() || ''));
+
+                                                order.events.push({
+                                                    event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'changed carrier').id,
+                                                    old_carrier_id: old_carrier?.id || null,
+                                                    new_carrier_id: new_carrier?.id || null,
+                                                    time: event_time,
+                                                    event_time: event_time,
+                                                    date: event_date,
+                                                    event_date: event_date,
+                                                    event_location: '',
+                                                    event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
+                                                    user_code_id: props.user?.user_code?.id
+                                                })
+                                            }
+
+                                            if (comment_data.filter(x => x.check_call_date === check_call_date).length === 0 && check_call.toLowerCase().indexOf('comment') > -1) {
+                                                comment_data.push({ check_call_date });
+
+                                                order.events.push({
+                                                    event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'general comment').id,
+                                                    time: event_time,
+                                                    event_time: event_time,
+                                                    date: event_date,
+                                                    event_date: event_date,
+                                                    event_location: '',
+                                                    event_notes: check_call_comment,
+                                                    user_code_id: props.user?.user_code?.id
+                                                })
+                                            }
+
+                                        });
+
+                                        if (po_data !== '') {
+                                            if (order.pickups.length === 1) {
+                                                po_data = po_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    if (i === 0) {
+                                                        p.po_numbers = po_data;
+                                                    }
+
+                                                    return p;
+                                                })
+                                            } else if (order.pickups.length > 1) {
+                                                po_data = po_data.split('/');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    p.po_numbers = (po_data[i] || '').trim();
+                                                    return p;
+                                                })
+                                            }
+                                        }
+
+                                        if (bol_data !== '') {
+                                            if (order.pickups.length === 1) {
+                                                bol_data = bol_data.split(' ').filter(s => s).join(' ').replace(' ', '-');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    if (i === 0) {
+                                                        p.bol_numbers = (bol_data || '');
+                                                    }
+
+                                                    return p;
+                                                })
+                                            } else if (order.pickups.length > 1) {
+                                                bol_data = bol_data.split('/');
+
+                                                order.pickups = order.pickups.map((p, i) => {
+                                                    p.bol_numbers = (bol_data[i] || '').trim();
+                                                    return p;
+                                                })
+                                            }
+                                        }
+
+                                        order_list.push(order);
+                                    }
+                                }
                             }
                         }
 
-                        let shipperList = [];
-
-                        let shipperCode = item[Object.keys(item).find(key => key.toLowerCase() === 'shipper1_code')];
-                        let shipperAppointment = item[Object.keys(item).find(key => key.toLowerCase() === 'shipper1_appointment')] || '';
-                        let shipperCustomer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === shipperCode);
-
-                        if (shipperCustomer === undefined) {
-                            status.push(`SHIPPER 1 DOESN\'T EXIST`);
-                        } else {
-                            if (moment(shipperAppointment.trim(), 'DD/MM/YYYY H:mm').format('DD/MM/YYYY H:mm') === shipperAppointment.trim()) {
-                                shipperCustomer.pu_date1 = moment(shipperAppointment.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                                shipperCustomer.pu_time1 = moment(shipperAppointment.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                                shipperCustomer.pu_date2 = moment(shipperAppointment.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                                shipperCustomer.pu_time2 = moment(shipperAppointment.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                            } else if (moment(shipperAppointment.trim(), 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm') === shipperAppointment.trim()) {
-                                shipperCustomer.pu_date1 = moment(shipperAppointment.trim(), 'DD/MM/YYYY HH:mm').format('MM/DD/YYYY');
-                                shipperCustomer.pu_time1 = moment(shipperAppointment.trim(), 'DD/MM/YYYY HH:mm').format('HHmm');
-                                shipperCustomer.pu_date2 = moment(shipperAppointment.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                                shipperCustomer.pu_time2 = moment(shipperAppointment.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                            } else if (moment(shipperAppointment.trim(), 'DD/MM/YYYY').format('DD/MM/YYYY') === shipperAppointment.trim()) {
-                                shipperCustomer.pu_date1 = moment(shipperAppointment.trim(), 'DD/MM/YYYY').format('MM/DD/YYYY');
-                                shipperCustomer.pu_time1 = '0800';
-                                shipperCustomer.pu_date2 = moment(shipperAppointment.trim(), 'DD/MM/YYYY').format('MM/DD/YYYY');
-                                shipperCustomer.pu_time2 = '0800';
-                            }
-
-                            shipperCustomer.ref_numbers = refNumbers;
-                        }
-
-                        shipperList.push({
-                            shipperCode: shipperCode,
-                            shipperCustomer: shipperCustomer
-                        });
-
-                        let consigneeList = [];
-                        let consigneeCode = item[Object.keys(item).find(key => key.toLowerCase() === 'consignee1_code')];
-                        let consigneeAppointment = item[Object.keys(item).find(key => key.toLowerCase() === 'consignee1_appointment')] || '';
-                        let consigneeCustomer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === consigneeCode);
-
-                        if (consigneeCustomer === undefined) {
-                            status.push(`CONSIGNEE 1 DOESN\'T EXIST`);
-                        } else {
-                            if (moment(consigneeAppointment.trim(), 'DD/MM/YYYY H:mm').format('DD/MM/YYYY H:mm') === consigneeAppointment.trim()) {
-                                consigneeCustomer.delivery_date1 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                                consigneeCustomer.delivery_time1 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                                consigneeCustomer.delivery_date2 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                                consigneeCustomer.delivery_time2 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                            } else if (moment(consigneeAppointment.trim(), 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm') === consigneeAppointment.trim()) {
-                                consigneeCustomer.delivery_date1 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY HH:mm').format('MM/DD/YYYY');
-                                consigneeCustomer.delivery_time1 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY HH:mm').format('HHmm');
-                                consigneeCustomer.delivery_date2 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                                consigneeCustomer.delivery_time2 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                            } else if (moment(consigneeAppointment.trim(), 'DD/MM/YYYY').format('DD/MM/YYYY') === consigneeAppointment.trim()) {
-                                consigneeCustomer.delivery_date1 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY').format('MM/DD/YYYY');
-                                consigneeCustomer.delivery_time1 = '0800';
-                                consigneeCustomer.delivery_date2 = moment(consigneeAppointment.trim(), 'DD/MM/YYYY').format('MM/DD/YYYY');
-                                consigneeCustomer.delivery_time2 = '0800';
-                            }
-                        }
-
-                        consigneeList.push({
-                            consigneeCode: consigneeCode,
-                            consigneeCustomer: consigneeCustomer
-                        });
-
-                        let customerRating = {
-                            rateTypeId: (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id,
-                            description: item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '',
-                            pieces: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')],
-                            piecesUnit: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk',
-                            weight: (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')],
-                            total_charges: item[Object.keys(item).find(key => key.toLowerCase() === 'revenue')] || 0
-                        };
-
-                        let carrierRating = {
-                            rateTypeId: (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id,
-                            description: item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '',
-                            pieces: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')],
-                            piecesUnit: (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk',
-                            weight: (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')],
-                            total_charges: item[Object.keys(item).find(key => key.toLowerCase() === 'cost')] || 0
-                        };
-
-                        let firstPickCheckCall = item[Object.keys(item).find(key => key.toLowerCase() === 'first_pick_check_call')] || '';
-                        let firstPickDate = '';
-                        let firstPickTime = '';
-
-                        if (moment(firstPickCheckCall.trim(), 'DD/MM/YYYY H:mm').format('DD/MM/YYYY H:mm') === firstPickCheckCall.trim()) {
-                            firstPickDate = moment(firstPickCheckCall.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                            firstPickTime = moment(firstPickCheckCall.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                        } else if (moment(firstPickCheckCall.trim(), 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm') === firstPickCheckCall.trim()) {
-                            firstPickDate = moment(firstPickCheckCall.trim(), 'DD/MM/YYYY HH:mm').format('MM/DD/YYYY');
-                            firstPickTime = moment(firstPickCheckCall.trim(), 'DD/MM/YYYY HH:mm').format('HHmm');
-                        } else if (moment(firstPickCheckCall.trim(), 'DD/MM/YYYY').format('DD/MM/YYYY') === firstPickCheckCall.trim()) {
-                            firstPickDate = moment(firstPickCheckCall.trim(), 'DD/MM/YYYY').format('MM/DD/YYYY');
-                            firstPickTime = '0800';
-                        }
-
-                        let loadedEvent = {
-                            isValid: firstPickCheckCall !== '',
-                            eventTypeId: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
-                            time: firstPickTime,
-                            date: firstPickDate,
-                            eventTime: firstPickTime,
-                            eventDate: firstPickDate,
-                            eventLocation: shipperList.length > 0 ? shipperList[0].shipperCustomer?.city + ', ' + shipperList[0].shipperCustomer?.state : '',
-                            eventNotes: shipperList.length > 0 ? 'Loaded at Shipper ' + shipperList[0].shipperCode + ' - ' + shipperList[0].shipperCustomer?.name : '',
-                        }
-
-                        let lastDeliveryCheckCall = item[Object.keys(item).find(key => key.toLowerCase() === 'last_delivery_check_call')] || '';
-                        let lastDeliveryDate = '';
-                        let lastDeliveryTime = '';
-
-                        if (moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY H:mm').format('DD/MM/YYYY H:mm') === lastDeliveryCheckCall.trim()) {
-                            lastDeliveryDate = moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY H:mm').format('MM/DD/YYYY');
-                            lastDeliveryTime = moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY H:mm').format('HHmm');
-                        } else if (moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm') === lastDeliveryCheckCall.trim()) {
-                            lastDeliveryDate = moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY HH:mm').format('MM/DD/YYYY');
-                            lastDeliveryTime = moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY HH:mm').format('HHmm');
-                        } else if (moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY').format('DD/MM/YYYY') === lastDeliveryCheckCall.trim()) {
-                            lastDeliveryDate = moment(lastDeliveryCheckCall.trim(), 'DD/MM/YYYY').format('MM/DD/YYYY');
-                            lastDeliveryTime = '0800';
-                        }
-
-                        let deliveredEvent = {
-                            isValid: lastDeliveryCheckCall !== '',
-                            eventTypeId: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
-                            time: lastDeliveryTime,
-                            date: lastDeliveryDate,
-                            eventTime: lastDeliveryTime,
-                            eventDate: lastDeliveryDate,
-                            eventLocation: consigneeList.length > 0 ? consigneeList[consigneeList.length - 1].consigneeCustomer?.city + ', ' + consigneeList[consigneeList.length - 1].consigneeCustomer?.state : '',
-                            eventNotes: consigneeList.length > 0 ? 'Delivered at Consignee ' + consigneeList[consigneeList.length - 1].consigneeCode + ' - ' + consigneeList[consigneeList.length - 1].consigneeCustomer?.name : '',
-                        }
-
-                        item = {
-                            order: order,
-                            trip: trip,
-                            loadType: loadType,
-                            hazMat: hazMat,
-                            expedited: expedited,
-                            miles: miles,
-                            orderDateTime: orderDateTime,
-                            billToCode: billToCode,
-                            billToCustomer: billtoCustomer,
-                            carrierCode: carrierCode,
-                            carrierCustomer: carrierCustomer,
-                            equipment: equipment,
-                            shipperList: shipperList,
-                            consigneeList: consigneeList,
-                            customerRating: customerRating,
-                            carrierRating: carrierRating,
-                            loadedEvent: loadedEvent,
-                            deliveredEvent: deliveredEvent,
-                            status: status
-                        }
-
-                        return item;
+                        return true;
                     });
 
-                    setOrderTotalListLength(list.length);
-                    setOrderList(list);
+                    setOrderTotalListLength(order_list.length);
+                    setOrderList(order_list);
                     refInputFile.current.value = '';
                     setIsLoading(false);
                 }).catch(err => {
@@ -332,31 +1326,23 @@ const OrderImport = (props) => {
             if (orderList.length > 0) {
                 let listToSend = orderList.map(item => {
                     let newItem = {
-                        order: item.order,
-                        trip: item.trip,
-                        loadTypeId: item.loadType.id || 0,
-                        hazMat: item.hazMat,
+                        user_code_id: props.user?.user_code?.id,
+                        order_number: item.order_number,
+                        trip_number: item.trip_number,
+                        load_type_id: item.load_type_id,
+                        equipment_id: item.equipment_id,
+                        haz_mat: item.haz_mat,
                         expedited: item.expedited,
-                        miles: item.miles || 0,
-                        orderDateTime: item.orderDateTime,
-                        billToCustomerId: item.billToCustomer?.id || 0,
-                        carrierId: item.carrierCustomer?.id || 0,
-                        equipmentTypeId: item.equipment?.id || 0,
-                        shipperCustomerId: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.id || 0 : 0,
-                        pu_date1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date1 || '' : '',
-                        pu_date2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_date2 || '' : '',
-                        pu_time1: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time1 || '' : '',
-                        pu_time2: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.pu_time2 || '' : '',
-                        ref_numbers: item.shipperList.length > 0 ? item.shipperList[0].shipperCustomer?.ref_numbers || '' : '',
-                        consigneeCustomerId: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.id || 0 : 0,
-                        delivery_date1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date1 || '' : '',
-                        delivery_date2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_date2 || '' : '',
-                        delivery_time1: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time1 || '' : '',
-                        delivery_time2: item.consigneeList.length > 0 ? item.consigneeList[0].consigneeCustomer?.delivery_time2 || '' : '',
-                        customerRating: item.customerRating,
-                        carrierRating: item.carrierRating,
-                        loadedEvent: item.loadedEvent,
-                        deliveredEvent: item.deliveredEvent,
+                        miles: item.miles,
+                        order_date_time: item.order_date_time,
+                        bill_to_customer_id: item.bill_to_customer.id,
+                        carrier_id: item.carrier?.id || null,
+                        pickups: item.pickups,
+                        deliveries: item.deliveries,
+                        internal_notes: item.internal_notes,
+                        customer_rating: item.customer_rating,
+                        carrier_rating: item.carrier_rating,
+                        events: item.events
                     }
 
                     return newItem
@@ -372,7 +1358,7 @@ const OrderImport = (props) => {
     }
 
     useEffect(() => {
-        if (groupOrderList.length > 0){
+        if (groupOrderList.length > 0) {
             processSubmit();
         }
     }, [groupOrderList]);
@@ -410,6 +1396,10 @@ const OrderImport = (props) => {
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                            {
+                                !isSubmitting &&
+                                <div>please wait while file is being processed...</div>
+                            }
                         </div>
                     </animated.div>
                 )
@@ -478,12 +1468,10 @@ const OrderImport = (props) => {
                                                 <div className="tcol code">Carrier Code</div>
                                                 <div className="tcol name">Carrier Name</div>
                                                 <div className="shipper" style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <div className="tcol code">Shipper Code</div>
-                                                    <div className="tcol name">Shipper Name</div>
+                                                    <div className="tcol code">Nº of Pickups</div>
                                                 </div>
                                                 <div className="consignee" style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <div className="tcol code">Consignee Code</div>
-                                                    <div className="tcol name">Consignee Name</div>
+                                                    <div className="tcol code">Nº of Deliveries</div>
                                                 </div>
                                                 <div className="tcol revenue">Revenue</div>
                                                 <div className="tcol cost">Cost</div>
@@ -508,12 +1496,10 @@ const OrderImport = (props) => {
                                                 <div className="tcol code">Carrier Code</div>
                                                 <div className="tcol name">Carrier Name</div>
                                                 <div className="shipper" style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <div className="tcol code">Shipper Code</div>
-                                                    <div className="tcol name">Shipper Name</div>
+                                                    <div className="tcol code">Nº of Pickups</div>
                                                 </div>
                                                 <div className="consignee" style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <div className="tcol code">Consignee Code</div>
-                                                    <div className="tcol name">Consignee Name</div>
+                                                    <div className="tcol code">Nº of Deliveries</div>
                                                 </div>
                                                 <div className="tcol revenue">Revenue</div>
                                                 <div className="tcol cost">Cost</div>
@@ -564,100 +1550,68 @@ const OrderImport = (props) => {
                                                         <div className="tcol order">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.order || ''}
+                                                                value={order.order_number || ''}
                                                             />
                                                         </div>
                                                         <div className="tcol trip">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.trip || ''}
+                                                                value={order.trip_number || ''}
                                                             />
                                                         </div>
                                                         <div className="tcol load-type">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.loadType?.name || ''}
+                                                                value={order.load_type?.name || ''}
                                                             />
                                                         </div>
                                                         <div className="tcol code">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.billToCustomer?.code || ''}
+                                                                value={order.bill_to_customer?.code || ''}
                                                             />
                                                         </div>
                                                         <div className="tcol name">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.billToCustomer?.name || ''}
+                                                                value={order.bill_to_customer?.name || ''}
                                                             />
                                                         </div>
                                                         <div className="tcol code">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.carrierCustomer?.code || ''}
+                                                                value={order.carrier?.code || ''}
                                                             />
                                                         </div>
                                                         <div className="tcol name">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.carrierCustomer?.name || ''}
+                                                                value={order.carrier?.name || ''}
                                                             />
                                                         </div>
 
-                                                        {
-                                                            (order.shipperList || []).map((shipper, index) => {
-                                                                return (
-                                                                    <div className="shipper" key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                                                                        <div className="tcol code">
-                                                                            <input type="text" readOnly={true}
-                                                                                onChange={(e) => { }}
-                                                                                value={shipper.shipperCustomer?.code || ''}
-                                                                            />
-                                                                        </div>
-                                                                        <div className="tcol name">
-                                                                            <input type="text" readOnly={true}
-                                                                                onChange={(e) => { }}
-                                                                                value={shipper.shipperCustomer?.name || ''}
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-
-                                                        {
-                                                            (order.consigneeList || []).map((consignee, index) => {
-                                                                return (
-                                                                    <div className="consignee" key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                                                                        <div className="tcol code">
-                                                                            <input type="text" readOnly={true}
-                                                                                onChange={(e) => { }}
-                                                                                value={consignee.consigneeCustomer?.code || ''}
-                                                                            />
-                                                                        </div>
-                                                                        <div className="tcol name">
-                                                                            <input type="text" readOnly={true}
-                                                                                onChange={(e) => { }}
-                                                                                value={consignee.consigneeCustomer?.name || ''}
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
+                                                        <div className="shipper" style={{ display: 'flex', alignItems: 'center' }}>
+                                                            <div className="tcol code">{order.pickups.length}</div>
+                                                        </div>
+                                                        <div className="consignee" style={{ display: 'flex', alignItems: 'center' }}>
+                                                            <div className="tcol code">{order.deliveries.length}</div>
+                                                        </div>
 
                                                         <div className="tcol revenue">
                                                             <NumberFormat
                                                                 className={classnames({
                                                                     "negative-number":
-                                                                        (order.customerRating?.total_charges || 0) < 0,
+                                                                        ((order.customer_rating || []).reduce((a, b) => {
+                                                                            return a + (b?.total_charges || 0)
+                                                                        }, 0)) < 0,
                                                                 })}
                                                                 style={{ fontSize: "0.7rem", textAlign: "center" }}
                                                                 value={new Intl.NumberFormat("en-US", {
                                                                     minimumFractionDigits: 2,
                                                                     maximumFractionDigits: 2,
-                                                                }).format((order.customerRating?.total_charges || 0)
-                                                                )}
+                                                                }).format(((order.customer_rating || []).reduce((a, b) => {
+                                                                    return a + (b?.total_charges || 0)
+                                                                }, 0)))}
                                                                 thousandsGroupStyle="thousand"
                                                                 thousandSeparator={true}
                                                                 decimalScale={2}
@@ -674,14 +1628,17 @@ const OrderImport = (props) => {
                                                             <NumberFormat
                                                                 className={classnames({
                                                                     "negative-number":
-                                                                        (order.carrierRating?.total_charges || 0) < 0,
+                                                                        ((order.carrier_rating || []).reduce((a, b) => {
+                                                                            return a + (b?.total_charges || 0)
+                                                                        }, 0)) < 0,
                                                                 })}
                                                                 style={{ fontSize: "0.7rem", textAlign: "center" }}
                                                                 value={new Intl.NumberFormat("en-US", {
                                                                     minimumFractionDigits: 2,
                                                                     maximumFractionDigits: 2,
-                                                                }).format((order.carrierRating?.total_charges || 0)
-                                                                )}
+                                                                }).format(((order.carrier_rating || []).reduce((a, b) => {
+                                                                    return a + (b?.total_charges || 0)
+                                                                }, 0)))}
                                                                 thousandsGroupStyle="thousand"
                                                                 thousandSeparator={true}
                                                                 decimalScale={2}
@@ -697,7 +1654,7 @@ const OrderImport = (props) => {
                                                         <div className="tcol date">
                                                             <input type="text" readOnly={true}
                                                                 onChange={(e) => { }}
-                                                                value={order.orderDateTime || ''}
+                                                                value={order.order_date_time || ''}
                                                             />
                                                         </div>
                                                     </div>
@@ -718,6 +1675,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,

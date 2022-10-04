@@ -1,0 +1,1 @@
+{"version":3,"sources":["input"],"names":[],"mappings":"AAAA,iBACI,sBAAA,CACA,wCAAA,CACA,eAEA,gBAAC,YACG","sourcesContent":[".container-sheet{\n    background-color: white;\n    box-shadow: 2px 2px 2px 0 rgba(0,0,0,0.7);\n    padding: 0 15mm;\n\n    &:last-child{\n        margin-bottom: 2rem;\n    }\n}"]}

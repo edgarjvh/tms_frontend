@@ -1,0 +1,1 @@
+{"version":3,"sources":["input"],"names":[],"mappings":"AACA,mBACE,YAAa,cAAb,CACA,cAAA,CACA,gBAAA,CACA,iBAAA,CACA,aAAA,CACA","sourcesContent":["/* ListHeader.css */\n.mochi-list-header {\n  font-family: \"Mochi Medium\";\n  font-size: 18pt;\n  font-weight: bold;\n  font-style: italic;\n  color: #323232;\n  padding:0 32px 0 32px;\n}"]}

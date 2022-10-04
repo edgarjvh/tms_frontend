@@ -252,7 +252,7 @@ const FactoringCompany = (props) => {
                     }
                 }
             }
-            
+
             let company = selectedFactoringCompany || {};
 
             if (company.id === undefined) {
@@ -349,7 +349,7 @@ const FactoringCompany = (props) => {
                     }
                 }
             }
-            
+
             if ((selectedFactoringCompany.id || 0) === 0) {
                 setIsSavingFactoringCompanyContact(false);
                 return;
@@ -438,7 +438,7 @@ const FactoringCompany = (props) => {
                     }
                 }
             }
-            
+
             if ((selectedFactoringCompany.id || 0) > 0) {
                 let mailing_address = selectedFactoringCompany.mailing_address || {};
 
@@ -914,6 +914,9 @@ const FactoringCompany = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="Name"
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                     ref={refFactoringCompanyName}
                                     // onKeyDown={validateFactoringCompanyToSave}
                                     onChange={e => setSelectedFactoringCompany({ ...selectedFactoringCompany, name: e.target.value })}
@@ -942,6 +945,9 @@ const FactoringCompany = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="City"
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                     // onKeyDown={validateFactoringCompanyToSave}
                                     onChange={e => setSelectedFactoringCompany({ ...selectedFactoringCompany, city: e.target.value })}
                                     value={selectedFactoringCompany.city || ''} />
@@ -965,6 +971,9 @@ const FactoringCompany = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="Contact Name"
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                     onInput={(e) => {
                                         if ((selectedFactoringCompany?.contacts || []).length === 0) {
                                             setSelectedFactoringCompany({ ...selectedFactoringCompany, contact_name: e.target.value })
@@ -1279,6 +1288,9 @@ const FactoringCompany = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="Name"
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                     // onKeyDown={validateMailingAddressToSave}
                                     onChange={e => {
                                         let mailing_address = selectedFactoringCompany.mailing_address || {};
@@ -1318,6 +1330,9 @@ const FactoringCompany = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="City"
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                     // onKeyDown={validateMailingAddressToSave}
                                     onChange={e => {
                                         let mailing_address = selectedFactoringCompany.mailing_address || {};
@@ -1354,6 +1369,9 @@ const FactoringCompany = (props) => {
                             <div className="select-box-container" style={{ flexGrow: 1 }}>
                                 <div className="select-box-wrapper">
                                     <input type="text" placeholder="Contact Name"
+                                        style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                         ref={refMailingContactName}
                                         onKeyDown={async (e) => {
                                             let key = e.keyCode || e.which;
@@ -1578,73 +1596,73 @@ const FactoringCompany = (props) => {
                                                     break;
                                             }
                                         }}
-                                           onBlur={e => {
-                                               let contact = (selectedFactoringCompany?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+                                        onBlur={e => {
+                                            let contact = (selectedFactoringCompany?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
 
-                                               if (contact) {
-                                                   setSelectedFactoringCompany(selectedFactoringCompany => {
-                                                       return {
-                                                           ...selectedFactoringCompany,
-                                                           mailing_address: {
-                                                               ...(selectedFactoringCompany?.mailing_address || {}),
-                                                               contact_phone: (contact.primary_phone || '') === 'work'
-                                                                   ? (contact.phone_work || '')
-                                                                   : (contact.primary_phone || '') === 'fax'
-                                                                       ? (contact.phone_work_fax || '')
-                                                                       : (contact.primary_phone || '') === 'mobile'
-                                                                           ? (contact.phone_mobile || '')
-                                                                           : (contact.primary_phone || '') === 'direct'
-                                                                               ? (contact.phone_direct || '')
-                                                                               : (contact.primary_phone || '') === 'other'
-                                                                                   ? (contact.phone_other || '')
-                                                                                   : '',
-                                                               ext: (contact.phone_ext || ''),
-                                                               email: (contact.primary_email || '') === 'work'
-                                                                   ? (contact.email_work || '')
-                                                                   : (contact.primary_email || '') === 'personal'
-                                                                       ? (contact.email_personal || '')
-                                                                       : (contact.primary_email || '') === 'other'
-                                                                           ? (contact.email_other || '')
-                                                                           : '',
-                                                               mailing_contact_id: contact.id
-                                                           }
-                                                       }
-                                                   })
-                                               } else {
-                                                   setSelectedFactoringCompany(selectedFactoringCompany => {
-                                                       return {
-                                                           ...selectedFactoringCompany,
-                                                           mailing_address: {
-                                                               ...(selectedFactoringCompany?.mailing_address || {}),
-                                                               mailing_contact_id: null,
-                                                           }
-                                                       }
-                                                   })
-                                               }
-                                           }}
-                                           onInput={e => {
-                                               setSelectedFactoringCompany(selectedFactoringCompany => {
-                                                   return {
-                                                       ...selectedFactoringCompany,
-                                                       mailing_address: {
-                                                           ...(selectedFactoringCompany?.mailing_address || {}),
-                                                           contact_name: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedFactoringCompany(selectedFactoringCompany => {
-                                                   return {
-                                                       ...selectedFactoringCompany,
-                                                       mailing_address: {
-                                                           ...(selectedFactoringCompany?.mailing_address || {}),
-                                                           contact_name: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedFactoringCompany?.mailing_address?.contact_name || ''}
+                                            if (contact) {
+                                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                    return {
+                                                        ...selectedFactoringCompany,
+                                                        mailing_address: {
+                                                            ...(selectedFactoringCompany?.mailing_address || {}),
+                                                            contact_phone: (contact.primary_phone || '') === 'work'
+                                                                ? (contact.phone_work || '')
+                                                                : (contact.primary_phone || '') === 'fax'
+                                                                    ? (contact.phone_work_fax || '')
+                                                                    : (contact.primary_phone || '') === 'mobile'
+                                                                        ? (contact.phone_mobile || '')
+                                                                        : (contact.primary_phone || '') === 'direct'
+                                                                            ? (contact.phone_direct || '')
+                                                                            : (contact.primary_phone || '') === 'other'
+                                                                                ? (contact.phone_other || '')
+                                                                                : '',
+                                                            ext: (contact.phone_ext || ''),
+                                                            email: (contact.primary_email || '') === 'work'
+                                                                ? (contact.email_work || '')
+                                                                : (contact.primary_email || '') === 'personal'
+                                                                    ? (contact.email_personal || '')
+                                                                    : (contact.primary_email || '') === 'other'
+                                                                        ? (contact.email_other || '')
+                                                                        : '',
+                                                            mailing_contact_id: contact.id
+                                                        }
+                                                    }
+                                                })
+                                            } else {
+                                                setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                    return {
+                                                        ...selectedFactoringCompany,
+                                                        mailing_address: {
+                                                            ...(selectedFactoringCompany?.mailing_address || {}),
+                                                            mailing_contact_id: null,
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                        }}
+                                        onInput={e => {
+                                            setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                return {
+                                                    ...selectedFactoringCompany,
+                                                    mailing_address: {
+                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                        contact_name: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                return {
+                                                    ...selectedFactoringCompany,
+                                                    mailing_address: {
+                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                        contact_name: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        value={selectedFactoringCompany?.mailing_address?.contact_name || ''}
                                     />
 
                                     {
@@ -2093,44 +2111,44 @@ const FactoringCompany = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container input-phone-ext">
                                 <input type="text" placeholder="Ext"
-                                       onInput={e => {
-                                           setSelectedFactoringCompany(selectedFactoringCompany => {
-                                               return {
-                                                   ...selectedFactoringCompany,
-                                                   mailing_address: {
-                                                       ...(selectedFactoringCompany?.mailing_address || {}),
-                                                       ext: e.target.value
-                                                   }
-                                               }
-                                           })
-                                       }}
-                                       onChange={e => {
-                                           setSelectedFactoringCompany(selectedFactoringCompany => {
-                                               return {
-                                                   ...selectedFactoringCompany,
-                                                   mailing_address: {
-                                                       ...(selectedFactoringCompany?.mailing_address || {}),
-                                                       ext: e.target.value
-                                                   }
-                                               }
-                                           })
-                                       }}
-                                       value={selectedFactoringCompany?.mailing_address?.ext || ''}/>
+                                    onInput={e => {
+                                        setSelectedFactoringCompany(selectedFactoringCompany => {
+                                            return {
+                                                ...selectedFactoringCompany,
+                                                mailing_address: {
+                                                    ...(selectedFactoringCompany?.mailing_address || {}),
+                                                    ext: e.target.value
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    onChange={e => {
+                                        setSelectedFactoringCompany(selectedFactoringCompany => {
+                                            return {
+                                                ...selectedFactoringCompany,
+                                                mailing_address: {
+                                                    ...(selectedFactoringCompany?.mailing_address || {}),
+                                                    ext: e.target.value
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    value={selectedFactoringCompany?.mailing_address?.ext || ''} />
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="select-box-container" style={{ flexGrow: 1 }}
-                                 onMouseEnter={() => {
-                                     if ((selectedFactoringCompany?.mailing_address?.email || '') !== '') {
-                                         setShowMailingContactEmailCopyBtn(true);
-                                     }
-                                 }}
-                                 onFocus={() => {
-                                     if ((selectedFactoringCompany?.mailing_address?.email || '') !== '') {
-                                         setShowMailingContactEmailCopyBtn(true);
-                                     }
-                                 }}
+                                onMouseEnter={() => {
+                                    if ((selectedFactoringCompany?.mailing_address?.email || '') !== '') {
+                                        setShowMailingContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedFactoringCompany?.mailing_address?.email || '') !== '') {
+                                        setShowMailingContactEmailCopyBtn(true);
+                                    }
+                                }}
                                 onBlur={() => {
                                     window.setTimeout(() => {
                                         setShowMailingContactEmailCopyBtn(false);
@@ -2303,29 +2321,29 @@ const FactoringCompany = (props) => {
                                                     break;
                                             }
                                         }}
-                                           onInput={e => {
-                                               setSelectedFactoringCompany(selectedFactoringCompany => {
-                                                   return {
-                                                       ...selectedFactoringCompany,
-                                                       mailing_address: {
-                                                           ...(selectedFactoringCompany?.mailing_address || {}),
-                                                           email: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedFactoringCompany(selectedFactoringCompany => {
-                                                   return {
-                                                       ...selectedFactoringCompany,
-                                                       mailing_address: {
-                                                           ...(selectedFactoringCompany?.mailing_address || {}),
-                                                           email: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedFactoringCompany?.mailing_address?.email || ''}
+                                        onInput={e => {
+                                            setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                return {
+                                                    ...selectedFactoringCompany,
+                                                    mailing_address: {
+                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                        email: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedFactoringCompany(selectedFactoringCompany => {
+                                                return {
+                                                    ...selectedFactoringCompany,
+                                                    mailing_address: {
+                                                        ...(selectedFactoringCompany?.mailing_address || {}),
+                                                        email: e.target.value
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        value={selectedFactoringCompany?.mailing_address?.email || ''}
                                     />
 
                                     {
@@ -2569,6 +2587,9 @@ const FactoringCompany = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="First Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                     // onKeyDown={validateContactForSaving}
                                     onChange={e => {
                                         setSelectedFactoringCompanyContact({ ...selectedFactoringCompanyContact, first_name: e.target.value })
@@ -2579,6 +2600,9 @@ const FactoringCompany = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="Last Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                     // onKeyDown={validateContactForSaving}
                                     onChange={e => setSelectedFactoringCompanyContact({ ...selectedFactoringCompanyContact, last_name: e.target.value })}
                                     value={selectedFactoringCompanyContact.last_name || ''} />
@@ -3405,7 +3429,7 @@ const FactoringCompany = (props) => {
 
                                         let key = e.keyCode || e.which;
 
-                                        if (key === 9){
+                                        if (key === 9) {
                                             e.preventDefault();
                                             refFactoringCompanyCode.current.focus();
                                         }

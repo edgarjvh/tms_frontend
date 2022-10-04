@@ -1,0 +1,1 @@
+{"version":3,"sources":["input"],"names":[],"mappings":"AAAA,cAAc,YAEV,qBACI,WAAA,CACA","sourcesContent":[".panel-content.routing-map{\n    // padding-bottom: 10px;\n    .map-main-container{\n        flex-grow: 1;\n        position: relative;\n    }\n    \n}"]}

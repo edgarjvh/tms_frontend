@@ -1263,6 +1263,15 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Notes</div>
                                         <input type="text" readOnly={!isEditingContact}
+                                               onKeyDown={e => {
+                                                   let key = e.keyCode || e.which;
+
+                                                   if (key === 9){
+                                                       e.preventDefault()
+
+                                                       refPrefix.current.focus();
+                                                   }
+                                               }}
                                                onInput={(e) => {
                                                    setTempSelectedContact({
                                                        ...tempSelectedContact,

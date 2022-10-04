@@ -47,6 +47,7 @@
 .form-bordered-box.import.order .tcol.code {
   min-width: 6rem;
   max-width: 6rem;
+  text-align: center;
 }
 .form-bordered-box.import.order .tcol.name {
   min-width: 14rem;

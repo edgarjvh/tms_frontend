@@ -2189,6 +2189,9 @@ const Carriers = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={44 + props.tabTimes} type="text" placeholder="Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
@@ -2235,6 +2238,9 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={47 + props.tabTimes} type="text" placeholder="City"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
@@ -2271,6 +2277,9 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={50 + props.tabTimes} type="text" placeholder="Contact Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
@@ -2686,6 +2695,9 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={80 + props.tabTimes} type="text" placeholder="First Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
@@ -2700,6 +2712,9 @@ const Carriers = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={81 + props.tabTimes} type="text" placeholder="Last Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier contacts')?.pivot?.save || 0) === 0 &&
@@ -3822,6 +3837,9 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={92 + props.tabTimes} type="text" placeholder="First Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        ref={refCarrierDriverFirstName}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -3840,6 +3858,9 @@ const Carriers = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input tabIndex={93 + props.tabTimes} type="text" placeholder="Last Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0 &&
@@ -4468,6 +4489,9 @@ const Carriers = (props) => {
 
                             <div className="input-box-container grow">
                                 <input tabIndex={55 + props.tabTimes} type="text" placeholder="Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
@@ -4519,6 +4543,9 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={58 + props.tabTimes} type="text" placeholder="City"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
@@ -4559,6 +4586,9 @@ const Carriers = (props) => {
                             <div className="select-box-container" style={{flexGrow: 1}}>
                                 <div className="select-box-wrapper">
                                     <input
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
@@ -6877,6 +6907,9 @@ const Carriers = (props) => {
 
                             <div className="input-box-container grow">
                                 <input tabIndex={66 + props.tabTimes} type="text" placeholder="Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        ref={refFactoringCompanyName}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -6935,6 +6968,9 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={69 + props.tabTimes} type="text" placeholder="City"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
@@ -6990,6 +7026,9 @@ const Carriers = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input tabIndex={72 + props.tabTimes} type="text" placeholder="Contact Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
                                        readOnly={
                                            (props.user?.user_code?.is_admin || 0) === 0 &&
                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
