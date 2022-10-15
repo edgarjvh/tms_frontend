@@ -299,6 +299,8 @@ const FactoringCompany = (props) => {
                             setSelectedFactoringCompany(selectedFactoringCompany => {
                                 return {
                                     ...selectedFactoringCompany,
+                                    code: factoring_company.code,
+                                    code_number: factoring_company.code_number,
                                     contacts: factoring_company.contacts || []
                                 }
                             });
@@ -2587,9 +2589,9 @@ const FactoringCompany = (props) => {
                         <div className="form-row">
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="First Name"
-                                style={{
-                                    textTransform: 'capitalize'
-                                }}
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                     // onKeyDown={validateContactForSaving}
                                     onChange={e => {
                                         setSelectedFactoringCompanyContact({ ...selectedFactoringCompanyContact, first_name: e.target.value })
@@ -2600,9 +2602,9 @@ const FactoringCompany = (props) => {
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="Last Name"
-                                style={{
-                                    textTransform: 'capitalize'
-                                }}
+                                    style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                     // onKeyDown={validateContactForSaving}
                                     onChange={e => setSelectedFactoringCompanyContact({ ...selectedFactoringCompanyContact, last_name: e.target.value })}
                                     value={selectedFactoringCompanyContact.last_name || ''} />
@@ -3677,6 +3679,7 @@ const FactoringCompany = (props) => {
                                         savingDocumentUrl='/saveFactoringCompanyDocument'
                                         deletingDocumentUrl='/deleteFactoringCompanyDocument'
                                         savingDocumentNoteUrl='/saveFactoringCompanyDocumentNote'
+                                        deletingDocumentNoteUrl='/deleteFactoringCompanyDocumentNote'
                                         serverDocumentsFolder='/factoring-company-documents/'
                                     />
                                 }

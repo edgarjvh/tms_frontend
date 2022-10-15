@@ -1103,6 +1103,7 @@ const Divisions = (props) => {
                     savingDocumentUrl='/saveDivisionDocument'
                     deletingDocumentUrl='/deleteDivisionDocument'
                     savingDocumentNoteUrl='/saveDivisionDocumentNote'
+                    deletingDocumentNoteUrl='/deleteDivisionDocumentNote'
                     serverDocumentsFolder='/division-documents/'
                     setSelectedDivision={setSelectedDivision}
                 />

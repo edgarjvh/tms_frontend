@@ -522,12 +522,12 @@ const Dispatch = (props) => {
 
     const [selectedOrderEvent, setSelectedOrderEvent] = useState({});
     const H = window.H;
-    const platform = new H.service.Platform({
+    const platform = H !== undefined ? new H.service.Platform({
         apikey: "_aKHLFzgJTYQLzsSzVqRKyiKk8iuywH3jbtV8Mxw5Gs",
         app_id: "X4qy0Sva14BQxJCbVqXL",
-    });
+    }) : undefined;
 
-    const routingService = platform.getRoutingService(null, 8);
+    const routingService = platform !== undefined ? platform.getRoutingService(null, 8) : undefined;
 
     const refBolNumbers = useRef();
     const refPoNumbers = useRef();
@@ -2816,70 +2816,72 @@ const Dispatch = (props) => {
                                     'return': 'summary'
                                 }
 
-                                routingService.calculateRoute(
-                                    params,
-                                    (result) => {
-                                        let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                            return a + b.summary.length;
-                                        }, 0) || 0;
+                                if (routingService) {
+                                    routingService.calculateRoute(
+                                        params,
+                                        (result) => {
+                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                return a + b.summary.length;
+                                            }, 0) || 0;
 
-                                        selected_order.miles = miles;
+                                            selected_order.miles = miles;
 
-                                        setSelectedOrder(selected_order);
-                                        setMileageLoaderVisible(false);
+                                            setSelectedOrder(selected_order);
+                                            setMileageLoaderVisible(false);
 
-                                        if (!isCreatingTemplate && !isEditingTemplate) {
-                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                if (res.data.result === "OK") {
-                                                    setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                    });
+                                            if (!isCreatingTemplate && !isEditingTemplate) {
+                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
+                                                    if (res.data.result === "OK") {
+                                                        setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                        });
 
-                                                    props.setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        component_id: props.componentId,
-                                                    });
-                                                }
-                                            }).catch((e) => {
-                                                console.log("error on saving order miles", e);
-                                                setMileageLoaderVisible(false);
-                                            });
+                                                        props.setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                            component_id: props.componentId,
+                                                        });
+                                                    }
+                                                }).catch((e) => {
+                                                    console.log("error on saving order miles", e);
+                                                    setMileageLoaderVisible(false);
+                                                });
+                                            }
+                                        },
+                                        (error) => {
+                                            console.log("error getting mileage", error);
+                                            selected_order.miles = 0;
+
+                                            setSelectedOrder(selected_order);
+                                            setMileageLoaderVisible(false);
+
+                                            if (!isCreatingTemplate && !isEditingTemplate) {
+                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
+                                                    if (res.data.result === "OK") {
+                                                        setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                        });
+
+                                                        props.setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                            component_id: props.componentId,
+                                                        });
+                                                    }
+                                                }).catch((e) => {
+                                                    console.log("error on saving order miles", e);
+                                                    setMileageLoaderVisible(false);
+                                                });
+                                            }
                                         }
-                                    },
-                                    (error) => {
-                                        console.log("error getting mileage", error);
-                                        selected_order.miles = 0;
-
-                                        setSelectedOrder(selected_order);
-                                        setMileageLoaderVisible(false);
-
-                                        if (!isCreatingTemplate && !isEditingTemplate) {
-                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                if (res.data.result === "OK") {
-                                                    setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                    });
-
-                                                    props.setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        component_id: props.componentId,
-                                                    });
-                                                }
-                                            }).catch((e) => {
-                                                console.log("error on saving order miles", e);
-                                                setMileageLoaderVisible(false);
-                                            });
-                                        }
-                                    }
-                                );
+                                    );
+                                }
                             }
                         }
                     }
@@ -3173,72 +3175,76 @@ const Dispatch = (props) => {
                                     'return': 'summary'
                                 }
 
-                                routingService.calculateRoute(
-                                    params,
-                                    (result) => {
-                                        let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                            return a + b.summary.length;
-                                        }, 0) || 0;
+                                if (routingService) {
+                                    routingService.calculateRoute(
+                                        params,
+                                        (result) => {
+                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                return a + b.summary.length;
+                                            }, 0) || 0;
 
-                                        selected_order.miles = miles;
+                                            selected_order.miles = miles;
 
-                                        setSelectedOrder(selected_order);
-                                        setMileageLoaderVisible(false);
+                                            setSelectedOrder(selected_order);
+                                            setMileageLoaderVisible(false);
 
-                                        if (!isCreatingTemplate && !isEditingTemplate) {
-                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                if (res.data.result === "OK") {
-                                                    setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings:
-                                                            res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings:
-                                                            res.data.order.order_carrier_ratings,
-                                                    });
+                                            if (!isCreatingTemplate && !isEditingTemplate) {
+                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
+                                                    if (res.data.result === "OK") {
+                                                        setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings:
+                                                                res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings:
+                                                                res.data.order.order_carrier_ratings,
+                                                        });
 
-                                                    props.setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        component_id: props.componentId,
-                                                    });
-                                                }
-                                            }).catch((e) => {
-                                                console.log("error on saving order miles", e);
-                                                setMileageLoaderVisible(false);
-                                            });
+                                                        props.setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                            component_id: props.componentId,
+                                                        });
+                                                    }
+                                                }).catch((e) => {
+                                                    console.log("error on saving order miles", e);
+                                                    setMileageLoaderVisible(false);
+                                                });
+                                            }
+                                        },
+                                        (error) => {
+                                            console.log("error getting mileage", error);
+                                            selected_order.miles = 0;
+
+                                            setSelectedOrder(selected_order);
+                                            setMileageLoaderVisible(false);
+
+                                            if (!isCreatingTemplate && !isEditingTemplate) {
+                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
+                                                    if (res.data.result === "OK") {
+                                                        setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                        });
+
+                                                        props.setSelectedOrder({
+                                                            ...selected_order,
+                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                            component_id: props.componentId,
+                                                        });
+                                                    }
+                                                }).catch((e) => {
+                                                    console.log("error on saving order miles", e);
+                                                    setMileageLoaderVisible(false);
+                                                });
+                                            }
                                         }
-                                    },
-                                    (error) => {
-                                        console.log("error getting mileage", error);
-                                        selected_order.miles = 0;
+                                    );
+                                }
 
-                                        setSelectedOrder(selected_order);
-                                        setMileageLoaderVisible(false);
 
-                                        if (!isCreatingTemplate && !isEditingTemplate) {
-                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                if (res.data.result === "OK") {
-                                                    setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                    });
-
-                                                    props.setSelectedOrder({
-                                                        ...selected_order,
-                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        component_id: props.componentId,
-                                                    });
-                                                }
-                                            }).catch((e) => {
-                                                console.log("error on saving order miles", e);
-                                                setMileageLoaderVisible(false);
-                                            });
-                                        }
-                                    }
-                                );
                             }
                         }
                     }
@@ -3610,8 +3616,6 @@ const Dispatch = (props) => {
             if ((selectedOrder?.id || 0) > 0) {
                 let pickup = (selectedOrder?.pickups || []).find((p) => p.id === isSavingPickupId);
 
-                console.log(isSavingPickupId, pickup);
-
                 if (pickup !== undefined) {
                     if ((pickup.customer?.id || 0) > 0) {
                         if (!isCreatingTemplate && !isEditingTemplate) {
@@ -3635,13 +3639,40 @@ const Dispatch = (props) => {
                                 special_instructions: pickup.special_instructions || "",
                                 type: "pickup",
                             }).then((res) => {
-                                if (res.data.result === "OK") {
-                                    setSelectedOrder((selectedOrder) => {
+                                if (res.data.result === "OK") {                                    
+                                    setSelectedOrder((prev) => {
                                         return {
-                                            ...selectedOrder,
+                                            ...prev,
                                             pickups: (selectedOrder.pickups || []).map((p, i) => {
-                                                if (p.id === isSavingPickupId) {
-                                                    p = res.data.pickup;
+                                                if (p.id === isSavingPickupId) {                                                   
+
+                                                    p = {
+                                                        ...res.data.pickup,
+                                                        customer: {
+                                                            ...(res.data.pickup?.customer || {}),
+                                                            contacts: [
+                                                                ...(res.data.pickup.customer?.contacts || [])
+                                                            ].sort(function (a, b) {
+                                                                var aFirstChar = a.first_name.charAt(0);
+                                                                var bFirstChar = b.first_name.charAt(0);
+                                                                if (aFirstChar > bFirstChar) {
+                                                                    return 1;
+                                                                } else if (aFirstChar < bFirstChar) {
+                                                                    return -1;
+                                                                } else {
+                                                                    var aLastChar = a.last_name.charAt(0);
+                                                                    var bLastChar = b.last_name.charAt(0);
+                                                                    if (aLastChar > bLastChar) {
+                                                                        return 1;
+                                                                    } else if (aLastChar < bLastChar) {
+                                                                        return -1;
+                                                                    } else {
+                                                                        return 0;
+                                                                    }
+                                                                }
+                                                            })
+                                                        }
+                                                    };
 
                                                     setSelectedShipperCustomer({
                                                         ...selectedShipperCustomer,
@@ -3678,6 +3709,71 @@ const Dispatch = (props) => {
                                         }).then((res) => {
                                             if (res.data.result === "OK") {
                                                 selected_order = res.data.order;
+
+                                                selected_order.pickups = (selected_order.pickups || []).map(item => {
+                                                    item = {
+                                                        ...item,
+                                                        customer: {
+                                                            ...(item?.customer || {}),
+                                                            contacts: [
+                                                                ...(item?.customer?.contacts || [])
+                                                            ].sort(function (a, b) {
+                                                                var aFirstChar = a.first_name.charAt(0);
+                                                                var bFirstChar = b.first_name.charAt(0);
+                                                                if (aFirstChar > bFirstChar) {
+                                                                    return 1;
+                                                                } else if (aFirstChar < bFirstChar) {
+                                                                    return -1;
+                                                                } else {
+                                                                    var aLastChar = a.last_name.charAt(0);
+                                                                    var bLastChar = b.last_name.charAt(0);
+                                                                    if (aLastChar > bLastChar) {
+                                                                        return 1;
+                                                                    } else if (aLastChar < bLastChar) {
+                                                                        return -1;
+                                                                    } else {
+                                                                        return 0;
+                                                                    }
+                                                                }
+                                                            })
+                                                        }
+                                                    }
+
+                                                    return item;
+                                                })
+
+                                                selected_order.deliveries = (selected_order.deliveries || []).map(item => {
+                                                    item = {
+                                                        ...item,
+                                                        customer: {
+                                                            ...(item?.customer || {}),
+                                                            contacts: [
+                                                                ...(item?.customer?.contacts || [])
+                                                            ].sort(function (a, b) {
+                                                                var aFirstChar = a.first_name.charAt(0);
+                                                                var bFirstChar = b.first_name.charAt(0);
+                                                                if (aFirstChar > bFirstChar) {
+                                                                    return 1;
+                                                                } else if (aFirstChar < bFirstChar) {
+                                                                    return -1;
+                                                                } else {
+                                                                    var aLastChar = a.last_name.charAt(0);
+                                                                    var bLastChar = b.last_name.charAt(0);
+                                                                    if (aLastChar > bLastChar) {
+                                                                        return 1;
+                                                                    } else if (aLastChar < bLastChar) {
+                                                                        return -1;
+                                                                    } else {
+                                                                        return 0;
+                                                                    }
+                                                                }
+                                                            })
+                                                        }
+                                                    }
+
+                                                    return item;
+                                                })
+
                                                 setSelectedOrder(selected_order);
 
                                                 setMileageLoaderVisible(true);
@@ -3764,72 +3860,76 @@ const Dispatch = (props) => {
                                                     'return': 'summary'
                                                 }
 
-                                                routingService.calculateRoute(
-                                                    params,
-                                                    (result) => {
-                                                        let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                            return a + b.summary.length;
-                                                        }, 0) || 0;
+                                                if (routingService) {
+                                                    routingService.calculateRoute(
+                                                        params,
+                                                        (result) => {
+                                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                return a + b.summary.length;
+                                                            }, 0) || 0;
 
-                                                        selected_order.miles = miles;
+                                                            selected_order.miles = miles;
 
-                                                        setSelectedOrder(selected_order);
-                                                        setMileageLoaderVisible(false);
-
-                                                        axios.post(
-                                                            props.serverUrl + "/saveOrder",
-                                                            selected_order
-                                                        ).then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                });
-
-                                                                props.setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                    component_id: props.componentId,
-                                                                });
-                                                            }
-                                                        }).catch((e) => {
-                                                            console.log("error on saving order miles", e);
+                                                            setSelectedOrder(selected_order);
                                                             setMileageLoaderVisible(false);
-                                                        });
-                                                    },
-                                                    (error) => {
-                                                        console.log("error getting mileage", error);
-                                                        selected_order.miles = 0;
 
-                                                        setSelectedOrder(selected_order);
-                                                        setMileageLoaderVisible(false);
+                                                            axios.post(
+                                                                props.serverUrl + "/saveOrder",
+                                                                selected_order
+                                                            ).then((res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                    });
 
-                                                        axios.post(
-                                                            props.serverUrl + "/saveOrder",
-                                                            selected_order
-                                                        ).then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                });
+                                                                    props.setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                        component_id: props.componentId,
+                                                                    });
+                                                                }
+                                                            }).catch((e) => {
+                                                                console.log("error on saving order miles", e);
+                                                                setMileageLoaderVisible(false);
+                                                            });
+                                                        },
+                                                        (error) => {
+                                                            console.log("error getting mileage", error);
+                                                            selected_order.miles = 0;
 
-                                                                props.setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                    component_id: props.componentId,
-                                                                });
-                                                            }
-                                                        }).catch((e) => {
-                                                            console.log("error on saving order miles", e);
+                                                            setSelectedOrder(selected_order);
                                                             setMileageLoaderVisible(false);
-                                                        });
-                                                    }
-                                                );
+
+                                                            axios.post(
+                                                                props.serverUrl + "/saveOrder",
+                                                                selected_order
+                                                            ).then((res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                    });
+
+                                                                    props.setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                        component_id: props.componentId,
+                                                                    });
+                                                                }
+                                                            }).catch((e) => {
+                                                                console.log("error on saving order miles", e);
+                                                                setMileageLoaderVisible(false);
+                                                            });
+                                                        }
+                                                    );
+                                                }
+
+
                                             } else {
                                                 selected_order.miles = 0;
                                                 setSelectedOrder(selected_order);
@@ -4048,72 +4148,76 @@ const Dispatch = (props) => {
                                                     'return': 'summary'
                                                 }
 
-                                                routingService.calculateRoute(
-                                                    params,
-                                                    (result) => {
-                                                        let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                            return a + b.summary.length;
-                                                        }, 0) || 0;
+                                                if (routingService) {
+                                                    routingService.calculateRoute(
+                                                        params,
+                                                        (result) => {
+                                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                return a + b.summary.length;
+                                                            }, 0) || 0;
 
-                                                        selected_order.miles = miles;
+                                                            selected_order.miles = miles;
 
-                                                        setSelectedOrder(selected_order);
-                                                        setMileageLoaderVisible(false);
-
-                                                        axios.post(
-                                                            props.serverUrl + "/saveOrder",
-                                                            selected_order
-                                                        ).then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                });
-
-                                                                props.setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                    component_id: props.componentId,
-                                                                });
-                                                            }
-                                                        }).catch((e) => {
-                                                            console.log("error on saving order miles", e);
+                                                            setSelectedOrder(selected_order);
                                                             setMileageLoaderVisible(false);
-                                                        });
-                                                    },
-                                                    (error) => {
-                                                        console.log("error getting mileage", error);
-                                                        selected_order.miles = 0;
 
-                                                        setSelectedOrder(selected_order);
-                                                        setMileageLoaderVisible(false);
+                                                            axios.post(
+                                                                props.serverUrl + "/saveOrder",
+                                                                selected_order
+                                                            ).then((res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                    });
 
-                                                        axios.post(
-                                                            props.serverUrl + "/saveOrder",
-                                                            selected_order
-                                                        ).then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                });
+                                                                    props.setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                        component_id: props.componentId,
+                                                                    });
+                                                                }
+                                                            }).catch((e) => {
+                                                                console.log("error on saving order miles", e);
+                                                                setMileageLoaderVisible(false);
+                                                            });
+                                                        },
+                                                        (error) => {
+                                                            console.log("error getting mileage", error);
+                                                            selected_order.miles = 0;
 
-                                                                props.setSelectedOrder({
-                                                                    ...selected_order,
-                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                    component_id: props.componentId,
-                                                                });
-                                                            }
-                                                        }).catch((e) => {
-                                                            console.log("error on saving order miles", e);
+                                                            setSelectedOrder(selected_order);
                                                             setMileageLoaderVisible(false);
-                                                        });
-                                                    }
-                                                );
+
+                                                            axios.post(
+                                                                props.serverUrl + "/saveOrder",
+                                                                selected_order
+                                                            ).then((res) => {
+                                                                if (res.data.result === "OK") {
+                                                                    setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                    });
+
+                                                                    props.setSelectedOrder({
+                                                                        ...selected_order,
+                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                        component_id: props.componentId,
+                                                                    });
+                                                                }
+                                                            }).catch((e) => {
+                                                                console.log("error on saving order miles", e);
+                                                                setMileageLoaderVisible(false);
+                                                            });
+                                                        }
+                                                    );
+                                                }
+
+
                                             } else {
                                                 selected_order.miles = 0;
                                                 setSelectedOrder(selected_order);
@@ -4193,6 +4297,38 @@ const Dispatch = (props) => {
                                 (c) => c.is_primary === 1
                             ),
                         });
+
+                        order.pickups = (order.pickups || []).map((p) => {
+                            if (p.customer){
+                                let contacts = [
+                                    ...(p.customer.contacts || [])
+                                ].sort(function (a, b) {
+                                    var aFirstChar = a.first_name.charAt(0);
+                                    var bFirstChar = b.first_name.charAt(0);
+                                    if (aFirstChar > bFirstChar) {
+                                        return 1;
+                                    } else if (aFirstChar < bFirstChar) {
+                                        return -1;
+                                    } else {
+                                        var aLastChar = a.last_name.charAt(0);
+                                        var bLastChar = b.last_name.charAt(0);
+                                        if (aLastChar > bLastChar) {
+                                            return 1;
+                                        } else if (aLastChar < bLastChar) {
+                                            return -1;
+                                        } else {
+                                            return 0;
+                                        }
+                                    }
+                                });
+
+                                p.customer = {
+                                    ...p.customer,
+                                    contacts: contacts
+                                }
+                            }
+                            return p;
+                        })
 
                         let pickup_id = (order.routing || []).find((r) => r.type === "pickup")?.pickup_id || 0;
                         let pickup = {
@@ -4876,7 +5012,7 @@ const Dispatch = (props) => {
         }
 
         props.openPanel(panel, props.origin);
-    }
+    }   
 
     return (
         <div
@@ -9493,7 +9629,7 @@ const Dispatch = (props) => {
                                                     panelName={`${props.panelName}-rate-conf`}
                                                     origin={props.origin}
                                                     componentId={moment().format("x")}
-                                                    selectedOrder={selectedOrder}
+                                                    selectedOrderId={selectedOrder?.id || 0}
                                                 />
                                             ),
                                         };
@@ -9727,7 +9863,7 @@ const Dispatch = (props) => {
                                         panelName={`${props.panelName}-rate-conf`}
                                         origin={props.origin}
                                         componentId={moment().format("x")}
-                                        selectedOrder={selectedOrder}
+                                        selectedOrderId={selectedOrder?.id || 0}
                                     />
                                 ),
                             };
@@ -9762,7 +9898,7 @@ const Dispatch = (props) => {
                                         openPanel={props.openPanel}
                                         closePanel={props.closePanel}
                                         componentId={moment().format("x")}
-                                        selectedOrder={selectedOrder}
+                                        selectedOrderId={selectedOrder?.id || 0}
                                     />
                                 ),
                             };
@@ -9845,6 +9981,7 @@ const Dispatch = (props) => {
                                         savingDocumentUrl="/saveOrderDocument"
                                         deletingDocumentUrl="/deleteOrderDocument"
                                         savingDocumentNoteUrl="/saveOrderDocumentNote"
+                                        deletingDocumentNoteUrl="/deleteOrderDocumentNote"
                                         serverDocumentsFolder="/order-documents/"
                                         permissionName='dispatch documents'
                                     />
@@ -10060,6 +10197,11 @@ const Dispatch = (props) => {
                                                     ref_numbers: pickup.ref_numbers,
                                                     seal_number: pickup.seal_number,
                                                     special_instructions: pickup.special_instructions,
+                                                    contact_id: pickup.contact_id,
+                                                    contact_name: pickup.contact_name,
+                                                    contact_phone: pickup.contact_phone,
+                                                    contact_phone_ext: pickup.contact_phone_ext,
+                                                    contact_primary_phone: pickup.contact_primary_phone,
                                                     type: pickup.type,
                                                 });
 
@@ -10241,96 +10383,100 @@ const Dispatch = (props) => {
                                                                                         'return': 'summary'
                                                                                     }
 
-                                                                                    routingService.calculateRoute(
-                                                                                        params,
-                                                                                        (result) => {
-                                                                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                                                                return a + b.summary.length;
-                                                                                            }, 0) || 0;
+                                                                                    if (routingService) {
+                                                                                        routingService.calculateRoute(
+                                                                                            params,
+                                                                                            (result) => {
+                                                                                                let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                                                    return a + b.summary.length;
+                                                                                                }, 0) || 0;
 
-                                                                                            selected_order.miles = miles;
+                                                                                                selected_order.miles = miles;
 
-                                                                                            setSelectedOrder(selected_order);
-                                                                                            setMileageLoaderVisible(false);
+                                                                                                setSelectedOrder(selected_order);
+                                                                                                setMileageLoaderVisible(false);
 
-                                                                                            axios
-                                                                                                .post(
-                                                                                                    props.serverUrl + "/saveOrder",
-                                                                                                    selected_order
-                                                                                                )
-                                                                                                .then(async (res) => {
-                                                                                                    if (res.data.result === "OK") {
-                                                                                                        setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                        });
+                                                                                                axios
+                                                                                                    .post(
+                                                                                                        props.serverUrl + "/saveOrder",
+                                                                                                        selected_order
+                                                                                                    )
+                                                                                                    .then(async (res) => {
+                                                                                                        if (res.data.result === "OK") {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selected_order,
+                                                                                                                order_customer_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_customer_ratings,
+                                                                                                                order_carrier_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_carrier_ratings,
+                                                                                                            });
 
-                                                                                                        props.setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                            component_id:
-                                                                                                                props.componentId,
-                                                                                                        });
-                                                                                                    }
-                                                                                                })
-                                                                                                .catch((e) => {
-                                                                                                    console.log("error on saving order miles", e);
-                                                                                                    setMileageLoaderVisible(false);
-                                                                                                });
-                                                                                        },
-                                                                                        (error) => {
-                                                                                            console.log("error getting mileage", error);
-                                                                                            selected_order.miles = 0;
+                                                                                                            props.setSelectedOrder({
+                                                                                                                ...selected_order,
+                                                                                                                order_customer_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_customer_ratings,
+                                                                                                                order_carrier_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_carrier_ratings,
+                                                                                                                component_id:
+                                                                                                                    props.componentId,
+                                                                                                            });
+                                                                                                        }
+                                                                                                    })
+                                                                                                    .catch((e) => {
+                                                                                                        console.log("error on saving order miles", e);
+                                                                                                        setMileageLoaderVisible(false);
+                                                                                                    });
+                                                                                            },
+                                                                                            (error) => {
+                                                                                                console.log("error getting mileage", error);
+                                                                                                selected_order.miles = 0;
 
-                                                                                            setSelectedOrder(selected_order);
-                                                                                            setMileageLoaderVisible(false);
+                                                                                                setSelectedOrder(selected_order);
+                                                                                                setMileageLoaderVisible(false);
 
-                                                                                            axios
-                                                                                                .post(
-                                                                                                    props.serverUrl + "/saveOrder",
-                                                                                                    selected_order
-                                                                                                )
-                                                                                                .then(async (res) => {
-                                                                                                    if (res.data.result === "OK") {
-                                                                                                        setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                        });
+                                                                                                axios
+                                                                                                    .post(
+                                                                                                        props.serverUrl + "/saveOrder",
+                                                                                                        selected_order
+                                                                                                    )
+                                                                                                    .then(async (res) => {
+                                                                                                        if (res.data.result === "OK") {
+                                                                                                            setSelectedOrder({
+                                                                                                                ...selected_order,
+                                                                                                                order_customer_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_customer_ratings,
+                                                                                                                order_carrier_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_carrier_ratings,
+                                                                                                            });
 
-                                                                                                        props.setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                            component_id:
-                                                                                                                props.componentId,
-                                                                                                        });
-                                                                                                    }
-                                                                                                })
-                                                                                                .catch((e) => {
-                                                                                                    console.log("error on saving order miles", e);
-                                                                                                    setMileageLoaderVisible(false);
-                                                                                                });
-                                                                                        }
-                                                                                    );
+                                                                                                            props.setSelectedOrder({
+                                                                                                                ...selected_order,
+                                                                                                                order_customer_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_customer_ratings,
+                                                                                                                order_carrier_ratings:
+                                                                                                                    res.data.order
+                                                                                                                        .order_carrier_ratings,
+                                                                                                                component_id:
+                                                                                                                    props.componentId,
+                                                                                                            });
+                                                                                                        }
+                                                                                                    })
+                                                                                                    .catch((e) => {
+                                                                                                        console.log("error on saving order miles", e);
+                                                                                                        setMileageLoaderVisible(false);
+                                                                                                    });
+                                                                                            }
+                                                                                        );
+                                                                                    }
+
+
                                                                                 } else {
                                                                                     selected_order.miles = 0;
                                                                                     setSelectedOrder(selected_order);
@@ -10461,93 +10607,97 @@ const Dispatch = (props) => {
                                                                                 'return': 'summary'
                                                                             }
 
-                                                                            routingService.calculateRoute(
-                                                                                params,
-                                                                                (result) => {
-                                                                                    let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                                                        return a + b.summary.length;
-                                                                                    }, 0) || 0;
+                                                                            if (routingService) {
+                                                                                routingService.calculateRoute(
+                                                                                    params,
+                                                                                    (result) => {
+                                                                                        let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                                            return a + b.summary.length;
+                                                                                        }, 0) || 0;
 
-                                                                                    selected_order.miles = miles;
+                                                                                        selected_order.miles = miles;
 
-                                                                                    setSelectedOrder(selected_order);
-                                                                                    setMileageLoaderVisible(false);
+                                                                                        setSelectedOrder(selected_order);
+                                                                                        setMileageLoaderVisible(false);
 
-                                                                                    axios
-                                                                                        .post(
-                                                                                            props.serverUrl + "/saveOrder",
-                                                                                            selected_order
-                                                                                        )
-                                                                                        .then(async (res) => {
-                                                                                            if (res.data.result === "OK") {
-                                                                                                setSelectedOrder({
-                                                                                                    ...selected_order,
-                                                                                                    order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
-                                                                                                    order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
-                                                                                                });
+                                                                                        axios
+                                                                                            .post(
+                                                                                                props.serverUrl + "/saveOrder",
+                                                                                                selected_order
+                                                                                            )
+                                                                                            .then(async (res) => {
+                                                                                                if (res.data.result === "OK") {
+                                                                                                    setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
+                                                                                                        order_carrier_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
+                                                                                                    });
 
-                                                                                                props.setSelectedOrder({
-                                                                                                    ...selected_order,
-                                                                                                    order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
-                                                                                                    order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
-                                                                                                    component_id: props.componentId,
-                                                                                                });
-                                                                                            }
-                                                                                        })
-                                                                                        .catch((e) => {
-                                                                                            setMileageLoaderVisible(false);
-                                                                                            console.log("error on saving order miles", e);
-                                                                                        });
-                                                                                },
-                                                                                (error) => {
-                                                                                    console.log("error getting mileage", error);
-                                                                                    selected_order.miles = 0;
-                                                                                    setSelectedOrder(selected_order);
-                                                                                    setMileageLoaderVisible(false);
+                                                                                                    props.setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
+                                                                                                        order_carrier_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
+                                                                                                        component_id: props.componentId,
+                                                                                                    });
+                                                                                                }
+                                                                                            })
+                                                                                            .catch((e) => {
+                                                                                                setMileageLoaderVisible(false);
+                                                                                                console.log("error on saving order miles", e);
+                                                                                            });
+                                                                                    },
+                                                                                    (error) => {
+                                                                                        console.log("error getting mileage", error);
+                                                                                        selected_order.miles = 0;
+                                                                                        setSelectedOrder(selected_order);
+                                                                                        setMileageLoaderVisible(false);
 
-                                                                                    axios
-                                                                                        .post(
-                                                                                            props.serverUrl + "/saveOrder",
-                                                                                            selected_order
-                                                                                        )
-                                                                                        .then(async (res) => {
-                                                                                            if (res.data.result === "OK") {
-                                                                                                setSelectedOrder({
-                                                                                                    ...selected_order,
-                                                                                                    order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
-                                                                                                    order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
-                                                                                                });
+                                                                                        axios
+                                                                                            .post(
+                                                                                                props.serverUrl + "/saveOrder",
+                                                                                                selected_order
+                                                                                            )
+                                                                                            .then(async (res) => {
+                                                                                                if (res.data.result === "OK") {
+                                                                                                    setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
+                                                                                                        order_carrier_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
+                                                                                                    });
 
-                                                                                                props.setSelectedOrder({
-                                                                                                    ...selected_order,
-                                                                                                    order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
-                                                                                                    order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
-                                                                                                    component_id: props.componentId,
-                                                                                                });
-                                                                                            }
-                                                                                        })
-                                                                                        .catch((e) => {
-                                                                                            setMileageLoaderVisible(false);
-                                                                                            console.log("error on saving order miles", e);
-                                                                                        });
-                                                                                }
-                                                                            );
+                                                                                                    props.setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
+                                                                                                        order_carrier_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
+                                                                                                        component_id: props.componentId,
+                                                                                                    });
+                                                                                                }
+                                                                                            })
+                                                                                            .catch((e) => {
+                                                                                                setMileageLoaderVisible(false);
+                                                                                                console.log("error on saving order miles", e);
+                                                                                            });
+                                                                                    }
+                                                                                );
+                                                                            }
+
+
                                                                         } else {
                                                                             selected_order.miles = 0;
                                                                             setSelectedOrder(selected_order);
@@ -10976,82 +11126,86 @@ const Dispatch = (props) => {
                                                                                 'return': 'summary'
                                                                             }
 
-                                                                            routingService.calculateRoute(
-                                                                                params,
-                                                                                (result) => {
-                                                                                    let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                                                        return a + b.summary.length;
-                                                                                    }, 0) || 0;
+                                                                            if (routingService) {
+                                                                                routingService.calculateRoute(
+                                                                                    params,
+                                                                                    (result) => {
+                                                                                        let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                                            return a + b.summary.length;
+                                                                                        }, 0) || 0;
 
-                                                                                    selected_order.miles = miles;
+                                                                                        selected_order.miles = miles;
 
-                                                                                    setSelectedOrder(selected_order);
-                                                                                    setMileageLoaderVisible(false);
+                                                                                        setSelectedOrder(selected_order);
+                                                                                        setMileageLoaderVisible(false);
 
-                                                                                    axios
-                                                                                        .post(
-                                                                                            props.serverUrl + "/saveOrder",
-                                                                                            selected_order
-                                                                                        )
-                                                                                        .then(async (res) => {
+                                                                                        axios
+                                                                                            .post(
+                                                                                                props.serverUrl + "/saveOrder",
+                                                                                                selected_order
+                                                                                            )
+                                                                                            .then(async (res) => {
+                                                                                                if (res.data.result === "OK") {
+                                                                                                    setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
+                                                                                                        order_carrier_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
+                                                                                                    });
+
+                                                                                                    props.setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_customer_ratings,
+                                                                                                        order_carrier_ratings:
+                                                                                                            res.data.order
+                                                                                                                .order_carrier_ratings,
+                                                                                                        component_id:
+                                                                                                            props.componentId,
+                                                                                                    });
+                                                                                                }
+                                                                                            })
+                                                                                            .catch((e) => {
+                                                                                                console.log("error on saving order miles", e);
+                                                                                                setMileageLoaderVisible(false);
+                                                                                            });
+                                                                                    },
+                                                                                    (error) => {
+                                                                                        console.log("error getting mileage", error);
+                                                                                        selected_order.miles = 0;
+
+                                                                                        setSelectedOrder(selected_order);
+                                                                                        setMileageLoaderVisible(false);
+
+                                                                                        axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                                                                             if (res.data.result === "OK") {
                                                                                                 setSelectedOrder({
                                                                                                     ...selected_order,
-                                                                                                    order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
-                                                                                                    order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
+                                                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
                                                                                                 });
 
                                                                                                 props.setSelectedOrder({
                                                                                                     ...selected_order,
-                                                                                                    order_customer_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_customer_ratings,
-                                                                                                    order_carrier_ratings:
-                                                                                                        res.data.order
-                                                                                                            .order_carrier_ratings,
-                                                                                                    component_id:
-                                                                                                        props.componentId,
+                                                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                    component_id: props.componentId,
                                                                                                 });
                                                                                             }
                                                                                         })
-                                                                                        .catch((e) => {
-                                                                                            console.log("error on saving order miles", e);
-                                                                                            setMileageLoaderVisible(false);
-                                                                                        });
-                                                                                },
-                                                                                (error) => {
-                                                                                    console.log("error getting mileage", error);
-                                                                                    selected_order.miles = 0;
-
-                                                                                    setSelectedOrder(selected_order);
-                                                                                    setMileageLoaderVisible(false);
-
-                                                                                    axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
-                                                                                        if (res.data.result === "OK") {
-                                                                                            setSelectedOrder({
-                                                                                                ...selected_order,
-                                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                            .catch((e) => {
+                                                                                                console.log("error on saving order miles", e);
+                                                                                                setMileageLoaderVisible(false);
                                                                                             });
+                                                                                    }
+                                                                                );
+                                                                            }
 
-                                                                                            props.setSelectedOrder({
-                                                                                                ...selected_order,
-                                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                                                component_id: props.componentId,
-                                                                                            });
-                                                                                        }
-                                                                                    })
-                                                                                        .catch((e) => {
-                                                                                            console.log("error on saving order miles", e);
-                                                                                            setMileageLoaderVisible(false);
-                                                                                        });
-                                                                                }
-                                                                            );
+
                                                                         } else {
                                                                             selected_order.miles = 0;
                                                                             setSelectedOrder(selected_order);
@@ -11182,93 +11336,67 @@ const Dispatch = (props) => {
                                                                             'return': 'summary'
                                                                         }
 
-                                                                        routingService.calculateRoute(
-                                                                            params,
-                                                                            (result) => {
-                                                                                let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                                                    return a + b.summary.length;
-                                                                                }, 0) || 0;
+                                                                        if (routingService) {
+                                                                            routingService.calculateRoute(
+                                                                                params,
+                                                                                (result) => {
+                                                                                    let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                                        return a + b.summary.length;
+                                                                                    }, 0) || 0;
 
-                                                                                selected_order.miles = miles;
+                                                                                    selected_order.miles = miles;
 
-                                                                                setSelectedOrder(selected_order);
-                                                                                setMileageLoaderVisible(false);
+                                                                                    setSelectedOrder(selected_order);
+                                                                                    setMileageLoaderVisible(false);
 
-                                                                                axios
-                                                                                    .post(
-                                                                                        props.serverUrl + "/saveOrder",
-                                                                                        selected_order
-                                                                                    )
-                                                                                    .then(async (res) => {
+                                                                                    axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                                                                         if (res.data.result === "OK") {
                                                                                             setSelectedOrder({
                                                                                                 ...selected_order,
-                                                                                                order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
-                                                                                                order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
                                                                                             });
 
                                                                                             props.setSelectedOrder({
                                                                                                 ...selected_order,
-                                                                                                order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
-                                                                                                order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
                                                                                                 component_id: props.componentId,
                                                                                             });
                                                                                         }
-                                                                                    })
-                                                                                    .catch((e) => {
+                                                                                    }).catch((e) => {
                                                                                         console.log("error on saving order miles", e);
                                                                                         setMileageLoaderVisible(false);
                                                                                     });
-                                                                            },
-                                                                            (error) => {
-                                                                                console.log("error getting mileage", error);
-                                                                                selected_order.miles = 0;
-                                                                                setSelectedOrder(selected_order);
-                                                                                setMileageLoaderVisible(false);
+                                                                                },
+                                                                                (error) => {
+                                                                                    console.log("error getting mileage", error);
+                                                                                    selected_order.miles = 0;
+                                                                                    setSelectedOrder(selected_order);
+                                                                                    setMileageLoaderVisible(false);
 
-                                                                                axios
-                                                                                    .post(
-                                                                                        props.serverUrl + "/saveOrder",
-                                                                                        selected_order
-                                                                                    )
-                                                                                    .then(async (res) => {
+                                                                                    axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                                                                         if (res.data.result === "OK") {
                                                                                             setSelectedOrder({
                                                                                                 ...selected_order,
-                                                                                                order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
-                                                                                                order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
                                                                                             });
 
                                                                                             props.setSelectedOrder({
                                                                                                 ...selected_order,
-                                                                                                order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
-                                                                                                order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
+                                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
                                                                                                 component_id: props.componentId,
                                                                                             });
                                                                                         }
-                                                                                    })
-                                                                                    .catch((e) => {
+                                                                                    }).catch((e) => {
                                                                                         console.log("error on saving order miles", e);
                                                                                         setMileageLoaderVisible(false);
                                                                                     });
-                                                                            }
-                                                                        );
+                                                                                }
+                                                                            );
+                                                                        }
                                                                     } else {
                                                                         selected_order.miles = 0;
                                                                         setSelectedOrder(selected_order);

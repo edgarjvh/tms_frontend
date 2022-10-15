@@ -1,0 +1,44 @@
+.filtering-section {
+  margin-top: 10px;
+}
+.panel-contact-list-container {
+  flex-grow: 1;
+  position: relative;
+}
+.panel-contact-list-container .contact-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 15px);
+  top: 15px;
+  left: 0;
+  overflow: auto;
+  padding: 0 0 20px;
+  font-size: 0.9rem;
+}
+.panel-contact-list-container .contact-list-wrapper .contact-list-header {
+  display: grid;
+  grid-template-columns: 170px 170px 150px 300px 120px auto;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  margin-bottom: 5px;
+  padding: 10px;
+}
+.panel-contact-list-container .contact-list-wrapper .contact-list-rows {
+  display: flex;
+  flex-direction: column;
+}
+.panel-contact-list-container .contact-list-wrapper .contact-list-rows .contact-list-item {
+  display: grid;
+  grid-template-columns: 170px 170px 150px 300px 120px auto;
+  padding: 3px 0;
+  transition: ease all 0.2s;
+  cursor: pointer;
+  padding: 10px;
+}
+.panel-contact-list-container .contact-list-wrapper .contact-list-rows .contact-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.panel-contact-list-container .contact-list-wrapper .contact-list-rows .contact-list-item.no-rows {
+  display: grid;
+  grid-template-columns: 1fr;
+}

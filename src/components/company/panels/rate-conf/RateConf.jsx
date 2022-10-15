@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { connect } from "react-redux";
 import CarrierConfirmation from './CarrierConfirmation.jsx';
 import CustomerConfirmation from './CustomerConfirmation.jsx';
@@ -11,12 +11,16 @@ import {
     setInvoiceOpenedPanels,
 } from './../../../../actions';
 import { useTransition, animated } from 'react-spring';
+import Loader from 'react-loader-spinner';
 import classNames from 'classnames';
+import axios from 'axios';
 
 const RateConf = (props) => {
     const [showingCarrierConfirmation, setShowingCarrierConfirmation] = useState(true);
     const carrierComponentRef = useRef();
     const customerComponentRef = useRef();
+    const [selectedOrder, setSelectedOrder] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
     const carrierConfirmationTransition = useTransition(showingCarrierConfirmation, {
         from: { opacity: 0 },
@@ -60,10 +64,40 @@ const RateConf = (props) => {
         content: () => showingCarrierConfirmation ? carrierComponentRef.current : customerComponentRef.current,
     });
 
+    const loadingTransition = useTransition(isLoading, {
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
+        reverse: isLoading,
+    });
+
+    useEffect(() => {
+        if ((props.selectedOrderId || 0) > 0) {
+            axios.post(props.serverUrl + '/getOrderById', { id: props.selectedOrderId }).then(res => {
+                if (res.data.result === 'OK') {
+                    setSelectedOrder(res.data.order);
+                }
+            }).finally(() => {
+                setIsLoading(false);
+            })
+        }
+    }, [])
+
     return (
         <div className="panel-content">
+            {
+                loadingTransition((style, item) => item &&
+                    <animated.div className='loading-container' style={style}>
+                        <div className="loading-container-wrapper">
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                        </div>
+                    </animated.div>
+                )
+            }
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+
+
 
             <div className="header-buttons" style={{ marginTop: 10, marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
                 <div className="mochi-button" onClick={() => {
@@ -118,11 +152,11 @@ const RateConf = (props) => {
                             <animated.div style={{ ...style }}>
                                 <CarrierConfirmation
                                     ref={carrierComponentRef}
-                                    selected_order={props.selectedOrder}
-                                    selectedCarrierInfo={props.selectedOrder.carrier}
-                                    selectedCarrierInfoContact={(props.selectedOrder.carrier?.contacts || []).find(c => c.is_primary === 1) || {}}
-                                    selectedCustomerInfo={props.selectedOrder.bill_to_company}
-                                    selectedCustomerInfoContact={(props.selectedOrder.bill_to_company?.contacts || []).find(c => c.is_primary === 1) || {}}
+                                    selected_order={selectedOrder}
+                                    selectedCarrierInfo={selectedOrder?.carrier}
+                                    selectedCarrierInfoContact={(selectedOrder?.carrier?.contacts || []).find(c => c.is_primary === 1) || {}}
+                                    selectedCustomerInfo={selectedOrder?.bill_to_company}
+                                    selectedCustomerInfoContact={(selectedOrder?.bill_to_company?.contacts || []).find(c => c.is_primary === 1) || {}}
                                     selectedCompany={props.selectedCompany}
                                 />
                             </animated.div>
@@ -133,11 +167,11 @@ const RateConf = (props) => {
                             <animated.div style={{ ...style }}>
                                 <CustomerConfirmation
                                     ref={customerComponentRef}
-                                    selected_order={props.selectedOrder}
-                                    selectedCarrierInfo={props.selectedOrder.carrier}
-                                    selectedCarrierInfoContact={(props.selectedOrder.carrier?.contacts || []).find(c => c.is_primary === 1) || {}}
-                                    selectedCustomerInfo={props.selectedOrder.bill_to_company}
-                                    selectedCustomerInfoContact={(props.selectedOrder.bill_to_company?.contacts || []).find(c => c.is_primary === 1) || {}}
+                                    selected_order={selectedOrder}
+                                    selectedCarrierInfo={selectedOrder?.carrier}
+                                    selectedCarrierInfoContact={(selectedOrder?.carrier?.contacts || []).find(c => c.is_primary === 1) || {}}
+                                    selectedCustomerInfo={selectedOrder?.bill_to_company}
+                                    selectedCustomerInfoContact={(selectedOrder?.bill_to_company?.contacts || []).find(c => c.is_primary === 1) || {}}
                                     selectedCompany={props.selectedCompany}
                                 />
                             </animated.div>

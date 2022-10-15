@@ -41,7 +41,8 @@ import {
     Documents,
     ContactSearch,
     Contacts,
-    Modal as CustomerModal
+    Modal as CustomerModal,
+    ContactList
 } from './../panels';
 
 import {
@@ -363,10 +364,13 @@ const Customers = (props) => {
 
     useEffect(() => {
         if ((props.selectedCustomer?.component_id || '') !== props.componentId) {
+            console.log('local', selectedCustomer);
+            console.log('props', props.selectedCustomer);
             if (((selectedCustomer?.id || 0) > 0 && (props.selectedCustomer?.id || 0) > 0) && selectedCustomer.id === props.selectedCustomer.id) {
-                setSelectedCustomer(selectedCustomer => {
+
+                setSelectedCustomer(prev => {
                     return {
-                        ...selectedCustomer,
+                        ...prev,
                         ...props.selectedCustomer
                     }
                 })
@@ -444,15 +448,37 @@ const Customers = (props) => {
                 }).then(res => {
                     if (res.data.result === 'OK') {
                         let customer = JSON.parse(JSON.stringify(res.data.customer));
+
                         if ((selectedCustomer?.id || 0) === 0) {
-                            setSelectedCustomer(_selectedCustomer => {
+
+                            setSelectedCustomer(prev => {
                                 return {
-                                    ..._selectedCustomer,
+                                    ...prev,
                                     id: customer.id,
                                     code: customer.code,
                                     code_number: customer.code_number,
-                                    contacts: customer.contacts || [],
-                                    credit_limit_total: customer.credit_limit_total.toFixed(2)
+                                    credit_limit_total: customer.credit_limit_total.toFixed(2),
+                                    contacts: [
+                                        ...(customer?.contacts || [])
+                                    ].sort(function (a, b) {
+                                        var aFirstChar = a.first_name.charAt(0);
+                                        var bFirstChar = b.first_name.charAt(0);
+                                        if (aFirstChar > bFirstChar) {
+                                            return 1;
+                                        } else if (aFirstChar < bFirstChar) {
+                                            return -1;
+                                        } else {
+                                            var aLastChar = a.last_name.charAt(0);
+                                            var bLastChar = b.last_name.charAt(0);
+                                            if (aLastChar > bLastChar) {
+                                                return 1;
+                                            } else if (aLastChar < bLastChar) {
+                                                return -1;
+                                            } else {
+                                                return 0;
+                                            }
+                                        }
+                                    })
                                 }
                             });
 
@@ -462,10 +488,32 @@ const Customers = (props) => {
                             })
 
                         } else {
-                            setSelectedCustomer(_selectedCustomer => {
+                            setSelectedCustomer(prev => {
                                 return {
-                                    ..._selectedCustomer,
-                                    contacts: (customer.contacts || []),
+                                    ...prev,
+                                    code: customer.code,
+                                    code_number: customer.code_number,
+                                    contacts: [
+                                        ...(customer?.contacts || [])
+                                    ].sort(function (a, b) {
+                                        var aFirstChar = a.first_name.charAt(0);
+                                        var bFirstChar = b.first_name.charAt(0);
+                                        if (aFirstChar > bFirstChar) {
+                                            return 1;
+                                        } else if (aFirstChar < bFirstChar) {
+                                            return -1;
+                                        } else {
+                                            var aLastChar = a.last_name.charAt(0);
+                                            var bLastChar = b.last_name.charAt(0);
+                                            if (aLastChar > bLastChar) {
+                                                return 1;
+                                            } else if (aLastChar < bLastChar) {
+                                                return -1;
+                                            } else {
+                                                return 0;
+                                            }
+                                        }
+                                    }),
                                     credit_limit_total: new Intl.NumberFormat('en-US', {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2
@@ -475,7 +523,29 @@ const Customers = (props) => {
 
                             props.setSelectedCustomer({
                                 ...selectedCustomer,
-                                contacts: customer.contacts || [],
+                                code: customer.code,
+                                code_number: customer.code_number,
+                                contacts: [
+                                    ...(customer?.contacts || [])
+                                ].sort(function (a, b) {
+                                    var aFirstChar = a.first_name.charAt(0);
+                                    var bFirstChar = b.first_name.charAt(0);
+                                    if (aFirstChar > bFirstChar) {
+                                        return 1;
+                                    } else if (aFirstChar < bFirstChar) {
+                                        return -1;
+                                    } else {
+                                        var aLastChar = a.last_name.charAt(0);
+                                        var bLastChar = b.last_name.charAt(0);
+                                        if (aLastChar > bLastChar) {
+                                            return 1;
+                                        } else if (aLastChar < bLastChar) {
+                                            return -1;
+                                        } else {
+                                            return 0;
+                                        }
+                                    }
+                                }),
                                 component_id: props.componentId
                             });
                         }
@@ -536,6 +606,8 @@ const Customers = (props) => {
                 selectedContact.zip_code = selectedCustomer?.zip;
             }
 
+            selectedContact.main_customer_id = selectedCustomer.id;
+
             axios.post(props.serverUrl + '/saveContact', selectedContact).then(res => {
                 if (res.data.result === 'OK') {
                     let mailing_contact = selectedCustomer?.mailing_address?.mailing_contact || {};
@@ -543,19 +615,23 @@ const Customers = (props) => {
                     if ((mailing_contact?.id || 0) === res.data.contact.id) {
                         mailing_contact = res.data.contact;
                     }
+
+                    let contact = (res.data?.contacts || []).find(x => x.id === res.data.contact.id);
+
                     setSelectedCustomer({
                         ...selectedCustomer,
-                        contacts: res.data.contacts,
+                        contacts: (res.data?.contacts || []),
                         mailing_address: {
                             ...selectedCustomer.mailing_address,
                             mailing_contact: mailing_contact
                         }
                     });
-                    setSelectedContact(res.data.contact);
+
+                    setSelectedContact(contact);
 
                     props.setSelectedCustomer({
                         ...selectedCustomer,
-                        contacts: res.data.contacts,
+                        contacts: (res.data?.contacts || []),
                         mailing_address: {
                             ...selectedCustomer.mailing_address,
                             mailing_contact: mailing_contact
@@ -564,7 +640,7 @@ const Customers = (props) => {
                     });
 
                     props.setSelectedContact({
-                        ...res.data.contact,
+                        ...contact,
                         component_id: props.componentId
                     });
                 }
@@ -853,11 +929,24 @@ const Customers = (props) => {
                     if (res.data.result === 'OK') {
                         if (res.data.customers.length > 0) {
                             setInitialValues();
+
                             setSelectedCustomer({
                                 ...res.data.customers[0],
-                                credit_limit_total: res.data.customers[0].credit_limit_total.toFixed(2)
+                                credit_limit_total: res.data.customers[0].credit_limit_total.toFixed(2),
+                                contacts: [
+                                    ...(res.data.customers[0]?.contacts || [])
+                                ]
                             });
                             setSelectedContact((res.data.customers[0].contacts || []).find(c => c.is_primary === 1) || {});
+
+                            props.setSelectedCustomer({
+                                ...res.data.customers[0],
+                                credit_limit_total: res.data.customers[0].credit_limit_total.toFixed(2),
+                                contacts: [
+                                    ...(res.data.customers[0]?.contacts || [])
+                                ],
+                                componentId: moment().format('x')
+                            })
 
                             getCustomerOrders(res.data.customers[0]);
                         } else {
@@ -1161,6 +1250,7 @@ const Customers = (props) => {
                     savingDocumentUrl='/saveCustomerDocument'
                     deletingDocumentUrl='/deleteCustomerDocument'
                     savingDocumentNoteUrl='/saveCustomerDocumentNote'
+                    deletingDocumentNoteUrl='/deleteCustomerDocumentNote'
                     serverDocumentsFolder='/customer-documents/'
                     permissionName='customer documents'
                 />
@@ -1690,9 +1780,9 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact Name"
-                                    style={{
-                                        textTransform: 'capitalize'
-                                    }}
+                                        style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
@@ -1715,10 +1805,14 @@ const Customers = (props) => {
                                             }
                                         }}
                                         value={
-                                            (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.contact_name || '')
-                                                // ? ''
-                                                : selectedCustomer?.contacts.find(c => c.is_primary === 1).first_name + ' ' + selectedCustomer?.contacts.find(c => c.is_primary === 1).last_name
+                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
+                                                ? (((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.first_name || '') + ' ' +
+                                                    ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.last_name || '')).trim()
+                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
+                                                    ? (selectedCustomer?.contact_name || '')
+                                                    // ? ''
+                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).first_name + ' ' + selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).last_name
+
                                         }
                                     />
                                 </div>
@@ -1751,31 +1845,49 @@ const Customers = (props) => {
                                             }
                                         }}
                                         value={
-                                            (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.contact_phone || '')
-                                                // ? ''
-                                                : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
-                                                    ? selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_work
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
-                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                                        : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
-                                                            ? selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                                            : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
-                                                                ? selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_direct
-                                                                : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
-                                                                    ? selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_other
+                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
+                                                ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'work'
+                                                    ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_work
+                                                    : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'fax'
+                                                        ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_work_fax
+                                                        : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'mobile'
+                                                            ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_mobile
+                                                            : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'direct'
+                                                                ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_direct
+                                                                : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'other'
+                                                                    ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_other
                                                                     : ''
+                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
+                                                    ? (selectedCustomer?.contact_phone || '')
+                                                    // ? ''
+                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'work'
+                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_work
+                                                        : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'fax'
+                                                            ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_work_fax
+                                                            : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'mobile'
+                                                                ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_mobile
+                                                                : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'direct'
+                                                                    ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_direct
+                                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'other'
+                                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_other
+                                                                        : ''
+
                                         }
                                     />
 
                                     {
-                                        ((selectedCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined) &&
+                                        ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1) ||
+                                            ((selectedCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined)) &&
                                         <div
                                             className={classnames({
                                                 'selected-customer-contact-primary-phone': true,
                                                 'pushed': false
                                             })}>
-                                            {selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_phone}
+                                            {
+                                                (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
+                                                    ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone
+                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone
+                                            }
                                         </div>
                                     }
                                 </div>
@@ -1798,10 +1910,13 @@ const Customers = (props) => {
                                             }
                                         }}
                                         value={
-                                            (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.ext || '')
-                                                // ? ''
-                                                : selectedCustomer?.contacts.find(c => c.is_primary === 1).phone_ext
+                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
+                                                ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_ext
+                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
+                                                    ? (selectedCustomer?.ext || '')
+                                                    // ? ''
+                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_ext
+
                                         }
                                     />
                                 </div>
@@ -1850,26 +1965,39 @@ const Customers = (props) => {
                                             }
                                         }}
                                         value={
-                                            (selectedCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                ? (selectedCustomer?.email || '')
-                                                // ? ''
-                                                : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
-                                                    ? selectedCustomer?.contacts.find(c => c.is_primary === 1).email_work
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
-                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1).email_personal
-                                                        : selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email === 'other'
-                                                            ? selectedCustomer?.contacts.find(c => c.is_primary === 1).email_other
+                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
+                                                ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email === 'work'
+                                                    ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).email_work
+                                                    : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email === 'personal'
+                                                        ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).email_personal
+                                                        : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email === 'other'
+                                                            ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).email_other
                                                             : ''
+                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
+                                                    ? (selectedCustomer?.email || '')
+                                                    // ? ''
+                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email === 'work'
+                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).email_work
+                                                        : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email === 'personal'
+                                                            ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).email_personal
+                                                            : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email === 'other'
+                                                                ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).email_other
+                                                                : ''
                                         }
                                     />
                                     {
-                                        ((selectedCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined) &&
+                                        ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1) ||
+                                            ((selectedCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined)) &&
                                         <div
                                             className={classnames({
                                                 'selected-customer-contact-primary-email': true,
                                                 'pushed': false
                                             })}>
-                                            {selectedCustomer?.contacts.find(c => c.is_primary === 1).primary_email}
+                                            {
+                                                (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
+                                                    ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email
+                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email
+                                            }
                                         </div>
                                     }
 
@@ -1964,9 +2092,9 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={19 + props.tabTimes} type="text" placeholder="Name"
-                                    style={{
-                                        textTransform: 'capitalize'
-                                    }}
+                                        style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
@@ -2057,9 +2185,9 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={22 + props.tabTimes} type="text" placeholder="City"
-                                    style={{
-                                        textTransform: 'capitalize'
-                                    }}
+                                        style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
@@ -2148,9 +2276,9 @@ const Customers = (props) => {
                                 <div className="select-box-container" style={{ flexGrow: 1 }}>
                                     <div className="select-box-wrapper">
                                         <input
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
+                                            style={{
+                                                textTransform: 'capitalize'
+                                            }}
                                             readOnly={
                                                 (props.user?.user_code?.is_admin || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
@@ -4818,6 +4946,57 @@ const Customers = (props) => {
                                         <div className="mochi-button-base">More</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
+
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={async () => {
+                                        if (selectedCustomer?.id === undefined) {
+                                            window.alert('You must select a customer first!');
+                                            return;
+                                        }
+
+                                        let panel = {
+                                            panelName: `${props.panelName}-contact-list`,
+                                            component: <ContactList
+                                                title='Contact List'
+                                                tabTimes={137000 + props.tabTimes}
+                                                panelName={`${props.panelName}-contact-list`}
+                                                origin={props.origin}
+                                                openPanel={props.openPanel}
+                                                closePanel={props.closePanel}
+                                                componentId={moment().format('x')}
+                                                selectedCustomerId={selectedCustomer?.id || 0}
+                                                setContacts={(contacts) => {
+                                                    console.log(contacts)
+                                                    new Promise((resolve, reject) => {
+                                                        setSelectedCustomer(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                contacts: contacts
+                                                            }
+                                                        })
+
+                                                        resolve('OK');
+                                                    }).then((response) => {
+                                                        props.closePanel(`${props.panelName}-contact-list`, props.origin);
+                                                        refCustomerCode.current.focus();
+                                                    }).catch(e => {
+                                                        props.closePanel(`${props.panelName}-contact-list`, props.origin);
+                                                        refCustomerCode.current.focus();
+                                                    })
+                                                }}
+                                            />
+                                        }
+
+                                        props.openPanel(panel, props.origin);
+
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Add Existing Contact</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
                                     <div className={
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0)
@@ -4856,7 +5035,7 @@ const Customers = (props) => {
                                         props.openPanel(panel, props.origin);
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Add Contact</div>
+                                        <div className="mochi-button-base">Add New Contact</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                     <div className="mochi-button" onClick={() => {
@@ -4874,9 +5053,9 @@ const Customers = (props) => {
                             <div className="form-row">
                                 <div className="input-box-container grow">
                                     <input tabIndex={12 + props.tabTimes} type="text" placeholder="First Name"
-                                    style={{
-                                        textTransform: 'capitalize'
-                                    }}
+                                        style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                         ref={refCustomerContactFirstName}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -4891,9 +5070,9 @@ const Customers = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
                                     <input tabIndex={13 + props.tabTimes} type="text" placeholder="Last Name"
-                                    style={{
-                                        textTransform: 'capitalize'
-                                    }}
+                                        style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
@@ -5332,13 +5511,30 @@ const Customers = (props) => {
                                             }
                                             id={props.panelName + '-cbox-customer-contacts-primary-btn'}
                                             onChange={(e) => {
-                                                setSelectedContact({
-                                                    ...selectedContact,
-                                                    is_primary: e.target.checked ? 1 : 0
-                                                });
+                                                if (selectedContact.pivot) {
+                                                    setSelectedContact(prev => {
+                                                        return {
+                                                            ...prev,
+                                                            pivot: {
+                                                                ...selectedContact?.pivot || {},
+                                                                is_primary: e.target.checked ? 1 : 0
+                                                            }
+                                                        }
+                                                    })
+                                                } else {
+                                                    setSelectedContact(prev => {
+                                                        return {
+                                                            ...prev,
+                                                            is_primary: e.target.checked ? 1 : 0
+                                                        }
+                                                    })
+                                                }
+
                                                 validateContactForSaving({ keyCode: 9 });
                                             }}
-                                            checked={(selectedContact.is_primary || 0) === 1} />
+                                            checked={selectedContact.pivot
+                                                ? (selectedContact?.pivot?.is_primary || 0) === 1
+                                                : (selectedContact?.is_primary || 0) === 1} />
                                         <label htmlFor={props.panelName + '-cbox-customer-contacts-primary-btn'}>
                                             <div className="label-text">Primary</div>
                                             <div className="input-toggle-btn"></div>
@@ -7231,10 +7427,15 @@ const Customers = (props) => {
                                                                 </div>
                                                             }
                                                             {
-                                                                (contact.is_primary === 1) &&
-                                                                <div className="contact-list-col tcol pri">
-                                                                    <FontAwesomeIcon icon={faCheck} />
-                                                                </div>
+                                                                (contact.pivot)
+                                                                    ? (contact?.pivot?.is_primary || 0) === 1 &&
+                                                                    <div className="contact-list-col tcol pri">
+                                                                        <FontAwesomeIcon icon={faCheck} />
+                                                                    </div>
+                                                                    : (contact?.is_primary || 0) === 1 &&
+                                                                    <div className="contact-list-col tcol pri">
+                                                                        <FontAwesomeIcon icon={faCheck} />
+                                                                    </div>
                                                             }
                                                         </div>
                                                     )

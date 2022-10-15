@@ -1004,6 +1004,7 @@ const Drivers = (props) => {
                                                 savingDocumentUrl='/saveDriverDocument'
                                                 deletingDocumentUrl='/deleteDriverDocument'
                                                 savingDocumentNoteUrl='/saveDriverDocumentNote'
+                                                deletingDocumentNoteUrl='/deleteDriverDocumentNote'
                                                 serverDocumentsFolder='/driver-documents/'
                                             />
                                         }

@@ -31,6 +31,7 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: ease 0.3s;
+  white-space: nowrap;
 }
 .invoice-main-container .order-pickup:not(:last-child) {
   margin-right: 5px;

@@ -64,6 +64,8 @@ const Documents = (props) => {
     const refIframeImg = useRef(null);
     const modalTransitionProps = useSpring({opacity: (selectedOwnerDocumentNote.id !== undefined) ? 1 : 0});
 
+    const [currentQuickLink, setCurrentQuickLink] = useState('');
+
     const loadingTransition = useTransition(isSavingDocument || isLoading, {
         from: {opacity: 0},
         enter: {opacity: 1},
@@ -107,7 +109,7 @@ const Documents = (props) => {
                 getDocumentsUrl = '/getDocumentsByOrder';
                 break;
             case 'order-billing':
-                getDocumentsUrl = '/getDocumentsByOrderBilling';
+                getDocumentsUrl = '/getOrderBillingDocumentsByOrder';
                 break;
             case 'division':
                 getDocumentsUrl = '/getDocumentsByDivision';
@@ -232,6 +234,7 @@ const Documents = (props) => {
         formData.append("title", selectedOwnerDocument.title);
         formData.append("subject", selectedOwnerDocument.subject);
         formData.append("tags", selectedOwnerDocument.tags);
+        formData.append("link", currentQuickLink);
 
         if (!isSavingDocument) {
             setIsSavingDocument(true);
@@ -372,13 +375,15 @@ const Documents = (props) => {
                             setSelectedOwner(selectedOwner => {
                                 return {
                                     ...selectedOwner,
-                                    documents: res.data.documents
+                                    documents: res.data.documents,
+                                    billing_documents: res.data.billing_documents
                                 }
                             })
 
                             props.setSelectedOrder({
                                 id: selectedOwner.id,
                                 documents: res.data.documents,
+                                billing_documents: res.data.billing_documents,
                                 component_id: props.componentId
                             });
                         }
@@ -507,6 +512,8 @@ const Documents = (props) => {
 
                             refDocumentInput.current.value = "";
 
+                            setCurrentQuickLink('');
+
                             refTitleInput.current.focus();
                         }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -542,6 +549,8 @@ const Documents = (props) => {
                                     tags: 'Signed BOL|BOL|Delivery Receipt'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Signed BOL');
                             }}>Signed BOL</div>
                         }
 
@@ -566,6 +575,8 @@ const Documents = (props) => {
                                     tags: 'Carrier|Invoice'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Carrier Invoice');
                             }}>Carrier Invoice</div>
                         }
 
@@ -590,6 +601,8 @@ const Documents = (props) => {
                                     tags: 'Customer|Invoice'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Customer Invoice');
                             }}>Customer Invoice</div>
                         }
 
@@ -614,6 +627,8 @@ const Documents = (props) => {
                                     tags: 'Signed Rate Confirmation|Rate Confirmation'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Signed Rate Confirmation');
                             }}>Signed Rate Confirmation</div>
                         }
 
@@ -638,6 +653,8 @@ const Documents = (props) => {
                                     tags: 'W9|Federal EIN'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('W9');
                             }}>W9</div>
                         }
 
@@ -662,6 +679,8 @@ const Documents = (props) => {
                                     tags: 'MC#|ICC#|Motor Carrier Number'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Authority');
                             }}>MC Authority</div>
                         }
 
@@ -686,6 +705,8 @@ const Documents = (props) => {
                                     tags: 'Insurance'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Insurance');
                             }}>Insurance</div>
                         }
 
@@ -710,6 +731,8 @@ const Documents = (props) => {
                                     tags: props.suborigin === 'company-agent' ? 'Signed Contract|Signed Agent Contract' : 'Signed Contract|Signed Broker Contract'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink(props.suborigin === 'company-agent' ? 'Agent Contract' : 'Broker Contract');
                             }}>Signed Contract</div>
                         }
 
@@ -734,6 +757,8 @@ const Documents = (props) => {
                                     tags: 'Carrier Packet|Carrier Information Packet'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Carrier Information');
                             }}>Carrier Information</div>
                         }
 
@@ -758,6 +783,8 @@ const Documents = (props) => {
                                     tags: 'Notice of Assignment|NOA'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('NOA');
                             }}>NOA</div>
                         }
 
@@ -782,6 +809,8 @@ const Documents = (props) => {
                                     tags: 'SCAC'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('SCAC');
                             }}>SCAC</div>
                         }
 
@@ -806,6 +835,8 @@ const Documents = (props) => {
                                     tags: 'ACH'
                                 });
                                 refTagInput.current.focus();
+
+                                setCurrentQuickLink('Signed ACH Form');
                             }}>ACH</div>
                         }
                     </div>
@@ -1252,9 +1283,8 @@ const Documents = (props) => {
                                          ? 'all' : 'none'
                                  }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base"
-                                     style={{color: (selectedOwnerDocument.id || 0) > 0 ? '#323232' : 'rgba(0,0,0,0.3)'}}>Add
-                                    Note
+                                <div className="mochi-button-base" style={{color: (selectedOwnerDocument.id || 0) > 0 ? '#323232' : 'rgba(0,0,0,0.3)'}}>
+                                    Add Note
                                 </div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
@@ -1363,6 +1393,7 @@ const Documents = (props) => {
                         selectedData={selectedOwnerDocumentNote}
                         setSelectedData={setSelectedOwnerDocumentNote}
                         selectedParent={selectedOwnerDocument}
+                        
                         setSelectedParent={(data) => {
                             setSelectedOwnerDocument({
                                 ...selectedOwnerDocument,
@@ -1478,7 +1509,7 @@ const Documents = (props) => {
                                 case 'order':
                                     props.setSelectedOrder({
                                         id: selectedOwner.id,
-                                        documents: props.selected_order.documents.map((document, index) => {
+                                        documents: (props.selected_order.documents || []).map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
                                                 document.notes = data.data;
                                             }
@@ -1491,7 +1522,7 @@ const Documents = (props) => {
                                 case 'order-billing':
                                     props.setSelectedOrder({
                                         id: selectedOwner.id,
-                                        billing_documents: props.selected_order.billing_documents.map((document, index) => {
+                                        billing_documents: (props.selected_order.billing_documents || []).map((document, index) => {
                                             if (document.id === selectedOwnerDocument.id) {
                                                 document.notes = data.data;
                                             }
@@ -1508,7 +1539,7 @@ const Documents = (props) => {
 
                         }}
                         savingDataUrl={savingDocumentNoteUrl}
-                        deletingDataUrl=''
+                        deletingDataUrl={props.deletingDocumentNoteUrl || ''}
                         type='note'
                         isEditable={
                             ((props.user?.user_code?.is_admin || 0) === 1 ||

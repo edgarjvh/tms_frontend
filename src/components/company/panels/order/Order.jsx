@@ -1,8 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { connect } from "react-redux";
 import moment from 'moment';
 import ToPrint from './ToPrint.jsx';
 import { useReactToPrint } from 'react-to-print';
+import { useTransition, animated } from 'react-spring';
+import Loader from 'react-loader-spinner';
+import axios from 'axios';
 import {
     setDispatchOpenedPanels,
     setCustomerOpenedPanels,
@@ -12,7 +15,8 @@ import {
 } from './../../../../actions';
 
 const Order = (props) => {
-
+    const [selectedOrder, setSelectedOrder] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
     const componentRef = useRef();
 
     const handlePrint = useReactToPrint({
@@ -64,8 +68,36 @@ const Order = (props) => {
         fontSize: '0.7rem'
     }
 
+    const loadingTransition = useTransition(isLoading, {
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
+        reverse: isLoading,
+    });
+
+    useEffect(() => {
+        if ((props.selectedOrderId || 0) > 0){
+            axios.post(props.serverUrl + '/getOrderById', {id: props.selectedOrderId}).then(res => {
+                if (res.data.result === 'OK'){
+                    setSelectedOrder(res.data.order);
+                }
+            }).finally(() => {
+                setIsLoading(false);
+            })
+        }
+    }, [])
+
     return (
         <div className="panel-content">
+            {
+                loadingTransition((style, item) => item &&
+                    <animated.div className='loading-container' style={style}>
+                        <div className="loading-container-wrapper">
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                        </div>
+                    </animated.div>
+                )
+            }
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 
@@ -107,7 +139,7 @@ const Order = (props) => {
                         origin={props.origin}
                         openPanel={props.openPanel}
                         closePanel={props.closePanel}
-                        selectedOrder={props.selectedOrder}
+                        selectedOrder={selectedOrder}
                         selectedCompany={props.selectedCompany}
                         invoiceScreenFocused={true}
                     />
@@ -119,6 +151,8 @@ const Order = (props) => {
 
 const mapStateToProps = (state) => {
     return {
+        scale: state.systemReducers.scale,
+        serverUrl: state.systemReducers.serverUrl,        
         dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
         customerOpenedPanels: state.customerReducers.customerOpenedPanels,
         carrierOpenedPanels: state.carrierReducers.carrierOpenedPanels,

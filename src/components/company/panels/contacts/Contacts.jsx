@@ -1,12 +1,12 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {connect} from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
 import axios from 'axios';
 import Draggable from 'react-draggable';
 import './Contacts.css';
 import MaskedInput from 'react-text-mask';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faCaretDown,
     faCaretRight,
@@ -31,11 +31,11 @@ import {
     setSelectedFactoringCompany,
     setSelectedFactoringCompanyContact
 } from './../../../../actions';
-import {Documents} from "../index";
+import { Documents } from "../index";
 import moment from "moment";
-import {animated, useTransition} from "react-spring";
+import { animated, useTransition } from "react-spring";
 
-import {PassModal} from './../../../admin/panels/';
+import { PassModal } from './../../../admin/panels/';
 
 
 const Contacts = (props) => {
@@ -56,17 +56,17 @@ const Contacts = (props) => {
     });
 
     const newPasswordTransition = useTransition(newPassword !== '', {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: newPassword !== '',
-        config: {duration: 100}
+        config: { duration: 100 }
     });
 
     useEffect(async () => {
         setContactSearchCustomer(props.contactSearchCustomer || {});
 
-        setTempSelectedContact({...props.contactSearchCustomer.selectedContact});
+        setTempSelectedContact({ ...props.contactSearchCustomer.selectedContact });
 
         if (props.isEditingContact) {
             setIsEditingContact(true);
@@ -227,47 +227,60 @@ const Contacts = (props) => {
             tempSelectedContact.zip_code = contactSearchCustomer.zip;
         }
 
+        tempSelectedContact.main_customer_id = contactSearchCustomer.id;
+
         axios.post(props.serverUrl + props.savingContactUrl, tempSelectedContact).then(res => {
             if (res.data.result === 'OK') {
+                let contacts = [
+                    ...res.data.contacts
+                ];
+
+                let contact = contacts.find(x => x.id === res.data.contact.id);
+
                 if (props.owner === 'customer') {
-                    props.setSelectedCustomer({...props.selectedCustomer, contacts: res.data.contacts});
-                    props.setSelectedContact(res.data.contact);
+                    props.setSelectedCustomer({
+                        ...props.selectedCustomer,
+                        contacts: contacts
+                    });
+                    props.setSelectedContact(contact);
                 }
 
                 if (props.owner === 'carrier') {
-                    props.setSelectedCarrier({...props.selectedCarrier, contacts: res.data.contacts});
-                    props.setSelectedCarrierContact(res.data.contact);
+                    props.setSelectedCarrier({ ...props.selectedCarrier, contacts: contacts });
+                    props.setSelectedCarrierContact(contact);
                 }
 
                 if (props.owner === 'factoring-company') {
-                    props.setSelectedFactoringCompany({...props.selectedFactoringCompany, contacts: res.data.contacts});
-                    props.setSelectedFactoringCompanyContact(res.data.contact);
+                    props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: contacts });
+                    props.setSelectedFactoringCompanyContact(contact);
                 }
 
                 if (props.owner === 'division') {
-                    props.setSelectedDivision({...props.selectedDivision, contacts: res.data.contacts});
-                    props.setSelectedDivisionContact(res.data.contact);
+                    props.setSelectedDivision({ ...props.selectedDivision, contacts: contacts });
+                    props.setSelectedDivisionContact(contact);
                 }
 
                 if (props.owner === 'employee') {
-                    props.setSelectedEmployee({...props.selectedEmployee, contacts: res.data.contacts});
-                    props.setSelectedEmployeeContact(res.data.contact);
+                    props.setSelectedEmployee({ ...props.selectedEmployee, contacts: contacts });
+                    props.setSelectedEmployeeContact(contact);
                 }
 
                 if (props.owner === 'agent') {
-                    props.setSelectedAgent({...props.selectedAgent, contacts: res.data.contacts});
-                    props.setSelectedAgentContact(res.data.contact);
+                    props.setSelectedAgent({ ...props.selectedAgent, contacts: contacts });
+                    props.setSelectedAgentContact(contact);
                 }
 
                 if (props.owner === 'owner-operator') {
-                    props.setSelectedOwnerOperator({...props.selectedOwnerOperator, contacts: res.data.contacts});
-                    props.setSelectedOwnerOperatorContact(res.data.contact);
+                    props.setSelectedOwnerOperator({ ...props.selectedOwnerOperator, contacts: contacts });
+                    props.setSelectedOwnerOperatorContact(contact);
                 }
 
-                setContactSearchCustomer({
-                    ...contactSearchCustomer,
-                    selectedContact: res.data.contact,
-                    contacts: res.data.contacts
+                setContactSearchCustomer(prev => {
+                    return {
+                        ...prev,
+                        selectedContact: contact,
+                        contacts: contacts
+                    }
                 });
                 setIsEditingContact(false);
             }
@@ -280,16 +293,16 @@ const Contacts = (props) => {
         let contact = contactSearchCustomer?.selectedContact;
 
         if (window.confirm('Are you sure to delete this contact?')) {
-            axios.post(props.serverUrl + props.deletingContactUrl, contact).then(res => {
+            axios.post(props.serverUrl + props.deletingContactUrl, {...contact, main_customer_id: contactSearchCustomer.id}).then(res => {
                 if (res.data.result === 'OK') {
                     if (props.owner === 'customer') {
-                        props.setSelectedCustomer({...props.selectedCustomer, contacts: res.data.contacts});
-                        props.setSelectedContact({id: contact.id, deleted: true});
+                        props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
+                        props.setSelectedContact({ id: contact.id, deleted: true });
                     }
 
                     if (props.owner === 'carrier') {
-                        props.setSelectedCarrier({...props.selectedCarrier, contacts: res.data.contacts});
-                        props.setSelectedCarrierContact({id: contact.id, deleted: true});
+                        props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });
+                        props.setSelectedCarrierContact({ id: contact.id, deleted: true });
                     }
 
                     if (props.owner === 'factoring-company') {
@@ -297,27 +310,27 @@ const Contacts = (props) => {
                             ...props.selectedFactoringCompany,
                             contacts: res.data.contacts
                         });
-                        props.setSelectedFactoringCompanyContact({id: contact.id, deleted: true});
+                        props.setSelectedFactoringCompanyContact({ id: contact.id, deleted: true });
                     }
 
                     if (props.owner === 'division') {
-                        props.setSelectedDivision({...props.selectedDivision, contacts: res.data.contacts});
-                        props.setSelectedDivisionContact({id: contact.id, deleted: true});
+                        props.setSelectedDivision({ ...props.selectedDivision, contacts: res.data.contacts });
+                        props.setSelectedDivisionContact({ id: contact.id, deleted: true });
                     }
 
                     if (props.owner === 'employee') {
-                        props.setSelectedEmployee({...props.selectedEmployee, contacts: res.data.contacts});
-                        props.setSelectedEmployeeContact({id: contact.id, deleted: true});
+                        props.setSelectedEmployee({ ...props.selectedEmployee, contacts: res.data.contacts });
+                        props.setSelectedEmployeeContact({ id: contact.id, deleted: true });
                     }
 
                     if (props.owner === 'agent') {
-                        props.setSelectedAgent({...props.selectedAgent, contacts: res.data.contacts});
-                        props.setSelectedAgentContact({id: contact.id, deleted: true});
+                        props.setSelectedAgent({ ...props.selectedAgent, contacts: res.data.contacts });
+                        props.setSelectedAgentContact({ id: contact.id, deleted: true });
                     }
 
                     if (props.owner === 'owner-operator') {
-                        props.setSelectedOwnerOperator({...props.selectedOwnerOperator, contacts: res.data.contacts});
-                        props.setSelectedOwnerOperatorContact({id: contact.id, deleted: true});
+                        props.setSelectedOwnerOperator({ ...props.selectedOwnerOperator, contacts: res.data.contacts });
+                        props.setSelectedOwnerOperatorContact({ id: contact.id, deleted: true });
                     }
 
                     setContactSearchCustomer({
@@ -352,7 +365,7 @@ const Contacts = (props) => {
 
             const options = {
                 onUploadProgress: (progressEvent) => {
-                    const {loaded, total} = progressEvent;
+                    const { loaded, total } = progressEvent;
 
                     setProgressUploaded(isNaN(loaded) ? 0 : loaded);
                     setProgressTotal(isNaN(total) ? 0 : total);
@@ -363,11 +376,11 @@ const Contacts = (props) => {
                 .then(async res => {
                     if (res.data.result === "OK") {
                         if (props.owner === 'customer') {
-                            props.setSelectedCustomer({...props.selectedCustomer, contacts: res.data.contacts});
+                            props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
                         }
 
                         if (props.owner === 'carrier') {
-                            props.setSelectedCarrier({...props.selectedCarrier, contacts: res.data.contacts});
+                            props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });
                         }
 
                         if (props.owner === 'factoring-company') {
@@ -378,15 +391,15 @@ const Contacts = (props) => {
                         }
 
                         if (props.owner === 'division') {
-                            props.setSelectedDivision({...props.selectedDivision, contacts: res.data.contacts});
+                            props.setSelectedDivision({ ...props.selectedDivision, contacts: res.data.contacts });
                         }
 
                         if (props.owner === 'employee') {
-                            props.setSelectedEmployee({...props.selectedEmployee, contacts: res.data.contacts});
+                            props.setSelectedEmployee({ ...props.selectedEmployee, contacts: res.data.contacts });
                         }
 
                         if (props.owner === 'agent') {
-                            props.setSelectedAgent({...props.selectedAgent, contacts: res.data.contacts});
+                            props.setSelectedAgent({ ...props.selectedAgent, contacts: res.data.contacts });
                         }
 
                         if (props.owner === 'owner-operator') {
@@ -419,31 +432,31 @@ const Contacts = (props) => {
         axios.post(props.serverUrl + props.removeAvatarUrl, contactSearchCustomer?.selectedContact).then(async res => {
             if (res.data.result === "OK") {
                 if (props.owner === 'customer') {
-                    props.setSelectedCustomer({...props.selectedCustomer, contacts: res.data.contacts});
+                    props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
                 }
 
                 if (props.owner === 'carrier') {
-                    props.setSelectedCarrier({...props.selectedCarrier, contacts: res.data.contacts});
+                    props.setSelectedCarrier({ ...props.selectedCarrier, contacts: res.data.contacts });
                 }
 
                 if (props.owner === 'factoring-company') {
-                    props.setSelectedFactoringCompany({...props.selectedFactoringCompany, contacts: res.data.contacts});
+                    props.setSelectedFactoringCompany({ ...props.selectedFactoringCompany, contacts: res.data.contacts });
                 }
 
                 if (props.owner === 'division') {
-                    props.setSelectedDivision({...props.selectedDivision, contacts: res.data.contacts});
+                    props.setSelectedDivision({ ...props.selectedDivision, contacts: res.data.contacts });
                 }
 
                 if (props.owner === 'employee') {
-                    props.setSelectedEmployee({...props.selectedEmployee, contacts: res.data.contacts});
+                    props.setSelectedEmployee({ ...props.selectedEmployee, contacts: res.data.contacts });
                 }
 
                 if (props.owner === 'agent') {
-                    props.setSelectedAgent({...props.selectedAgent, contacts: res.data.contacts});
+                    props.setSelectedAgent({ ...props.selectedAgent, contacts: res.data.contacts });
                 }
 
                 if (props.owner === 'owner-operator') {
-                    props.setSelectedOwnerOperator({...props.selectedOwnerOperator, contacts: res.data.contacts});
+                    props.setSelectedOwnerOperator({ ...props.selectedOwnerOperator, contacts: res.data.contacts });
                 }
 
                 await setContactSearchCustomer({
@@ -459,7 +472,7 @@ const Contacts = (props) => {
 
     const setContactPassword = () => {
         if (window.confirm('Are you sure you want to proceed?')) {
-            axios.post(props.serverUrl + '/resetAgentContactPassword', {id: (contactSearchCustomer?.selectedContact?.id || 0)}).then(res => {
+            axios.post(props.serverUrl + '/resetAgentContactPassword', { id: (contactSearchCustomer?.selectedContact?.id || 0) }).then(res => {
                 if (res.data.result === 'OK') {
                     setNewPassword(res.data.newpass);
                 } else {
@@ -472,10 +485,10 @@ const Contacts = (props) => {
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
 
-            <div className="contact-container" style={{overflow: 'initial'}}>
+            <div className="contact-container" style={{ overflow: 'initial' }}>
                 <div className="contact-list-container">
                     <div className="title">{props.title}</div>
-                    <div className="side-title" style={{left: '-45px'}}>
+                    <div className="side-title" style={{ left: '-45px' }}>
                         <div>{props.title}</div>
                     </div>
 
@@ -500,21 +513,27 @@ const Contacts = (props) => {
                                                     <div className="contact-avatar-container">
                                                         <img
                                                             src={contact.avatar ? props.serverUrl + '/avatars/' + contact.avatar : 'img/avatar-user-default.png'}
-                                                            alt=""/>
+                                                            alt="" />
                                                     </div>
 
                                                     <div className="contact-data">
                                                         <div className="contact-name" style={{
                                                             display: 'flex', alignItems: 'center'
                                                         }}>
-                                                            <div style={{flexGrow: 1}}>
+                                                            <div style={{ flexGrow: 1 }}>
                                                                 {(contact.prefix || '') + " " + contact.first_name + " " + (contact.middle_name || '') + " " + contact.last_name}
                                                             </div>
                                                             {
-                                                                (contact.is_primary === 1) &&
-                                                                <div className="contact-list-col tcol pri">
-                                                                    <FontAwesomeIcon icon={faCheck}/>
-                                                                </div>
+                                                                contact.pivot
+                                                                    ? (contact?.pivot?.is_primary || 0) === 1 &&
+                                                                    <div className="contact-list-col tcol pri">
+                                                                        <FontAwesomeIcon icon={faCheck} />
+                                                                    </div>
+                                                                    : (contact.is_primary || 0) === 1 &&
+                                                                    <div className="contact-list-col tcol pri">
+                                                                        <FontAwesomeIcon icon={faCheck} />
+                                                                    </div>
+
                                                             }</div>
                                                         <div className="online-status">
                                                             <div
@@ -547,7 +566,7 @@ const Contacts = (props) => {
                                                 <div className="contact-avatar-container">
                                                     <img
                                                         src={contact.avatar ? props.serverUrl + '/avatars/' + contact.avatar : 'img/avatar-user-default.png'}
-                                                        alt=""/>
+                                                        alt="" />
                                                 </div>
 
                                                 <div className="contact-data">
@@ -586,7 +605,7 @@ const Contacts = (props) => {
                                 {
                                     (isEditingContact && (contactSearchCustomer?.selectedContact?.id || 0) > 0 && (contactSearchCustomer?.selectedContact?.avatar || '') !== '') &&
                                     <span className="fas fa-trash-alt remove-contact-avatar-btn"
-                                          onClick={removeContactAvatar}></span>
+                                        onClick={removeContactAvatar}></span>
                                 }
                                 {
                                     (isEditingContact && (contactSearchCustomer?.selectedContact?.id || 0) > 0) &&
@@ -595,15 +614,15 @@ const Contacts = (props) => {
                                     }}></span>
                                 }
 
-                                <form encType='multipart/form-data' style={{display: 'none'}}>
+                                <form encType='multipart/form-data' style={{ display: 'none' }}>
                                     <input type="file" ref={refInputAvatar} accept='image/*'
-                                           onChange={contactAvatarChange}/>
+                                        onChange={contactAvatarChange} />
                                 </form>
 
                                 <div className="contact-avatar-wrapper">
                                     <img
                                         src={contactSearchCustomer?.selectedContact?.avatar ? props.serverUrl + '/avatars/' + contactSearchCustomer?.selectedContact?.avatar : 'img/avatar-user-default.png'}
-                                        alt=""/>
+                                        alt="" />
                                 </div>
 
                             </div>
@@ -613,7 +632,13 @@ const Contacts = (props) => {
                                 </div>
                                 <div className="contact-company">
                                     <span>
-                                        {contactSearchCustomer?.selectedContact?.id !== undefined ? contactSearchCustomer.name : ''}
+                                        {
+                                            (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                ? contactSearchCustomer?.selectedContact?.customer
+                                                    ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
+                                                    : (contactSearchCustomer?.name || '')
+                                                : ''
+                                        }
                                     </span>
 
                                     <span>
@@ -638,21 +663,44 @@ const Contacts = (props) => {
                             <div className="contact-buttons">
                                 <div className="input-toggle-container">
                                     <input type="checkbox" id="cbox-panel-customer-contacts-primary-btn"
-                                           onChange={e => {
-                                               setTempSelectedContact({
-                                                   ...tempSelectedContact,
-                                                   is_primary: e.target.checked ? 1 : 0
-                                               })
-                                           }}
-                                           disabled={!isEditingContact}
-                                           checked={isEditingContact ? (tempSelectedContact.is_primary || 0) === 1 : (contactSearchCustomer?.selectedContact?.is_primary || 0) === 1}/>
+                                        onChange={e => {
+                                            if (tempSelectedContact.customer) {
+                                                setTempSelectedContact(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        pivot: {
+                                                            ...tempSelectedContact?.pivot || {},
+                                                            is_primary: e.target.checked ? 1 : 0
+                                                        }
+                                                    }
+                                                })
+                                            } else {
+                                                setTempSelectedContact(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        is_primary: e.target.checked ? 1 : 0
+                                                    }
+                                                })
+                                            }
+
+                                        }}
+                                        disabled={!isEditingContact}
+                                        checked={isEditingContact
+                                            ? tempSelectedContact?.pivot
+                                                ? (tempSelectedContact?.pivot.is_primary || 0) === 1
+                                                : (tempSelectedContact?.is_primary || 0) === 1
+                                            : contactSearchCustomer?.selectedContact?.pivot
+                                                ? (contactSearchCustomer?.selectedContact?.pivot?.is_primary || 0) === 1
+                                                : (contactSearchCustomer?.selectedContact?.is_primary || 0) === 1
+
+                                        } />
                                     <label htmlFor="cbox-panel-customer-contacts-primary-btn">
                                         <div className="label-text">Primary</div>
                                         <div className="input-toggle-btn"></div>
                                     </label>
                                 </div>
 
-                                <div className="right-buttons" style={{display: 'flex'}}>
+                                <div className="right-buttons" style={{ display: 'flex' }}>
                                     {
                                         isEditingContact &&
                                         <div className="mochi-button" onClick={() => {
@@ -685,7 +733,7 @@ const Contacts = (props) => {
                                                 ? 'mochi-button disabled' : 'mochi-button'
                                         } onClick={() => {
                                             setIsEditingContact(true);
-                                            setTempSelectedContact({...contactSearchCustomer?.selectedContact});
+                                            setTempSelectedContact({ ...contactSearchCustomer?.selectedContact });
                                         }} style={{
                                             color: contactSearchCustomer?.selectedContact?.id !== undefined ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.5)',
                                             pointerEvents: contactSearchCustomer?.selectedContact?.id !== undefined ? 'all' : 'none'
@@ -713,7 +761,7 @@ const Contacts = (props) => {
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base"
-                                             style={{color: (contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) ? 'rgba(138,8,8,1)' : 'rgba(138,8,8,0.5)'}}>Delete
+                                            style={{ color: (contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) ? 'rgba(138,8,8,1)' : 'rgba(138,8,8,0.5)' }}>Delete
                                         </div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
@@ -736,7 +784,7 @@ const Contacts = (props) => {
 
                                 {
                                     ((contactSearchCustomer?.selectedContact?.agent_id || 0) > 0) &&
-                                    <div className="mochi-button" style={{margin: '5px 0'}} onClick={() => {
+                                    <div className="mochi-button" style={{ margin: '5px 0' }} onClick={() => {
 
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -753,19 +801,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Prefix</div>
                                         <input ref={refPrefix} type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       prefix: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       prefix: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.prefix || '' : contactSearchCustomer?.selectedContact?.prefix || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    prefix: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    prefix: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.prefix || '' : contactSearchCustomer?.selectedContact?.prefix || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -773,19 +821,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">First Name</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       first_name: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       first_name: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.first_name || '' : contactSearchCustomer?.selectedContact?.first_name || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    first_name: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    first_name: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.first_name || '' : contactSearchCustomer?.selectedContact?.first_name || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -793,19 +841,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Middle Name</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       middle_name: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       middle_name: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.middle_name || '' : contactSearchCustomer?.selectedContact?.middle_name || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    middle_name: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    middle_name: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.middle_name || '' : contactSearchCustomer?.selectedContact?.middle_name || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -813,19 +861,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Last Name</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       last_name: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       last_name: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.last_name || '' : contactSearchCustomer?.selectedContact?.last_name || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    last_name: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    last_name: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.last_name || '' : contactSearchCustomer?.selectedContact?.last_name || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -833,19 +881,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Suffix</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       suffix: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       suffix: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.suffix || '' : contactSearchCustomer?.selectedContact?.suffix || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    suffix: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    suffix: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.suffix || '' : contactSearchCustomer?.selectedContact?.suffix || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -853,30 +901,36 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Company</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                               }}
-                                               onChange={e => {
-                                               }}
-                                               value={contactSearchCustomer?.selectedContact?.id !== undefined ? contactSearchCustomer.name : ''}/>
+                                            onInput={(e) => {
+                                            }}
+                                            onChange={e => {
+                                            }}
+                                            value={
+                                                (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                    ? contactSearchCustomer?.selectedContact?.customer
+                                                        ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
+                                                        : (contactSearchCustomer.name || '')
+                                                    : ''
+                                            } />
                                         <div className={borderBottomClasses}></div>
                                     </div>
 
                                     <div className="field-container">
                                         <div className="field-title">Title</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       title: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       title: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.title || '' : contactSearchCustomer?.selectedContact?.title || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    title: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    title: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.title || '' : contactSearchCustomer?.selectedContact?.title || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -884,19 +938,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Department</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       department: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       department: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.department || '' : contactSearchCustomer?.selectedContact?.department || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    department: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    department: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.department || '' : contactSearchCustomer?.selectedContact?.department || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -904,19 +958,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">E-mail Work</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       email_work: e.target.value.toLowerCase()
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       email_work: e.target.value.toLowerCase()
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.email_work || '' : contactSearchCustomer?.selectedContact?.email_work || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    email_work: e.target.value.toLowerCase()
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    email_work: e.target.value.toLowerCase()
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.email_work || '' : contactSearchCustomer?.selectedContact?.email_work || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -924,19 +978,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">E-mail Personal</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       email_personal: e.target.value.toLowerCase()
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       email_personal: e.target.value.toLowerCase()
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.email_personal || '' : contactSearchCustomer?.selectedContact?.email_personal || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    email_personal: e.target.value.toLowerCase()
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    email_personal: e.target.value.toLowerCase()
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.email_personal || '' : contactSearchCustomer?.selectedContact?.email_personal || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -944,19 +998,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">E-mail Other</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       email_other: e.target.value.toLowerCase()
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       email_other: e.target.value.toLowerCase()
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.email_other || '' : contactSearchCustomer?.selectedContact?.email_other || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    email_other: e.target.value.toLowerCase()
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    email_other: e.target.value.toLowerCase()
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.email_other || '' : contactSearchCustomer?.selectedContact?.email_other || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -987,19 +1041,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Ext</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       phone_ext: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       phone_ext: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.phone_ext || '' : contactSearchCustomer?.selectedContact?.phone_ext || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    phone_ext: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    phone_ext: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.phone_ext || '' : contactSearchCustomer?.selectedContact?.phone_ext || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1099,19 +1153,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Country</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       country: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       country: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.country || '' : contactSearchCustomer?.selectedContact?.country || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    country: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    country: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.country || '' : contactSearchCustomer?.selectedContact?.country || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1119,19 +1173,21 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Address 1</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       address1: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       address1: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.address1 || '' : contactSearchCustomer?.selectedContact?.address1 || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    address1: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    address1: e.target.value
+                                                });
+                                            }}
+                                            value={
+                                                isEditingContact ? tempSelectedContact.address1 || '' : contactSearchCustomer?.selectedContact?.address1 || ''
+                                            }
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1139,19 +1195,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Address 2</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       address2: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       address2: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.address2 || '' : contactSearchCustomer?.selectedContact?.address2 || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    address2: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    address2: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.address2 || '' : contactSearchCustomer?.selectedContact?.address2 || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1159,19 +1215,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">City</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       city: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       city: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.city || '' : contactSearchCustomer?.selectedContact?.city || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    city: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    city: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.city || '' : contactSearchCustomer?.selectedContact?.city || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1179,20 +1235,20 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">State</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               style={{textTransform: 'uppercase'}} maxLength={2}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       state: e.target.value.toUpperCase()
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       state: e.target.value.toUpperCase()
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.state || '' : contactSearchCustomer?.selectedContact?.state || ''}
+                                            style={{ textTransform: 'uppercase' }} maxLength={2}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    state: e.target.value.toUpperCase()
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    state: e.target.value.toUpperCase()
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.state || '' : contactSearchCustomer?.selectedContact?.state || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1200,19 +1256,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Postal Code</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       zip_code: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       zip_code: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.zip_code || '' : contactSearchCustomer?.selectedContact?.zip_code || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    zip_code: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    zip_code: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.zip_code || '' : contactSearchCustomer?.selectedContact?.zip_code || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1243,19 +1299,19 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Website</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       website: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       website: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.website || '' : contactSearchCustomer?.selectedContact?.website || ''}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    website: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    website: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.website || '' : contactSearchCustomer?.selectedContact?.website || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1263,28 +1319,28 @@ const Contacts = (props) => {
                                     <div className="field-container">
                                         <div className="field-title">Notes</div>
                                         <input type="text" readOnly={!isEditingContact}
-                                               onKeyDown={e => {
-                                                   let key = e.keyCode || e.which;
+                                            onKeyDown={e => {
+                                                let key = e.keyCode || e.which;
 
-                                                   if (key === 9){
-                                                       e.preventDefault()
+                                                if (key === 9) {
+                                                    e.preventDefault()
 
-                                                       refPrefix.current.focus();
-                                                   }
-                                               }}
-                                               onInput={(e) => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       notes: e.target.value
-                                                   });
-                                               }}
-                                               onChange={e => {
-                                                   setTempSelectedContact({
-                                                       ...tempSelectedContact,
-                                                       notes: e.target.value
-                                                   });
-                                               }}
-                                               value={isEditingContact ? tempSelectedContact.notes || '' : contactSearchCustomer?.selectedContact?.notes || ''}
+                                                    refPrefix.current.focus();
+                                                }
+                                            }}
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    notes: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    notes: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.notes || '' : contactSearchCustomer?.selectedContact?.notes || ''}
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1480,7 +1536,7 @@ const Contacts = (props) => {
 
             {
                 newPasswordTransition((style, item) => item && (
-                    <animated.div style={{...style}}>
+                    <animated.div style={{ ...style }}>
                         <PassModal
                             title="New Password"
                             text={newPassword}

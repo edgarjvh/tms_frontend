@@ -582,6 +582,7 @@ const Employees = (props) => {
                                                 savingDocumentUrl='/saveEmployeeDocument'
                                                 deletingDocumentUrl='/deleteEmployeeDocument'
                                                 savingDocumentNoteUrl='/saveEmployeeDocumentNote'
+                                                deletingDocumentNoteUrl='/deleteEmployeeDocumentNote'
                                                 serverDocumentsFolder='/employee-documents/'
                                             />
                                         }

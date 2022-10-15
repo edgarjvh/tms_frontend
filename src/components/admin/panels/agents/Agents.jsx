@@ -1232,6 +1232,7 @@ const Agents = (props) => {
                     savingDocumentUrl='/saveAgentDocument'
                     deletingDocumentUrl='/deleteAgentDocument'
                     savingDocumentNoteUrl='/saveAgentDocumentNote'
+                    deletingDocumentNoteUrl='/deleteAgentDocumentNote'
                     serverDocumentsFolder='/agent-documents/'
                     setSelectedAgent={setSelectedAgent}
                 />

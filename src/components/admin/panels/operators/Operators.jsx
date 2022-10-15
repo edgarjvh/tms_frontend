@@ -1049,6 +1049,7 @@ const Operators = (props) => {
                                                 savingDocumentUrl='/saveOperatorDocument'
                                                 deletingDocumentUrl='/deleteOperatorDocument'
                                                 savingDocumentNoteUrl='/saveOperatorDocumentNote'
+                                                deletingDocumentNoteUrl='/deleteOperatorDocumentNote'
                                                 serverDocumentsFolder='/operator-documents/'
                                             />
                                         }

@@ -124,33 +124,33 @@ const OrderImport = (props) => {
                     let order_list = [];
 
                     (res || []).map((row, index) => {
-                        let order_number = (row[Object.keys(row).find(key => ['order', 'order_number'].includes(key.toLowerCase()))] || '').trim();
+                        let order_number = (row.order_number || '').trim();
 
                         if (last_order_number === '') {
                             order_group.push(row);
                             last_order_number = order_number;
 
                             if (index === (order_list.length - 1)) {
-                                let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                let bill_to_code = (order_group[0].bill_to_code || '').trim();
                                 let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
 
                                 if (bill_to_customer) {
                                     let order = {};
-                                    let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
-                                    let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
-                                    let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
-                                    let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
-                                    let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
-                                    let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
-                                    let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                                    let trip_number = (order_group[0].trip_number || '').trim();
+                                    let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
+                                    let order_comments = (order_group[0].order_comments || '').trim();
+                                    let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let miles = (order_group[0].miles || 0);
+                                    let creation_date = moment((order_group[0].creation_date || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
 
-                                    let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                    let carrier_code = (order_group[0].carrier_code || '').trim();
                                     let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
 
-                                    let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+                                    let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0].equipment_type || '')).toLowerCase())?.id || null;
 
                                     order.order_number = last_order_number;
-                                    order.trip_number = trip_number;
+                                    order.trip_number = trip_number === '' ? null : trip_number;
                                     order.load_type = load_type;
                                     order.load_type_id = load_type?.id || null;
                                     order.bill_to_customer = bill_to_customer;
@@ -254,82 +254,141 @@ const OrderImport = (props) => {
                                         return item;
                                     });
 
-                                    // handle pickups, deliveries and events
                                     let shipper_data = [];
                                     let consignee_data = [];
+                                    let event_data = [];
                                     let carrier_data = [];
                                     let comment_data = [];
                                     let routing_position = 0;
                                     let po_data = '';
                                     let bol_data = '';
 
+                                    // handle pickups
+                                    order_group.sort((a, b) => a.shipper_position - b.shipper_position);
+
                                     order_group.map((item, i) => {
-                                        let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
-                                        let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
-                                        let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
-                                        let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
-                                        po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
-                                        bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                        let shipper_position = item?.shipper_position || 0;
+                                        let shipper_code = (item?.shipper_code || '').trim();
+                                        let pickup_early_appt = (item?.pickup_early_appt || '').trim();
+                                        let pickup_late_appt = (item?.pickup_late_appt || '').trim();
+                                        let pickup_date1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let pickup_time1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                        let pickup_date2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let pickup_time2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                        po_data = (item?.po_number || '').trim();
+                                        bol_data = (item?.bol_number || '').trim();
+
+                                        if (shipper_code !== '') {
+                                            if (shipper_data.filter(x => x.position = shipper_position && x.code === shipper_code).length === 0) {
+                                                shipper_data.push({ position: shipper_position, code: shipper_code });
+
+                                                let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === shipper_code.toLowerCase());
+
+                                                if (shipper_customer) {
+                                                    order.pickups.push({
+                                                        customer_id: shipper_customer.id,
+                                                        code: shipper_code,
+                                                        name: shipper_customer.name,
+                                                        pu_date1: pickup_date1,
+                                                        pu_date2: pickup_date2,
+                                                        pu_time1: pickup_time1,
+                                                        pu_time2: pickup_time2,
+                                                        type: 'pickup'
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    })
+
+                                    // handle deliveries
+                                    order_group.sort((a, b) => a.consignee_position - b.consignee_position);
+
+                                    order_group.map((item, i) => {
+                                        let consignee_position = item?.consignee_position || 0;
+                                        let consignee_code = (item?.consignee_code || '').trim();
+                                        let delivery_early_appt = (item?.delivery_early_appt || '').trim();
+                                        let delivery_late_appt = (item?.delivery_late_appt || '').trim();
+                                        let delivery_date1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let delivery_time1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                        let delivery_date2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let delivery_time2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+
+                                        if (consignee_code !== '') {
+                                            if (consignee_data.filter(x => x.position = consignee_position && x.code === consignee_code).length === 0) {
+                                                consignee_data.push({ position: consignee_position, code: consignee_code });
+
+                                                let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === consignee_code.toLowerCase());
+
+                                                if (consignee_customer) {
+                                                    order.deliveries.push({
+                                                        customer_id: consignee_customer.id,
+                                                        code: consignee_code,
+                                                        name: consignee_customer.name,
+                                                        delivery_date1: delivery_date1,
+                                                        delivery_date2: delivery_date2,
+                                                        delivery_time1: delivery_time1,
+                                                        delivery_time2: delivery_time2,
+                                                        type: 'delivery'
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    })
+
+                                    // handle events
+                                    order_group.map((item, i) => {
+                                        let customer_code = (item?.customer_code || '').trim();
+                                        let check_call = (item?.check_call || '').trim();
+                                        let check_call_date = (item?.check_call_date || '').trim();
+                                        let check_call_comment = (item?.check_call_comment || '').trim();
                                         let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
                                         let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
 
                                         if (customer_code !== '') {
-                                            if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                            if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'pickup').length === 0 &&
                                                 check_call.toLowerCase().indexOf('pickup') > -1) {
-                                                shipper_data.push({ customer_code, check_call_date });
+                                                event_data.push({ customer_code, check_call_date, type: 'pickup' });
 
                                                 let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                 if (shipper_customer) {
-                                                    routing_position = routing_position + 1;
-
-                                                    order.pickups.push({
-                                                        customer_id: shipper_customer.id,
-                                                        code: customer_code,
-                                                        name: shipper_customer.name,
-                                                        routing_position: routing_position
-                                                    })
-
                                                     order.events.push({
                                                         event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
                                                         shipper_id: shipper_customer.id,
+                                                        code: customer_code,
                                                         time: event_time,
                                                         event_time: event_time,
                                                         date: event_date,
                                                         event_date: event_date,
                                                         event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
                                                         event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
-                                                        user_code_id: props.user?.user_code?.id
+                                                        user_code_id: props.user?.user_code?.id,
+                                                        timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                        type: 'pickup'
                                                     })
                                                 }
                                             }
 
-                                            if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                            if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'delivery').length === 0 &&
                                                 check_call.toLowerCase().indexOf('delivered') > -1) {
-                                                consignee_data.push({ customer_code, check_call_date });
+                                                event_data.push({ customer_code, check_call_date, type: 'delivery' });
 
                                                 let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                 if (consignee_customer) {
-                                                    routing_position = routing_position + 1;
-
-                                                    order.deliveries.push({
-                                                        customer_id: consignee_customer.id,
-                                                        code: customer_code,
-                                                        name: consignee_customer.name,
-                                                        routing_position: routing_position
-                                                    })
-
                                                     order.events.push({
                                                         event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
                                                         consignee_id: consignee_customer.id,
+                                                        code: customer_code,
                                                         time: event_time,
                                                         event_time: event_time,
                                                         date: event_date,
                                                         event_date: event_date,
                                                         event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
                                                         event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
-                                                        user_code_id: props.user?.user_code?.id
+                                                        user_code_id: props.user?.user_code?.id,
+                                                        timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                        type: 'delivery'
                                                     })
                                                 }
                                             }
@@ -353,7 +412,8 @@ const OrderImport = (props) => {
                                                 event_date: event_date,
                                                 event_location: '',
                                                 event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
-                                                user_code_id: props.user?.user_code?.id
+                                                user_code_id: props.user?.user_code?.id,
+                                                timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                             })
                                         }
 
@@ -368,7 +428,8 @@ const OrderImport = (props) => {
                                                 event_date: event_date,
                                                 event_location: '',
                                                 event_notes: check_call_comment,
-                                                user_code_id: props.user?.user_code?.id
+                                                user_code_id: props.user?.user_code?.id,
+                                                timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                             })
                                         }
 
@@ -415,6 +476,33 @@ const OrderImport = (props) => {
                                             })
                                         }
                                     }
+
+                                    order.events.sort((a, b) => a.timestamp - b.timestamp);
+
+                                    order.pickups.sort((a, b) => a.timestamp - b.timestamp);
+                                    order.deliveries.sort((a, b) => a.timestamp - b.timestamp);
+
+                                    order.routing = [
+                                        ...order.pickups,
+                                        ...order.deliveries
+                                    ];
+
+                                    let pos = 0;
+
+                                    order.events.map((e, i) => {
+                                        order.routing = order.routing.map(route => {
+                                            if (e.code === route.code && e.type === route.type && (route.position || 0) === 0) {
+                                                pos = pos + 1;
+                                                route.position = pos;
+                                            }
+
+                                            return route;
+                                        })
+
+                                        return e;
+                                    })
+
+                                    order.routing.sort((a, b) => a.position - b.position);
 
                                     order_list.push(order);
                                 }
@@ -424,26 +512,26 @@ const OrderImport = (props) => {
                                 order_group.push(row);
 
                                 if (index === (order_list.length - 1)) {
-                                    let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                    let bill_to_code = (order_group[0].bill_to_code || '').trim();
                                     let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
 
                                     if (bill_to_customer) {
                                         let order = {};
-                                        let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
-                                        let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
-                                        let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
-                                        let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
-                                        let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
-                                        let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
-                                        let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                                        let trip_number = (order_group[0].trip_number || '').trim();
+                                        let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
+                                        let order_comments = (order_group[0].order_comments || '').trim();
+                                        let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let miles = (order_group[0].miles || 0);
+                                        let creation_date = moment((order_group[0].creation_date || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
 
-                                        let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                        let carrier_code = (order_group[0].carrier_code || '').trim();
                                         let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
 
-                                        let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+                                        let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0].equipment_type || '')).toLowerCase())?.id || null;
 
                                         order.order_number = last_order_number;
-                                        order.trip_number = trip_number;
+                                        order.trip_number = trip_number === '' ? null : trip_number;
                                         order.load_type = load_type;
                                         order.load_type_id = load_type?.id || null;
                                         order.bill_to_customer = bill_to_customer;
@@ -547,82 +635,141 @@ const OrderImport = (props) => {
                                             return item;
                                         });
 
-                                        // handle pickups, deliveries and events
                                         let shipper_data = [];
                                         let consignee_data = [];
+                                        let event_data = [];
                                         let carrier_data = [];
                                         let comment_data = [];
                                         let routing_position = 0;
                                         let po_data = '';
                                         let bol_data = '';
 
+                                        // handle pickups
+                                        order_group.sort((a, b) => a.shipper_position - b.shipper_position);
+
                                         order_group.map((item, i) => {
-                                            let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
-                                            let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
-                                            let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
-                                            let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
-                                            po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
-                                            bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                            let shipper_position = item?.shipper_position || 0;
+                                            let shipper_code = (item?.shipper_code || '').trim();
+                                            let pickup_early_appt = (item?.pickup_early_appt || '').trim();
+                                            let pickup_late_appt = (item?.pickup_late_appt || '').trim();
+                                            let pickup_date1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let pickup_time1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                            let pickup_date2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let pickup_time2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                            po_data = (item?.po_number || '').trim();
+                                            bol_data = (item?.bol_number || '').trim();
+
+                                            if (shipper_code !== '') {
+                                                if (shipper_data.filter(x => x.position = shipper_position && x.code === shipper_code).length === 0) {
+                                                    shipper_data.push({ position: shipper_position, code: shipper_code });
+
+                                                    let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === shipper_code.toLowerCase());
+
+                                                    if (shipper_customer) {
+                                                        order.pickups.push({
+                                                            customer_id: shipper_customer.id,
+                                                            code: shipper_code,
+                                                            name: shipper_customer.name,
+                                                            pu_date1: pickup_date1,
+                                                            pu_date2: pickup_date2,
+                                                            pu_time1: pickup_time1,
+                                                            pu_time2: pickup_time2,
+                                                            type: 'pickup'
+                                                        })
+                                                    }
+                                                }
+                                            }
+                                        })
+
+                                        // handle deliveries
+                                        order_group.sort((a, b) => a.consignee_position - b.consignee_position);
+
+                                        order_group.map((item, i) => {
+                                            let consignee_position = item?.consignee_position || 0;
+                                            let consignee_code = (item?.consignee_code || '').trim();
+                                            let delivery_early_appt = (item?.delivery_early_appt || '').trim();
+                                            let delivery_late_appt = (item?.delivery_late_appt || '').trim();
+                                            let delivery_date1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let delivery_time1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                            let delivery_date2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let delivery_time2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+
+                                            if (consignee_code !== '') {
+                                                if (consignee_data.filter(x => x.position = consignee_position && x.code === consignee_code).length === 0) {
+                                                    consignee_data.push({ position: consignee_position, code: consignee_code });
+
+                                                    let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === consignee_code.toLowerCase());
+
+                                                    if (consignee_customer) {
+                                                        order.deliveries.push({
+                                                            customer_id: consignee_customer.id,
+                                                            code: consignee_code,
+                                                            name: consignee_customer.name,
+                                                            delivery_date1: delivery_date1,
+                                                            delivery_date2: delivery_date2,
+                                                            delivery_time1: delivery_time1,
+                                                            delivery_time2: delivery_time2,
+                                                            type: 'delivery'
+                                                        })
+                                                    }
+                                                }
+                                            }
+                                        })
+
+                                        // handle events
+                                        order_group.map((item, i) => {
+                                            let customer_code = (item?.customer_code || '').trim();
+                                            let check_call = (item?.check_call || '').trim();
+                                            let check_call_date = (item?.check_call_date || '').trim();
+                                            let check_call_comment = (item?.check_call_comment || '').trim();
                                             let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
                                             let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
 
                                             if (customer_code !== '') {
-                                                if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'pickup').length === 0 &&
                                                     check_call.toLowerCase().indexOf('pickup') > -1) {
-                                                    shipper_data.push({ customer_code, check_call_date });
+                                                    event_data.push({ customer_code, check_call_date, type: 'pickup' });
 
                                                     let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                     if (shipper_customer) {
-                                                        routing_position = routing_position + 1;
-
-                                                        order.pickups.push({
-                                                            customer_id: shipper_customer.id,
-                                                            code: customer_code,
-                                                            name: shipper_customer.name,
-                                                            routing_position: routing_position
-                                                        })
-
                                                         order.events.push({
                                                             event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
                                                             shipper_id: shipper_customer.id,
+                                                            code: customer_code,
                                                             time: event_time,
                                                             event_time: event_time,
                                                             date: event_date,
                                                             event_date: event_date,
                                                             event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
                                                             event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
-                                                            user_code_id: props.user?.user_code?.id
+                                                            user_code_id: props.user?.user_code?.id,
+                                                            timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                            type: 'pickup'
                                                         })
                                                     }
                                                 }
 
-                                                if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'delivery').length === 0 &&
                                                     check_call.toLowerCase().indexOf('delivered') > -1) {
-                                                    consignee_data.push({ customer_code, check_call_date });
+                                                    event_data.push({ customer_code, check_call_date, type: 'delivery' });
 
                                                     let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                     if (consignee_customer) {
-                                                        routing_position = routing_position + 1;
-
-                                                        order.deliveries.push({
-                                                            customer_id: consignee_customer.id,
-                                                            code: customer_code,
-                                                            name: consignee_customer.name,
-                                                            routing_position: routing_position
-                                                        })
-
                                                         order.events.push({
                                                             event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
                                                             consignee_id: consignee_customer.id,
+                                                            code: customer_code,
                                                             time: event_time,
                                                             event_time: event_time,
                                                             date: event_date,
                                                             event_date: event_date,
                                                             event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
                                                             event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
-                                                            user_code_id: props.user?.user_code?.id
+                                                            user_code_id: props.user?.user_code?.id,
+                                                            timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                            type: 'delivery'
                                                         })
                                                     }
                                                 }
@@ -646,7 +793,8 @@ const OrderImport = (props) => {
                                                     event_date: event_date,
                                                     event_location: '',
                                                     event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
-                                                    user_code_id: props.user?.user_code?.id
+                                                    user_code_id: props.user?.user_code?.id,
+                                                    timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                                 })
                                             }
 
@@ -661,7 +809,8 @@ const OrderImport = (props) => {
                                                     event_date: event_date,
                                                     event_location: '',
                                                     event_notes: check_call_comment,
-                                                    user_code_id: props.user?.user_code?.id
+                                                    user_code_id: props.user?.user_code?.id,
+                                                    timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                                 })
                                             }
 
@@ -709,30 +858,57 @@ const OrderImport = (props) => {
                                             }
                                         }
 
+                                        order.events.sort((a, b) => a.timestamp - b.timestamp);
+
+                                        order.pickups.sort((a, b) => a.timestamp - b.timestamp);
+                                        order.deliveries.sort((a, b) => a.timestamp - b.timestamp);
+
+                                        order.routing = [
+                                            ...order.pickups,
+                                            ...order.deliveries
+                                        ];
+
+                                        let pos = 0;
+
+                                        order.events.map((e, i) => {
+                                            order.routing = order.routing.map(route => {
+                                                if (e.code === route.code && e.type === route.type && (route.position || 0) === 0) {
+                                                    pos = pos + 1;
+                                                    route.position = pos;
+                                                }
+
+                                                return route;
+                                            })
+
+                                            return e;
+                                        })
+
+                                        order.routing.sort((a, b) => a.position - b.position);
+
                                         order_list.push(order);
                                     }
                                 }
                             } else {
-                                let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                let bill_to_code = (order_group[0].bill_to_code || '').trim();
                                 let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
 
                                 if (bill_to_customer) {
                                     let order = {};
-                                    let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
-                                    let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
-                                    let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
-                                    let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
-                                    let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
-                                    let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
-                                    let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                                    let trip_number = (order_group[0].trip_number || '').trim();
+                                    let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
+                                    let order_comments = (order_group[0].order_comments || '').trim();
+                                    let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
+                                    let miles = (order_group[0].miles || 0);
+                                    let creation_date = moment((order_group[0].creation_date || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
 
-                                    let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                    let carrier_code = (order_group[0].carrier_code || '').trim();
                                     let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
 
-                                    let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+                                    let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0].equipment_type || '')).toLowerCase())?.id || null;
 
                                     order.order_number = last_order_number;
-                                    order.trip_number = trip_number;
+                                    order.trip_number = trip_number === '' ? null : trip_number;
                                     order.load_type = load_type;
                                     order.load_type_id = load_type?.id || null;
                                     order.bill_to_customer = bill_to_customer;
@@ -836,82 +1012,141 @@ const OrderImport = (props) => {
                                         return item;
                                     });
 
-                                    // handle pickups, deliveries and events
                                     let shipper_data = [];
                                     let consignee_data = [];
+                                    let event_data = [];
                                     let carrier_data = [];
                                     let comment_data = [];
                                     let routing_position = 0;
                                     let po_data = '';
                                     let bol_data = '';
 
+                                    // handle pickups
+                                    order_group.sort((a, b) => a.shipper_position - b.shipper_position);
+
                                     order_group.map((item, i) => {
-                                        let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
-                                        let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
-                                        let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
-                                        let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
-                                        po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
-                                        bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                        let shipper_position = item?.shipper_position || 0;
+                                        let shipper_code = (item?.shipper_code || '').trim();
+                                        let pickup_early_appt = (item?.pickup_early_appt || '').trim();
+                                        let pickup_late_appt = (item?.pickup_late_appt || '').trim();
+                                        let pickup_date1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let pickup_time1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                        let pickup_date2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let pickup_time2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                        po_data = (item?.po_number || '').trim();
+                                        bol_data = (item?.bol_number || '').trim();
+
+                                        if (shipper_code !== '') {
+                                            if (shipper_data.filter(x => x.position = shipper_position && x.code === shipper_code).length === 0) {
+                                                shipper_data.push({ position: shipper_position, code: shipper_code });
+
+                                                let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === shipper_code.toLowerCase());
+
+                                                if (shipper_customer) {
+                                                    order.pickups.push({
+                                                        customer_id: shipper_customer.id,
+                                                        code: shipper_code,
+                                                        name: shipper_customer.name,
+                                                        pu_date1: pickup_date1,
+                                                        pu_date2: pickup_date2,
+                                                        pu_time1: pickup_time1,
+                                                        pu_time2: pickup_time2,
+                                                        type: 'pickup'
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    })
+
+                                    // handle deliveries
+                                    order_group.sort((a, b) => a.consignee_position - b.consignee_position);
+
+                                    order_group.map((item, i) => {
+                                        let consignee_position = item?.consignee_position || 0;
+                                        let consignee_code = (item?.consignee_code || '').trim();
+                                        let delivery_early_appt = (item?.delivery_early_appt || '').trim();
+                                        let delivery_late_appt = (item?.delivery_late_appt || '').trim();
+                                        let delivery_date1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let delivery_time1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                        let delivery_date2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                        let delivery_time2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+
+                                        if (consignee_code !== '') {
+                                            if (consignee_data.filter(x => x.position = consignee_position && x.code === consignee_code).length === 0) {
+                                                consignee_data.push({ position: consignee_position, code: consignee_code });
+
+                                                let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === consignee_code.toLowerCase());
+
+                                                if (consignee_customer) {
+                                                    order.deliveries.push({
+                                                        customer_id: consignee_customer.id,
+                                                        code: consignee_code,
+                                                        name: consignee_customer.name,
+                                                        delivery_date1: delivery_date1,
+                                                        delivery_date2: delivery_date2,
+                                                        delivery_time1: delivery_time1,
+                                                        delivery_time2: delivery_time2,
+                                                        type: 'delivery'
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    })
+
+                                    // handle events
+                                    order_group.map((item, i) => {
+                                        let customer_code = (item?.customer_code || '').trim();
+                                        let check_call = (item?.check_call || '').trim();
+                                        let check_call_date = (item?.check_call_date || '').trim();
+                                        let check_call_comment = (item?.check_call_comment || '').trim();
                                         let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
                                         let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
 
                                         if (customer_code !== '') {
-                                            if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                            if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'pickup').length === 0 &&
                                                 check_call.toLowerCase().indexOf('pickup') > -1) {
-                                                shipper_data.push({ customer_code, check_call_date });
+                                                event_data.push({ customer_code, check_call_date, type: 'pickup' });
 
                                                 let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                 if (shipper_customer) {
-                                                    routing_position = routing_position + 1;
-
-                                                    order.pickups.push({
-                                                        customer_id: shipper_customer.id,
-                                                        code: customer_code,
-                                                        name: shipper_customer.name,
-                                                        routing_position: routing_position
-                                                    })
-
                                                     order.events.push({
                                                         event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
                                                         shipper_id: shipper_customer.id,
+                                                        code: customer_code,
                                                         time: event_time,
                                                         event_time: event_time,
                                                         date: event_date,
                                                         event_date: event_date,
                                                         event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
                                                         event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
-                                                        user_code_id: props.user?.user_code?.id
+                                                        user_code_id: props.user?.user_code?.id,
+                                                        timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                        type: 'pickup'
                                                     })
                                                 }
                                             }
 
-                                            if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                            if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'delivery').length === 0 &&
                                                 check_call.toLowerCase().indexOf('delivered') > -1) {
-                                                consignee_data.push({ customer_code, check_call_date });
+                                                event_data.push({ customer_code, check_call_date, type: 'delivery' });
 
                                                 let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                 if (consignee_customer) {
-                                                    routing_position = routing_position + 1;
-
-                                                    order.deliveries.push({
-                                                        customer_id: consignee_customer.id,
-                                                        code: customer_code,
-                                                        name: consignee_customer.name,
-                                                        routing_position: routing_position
-                                                    })
-
                                                     order.events.push({
                                                         event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
                                                         consignee_id: consignee_customer.id,
+                                                        code: customer_code,
                                                         time: event_time,
                                                         event_time: event_time,
                                                         date: event_date,
                                                         event_date: event_date,
                                                         event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
                                                         event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
-                                                        user_code_id: props.user?.user_code?.id
+                                                        user_code_id: props.user?.user_code?.id,
+                                                        timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                        type: 'delivery'
                                                     })
                                                 }
                                             }
@@ -935,7 +1170,8 @@ const OrderImport = (props) => {
                                                 event_date: event_date,
                                                 event_location: '',
                                                 event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
-                                                user_code_id: props.user?.user_code?.id
+                                                user_code_id: props.user?.user_code?.id,
+                                                timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                             })
                                         }
 
@@ -950,7 +1186,8 @@ const OrderImport = (props) => {
                                                 event_date: event_date,
                                                 event_location: '',
                                                 event_notes: check_call_comment,
-                                                user_code_id: props.user?.user_code?.id
+                                                user_code_id: props.user?.user_code?.id,
+                                                timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                             })
                                         }
 
@@ -998,6 +1235,33 @@ const OrderImport = (props) => {
                                         }
                                     }
 
+                                    order.events.sort((a, b) => a.timestamp - b.timestamp);
+
+                                    order.pickups.sort((a, b) => a.timestamp - b.timestamp);
+                                    order.deliveries.sort((a, b) => a.timestamp - b.timestamp);
+
+                                    order.routing = [
+                                        ...order.pickups,
+                                        ...order.deliveries
+                                    ];
+
+                                    let pos = 0;
+
+                                    order.events.map((e, i) => {
+                                        order.routing = order.routing.map(route => {
+                                            if (e.code === route.code && e.type === route.type && (route.position || 0) === 0) {
+                                                pos = pos + 1;
+                                                route.position = pos;
+                                            }
+
+                                            return route;
+                                        })
+
+                                        return e;
+                                    })
+
+                                    order.routing.sort((a, b) => a.position - b.position);
+
                                     order_list.push(order);
                                 }
 
@@ -1006,26 +1270,26 @@ const OrderImport = (props) => {
                                 order_group.push(row);
 
                                 if (index === (order_list.length - 1)) {
-                                    let bill_to_code = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'bill_to_code')] || '');
+                                    let bill_to_code = (order_group[0].bill_to_code || '').trim();
                                     let bill_to_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === bill_to_code.toLowerCase());
 
                                     if (bill_to_customer) {
                                         let order = {};
-                                        let trip_number = (order_group[0][Object.keys(order_group[0]).find(key => ['trip', 'trip_number'].includes(key.toLowerCase()))] || '').trim();
-                                        let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0][Object.keys(order_group[0]).find(key => ['load_type', 'order_type'].includes(key.toLowerCase()))]).toLowerCase());
-                                        let order_comments = (order_group[0][Object.keys(order_group[0]).find(key => ['order_comments'].includes(key.toLowerCase()))] || '');
-                                        let haz_mat = (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => ['haz_mat', 'hazmat'].includes(key.toLowerCase()))] || '').toLowerCase() === 'n' ? 0 : 1;
-                                        let expedited = (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === '' ? 0 : (order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'expedited')] || '').toLowerCase() === 'n' ? 0 : 1;
-                                        let miles = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'miles')] || 0;
-                                        let creation_date = moment((order_group[0][Object.keys(order_group[0]).find(key => ['creation_date', 'order_date'].includes(key.toLowerCase()))] || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                                        let trip_number = (order_group[0].trip_number || '').trim();
+                                        let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
+                                        let order_comments = (order_group[0].order_comments || '').trim();
+                                        let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
+                                        let miles = (order_group[0].miles || 0);
+                                        let creation_date = moment((order_group[0].creation_date || '').toString().trim(), 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
 
-                                        let carrier_code = order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'carrier_code')];
+                                        let carrier_code = (order_group[0].carrier_code || '').trim();
                                         let carrier = (carriers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)) === carrier_code);
 
-                                        let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0][Object.keys(order_group[0]).find(key => key.toLowerCase() === 'equipment_type')] || '')).toLowerCase())?.id || null;
+                                        let equipment_id = (equipments || []).find(e => e.name.toLowerCase() === ((order_group[0].equipment_type || '')).toLowerCase())?.id || null;
 
                                         order.order_number = last_order_number;
-                                        order.trip_number = trip_number;
+                                        order.trip_number = trip_number === '' ? null : trip_number;
                                         order.load_type = load_type;
                                         order.load_type_id = load_type?.id || null;
                                         order.bill_to_customer = bill_to_customer;
@@ -1129,82 +1393,141 @@ const OrderImport = (props) => {
                                             return item;
                                         });
 
-                                        // handle pickups, deliveries and events
                                         let shipper_data = [];
                                         let consignee_data = [];
+                                        let event_data = [];
                                         let carrier_data = [];
                                         let comment_data = [];
                                         let routing_position = 0;
                                         let po_data = '';
                                         let bol_data = '';
 
+                                        // handle pickups
+                                        order_group.sort((a, b) => a.shipper_position - b.shipper_position);
+
                                         order_group.map((item, i) => {
-                                            let customer_code = (item[Object.keys(item).find(key => ['customer_code'].includes(key.toLowerCase()))] || '').trim();
-                                            let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
-                                            let check_call_date = (item[Object.keys(item).find(key => ['check_call_date'].includes(key.toLowerCase()))] || '').trim();
-                                            let check_call_comment = (item[Object.keys(item).find(key => ['check_call_comment'].includes(key.toLowerCase()))] || '').trim();
-                                            po_data = (item[Object.keys(item).find(key => ['po_number'].includes(key.toLowerCase()))] || '').trim();
-                                            bol_data = (item[Object.keys(item).find(key => ['bol_number'].includes(key.toLowerCase()))] || '').trim();
+                                            let shipper_position = item?.shipper_position || 0;
+                                            let shipper_code = (item?.shipper_code || '').trim();
+                                            let pickup_early_appt = (item?.pickup_early_appt || '').trim();
+                                            let pickup_late_appt = (item?.pickup_late_appt || '').trim();
+                                            let pickup_date1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let pickup_time1 = pickup_early_appt === '' ? '' : moment(pickup_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                            let pickup_date2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let pickup_time2 = pickup_late_appt === '' ? '' : moment(pickup_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                            po_data = (item?.po_number || '').trim();
+                                            bol_data = (item?.bol_number || '').trim();
+
+                                            if (shipper_code !== '') {
+                                                if (shipper_data.filter(x => x.position = shipper_position && x.code === shipper_code).length === 0) {
+                                                    shipper_data.push({ position: shipper_position, code: shipper_code });
+
+                                                    let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === shipper_code.toLowerCase());
+
+                                                    if (shipper_customer) {
+                                                        order.pickups.push({
+                                                            customer_id: shipper_customer.id,
+                                                            code: shipper_code,
+                                                            name: shipper_customer.name,
+                                                            pu_date1: pickup_date1,
+                                                            pu_date2: pickup_date2,
+                                                            pu_time1: pickup_time1,
+                                                            pu_time2: pickup_time2,
+                                                            type: 'pickup'
+                                                        })
+                                                    }
+                                                }
+                                            }
+                                        })
+
+                                        // handle deliveries
+                                        order_group.sort((a, b) => a.consignee_position - b.consignee_position);
+
+                                        order_group.map((item, i) => {
+                                            let consignee_position = item?.consignee_position || 0;
+                                            let consignee_code = (item?.consignee_code || '').trim();
+                                            let delivery_early_appt = (item?.delivery_early_appt || '').trim();
+                                            let delivery_late_appt = (item?.delivery_late_appt || '').trim();
+                                            let delivery_date1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let delivery_time1 = delivery_early_appt === '' ? '' : moment(delivery_early_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+                                            let delivery_date2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
+                                            let delivery_time2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
+
+                                            if (consignee_code !== '') {
+                                                if (consignee_data.filter(x => x.position = consignee_position && x.code === consignee_code).length === 0) {
+                                                    consignee_data.push({ position: consignee_position, code: consignee_code });
+
+                                                    let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === consignee_code.toLowerCase());
+
+                                                    if (consignee_customer) {
+                                                        order.deliveries.push({
+                                                            customer_id: consignee_customer.id,
+                                                            code: consignee_code,
+                                                            name: consignee_customer.name,
+                                                            delivery_date1: delivery_date1,
+                                                            delivery_date2: delivery_date2,
+                                                            delivery_time1: delivery_time1,
+                                                            delivery_time2: delivery_time2,
+                                                            type: 'delivery'
+                                                        })
+                                                    }
+                                                }
+                                            }
+                                        })
+
+                                        // handle events
+                                        order_group.map((item, i) => {
+                                            let customer_code = (item?.customer_code || '').trim();
+                                            let check_call = (item?.check_call || '').trim();
+                                            let check_call_date = (item?.check_call_date || '').trim();
+                                            let check_call_comment = (item?.check_call_comment || '').trim();
                                             let event_date = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('MM/DD/YYYY');
                                             let event_time = moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
 
                                             if (customer_code !== '') {
-                                                if (shipper_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'pickup').length === 0 &&
                                                     check_call.toLowerCase().indexOf('pickup') > -1) {
-                                                    shipper_data.push({ customer_code, check_call_date });
+                                                    event_data.push({ customer_code, check_call_date, type: 'pickup' });
 
                                                     let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                     if (shipper_customer) {
-                                                        routing_position = routing_position + 1;
-
-                                                        order.pickups.push({
-                                                            customer_id: shipper_customer.id,
-                                                            code: customer_code,
-                                                            name: shipper_customer.name,
-                                                            routing_position: routing_position
-                                                        })
-
                                                         order.events.push({
                                                             event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'loaded').id,
                                                             shipper_id: shipper_customer.id,
+                                                            code: customer_code,
                                                             time: event_time,
                                                             event_time: event_time,
                                                             date: event_date,
                                                             event_date: event_date,
                                                             event_location: shipper_customer.city + ' ' + shipper_customer.state.toUpperCase(),
                                                             event_notes: `Loaded at Shipper ${customer_code} - ${shipper_customer.name}`,
-                                                            user_code_id: props.user?.user_code?.id
+                                                            user_code_id: props.user?.user_code?.id,
+                                                            timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                            type: 'pickup'
                                                         })
                                                     }
                                                 }
 
-                                                if (consignee_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date).length === 0 &&
+                                                if (event_data.filter(x => x.customer_code === customer_code && x.check_call_date === check_call_date && x.type === 'delivery').length === 0 &&
                                                     check_call.toLowerCase().indexOf('delivered') > -1) {
-                                                    consignee_data.push({ customer_code, check_call_date });
+                                                    event_data.push({ customer_code, check_call_date, type: 'delivery' });
 
                                                     let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === customer_code.toLowerCase());
 
                                                     if (consignee_customer) {
-                                                        routing_position = routing_position + 1;
-
-                                                        order.deliveries.push({
-                                                            customer_id: consignee_customer.id,
-                                                            code: customer_code,
-                                                            name: consignee_customer.name,
-                                                            routing_position: routing_position
-                                                        })
-
                                                         order.events.push({
                                                             event_type_id: (eventTypes || []).find(e => e.name.toLowerCase() === 'delivered').id,
                                                             consignee_id: consignee_customer.id,
+                                                            code: customer_code,
                                                             time: event_time,
                                                             event_time: event_time,
                                                             date: event_date,
                                                             event_date: event_date,
                                                             event_location: consignee_customer.city + ' ' + consignee_customer.state.toUpperCase(),
                                                             event_notes: `Delivered at Consignee ${customer_code} - ${consignee_customer.name}`,
-                                                            user_code_id: props.user?.user_code?.id
+                                                            user_code_id: props.user?.user_code?.id,
+                                                            timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix(),
+                                                            type: 'delivery'
                                                         })
                                                     }
                                                 }
@@ -1228,7 +1551,8 @@ const OrderImport = (props) => {
                                                     event_date: event_date,
                                                     event_location: '',
                                                     event_notes: `Changed Carrier from: "Old Carrier (${carrier_codes[0] || ''} - ${old_carrier?.name || ''})" to "New Carrier (${carrier_codes[1] || ''} - ${new_carrier?.name || ''})"`,
-                                                    user_code_id: props.user?.user_code?.id
+                                                    user_code_id: props.user?.user_code?.id,
+                                                    timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                                 })
                                             }
 
@@ -1243,7 +1567,8 @@ const OrderImport = (props) => {
                                                     event_date: event_date,
                                                     event_location: '',
                                                     event_notes: check_call_comment,
-                                                    user_code_id: props.user?.user_code?.id
+                                                    user_code_id: props.user?.user_code?.id,
+                                                    timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                                 })
                                             }
 
@@ -1290,6 +1615,33 @@ const OrderImport = (props) => {
                                                 })
                                             }
                                         }
+
+                                        order.events.sort((a, b) => a.timestamp - b.timestamp);
+
+                                        order.pickups.sort((a, b) => a.timestamp - b.timestamp);
+                                        order.deliveries.sort((a, b) => a.timestamp - b.timestamp);
+
+                                        order.routing = [
+                                            ...order.pickups,
+                                            ...order.deliveries
+                                        ];
+
+                                        let pos = 0;
+
+                                        order.events.map((e, i) => {
+                                            order.routing = order.routing.map(route => {
+                                                if (e.code === route.code && e.type === route.type && (route.position || 0) === 0) {
+                                                    pos = pos + 1;
+                                                    route.position = pos;
+                                                }
+
+                                                return route;
+                                            })
+
+                                            return e;
+                                        })
+
+                                        order.routing.sort((a, b) => a.position - b.position);
 
                                         order_list.push(order);
                                     }
@@ -1318,6 +1670,8 @@ const OrderImport = (props) => {
         }
     }
 
+
+
     const submitImport = () => {
         if (window.confirm('Are you sure you want to proceed?')) {
             setIsLoading(true);
@@ -1337,8 +1691,9 @@ const OrderImport = (props) => {
                         order_date_time: item.order_date_time,
                         bill_to_customer_id: item.bill_to_customer.id,
                         carrier_id: item.carrier?.id || null,
-                        pickups: item.pickups,
-                        deliveries: item.deliveries,
+                        // pickups: item.pickups,
+                        // deliveries: item.deliveries,
+                        routing: item.routing,
                         internal_notes: item.internal_notes,
                         customer_rating: item.customer_rating,
                         carrier_rating: item.carrier_rating,
