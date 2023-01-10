@@ -1,5 +1,5 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {connect} from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
 import Draggable from 'react-draggable';
@@ -7,11 +7,11 @@ import './RevenueInformation.css';
 import MaskedInput from 'react-text-mask';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
-import {useTransition, useSpring, animated, Transition, config} from 'react-spring';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCaretDown, faCaretUp, faCaretRight, faCalendarAlt} from '@fortawesome/free-solid-svg-icons';
-import {useDetectClickOutside} from "react-detect-click-outside";
-import {Calendar} from './../../panels';
+import { useTransition, useSpring, animated, Transition, config } from 'react-spring';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretUp, faCaretRight, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { useDetectClickOutside } from "react-detect-click-outside";
+import { Calendar } from './../../panels';
 import moment from 'moment';
 import axios from 'axios';
 import NumberFormat from 'react-number-format';
@@ -55,9 +55,9 @@ const RevenueInformation = (props) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
-        from: {opacity: 0, display: 'block'},
-        enter: {opacity: 1, display: 'block'},
-        leave: {opacity: 0, display: 'none'},
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
         reverse: isLoading,
     });
     const [noOrdersFound, setNoOrdersFound] = useState(false);
@@ -199,20 +199,23 @@ const RevenueInformation = (props) => {
                     let currentDateGroup = [];
                     let currentYearGroup = [];
                     let currentOrderGroup = [];
-                    let lastCustomer = {id: 0};
+                    let lastCustomer = { id: 0 };
+                    const orderLength = newOrders.length - 1;
 
-                    newOrders.sort((a, b) => a.bill_to_company.code.localeCompare(b.bill_to_company.code) || a.bill_to_company.code_number - b.bill_to_company.code_number || a.id - b.id).map((order, index) => {
-                        let currentCustomer = order.bill_to_company;
+                    newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
+
+                    newOrders.map((order, index) => {
+                        let currentCustomer = order.bill_to_customer;
                         currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                         currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
 
-                        if (lastCustomer.id === 0) {
+                        if (lastCustomer.id === 0) { // if is the first customer
                             lastCustomer = currentCustomer;
                             lastMonth = currentMonth;
                             lastYear = currentYear;
                             currentOrderGroup.push(order);
 
-                            if (index === newOrders.length - 1) {
+                            if (index === orderLength) { // if is the only/last record of the array
                                 groupedOrders.push({
                                     billToCustomer: lastCustomer,
                                     dateGroup: [{
@@ -229,18 +232,18 @@ const RevenueInformation = (props) => {
                                 });
                             }
                         } else {
-                            if (currentCustomer.id === lastCustomer.id) {
+                            if (currentCustomer.id === lastCustomer.id) { // if is the same customer than before
                                 if (lastYear !== currentYear) {
+                                    currentDateGroup.push({
+                                        month: lastMonth,
+                                        year: lastYear,
+                                        orders: currentOrderGroup,
+                                        showMonthGroup: true
+                                    })
+
                                     currentYearGroup.push({
                                         year: lastYear,
-                                        months: [
-                                            {
-                                                month: lastMonth,
-                                                year: lastYear,
-                                                orders: currentOrderGroup,
-                                                showMonthGroup: true
-                                            }
-                                        ],
+                                        months: currentDateGroup,
                                         showYearGroup: true
                                     });
 
@@ -470,7 +473,7 @@ const RevenueInformation = (props) => {
                         }
 
                         return groupOrder;
-                    })
+                    });
 
                     setOrders(groupedOrders)
 
@@ -492,19 +495,19 @@ const RevenueInformation = (props) => {
     }, [])
 
     const dateStartTransition = useTransition(isDateStartCalendarShown, {
-        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
         reverse: isDateStartCalendarShown,
-        config: {duration: 100}
+        config: { duration: 100 }
     })
 
     const dateEndTransition = useTransition(isDateEndCalendarShown, {
-        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
         reverse: isDateEndCalendarShown,
-        config: {duration: 100}
+        config: { duration: 100 }
     })
 
     const doSearch = () => {
@@ -549,10 +552,12 @@ const RevenueInformation = (props) => {
                 let currentDateGroup = [];
                 let currentYearGroup = [];
                 let currentOrderGroup = [];
-                let lastCustomer = {id: 0};
+                let lastCustomer = { id: 0 };
 
-                newOrders.sort((a, b) => a.bill_to_company.code.localeCompare(b.bill_to_company.code) || a.bill_to_company.code_number - b.bill_to_company.code_number || a.id - b.id).map((order, index) => {
-                    let currentCustomer = order.bill_to_company;
+                newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
+
+                newOrders.map((order, index) => {
+                    let currentCustomer = order.bill_to_customer;
                     currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                     currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
 
@@ -582,19 +587,18 @@ const RevenueInformation = (props) => {
                         if (currentCustomer.id === lastCustomer.id) {
 
                             if (lastYear !== currentYear) {
+                                currentDateGroup.push({
+                                    month: lastMonth,
+                                    year: lastYear,
+                                    orders: currentOrderGroup,
+                                    showMonthGroup: true
+                                })
 
                                 currentYearGroup.push({
                                     year: lastYear,
-                                    months: [
-                                        {
-                                            month: lastMonth,
-                                            year: lastYear,
-                                            orders: currentOrderGroup,
-                                            showMonthGroup: true
-                                        }
-                                    ],
+                                    months: currentDateGroup,
                                     showYearGroup: true
-                                });
+                                });                                
 
                                 lastYear = currentYear;
                                 lastMonth = currentMonth;
@@ -851,7 +855,7 @@ const RevenueInformation = (props) => {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>
                         <div className="loading-container-wrapper">
-                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                         </div>
                     </animated.div>
                 )
@@ -860,9 +864,9 @@ const RevenueInformation = (props) => {
             <div className="order-fields-container">
 
                 <div className="search-fields">
-                    <div className="select-box-container date" style={{position: 'relative', marginRight: 2}}>
+                    <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
                         <div className="select-box-wrapper">
-                            <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Date
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Date
                                 Start
                             </div>
                             <MaskedInput
@@ -961,7 +965,7 @@ const RevenueInformation = (props) => {
 
                                     refDateStart.current.inputElement.focus();
                                 }
-                            }}/>
+                            }} />
                         </div>
 
                         {
@@ -975,7 +979,7 @@ const RevenueInformation = (props) => {
                                     }}
                                     ref={refDateStartCalendarDropDown}
                                 >
-                                    <div className="mochi-contextual-popup vertical below right" style={{height: 275}}>
+                                    <div className="mochi-contextual-popup vertical below right" style={{ height: 275 }}>
                                         <div className="mochi-contextual-popup-content">
                                             <div className="mochi-contextual-popup-wrapper">
                                                 <Calendar
@@ -1001,89 +1005,89 @@ const RevenueInformation = (props) => {
                         }
                     </div>
                     <div className="input-box-container city">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>City Origin
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>City Origin
                         </div>
                         <input type="text"
-                               tabIndex={3 + props.tabTimes}
-                               onInput={(e) => {
-                                   setCityOrigin(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setCityOrigin(e.target.value)
-                               }}
-                               value={cityOrigin || ''}
+                            tabIndex={3 + props.tabTimes}
+                            onInput={(e) => {
+                                setCityOrigin(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setCityOrigin(e.target.value)
+                            }}
+                            value={cityOrigin || ''}
                         />
                     </div>
                     <div className="input-box-container state">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>State Origin
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>State Origin
                         </div>
                         <input type="text"
-                               tabIndex={5 + props.tabTimes}
-                               style={{textTransform: 'uppercase'}}
-                               maxLength={2}
-                               onInput={(e) => {
-                                   setStateOrigin(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setStateOrigin(e.target.value)
-                               }}
-                               value={stateOrigin || ''}
+                            tabIndex={5 + props.tabTimes}
+                            style={{ textTransform: 'uppercase' }}
+                            maxLength={2}
+                            onInput={(e) => {
+                                setStateOrigin(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setStateOrigin(e.target.value)
+                            }}
+                            value={stateOrigin || ''}
                         />
                     </div>
                     <div className="input-box-container zip">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Zip Origin
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Zip Origin
                         </div>
                         <input type="text"
-                               tabIndex={7 + props.tabTimes}
-                               maxLength={10}
-                               onKeyDown={(e) => {
-                                   let key = e.keyCode || e.which;
+                            tabIndex={7 + props.tabTimes}
+                            maxLength={10}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                   if (
-                                       key === 9 || // TAB
-                                       (key >= 48 && key <= 57) || // NUMBER
-                                       (key >= 96 && key <= 105) || // NUMBER
-                                       (key === 8 || key === 46) || // BACKSPACE - DELETE
-                                       (key >= 37 && key <= 40) // ARROW KEYS
-                                   ) {
-                                   } else {
-                                       e.preventDefault();
-                                   }
-                               }}
-                               onInput={(e) => {
-                                   setZipOrigin(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setZipOrigin(e.target.value)
-                               }}
-                               value={zipOrigin || ''}
+                                if (
+                                    key === 9 || // TAB
+                                    (key >= 48 && key <= 57) || // NUMBER
+                                    (key >= 96 && key <= 105) || // NUMBER
+                                    (key === 8 || key === 46) || // BACKSPACE - DELETE
+                                    (key >= 37 && key <= 40) // ARROW KEYS
+                                ) {
+                                } else {
+                                    e.preventDefault();
+                                }
+                            }}
+                            onInput={(e) => {
+                                setZipOrigin(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setZipOrigin(e.target.value)
+                            }}
+                            value={zipOrigin || ''}
                         />
                     </div>
                     <div className="input-box-container">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Bill-To Code
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Bill-To Code
                         </div>
                         <input type="text"
-                               tabIndex={9 + props.tabTimes}
-                               maxLength={10}
-                               style={{textTransform: 'uppercase'}}
-                               onInput={(e) => {
-                                   setBillToCode(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setBillToCode(e.target.value)
-                               }}
-                               value={billToCode || ''}
+                            tabIndex={9 + props.tabTimes}
+                            maxLength={10}
+                            style={{ textTransform: 'uppercase' }}
+                            onInput={(e) => {
+                                setBillToCode(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setBillToCode(e.target.value)
+                            }}
+                            value={billToCode || ''}
                         />
                     </div>
-                    <div className="input-toggle-container" style={{minWidth: '7.5rem', maxWidth: '7.5rem'}}>
+                    <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
                         <input type="checkbox"
-                               id={props.panelName + '-cbox-revenue-information-show-year-totals-btn'}
-                               onChange={(e) => {
-                                   setShowYearTotals(e.target.checked);
-                               }}
-                               checked={showYearTotals}/>
+                            id={props.panelName + '-cbox-revenue-information-show-year-totals-btn'}
+                            onChange={(e) => {
+                                setShowYearTotals(e.target.checked);
+                            }}
+                            checked={showYearTotals} />
                         <label htmlFor={props.panelName + '-cbox-revenue-information-show-year-totals-btn'}
-                               style={{fontSize: '0.7rem'}}>
+                            style={{ fontSize: '0.7rem' }}>
                             <div className="label-text">Show Year Totals</div>
                             <div className="input-toggle-btn"></div>
                         </label>
@@ -1099,7 +1103,7 @@ const RevenueInformation = (props) => {
                             setZipOrigin('');
                             setZipDestination('');
                             setBillToCode('');
-                            if ((props.selectedCustomer?.id || 0) === 0){
+                            if ((props.selectedCustomer?.id || 0) === 0) {
                                 setCustomerCode('');
                             }
 
@@ -1113,9 +1117,9 @@ const RevenueInformation = (props) => {
                         </div>
                     </div>
 
-                    <div className="select-box-container date" style={{position: 'relative', marginRight: 2}}>
+                    <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
                         <div className="select-box-wrapper">
-                            <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Date End
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Date End
                             </div>
                             <MaskedInput
                                 tabIndex={2 + props.tabTimes}
@@ -1211,16 +1215,16 @@ const RevenueInformation = (props) => {
 
                                     refDateEnd.current.inputElement.focus();
                                 }
-                            }}/>
+                            }} />
                         </div>
 
                         {
                             useTransition(isDateEndCalendarShown, {
-                                from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-                                enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-                                leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+                                from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+                                enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+                                leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
                                 reverse: isDateEndCalendarShown,
-                                config: {duration: 100}
+                                config: { duration: 100 }
                             })((style, item) => item &&
                                 (<animated.div
                                     className="mochi-contextual-container"
@@ -1231,7 +1235,7 @@ const RevenueInformation = (props) => {
                                     }}
                                     ref={refDateEndCalendarDropDown}
                                 >
-                                    <div className="mochi-contextual-popup vertical below right" style={{height: 275}}>
+                                    <div className="mochi-contextual-popup vertical below right" style={{ height: 275 }}>
                                         <div className="mochi-contextual-popup-content">
                                             <div className="mochi-contextual-popup-wrapper">
                                                 <Calendar
@@ -1257,104 +1261,104 @@ const RevenueInformation = (props) => {
                         }
                     </div>
                     <div className="input-box-container city">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>City
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>City
                             Destination
                         </div>
                         <input type="text"
-                               tabIndex={4 + props.tabTimes}
-                               onInput={(e) => {
-                                   setCityDestination(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setCityDestination(e.target.value)
-                               }}
-                               value={cityDestination || ''}
+                            tabIndex={4 + props.tabTimes}
+                            onInput={(e) => {
+                                setCityDestination(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setCityDestination(e.target.value)
+                            }}
+                            value={cityDestination || ''}
                         />
                     </div>
                     <div className="input-box-container state">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>State
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>State
                             Destination
                         </div>
                         <input type="text"
-                               tabIndex={6 + props.tabTimes}
-                               maxLength={2}
-                               style={{textTransform: 'uppercase'}}
-                               onInput={(e) => {
-                                   setStateDestination(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setStateDestination(e.target.value)
-                               }}
-                               value={stateDestination || ''}
+                            tabIndex={6 + props.tabTimes}
+                            maxLength={2}
+                            style={{ textTransform: 'uppercase' }}
+                            onInput={(e) => {
+                                setStateDestination(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setStateDestination(e.target.value)
+                            }}
+                            value={stateDestination || ''}
                         />
                     </div>
                     <div className="input-box-container zip">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Zip
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Zip
                             Destination
                         </div>
                         <input type="text"
-                               tabIndex={8 + props.tabTimes}
-                               maxLength={10}
-                               onKeyDown={(e) => {
-                                   let key = e.keyCode || e.which;
+                            tabIndex={8 + props.tabTimes}
+                            maxLength={10}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                   if (
-                                       key === 9 || // TAB
-                                       (key >= 48 && key <= 57) || // NUMBER
-                                       (key >= 96 && key <= 105) || // NUMBER
-                                       (key === 8 || key === 46) || // BACKSPACE - DELETE
-                                       (key >= 37 && key <= 40) // ARROW KEYS
-                                   ) {
-                                   } else {
-                                       e.preventDefault();
-                                   }
-                               }}
-                               onInput={(e) => {
-                                   setZipDestination(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setZipDestination(e.target.value)
-                               }}
-                               value={zipDestination || ''}
+                                if (
+                                    key === 9 || // TAB
+                                    (key >= 48 && key <= 57) || // NUMBER
+                                    (key >= 96 && key <= 105) || // NUMBER
+                                    (key === 8 || key === 46) || // BACKSPACE - DELETE
+                                    (key >= 37 && key <= 40) // ARROW KEYS
+                                ) {
+                                } else {
+                                    e.preventDefault();
+                                }
+                            }}
+                            onInput={(e) => {
+                                setZipDestination(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setZipDestination(e.target.value)
+                            }}
+                            value={zipDestination || ''}
                         />
                     </div>
                     <div className="input-box-container">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>
                             {props.suborigin === 'customer' ? 'Customer Code' : 'Carrier Code'}
                         </div>
                         <input type="text"
-                               readOnly={(props.selectedCustomer?.id || 0) > 0}
-                               tabIndex={10 + props.tabTimes}
-                               maxLength={10}
-                               onKeyDown={e => {
-                                   let key = e.keyCode || e.which;
+                            readOnly={(props.selectedCustomer?.id || 0) > 0}
+                            tabIndex={10 + props.tabTimes}
+                            maxLength={10}
+                            onKeyDown={e => {
+                                let key = e.keyCode || e.which;
 
-                                   if (key === 9) {
-                                       e.preventDefault();
-                                       refDateStart.current.inputElement.focus();
+                                if (key === 9) {
+                                    e.preventDefault();
+                                    refDateStart.current.inputElement.focus();
 
-                                       doSearch();
-                                   }
-                               }}
-                               style={{textTransform: 'uppercase'}}
-                               onInput={(e) => {
-                                   setCustomerCode(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setCustomerCode(e.target.value)
-                               }}
-                               value={customerCode || ''}
+                                    doSearch();
+                                }
+                            }}
+                            style={{ textTransform: 'uppercase' }}
+                            onInput={(e) => {
+                                setCustomerCode(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setCustomerCode(e.target.value)
+                            }}
+                            value={customerCode || ''}
                         />
                     </div>
-                    <div className="input-toggle-container" style={{minWidth: '7.5rem', maxWidth: '7.5rem'}}>
+                    <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
                         <input type="checkbox"
-                               id={props.panelName + '-cbox-revenue-information-show-month-totals-btn'}
-                               onChange={(e) => {
-                                   setShowMonthTotals(e.target.checked);
-                               }}
-                               checked={showMonthTotals}/>
+                            id={props.panelName + '-cbox-revenue-information-show-month-totals-btn'}
+                            onChange={(e) => {
+                                setShowMonthTotals(e.target.checked);
+                            }}
+                            checked={showMonthTotals} />
                         <label htmlFor={props.panelName + '-cbox-revenue-information-show-month-totals-btn'}
-                               style={{fontSize: '0.7rem'}}>
+                            style={{ fontSize: '0.7rem' }}>
                             <div className="label-text">Show Month Totals</div>
                             <div className="input-toggle-btn"></div>
                         </label>
@@ -1412,8 +1416,8 @@ const RevenueInformation = (props) => {
                         <div className="order-info-wrapper">
                             {
                                 (orders || []).map((groupOrder, index1) => {
-                                    const {id, code, code_number, name, city, state} = groupOrder.billToCustomer;
-                                    const {dateGroup} = groupOrder;
+                                    const { id, code, code_number, name, city, state } = groupOrder.billToCustomer;
+                                    const { dateGroup } = groupOrder;
                                     const customerOrdersClasses = classnames({
                                         'customer-orders': true,
                                         'hidden': !groupOrder.showCustomerGroup
@@ -1455,20 +1459,20 @@ const RevenueInformation = (props) => {
                                                         fontSize: '1.2rem',
                                                         cursor: "pointer"
                                                     }} onClick={() => {
-                                                    setOrders(orders.map((order, i) => {
-                                                        if (index1 === i) {
-                                                            order.showCustomerGroup = !order.showCustomerGroup;
-                                                        }
+                                                        setOrders(orders.map((order, i) => {
+                                                            if (index1 === i) {
+                                                                order.showCustomerGroup = !order.showCustomerGroup;
+                                                            }
 
-                                                        return order;
-                                                    }))
-                                                }}/>
+                                                            return order;
+                                                        }))
+                                                    }} />
                                             </div>
 
                                             <div className={customerOrdersClasses}>
                                                 {
                                                     (dateGroup || []).map((yearGroup, index2) => {
-                                                        const {months} = yearGroup;
+                                                        const { months } = yearGroup;
                                                         const yearOrdersClasses = classnames({
                                                             'year-orders': true,
                                                             'hidden': !yearGroup.showYearGroup
@@ -1488,26 +1492,26 @@ const RevenueInformation = (props) => {
                                                                             cursor: "pointer",
                                                                             marginLeft: 10
                                                                         }} onClick={() => {
-                                                                        setOrders(orders.map((order, i) => {
-                                                                            if (index1 === i) {
-                                                                                order.dateGroup.map((year, x) => {
-                                                                                    if (index2 === x) {
-                                                                                        year.showYearGroup = !year.showYearGroup;
-                                                                                    }
+                                                                            setOrders(orders.map((order, i) => {
+                                                                                if (index1 === i) {
+                                                                                    order.dateGroup.map((year, x) => {
+                                                                                        if (index2 === x) {
+                                                                                            year.showYearGroup = !year.showYearGroup;
+                                                                                        }
 
-                                                                                    return year;
-                                                                                })
-                                                                            }
+                                                                                        return year;
+                                                                                    })
+                                                                                }
 
-                                                                            return order;
-                                                                        }))
-                                                                    }}/>
+                                                                                return order;
+                                                                            }))
+                                                                        }} />
                                                                 </div>
 
                                                                 <div className={yearOrdersClasses}>
                                                                     {
                                                                         (months || []).map((group, index3) => {
-                                                                            const {orders} = group;
+                                                                            const { orders } = group;
                                                                             const monthOrdersClasses = classnames({
                                                                                 'month-orders': true,
                                                                                 'hidden': !group.showMonthGroup
@@ -1515,7 +1519,7 @@ const RevenueInformation = (props) => {
 
                                                                             return (
                                                                                 <div className="month-container"
-                                                                                     key={index3}>
+                                                                                    key={index3}>
                                                                                     <div className="month-info">
                                                                                         <span>{group.month}</span>
 
@@ -1527,26 +1531,26 @@ const RevenueInformation = (props) => {
                                                                                                 cursor: "pointer",
                                                                                                 marginLeft: 10
                                                                                             }} onClick={() => {
-                                                                                            setOrders(_orders => _orders.map((order, i) => {
-                                                                                                if (index1 === i) {
-                                                                                                    order.dateGroup.map((year, x) => {
-                                                                                                        if (index2 === x) {
-                                                                                                            year.months.map((month, y) => {
-                                                                                                                if (index3 === y) {
-                                                                                                                    month.showMonthGroup = !month.showMonthGroup;
-                                                                                                                }
+                                                                                                setOrders(_orders => _orders.map((order, i) => {
+                                                                                                    if (index1 === i) {
+                                                                                                        order.dateGroup.map((year, x) => {
+                                                                                                            if (index2 === x) {
+                                                                                                                year.months.map((month, y) => {
+                                                                                                                    if (index3 === y) {
+                                                                                                                        month.showMonthGroup = !month.showMonthGroup;
+                                                                                                                    }
 
-                                                                                                                return month;
-                                                                                                            })
-                                                                                                        }
+                                                                                                                    return month;
+                                                                                                                })
+                                                                                                            }
 
-                                                                                                        return year;
-                                                                                                    })
-                                                                                                }
+                                                                                                            return year;
+                                                                                                        })
+                                                                                                    }
 
-                                                                                                return order;
-                                                                                            }))
-                                                                                        }}/>
+                                                                                                    return order;
+                                                                                                }))
+                                                                                            }} />
                                                                                     </div>
 
                                                                                     <div className={monthOrdersClasses}>
@@ -1692,16 +1696,16 @@ const RevenueInformation = (props) => {
                                                                                             <div
                                                                                                 className="order-info-col order-number">
                                                                                                 Total <span
-                                                                                                style={{fontWeight: 'bold'}}>{group.month}</span>
+                                                                                                    style={{ fontWeight: 'bold' }}>{group.month}</span>
                                                                                             </div>
                                                                                             <div
                                                                                                 className="order-info-col order-totals">
-                                                    <span style={{
-                                                        fontWeight: 'bold',
-                                                        color: 'rgba(0, 0, 0, 0.7)',
-                                                        marginRight: 10
-                                                    }}>
-                                                        Orders:</span>
+                                                                                                <span style={{
+                                                                                                    fontWeight: 'bold',
+                                                                                                    color: 'rgba(0, 0, 0, 0.7)',
+                                                                                                    marginRight: 10
+                                                                                                }}>
+                                                                                                    Orders:</span>
                                                                                                 {group.totals.orderCount}
                                                                                             </div>
                                                                                             <div
@@ -1815,15 +1819,15 @@ const RevenueInformation = (props) => {
                                                                     <div className="year-totals">
                                                                         <div className="order-info-col order-number">
                                                                             Total <span
-                                                                            style={{fontWeight: 'bold'}}>{yearGroup.year}</span>
+                                                                                style={{ fontWeight: 'bold' }}>{yearGroup.year}</span>
                                                                         </div>
                                                                         <div className="order-info-col order-totals">
-                                                    <span style={{
-                                                        fontWeight: 'bold',
-                                                        color: 'rgba(0, 0, 0, 0.7)',
-                                                        marginRight: 10
-                                                    }}>
-                                                        Orders:</span>
+                                                                            <span style={{
+                                                                                fontWeight: 'bold',
+                                                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                                                marginRight: 10
+                                                                            }}>
+                                                                                Orders:</span>
                                                                             {yearGroup.totals.orderCount}
                                                                         </div>
                                                                         <div
@@ -1933,14 +1937,14 @@ const RevenueInformation = (props) => {
                                                 showCustomerTotals &&
                                                 <div className="customer-totals">
                                                     <div className="order-info-col order-number">Total <span
-                                                        style={{fontWeight: 'bold'}}>
-                                                    {code}{code_number > 0 ? code_number : ''}</span></div>
+                                                        style={{ fontWeight: 'bold' }}>
+                                                        {code}{code_number > 0 ? code_number : ''}</span></div>
                                                     <div className="order-info-col order-totals">
-                                                    <span style={{
-                                                        fontWeight: 'bold',
-                                                        color: 'rgba(0, 0, 0, 0.7)',
-                                                        marginRight: 10
-                                                    }}>Orders:</span>
+                                                        <span style={{
+                                                            fontWeight: 'bold',
+                                                            color: 'rgba(0, 0, 0, 0.7)',
+                                                            marginRight: 10
+                                                        }}>Orders:</span>
                                                         {groupOrder.totals.orderCount}
                                                     </div>
                                                     <div className="order-info-col customer-charges">
@@ -2047,7 +2051,7 @@ const RevenueInformation = (props) => {
                     }
 
                     {
-                        (orders || []).length > 0 && <div style={{flexGrow: 1}}></div>
+                        (orders || []).length > 0 && <div style={{ flexGrow: 1 }}></div>
                     }
                     {
                         (orders || []).length > 0 &&

@@ -198,6 +198,8 @@ const OrderHistory = (props) => {
                         let groupedOrders = [];
                         let currentDateGroup = [];
                         let currentOrderGroup = [];
+                        
+                        newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
 
                         newOrders.map((order, index) => {
                             currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
@@ -206,9 +208,9 @@ const OrderHistory = (props) => {
                             if (customer_code === '') {
                                 order.isOnBillTo = false;
                                 order.isOnShipper = false;
-                                order.isOnConsignee = false;
+                                order.isOnConsignee = false; 
                             } else {
-                                order.isOnBillTo = ((order.bill_to_company?.code || '') + ((order.bill_to_company?.code_number || 0) === 0 ? '' : order.bill_to_company.code_number)) === customer_code.toUpperCase();
+                                order.isOnBillTo = ((order.bill_to_customer?.code || '') + ((order.bill_to_customer?.code_number || 0) === 0 ? '' : order.bill_to_customer.code_number)) === customer_code.toUpperCase();
                                 order.isOnShipper = order.pickups.find(x => (x.customer?.code || '') + ((x.customer?.code_number || 0) === 0 ? '' : x.customer.code_number) === customer_code.toUpperCase()) !== undefined;
                                 order.isOnConsignee = order.deliveries.find(x => (x.customer?.code || '') + ((x.customer?.code_number || 0) === 0 ? '' : x.customer.code_number) === customer_code.toUpperCase()) !== undefined;
                             }
@@ -449,6 +451,8 @@ const OrderHistory = (props) => {
                 let currentDateGroup = [];
                 let currentOrderGroup = [];
 
+                newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
+
                 newOrders.map((order, index) => {
                     currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                     currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
@@ -458,7 +462,7 @@ const OrderHistory = (props) => {
                         order.isOnShipper = false;
                         order.isOnConsignee = false;
                     } else {
-                        order.isOnBillTo = ((order.bill_to_company?.code || '') + ((order.bill_to_company?.code_number || 0) === 0 ? '' : order.bill_to_company.code_number)) === customerCode.toUpperCase();
+                        order.isOnBillTo = ((order.bill_to_customer?.code || '') + ((order.bill_to_customer?.code_number || 0) === 0 ? '' : order.bill_to_customer.code_number)) === customerCode.toUpperCase();
                         order.isOnShipper = order.pickups.find(x => (x.customer?.code || '') + ((x.customer?.code_number || 0) === 0 ? '' : x.customer.code_number) === customerCode.toUpperCase()) !== undefined;
                         order.isOnConsignee = order.deliveries.find(x => (x.customer?.code || '') + ((x.customer?.code_number || 0) === 0 ? '' : x.customer.code_number) === customerCode.toUpperCase()) !== undefined;
                     }

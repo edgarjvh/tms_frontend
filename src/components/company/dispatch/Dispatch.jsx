@@ -231,13 +231,15 @@ const Dispatch = (props) => {
 
                     setIsLoading(false);
 
-                    refOrderNumber.current.focus({
-                        preventScroll: true,
-                    });
+                    refDispatchEvents.current.focus();
                 }
             }).catch((e) => {
                 console.log("error getting order by id", e);
                 setIsLoading(false);
+
+                refOrderNumber.current.focus({
+                    preventScroll: true,
+                });
             });
         } else {
             refOrderNumber.current.focus({
@@ -1844,14 +1846,17 @@ const Dispatch = (props) => {
                             selected_order.carrier_id = res.data.carriers[0].id;
 
                             if (res.data.carriers[0].drivers.length > 0) {
-                                setSelectedCarrierDriver({
-                                    ...res.data.carriers[0].drivers[0],
-                                    name: res.data.carriers[0].drivers[0].first_name +
-                                        (res.data.carriers[0].drivers[0].last_name.trim() === ""
-                                            ? ""
-                                            : " " + res.data.carriers[0].drivers[0].last_name),
-                                });
-                                selected_order.carrier_driver_id = res.data.carriers[0].drivers[0].id;
+                                // setSelectedCarrierDriver({
+                                //     ...res.data.carriers[0].drivers[0],
+                                //     name: res.data.carriers[0].drivers[0].first_name +
+                                //         (res.data.carriers[0].drivers[0].last_name.trim() === ""
+                                //             ? ""
+                                //             : " " + res.data.carriers[0].drivers[0].last_name),
+                                // });
+                                // selected_order.carrier_driver_id = res.data.carriers[0].drivers[0].id;
+
+                                setSelectedCarrierDriver({});
+                                selected_order.carrier_driver_id = null;
                                 selected_order.equipment = res.data.carriers[0].drivers[0].equipment;
                                 selected_order.equipment_id = res.data.carriers[0].drivers[0].equipment_id;
                             }
@@ -1925,6 +1930,8 @@ const Dispatch = (props) => {
                                     }
                                 }
                             }
+
+                            refDriverName.current.focus();
                         } else {
                             setSelectedCarrier({});
                             setSelectedCarrierDriver({});
@@ -2204,127 +2211,138 @@ const Dispatch = (props) => {
                     suborigin={"carrier"}
                     componentId={moment().format("x")}
                     customerSearch={carrierSearch}
-                    callback={(carrier) => {
+                    callback={(id) => {
                         new Promise((resolve, reject) => {
-                            if (carrier) {
-                                setSelectedCarrier({ ...carrier });
-                                let carrierPrimaryContact = (carrier.contacts || []).find((c) => c.is_primary === 1) || {};
+                            axios.post(props.serverUrl + '/getCarrierById', { id: id }).then(res => {
+                                if (res.data.result === 'OK') {
+                                    let carrier = res.data.carrier;
 
-                                if ((carrierPrimaryContact?.id || 0) > 0) {
-                                    setSelectedCarrierContact(carrierPrimaryContact);
-                                    selected_order.carrier_contact_id = carrierPrimaryContact.id;
-                                    selected_order.carrier_contact_primary_phone = carrierPrimaryContact.primary_phone
-                                }
+                                    if (carrier) {
+                                        let selected_order = { ...selectedOrder } || {
+                                            order_number: 0,
+                                        };
 
-                                setSelectedCarrierInsurance({});
+                                        setSelectedCarrier({ ...carrier });
+                                        let carrierPrimaryContact = (carrier.contacts || []).find((c) => c.is_primary === 1) || {};
 
-                                let selected_order = { ...selectedOrder } || {
-                                    order_number: 0,
-                                };
+                                        if ((carrierPrimaryContact?.id || 0) > 0) {
+                                            setSelectedCarrierContact(carrierPrimaryContact);
+                                            selected_order.carrier_contact_id = carrierPrimaryContact.id;
+                                            selected_order.carrier_contact_primary_phone = carrierPrimaryContact.primary_phone
+                                        }
 
-                                selected_order.bill_to_customer_id = selectedBillToCustomer?.id || 0;
-                                selected_order.shipper_customer_id = selectedShipperCustomer?.id || 0;
-                                selected_order.consignee_customer_id = selectedConsigneeCustomer?.id || 0;
-                                selected_order.carrier_id = carrier.id;
+                                        setSelectedCarrierInsurance({});
 
-                                if (carrier.drivers.length > 0) {
-                                    setSelectedCarrierDriver({
-                                        ...carrier.drivers[0],
-                                        name:
-                                            carrier.drivers[0].first_name +
-                                            (carrier.drivers[0].last_name.trim() === ""
-                                                ? ""
-                                                : " " + carrier.drivers[0].last_name),
-                                    });
-                                    selected_order.carrier_driver_id = carrier.drivers[0].id;
-                                }
+                                        selected_order.bill_to_customer_id = selectedBillToCustomer?.id || 0;
+                                        selected_order.shipper_customer_id = selectedShipperCustomer?.id || 0;
+                                        selected_order.consignee_customer_id = selectedConsigneeCustomer?.id || 0;
+                                        selected_order.carrier_id = carrier.id;
 
+                                        if (carrier.drivers.length > 0) {
+                                            // setSelectedCarrierDriver({
+                                            //     ...carrier.drivers[0],
+                                            //     name:
+                                            //         carrier.drivers[0].first_name +
+                                            //         (carrier.drivers[0].last_name.trim() === ""
+                                            //             ? ""
+                                            //             : " " + carrier.drivers[0].last_name),
+                                            // });
+                                            // selected_order.carrier_driver_id = carrier.drivers[0].id;
+                                            setSelectedCarrierDriver({});
+                                            selected_order.carrier_driver_id = null;
+                                        }
 
-                                if ((selected_order.events || []).find((el) => el.event_type === "carrier asigned") === undefined) {
-                                    let event_parameters = {
-                                        order_id: selected_order.id,
-                                        time: moment().format("HHmm"),
-                                        event_time: moment().format("HHmm"),
-                                        date: moment().format("MM/DD/YYYY"),
-                                        event_date: moment().format("MM/DD/YYYY"),
-                                        user_code_id: props.user.user_code.id || null,
-                                        event_location: "",
-                                        event_notes:
-                                            "Assigned Carrier " +
-                                            carrier.code +
-                                            (carrier.code_number === 0 ? "" : carrier.code_number) +
-                                            " - " +
-                                            carrier.name,
-                                        event_type_id: 2,
-                                        new_carrier_id: carrier.id,
-                                    };
+                                        if ((selected_order.events || []).find((el) => el.event_type === "carrier asigned") === undefined) {
+                                            let event_parameters = {
+                                                order_id: selected_order.id,
+                                                time: moment().format("HHmm"),
+                                                event_time: moment().format("HHmm"),
+                                                date: moment().format("MM/DD/YYYY"),
+                                                event_date: moment().format("MM/DD/YYYY"),
+                                                user_code_id: props.user.user_code.id || null,
+                                                event_location: "",
+                                                event_notes:
+                                                    "Assigned Carrier " +
+                                                    carrier.code +
+                                                    (carrier.code_number === 0 ? "" : carrier.code_number) +
+                                                    " - " +
+                                                    carrier.name,
+                                                event_type_id: 2,
+                                                new_carrier_id: carrier.id,
+                                            };
 
-                                    if (!isCreatingTemplate && !isEditingTemplate) {
-                                        setIsLoading(true);
+                                            if (!isCreatingTemplate && !isEditingTemplate) {
+                                                setIsLoading(true);
 
-                                        axios.post(props.serverUrl + "/saveOrderEvent", event_parameters).then(async (res) => {
-                                            if (res.data.result === "OK") {
-                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
+                                                axios.post(props.serverUrl + "/saveOrderEvent", event_parameters).then(async (res) => {
                                                     if (res.data.result === "OK") {
-                                                        setSelectedOrder(res.data.order);
+                                                        axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setSelectedOrder(res.data.order);
 
-                                                        props.setSelectedOrder({
-                                                            ...res.data.order,
-                                                            component_id: props.componentId,
+                                                                props.setSelectedOrder({
+                                                                    ...res.data.order,
+                                                                    component_id: props.componentId,
+                                                                });
+                                                            }
+
+                                                            setIsSavingOrder(false);
+                                                        }).catch((e) => {
+                                                            console.log("error saving order", e);
+                                                            setIsSavingOrder(false);
                                                         });
+                                                    } else if (res.data.result === "ORDER ID NOT VALID") {
+                                                        window.alert("The order number is not valid!");
+                                                        goToTabindex((74 + props.tabTimes).toString());
                                                     }
-
-                                                    setIsSavingOrder(false);
+                                                    setIsLoading(false);
                                                 }).catch((e) => {
-                                                    console.log("error saving order", e);
-                                                    setIsSavingOrder(false);
+                                                    console.log("error saving order event", e);
+                                                    setIsLoading(false);
                                                 });
-                                            } else if (res.data.result === "ORDER ID NOT VALID") {
-                                                window.alert("The order number is not valid!");
-                                                goToTabindex((74 + props.tabTimes).toString());
                                             }
-                                            setIsLoading(false);
-                                        }).catch((e) => {
-                                            console.log("error saving order event", e);
-                                            setIsLoading(false);
-                                        });
-                                    }
 
-                                } else {
-                                    if (!isSavingOrder) {
-                                        setIsSavingOrder(true);
-                                        if (!isCreatingTemplate && !isEditingTemplate) {
-                                            setIsLoading(true);
-                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
-                                                if (res.data.result === "OK") {
-                                                    setSelectedOrder({ ...res.data.order });
+                                        } else {
+                                            if (!isSavingOrder) {
+                                                setIsSavingOrder(true);
+                                                if (!isCreatingTemplate && !isEditingTemplate) {
+                                                    setIsLoading(true);
+                                                    axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                        if (res.data.result === "OK") {
+                                                            setSelectedOrder({ ...res.data.order });
 
-                                                    props.setSelectedOrder({
-                                                        ...res.data.order,
-                                                        component_id: props.componentId,
+                                                            props.setSelectedOrder({
+                                                                ...res.data.order,
+                                                                component_id: props.componentId,
+                                                            });
+                                                        }
+
+                                                        setIsSavingOrder(false);
+                                                        setIsLoading(false);
+                                                    }).catch((e) => {
+                                                        console.log("error saving order", e);
+                                                        setIsSavingOrder(false);
+                                                        setIsLoading(false);
                                                     });
                                                 }
-
-                                                setIsSavingOrder(false);
-                                                setIsLoading(false);
-                                            }).catch((e) => {
-                                                console.log("error saving order", e);
-                                                setIsSavingOrder(false);
-                                                setIsLoading(false);
-                                            });
+                                            }
                                         }
+                                        resolve("OK");
+                                    } else {
+                                        reject("no carrier");
                                     }
                                 }
-                                resolve("OK");
-                            } else {
-                                reject("no carrier");
-                            }
+                            }).catch(e => {
+                                console.log('error on getting carrier', e);
+                            })
                         }).then((response) => {
                             if (response === "OK") {
                                 props.closePanel(
                                     `${props.panelName}-carrier-search`,
                                     props.origin
                                 );
+
+                                refDriverName.current.focus();
                             }
                         }).catch((e) => {
                             props.closePanel(
@@ -3639,13 +3657,12 @@ const Dispatch = (props) => {
                                 special_instructions: pickup.special_instructions || "",
                                 type: "pickup",
                             }).then((res) => {
-                                if (res.data.result === "OK") {                                    
+                                if (res.data.result === "OK") {
                                     setSelectedOrder((prev) => {
                                         return {
                                             ...prev,
                                             pickups: (selectedOrder.pickups || []).map((p, i) => {
-                                                if (p.id === isSavingPickupId) {                                                   
-
+                                                if (p.id === isSavingPickupId) {
                                                     p = {
                                                         ...res.data.pickup,
                                                         customer: {
@@ -4299,7 +4316,7 @@ const Dispatch = (props) => {
                         });
 
                         order.pickups = (order.pickups || []).map((p) => {
-                            if (p.customer){
+                            if (p.customer) {
                                 let contacts = [
                                     ...(p.customer.contacts || [])
                                 ].sort(function (a, b) {
@@ -4408,6 +4425,8 @@ const Dispatch = (props) => {
                         });
 
                         setIsLoading(false);
+
+                        refDispatchEvents.current.focus();
                     } else {
                         setIsLoading(false);
                         refOrderNumber.current.focus();
@@ -4534,6 +4553,8 @@ const Dispatch = (props) => {
                             });
 
                             setIsLoading(false);
+
+                            refDispatchEvents.current.focus();
                         }
                     })
                     .catch((e) => {
@@ -5012,7 +5033,7 @@ const Dispatch = (props) => {
         }
 
         props.openPanel(panel, props.origin);
-    }   
+    }
 
     return (
         <div
@@ -5365,7 +5386,8 @@ const Dispatch = (props) => {
 
                                                                 validateOrderForSaving({ keyCode: 9 });
                                                                 setDivisionItems([]);
-                                                                refDivision.current.focus();
+                                                                // refDivision.current.focus();
+                                                                refLoadType.current.focus();
                                                             }
                                                             break;
 
@@ -5389,7 +5411,8 @@ const Dispatch = (props) => {
                                                                 });
                                                                 validateOrderForSaving({ keyCode: 9 });
                                                                 setDivisionItems([]);
-                                                                refDivision.current.focus();
+                                                                // refDivision.current.focus();
+                                                                refLoadType.current.focus();
                                                             }
                                                             break;
 
@@ -5597,7 +5620,8 @@ const Dispatch = (props) => {
                                                                                             keyCode: 9,
                                                                                         });
                                                                                         setDivisionItems([]);
-                                                                                        refDivision.current.focus();
+                                                                                        // refDivision.current.focus();
+                                                                                        refLoadType.current.focus();
                                                                                     }, 0);
                                                                                 }}
                                                                                 ref={(ref) =>
@@ -5841,7 +5865,7 @@ const Dispatch = (props) => {
                                                                 });
                                                                 validateOrderForSaving({ keyCode: 9 });
                                                                 setLoadTypeItems([]);
-                                                                refLoadType.current.focus();
+                                                                refTemplate.current.focus();
                                                             }
                                                             break;
 
@@ -5865,7 +5889,7 @@ const Dispatch = (props) => {
                                                                 });
                                                                 validateOrderForSaving({ keyCode: 9 });
                                                                 setLoadTypeItems([]);
-                                                                refLoadType.current.focus();
+                                                                refTemplate.current.focus();
                                                             }
                                                             break;
 
@@ -6074,7 +6098,7 @@ const Dispatch = (props) => {
                                                                                             keyCode: 9,
                                                                                         });
                                                                                         setLoadTypeItems([]);
-                                                                                        refLoadType.current.focus();
+                                                                                        refTemplate.current.focus();
                                                                                     }, 0);
                                                                                 }}
                                                                                 ref={(ref) =>
@@ -6609,7 +6633,22 @@ const Dispatch = (props) => {
                                         selected_order.trip_number = 0;
                                         selected_order.carrier_id = null;
                                         selected_order.carrier_driver_id = null;
-                                        selected_order.user_code_id = props.user.user_code.id
+                                        selected_order.user_code_id = props.user.user_code.id;
+                                        selected_order.customer_check_number = null;
+                                        selected_order.customer_date_received = null;
+                                        selected_order.invoice_received_date = null;
+                                        selected_order.invoice_number = null;
+                                        selected_order.term_id = null;
+                                        selected_order.invoice_date_paid = null;
+                                        selected_order.carrier_check_number = null;
+                                        selected_order.invoice_customer_reviewed = 0;
+                                        selected_order.order_invoiced = 0;
+                                        selected_order.invoice_carrier_previewed = 0;
+                                        selected_order.invoice_carrier_received = 0;
+                                        selected_order.invoice_bol_received = 0;
+                                        selected_order.invoice_rate_conf_received = 0;
+                                        selected_order.invoice_carrier_approved = 0;
+                                        selected_order.is_imported = 0;
 
                                         axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                             if (res.data.result === "OK") {
@@ -7278,20 +7317,7 @@ const Dispatch = (props) => {
                                 >
                                     <MaskedInput
                                         tabIndex={14 + props.tabTimes}
-                                        mask={[
-                                            /[0-9]/,
-                                            /\d/,
-                                            /\d/,
-                                            "-",
-                                            /\d/,
-                                            /\d/,
-                                            /\d/,
-                                            "-",
-                                            /\d/,
-                                            /\d/,
-                                            /\d/,
-                                            /\d/,
-                                        ]}
+                                        mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/,]}
                                         guide={true}
                                         type="text"
                                         placeholder="Contact Phone"
@@ -9166,7 +9192,7 @@ const Dispatch = (props) => {
                                                                     setIsSavingOrder(false);
                                                                 });
 
-                                                                refDriverName.current.focus();
+                                                                refDriverPhone.current.focus();
                                                             } else {
                                                                 await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
                                                                 await setSelectedOrder({
@@ -9211,7 +9237,7 @@ const Dispatch = (props) => {
                                                                     setIsSavingOrder(false);
                                                                 });
 
-                                                                refDriverName.current.focus();
+                                                                refDriverPhone.current.focus();
                                                             } else {
                                                                 await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
 
@@ -9440,7 +9466,7 @@ const Dispatch = (props) => {
                                                                                         setIsSavingOrder(false);
                                                                                     });
 
-                                                                                    refDriverName.current.focus();
+                                                                                    refDriverPhone.current.focus();
                                                                                 } else {
                                                                                     setSelectedCarrierDriver(item);
 
@@ -12841,7 +12867,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowShipperContactNames(false);
-                                                                                refShipperContactName.current.focus();
+                                                                                refShipperContactPhone.current.focus();
                                                                             }
                                                                             break;
 
@@ -12943,7 +12969,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowShipperContactNames(false);
-                                                                                refShipperContactName.current.focus();
+                                                                                refShipperContactPhone.current.focus();
                                                                             } else {
 
                                                                             }
@@ -13353,7 +13379,7 @@ const Dispatch = (props) => {
                                                                                                     });
 
                                                                                                     setShowShipperContactNames(false);
-                                                                                                    refShipperContactName.current.focus();
+                                                                                                    refShipperContactPhone.current.focus();
                                                                                                 }}
                                                                                                 ref={ref => refShipperContactNamePopupItems.current.push(ref)}
                                                                                             >
@@ -14059,8 +14085,8 @@ const Dispatch = (props) => {
                                                                                     if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                         pu.pu_date1 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
                                                                                         pu.pu_date2 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
-                                                                                        setIsSavingPickupId(-1);
-                                                                                        setIsSavingPickupId(pu.id);
+                                                                                        // setIsSavingPickupId(-1);
+                                                                                        // setIsSavingPickupId(pu.id);
                                                                                     }
                                                                                     return pu;
                                                                                 }),
@@ -14132,8 +14158,8 @@ const Dispatch = (props) => {
                                                                             if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                 pu.pu_date1 = formatted;
                                                                                 pu.pu_date2 = formatted;
-                                                                                setIsSavingPickupId(-1);
-                                                                                setIsSavingPickupId(pu.id);
+                                                                                // setIsSavingPickupId(-1);
+                                                                                // setIsSavingPickupId(pu.id);
                                                                             }
                                                                             return pu;
                                                                         });
@@ -14228,23 +14254,9 @@ const Dispatch = (props) => {
                                                                             <div className="mochi-contextual-popup-content">
                                                                                 <div className="mochi-contextual-popup-wrapper">
                                                                                     <Calendar
-                                                                                        value={
-                                                                                            moment(
-                                                                                                (
-                                                                                                    selectedShipperCustomer?.pu_date1 ||
-                                                                                                    ""
-                                                                                                ).trim(),
-                                                                                                "MM/DD/YYYY"
-                                                                                            ).format("MM/DD/YYYY") ===
-                                                                                                (
-                                                                                                    selectedShipperCustomer?.pu_date1 ||
-                                                                                                    ""
-                                                                                                ).trim()
-                                                                                                ? moment(
-                                                                                                    selectedShipperCustomer?.pu_date1,
-                                                                                                    "MM/DD/YYYY"
-                                                                                                )
-                                                                                                : moment()
+                                                                                        value={moment((selectedShipperCustomer?.pu_date1 || "").trim(), "MM/DD/YYYY").format("MM/DD/YYYY") === (selectedShipperCustomer?.pu_date1 || "").trim()
+                                                                                            ? moment(selectedShipperCustomer?.pu_date1, "MM/DD/YYYY")
+                                                                                            : moment()
                                                                                         }
                                                                                         onChange={(day) => {
                                                                                             setSelectedShipperCustomer(
@@ -14263,31 +14275,12 @@ const Dispatch = (props) => {
                                                                                                 (selectedOrder) => {
                                                                                                     return {
                                                                                                         ...selectedOrder,
-                                                                                                        pickups: (
-                                                                                                            selectedOrder?.pickups ||
-                                                                                                            []
-                                                                                                        ).map((pu, i) => {
-                                                                                                            if (
-                                                                                                                pu.id ===
-                                                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                                                    0)
-                                                                                                            ) {
-                                                                                                                pu.pu_date1 =
-                                                                                                                    preSelectedPickupDate1
-                                                                                                                        .clone()
-                                                                                                                        .format(
-                                                                                                                            "MM/DD/YYYY"
-                                                                                                                        );
-                                                                                                                pu.pu_date2 =
-                                                                                                                    preSelectedPickupDate1
-                                                                                                                        .clone()
-                                                                                                                        .format(
-                                                                                                                            "MM/DD/YYYY"
-                                                                                                                        );
-                                                                                                                setIsSavingPickupId(-1);
-                                                                                                                setIsSavingPickupId(
-                                                                                                                    pu.id
-                                                                                                                );
+                                                                                                        pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                                                pu.pu_date1 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
+                                                                                                                pu.pu_date2 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
+                                                                                                                // setIsSavingPickupId(-1);
+                                                                                                                // setIsSavingPickupId(pu.id);
                                                                                                             }
                                                                                                             return pu;
                                                                                                         }),
@@ -14295,25 +14288,15 @@ const Dispatch = (props) => {
                                                                                                 }
                                                                                             );
 
-                                                                                            setIsPickupDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsPickupDate2CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate2CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsPickupDate1CalendarShown(false);
+                                                                                            setIsPickupDate2CalendarShown(false);
+                                                                                            setIsDeliveryDate1CalendarShown(false);
+                                                                                            setIsDeliveryDate2CalendarShown(false);
 
                                                                                             refPickupTime1.current.focus();
                                                                                         }}
                                                                                         closeCalendar={() => {
-                                                                                            setIsPickupDate1CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsPickupDate1CalendarShown(false);
                                                                                         }}
                                                                                         preDay={preSelectedPickupDate1}
                                                                                         onChangePreDay={(preDay) => {
@@ -14341,25 +14324,18 @@ const Dispatch = (props) => {
                                                             }}
                                                             onBlur={async (e) => {
                                                                 if (puTime1KeyCode === 9) {
-                                                                    let formatted = getFormattedHours(
-                                                                        e.target.value
-                                                                    );
+                                                                    let formatted = getFormattedHours(e.target.value);
 
                                                                     await setSelectedShipperCustomer({
                                                                         ...selectedShipperCustomer,
                                                                         pu_time1: formatted,
                                                                     });
 
-                                                                    let pickups = (
-                                                                        selectedOrder?.pickups || []
-                                                                    ).map((pu, i) => {
-                                                                        if (
-                                                                            pu.id ===
-                                                                            (selectedShipperCustomer?.pickup_id || 0)
-                                                                        ) {
+                                                                    let pickups = (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                        if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                             pu.pu_time1 = formatted;
-                                                                            setIsSavingPickupId(-1);
-                                                                            setIsSavingPickupId(pu.id);
+                                                                            // setIsSavingPickupId(-1);
+                                                                            // setIsSavingPickupId(pu.id);
                                                                         }
                                                                         return pu;
                                                                     });
@@ -14378,18 +14354,12 @@ const Dispatch = (props) => {
 
                                                                 setSelectedOrder({
                                                                     ...selectedOrder,
-                                                                    pickups: (selectedOrder?.pickups || []).map(
-                                                                        (pu, i) => {
-                                                                            if (
-                                                                                pu.id ===
-                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                    0)
-                                                                            ) {
-                                                                                pu.pu_time1 = e.target.value;
-                                                                            }
-                                                                            return pu;
+                                                                    pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                        if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                            pu.pu_time1 = e.target.value;
                                                                         }
-                                                                    ),
+                                                                        return pu;
+                                                                    }),
                                                                 });
                                                             }}
                                                             onChange={(e) => {
@@ -14400,18 +14370,12 @@ const Dispatch = (props) => {
 
                                                                 setSelectedOrder({
                                                                     ...selectedOrder,
-                                                                    pickups: (selectedOrder?.pickups || []).map(
-                                                                        (pu, i) => {
-                                                                            if (
-                                                                                pu.id ===
-                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                    0)
-                                                                            ) {
-                                                                                pu.pu_time1 = e.target.value;
-                                                                            }
-                                                                            return pu;
+                                                                    pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                        if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                            pu.pu_time1 = e.target.value;
                                                                         }
-                                                                    ),
+                                                                        return pu;
+                                                                    }),
                                                                 });
                                                             }}
                                                             value={selectedShipperCustomer?.pu_time1 || ""}
@@ -14460,8 +14424,8 @@ const Dispatch = (props) => {
                                                                                 ).map((pu, i) => {
                                                                                     if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                         pu.pu_date2 = preSelectedPickupDate2.clone().format("MM/DD/YYYY");
-                                                                                        setIsSavingPickupId(-1);
-                                                                                        setIsSavingPickupId(pu.id);
+                                                                                        // setIsSavingPickupId(-1);
+                                                                                        // setIsSavingPickupId(pu.id);
                                                                                     }
                                                                                     return pu;
                                                                                 }),
@@ -14530,8 +14494,8 @@ const Dispatch = (props) => {
                                                                         let pickups = (selectedOrder?.pickups || []).map((pu, i) => {
                                                                             if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                 pu.pu_date2 = formatted;
-                                                                                setIsSavingPickupId(-1);
-                                                                                setIsSavingPickupId(pu.id);
+                                                                                // setIsSavingPickupId(-1);
+                                                                                // setIsSavingPickupId(pu.id);
                                                                             }
                                                                             return pu;
                                                                         });
@@ -14644,10 +14608,8 @@ const Dispatch = (props) => {
                                                                                                     pickups: (selectedOrder?.pickups || []).map((pu, i) => {
                                                                                                         if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                                             pu.pu_date2 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
-                                                                                                            setIsSavingPickupId(-1);
-                                                                                                            setIsSavingPickupId(
-                                                                                                                pu.id
-                                                                                                            );
+                                                                                                            // setIsSavingPickupId(-1);
+                                                                                                            // setIsSavingPickupId(pu.id);
                                                                                                         }
                                                                                                         return pu;
                                                                                                     }),
@@ -14708,8 +14670,8 @@ const Dispatch = (props) => {
                                                                             (selectedShipperCustomer?.pickup_id || 0)
                                                                         ) {
                                                                             pu.pu_time2 = formatted;
-                                                                            setIsSavingPickupId(-1);
-                                                                            setIsSavingPickupId(pu.id);
+                                                                            // setIsSavingPickupId(-1);
+                                                                            // setIsSavingPickupId(pu.id);
                                                                         }
                                                                         return pu;
                                                                     });
@@ -16482,7 +16444,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowConsigneeContactNames(false);
-                                                                                refConsigneeContactName.current.focus();
+                                                                                refConsigneeContactPhone.current.focus();
                                                                             }
                                                                             break;
 
@@ -16584,7 +16546,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowConsigneeContactNames(false);
-                                                                                refConsigneeContactName.current.focus();
+                                                                                refConsigneeContactPhone.current.focus();
                                                                             } else {
 
                                                                             }
@@ -16991,7 +16953,7 @@ const Dispatch = (props) => {
                                                                                                     });
 
                                                                                                     setShowConsigneeContactNames(false);
-                                                                                                    refConsigneeContactName.current.focus();
+                                                                                                    refConsigneeContactPhone.current.focus();
                                                                                                 }}
                                                                                                 ref={ref => refConsigneeContactNamePopupItems.current.push(ref)}
                                                                                             >
@@ -17709,38 +17671,20 @@ const Dispatch = (props) => {
                                                                                 deliveries: (
                                                                                     selectedOrder?.deliveries || []
                                                                                 ).map((delivery, i) => {
-                                                                                    if (
-                                                                                        delivery.id ===
-                                                                                        (selectedConsigneeCustomer?.delivery_id ||
-                                                                                            0)
-                                                                                    ) {
-                                                                                        delivery.delivery_date1 =
-                                                                                            preSelectedDeliveryDate1
-                                                                                                .clone()
-                                                                                                .format("MM/DD/YYYY");
-                                                                                        delivery.delivery_date2 =
-                                                                                            preSelectedDeliveryDate1
-                                                                                                .clone()
-                                                                                                .format("MM/DD/YYYY");
-                                                                                        setIsSavingDeliveryId(-1);
-                                                                                        setIsSavingDeliveryId(delivery.id);
+                                                                                    if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                        delivery.delivery_date1 = preSelectedDeliveryDate1.clone().format("MM/DD/YYYY");
+                                                                                        delivery.delivery_date2 = preSelectedDeliveryDate1.clone().format("MM/DD/YYYY");
+                                                                                        // setIsSavingDeliveryId(-1);
+                                                                                        // setIsSavingDeliveryId(delivery.id);
                                                                                     }
                                                                                     return delivery;
                                                                                 }),
                                                                             });
 
-                                                                            await setIsPickupDate1CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsPickupDate2CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsDeliveryDate1CalendarShown(
-                                                                                false
-                                                                            );
-                                                                            await setIsDeliveryDate2CalendarShown(
-                                                                                false
-                                                                            );
+                                                                            await setIsPickupDate1CalendarShown(false);
+                                                                            await setIsPickupDate2CalendarShown(false);
+                                                                            await setIsDeliveryDate1CalendarShown(false);
+                                                                            await setIsDeliveryDate2CalendarShown(false);
 
                                                                             refDeliveryTime1.current.focus();
                                                                         }
@@ -17834,8 +17778,8 @@ const Dispatch = (props) => {
                                                                             ) {
                                                                                 delivery.delivery_date1 = formatted;
                                                                                 delivery.delivery_date2 = formatted;
-                                                                                setIsSavingDeliveryId(-1);
-                                                                                setIsSavingDeliveryId(delivery.id);
+                                                                                // setIsSavingDeliveryId(-1);
+                                                                                // setIsSavingDeliveryId(delivery.id);
                                                                             }
                                                                             return delivery;
                                                                         });
@@ -18092,8 +18036,8 @@ const Dispatch = (props) => {
                                                                                 0)
                                                                         ) {
                                                                             delivery.delivery_time1 = formatted;
-                                                                            setIsSavingDeliveryId(-1);
-                                                                            setIsSavingDeliveryId(delivery.id);
+                                                                            // setIsSavingDeliveryId(-1);
+                                                                            // setIsSavingDeliveryId(delivery.id);
                                                                         }
                                                                         return delivery;
                                                                     });
@@ -18191,8 +18135,8 @@ const Dispatch = (props) => {
                                                                                 deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
                                                                                     if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                                                                         delivery.delivery_date2 = preSelectedDeliveryDate2.clone().format("MM/DD/YYYY");
-                                                                                        setIsSavingDeliveryId(-1);
-                                                                                        setIsSavingDeliveryId(delivery.id);
+                                                                                        // setIsSavingDeliveryId(-1);
+                                                                                        // setIsSavingDeliveryId(delivery.id);
                                                                                     }
                                                                                     return delivery;
                                                                                 }),
@@ -18262,8 +18206,8 @@ const Dispatch = (props) => {
                                                                         let deliveries = (selectedOrder?.deliveries || []).map((delivery, i) => {
                                                                             if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                                                                 delivery.delivery_date2 = formatted;
-                                                                                setIsSavingDeliveryId(-1);
-                                                                                setIsSavingDeliveryId(delivery.id);
+                                                                                // setIsSavingDeliveryId(-1);
+                                                                                // setIsSavingDeliveryId(delivery.id);
                                                                             }
                                                                             return delivery;
                                                                         });
@@ -18369,8 +18313,8 @@ const Dispatch = (props) => {
                                                                                                     deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
                                                                                                         if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                                                                                             delivery.delivery_date2 = preSelectedDeliveryDate1.clone().format("MM/DD/YYYY");
-                                                                                                            setIsSavingDeliveryId(-1);
-                                                                                                            setIsSavingDeliveryId(delivery.id);
+                                                                                                            // setIsSavingDeliveryId(-1);
+                                                                                                            // setIsSavingDeliveryId(delivery.id);
                                                                                                         }
                                                                                                         return delivery;
                                                                                                     }),
@@ -18432,8 +18376,8 @@ const Dispatch = (props) => {
                                                                                 0)
                                                                         ) {
                                                                             delivery.delivery_time2 = formatted;
-                                                                            setIsSavingDeliveryId(-1);
-                                                                            setIsSavingDeliveryId(delivery.id);
+                                                                            // setIsSavingDeliveryId(-1);
+                                                                            // setIsSavingDeliveryId(delivery.id);
                                                                         }
                                                                         return delivery;
                                                                     });
@@ -19039,34 +18983,23 @@ const Dispatch = (props) => {
 
                                             if (dispatchEventItems.length > 0) {
                                                 if (showDispatchEventSecondPageItems) {
-                                                    let selectedIndex =
-                                                        dispatchEventSecondPageItems.findIndex(
-                                                            (item) => item.selected
-                                                        );
+                                                    let selectedIndex = dispatchEventSecondPageItems.findIndex((item) => item.selected);
 
                                                     if (selectedIndex === -1) {
-                                                        setDispatchEventSecondPageItems(
-                                                            dispatchEventSecondPageItems.map(
-                                                                (item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }
-                                                            )
-                                                        );
+                                                        setDispatchEventSecondPageItems(dispatchEventSecondPageItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }));
                                                     } else {
                                                         setDispatchEventSecondPageItems(
-                                                            dispatchEventSecondPageItems.map(
-                                                                (item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected =
-                                                                            index ===
-                                                                            dispatchEventSecondPageItems.length - 1;
-                                                                    } else {
-                                                                        item.selected = index === selectedIndex - 1;
-                                                                    }
-                                                                    return item;
+                                                            dispatchEventSecondPageItems.map((item, index) => {
+                                                                if (selectedIndex === 0) {
+                                                                    item.selected = index === dispatchEventSecondPageItems.length - 1;
+                                                                } else {
+                                                                    item.selected = index === selectedIndex - 1;
                                                                 }
-                                                            )
+                                                                return item;
+                                                            })
                                                         );
                                                     }
 
@@ -19291,32 +19224,21 @@ const Dispatch = (props) => {
                                             break;
 
                                         case 13: // enter
-                                            if (
-                                                dispatchEventItems.length > 0 &&
-                                                dispatchEventItems.findIndex((item) => item.selected) >
-                                                -1
-                                            ) {
+                                            if (dispatchEventItems.length > 0 && dispatchEventItems.findIndex((item) => item.selected) > -1) {
                                                 if (showDispatchEventSecondPageItems) {
                                                     let item = dispatchEventSecondPageItems.find(
                                                         (el) => el.selected
                                                     );
 
                                                     if (item !== undefined) {
-                                                        let eventItem = dispatchEventItems.find(
-                                                            (el) => el.selected
-                                                        );
+                                                        let eventItem = dispatchEventItems.find((el) => el.selected);
 
                                                         setSelectedOrderEvent(item);
 
                                                         setDispatchEvent(eventItem);
-                                                        setDispatchEventLocation(
-                                                            item.customer.city + ", " + item.customer.state
-                                                        );
+                                                        setDispatchEventLocation(item.customer.city + ", " + item.customer.state);
 
-                                                        if (
-                                                            (eventItem?.name || "").toLowerCase() ===
-                                                            "arrived"
-                                                        ) {
+                                                        if ((eventItem?.name || "").toLowerCase() === "arrived") {
                                                             setDispatchEventNotes(
                                                                 "Arrived at " +
                                                                 item.customer.code +
@@ -19361,6 +19283,7 @@ const Dispatch = (props) => {
                                                             setShowDispatchEventSecondPageItems(false);
                                                             setDispatchEventItems([]);
                                                             goToTabindex((74 + props.tabTimes).toString());
+                                                            
                                                         }, 0);
                                                     }
                                                 } else {

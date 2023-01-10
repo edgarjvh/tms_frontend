@@ -55,7 +55,8 @@
   height: 100%;
   top: 0;
   left: 0;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px;
 }
 .documents-list .form-bordered-box .form-wrapper .documents-list-item,
@@ -69,16 +70,20 @@
   cursor: default;
   transition: ease 0.3s;
   align-items: center;
-}
-.documents-list .form-bordered-box .form-wrapper .documents-list-item span,
-.documents-list .form-bordered-box .form-wrapper .documents-notes-list-item span {
-  margin-right: 10px;
+  overflow: hidden;
 }
 .documents-list .form-bordered-box .form-wrapper .documents-list-item .item-info,
 .documents-list .form-bordered-box .form-wrapper .documents-notes-list-item .item-info {
   display: flex;
   flex-grow: 1;
   align-items: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.documents-list .form-bordered-box .form-wrapper .documents-list-item .item-info span,
+.documents-list .form-bordered-box .form-wrapper .documents-notes-list-item .item-info span {
+  white-space: nowrap;
+  margin-right: 5px;
 }
 .documents-list .form-bordered-box .form-wrapper .documents-list-item .tcol.note-text,
 .documents-list .form-bordered-box .form-wrapper .documents-notes-list-item .tcol.note-text {

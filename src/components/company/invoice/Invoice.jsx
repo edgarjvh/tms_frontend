@@ -393,7 +393,7 @@ const Invoice = (props) => {
 
             axios.post(props.serverUrl + '/saveOrder', selected_order).then(res => {
                 if (res.data.result === 'OK') {
-                    setSelectedOrder({ ...res.data.order });
+                    // setSelectedOrder({ ...res.data.order });
 
                     props.setSelectedOrder({
                         ...res.data.order,

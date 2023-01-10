@@ -1,4 +1,3 @@
-import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { systemConstants } from '../constants';
 
 export const systemReducers = (state = {

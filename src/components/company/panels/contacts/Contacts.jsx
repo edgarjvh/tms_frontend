@@ -13,8 +13,9 @@ import {
     faCalendarAlt,
     faCheck,
     faPencilAlt,
-    faTrashAlt
+    faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
+
 import {
     setCompanyOpenedPanels,
     setDispatchOpenedPanels,
@@ -293,7 +294,7 @@ const Contacts = (props) => {
         let contact = contactSearchCustomer?.selectedContact;
 
         if (window.confirm('Are you sure to delete this contact?')) {
-            axios.post(props.serverUrl + props.deletingContactUrl, {...contact, main_customer_id: contactSearchCustomer.id}).then(res => {
+            axios.post(props.serverUrl + props.deletingContactUrl, { ...contact, main_customer_id: contactSearchCustomer.id }).then(res => {
                 if (res.data.result === 'OK') {
                     if (props.owner === 'customer') {
                         props.setSelectedCustomer({ ...props.selectedCustomer, contacts: res.data.contacts });
@@ -485,7 +486,66 @@ const Contacts = (props) => {
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
 
-            <div className="contact-container" style={{ overflow: 'initial' }}>
+            <div className="contact-container" tabIndex="0" onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (key === 120) {
+                    e.stopPropagation();
+
+                    isEditingContact
+                        ? (tempSelectedContact?.type || 'internal') === 'internal'
+                            ? setTempSelectedContact(prev => {
+                                return {
+                                    ...prev,
+                                    type: 'external',
+                                    prefix: '',
+                                    first_name: '',
+                                    middle_name: '',
+                                    last_name: '',
+                                    suffix: '',
+                                    company: '',
+                                    title: '',
+                                    department: '',
+                                    email_work: '',
+                                    email_personal: '',
+                                    email_other: '',
+                                    primary_email: 'work',
+                                    phone_work: '',
+                                    phone_work_fax: '',
+                                    phone_mobile: '',
+                                    phone_direct: '',
+                                    phone_other: '',
+                                    phone_ext: '',
+                                    primary_phone: 'work',
+                                    country: '',
+                                    address1: '',
+                                    address2: '',
+                                    city: '',
+                                    state: '',
+                                    zip_code: '',
+                                    birthday: '',
+                                    website: '',
+                                    notes: '',
+                                    is_primary: 0
+                                }
+                            })
+                            : window.confirm('Are you sure you want to proceed?')
+                                ? setTempSelectedContact(prev => {
+                                    return {
+                                        ...prev,
+                                        company: contactSearchCustomer?.selectedContact?.company || '',
+                                        address1: contactSearchCustomer?.selectedContact?.address1 || '',
+                                        address2: contactSearchCustomer?.selectedContact?.address2 || '',
+                                        city: contactSearchCustomer?.selectedContact?.city || '',
+                                        state: contactSearchCustomer?.selectedContact?.state || '',
+                                        zip_code: contactSearchCustomer?.selectedContact?.zip_code || '',
+                                        type: 'internal'
+                                    }
+                                })
+                                : e.preventDefault()
+                        : e.preventDefault()
+                }
+            }} style={{ overflow: 'initial' }}>
                 <div className="contact-list-container">
                     <div className="title">{props.title}</div>
                     <div className="side-title" style={{ left: '-45px' }}>
@@ -503,10 +563,23 @@ const Contacts = (props) => {
                                             <div key={index}>
                                                 <div className="letter-header">{curLetter}</div>
 
-                                                <div className="row-contact" onClick={async () => {
-                                                    await setContactSearchCustomer({
-                                                        ...contactSearchCustomer,
-                                                        selectedContact: contact
+                                                <div className="row-contact" style={{
+                                                    transition: 'ease-in-out 0.3s',
+                                                    borderLeft: isEditingContact
+                                                        ? (tempSelectedContact?.id || 0) === contact.id ? '3px solid #2D0DFF' : '3px solid transparent'
+                                                        : (contactSearchCustomer?.selectedContact?.id || 0) === contact.id ? '3px solid #2D0DFF' : '3px solid transparent'
+                                                }} onClick={async () => {
+                                                    await setContactSearchCustomer(prev => {
+                                                        console.log(prev)
+                                                        return {
+                                                            ...prev,
+                                                            selectedContact: {
+                                                                ...contact,
+                                                                company: (contact?.company || '') === ''
+                                                                    ? prev?.name || ''
+                                                                    : contact.company
+                                                            }
+                                                        }
                                                     });
                                                     setIsEditingContact(false);
                                                 }}>
@@ -526,13 +599,9 @@ const Contacts = (props) => {
                                                             {
                                                                 contact.pivot
                                                                     ? (contact?.pivot?.is_primary || 0) === 1 &&
-                                                                    <div className="contact-list-col tcol pri">
-                                                                        <FontAwesomeIcon icon={faCheck} />
-                                                                    </div>
+                                                                    <div className="contact-list-col tcol pri" style={{ fontWeight: 'bold', fontStyle: 'normal' }}>P</div>
                                                                     : (contact.is_primary || 0) === 1 &&
-                                                                    <div className="contact-list-col tcol pri">
-                                                                        <FontAwesomeIcon icon={faCheck} />
-                                                                    </div>
+                                                                    <div className="contact-list-col tcol pri" style={{ fontWeight: 'bold', fontStyle: 'normal' }}>P</div>
 
                                                             }</div>
                                                         <div className="online-status">
@@ -634,9 +703,11 @@ const Contacts = (props) => {
                                     <span>
                                         {
                                             (contactSearchCustomer?.selectedContact?.id || 0) > 0
-                                                ? contactSearchCustomer?.selectedContact?.customer
-                                                    ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
-                                                    : (contactSearchCustomer?.name || '')
+                                                ? (contactSearchCustomer?.selectedContact?.company || '') === ''
+                                                    ? (contactSearchCustomer?.selectedContact?.type || 'internal') === 'internal'
+                                                        ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
+                                                        : ''
+                                                    : contactSearchCustomer?.selectedContact?.company
                                                 : ''
                                         }
                                     </span>
@@ -700,6 +771,79 @@ const Contacts = (props) => {
                                     </label>
                                 </div>
 
+                                <div className="input-toggle-container">
+                                    <input type="checkbox" id="cbox-panel-customer-contacts-type-btn"
+                                        onChange={e => {
+                                            isEditingContact
+                                                ? (tempSelectedContact?.type || 'internal') === 'internal'
+                                                    ? setTempSelectedContact(prev => {
+                                                        return {
+                                                            ...prev,
+                                                            type: 'external',
+                                                            prefix: '',
+                                                            first_name: '',
+                                                            middle_name: '',
+                                                            last_name: '',
+                                                            suffix: '',
+                                                            company: '',
+                                                            title: '',
+                                                            department: '',
+                                                            email_work: '',
+                                                            email_personal: '',
+                                                            email_other: '',
+                                                            primary_email: 'work',
+                                                            phone_work: '',
+                                                            phone_work_fax: '',
+                                                            phone_mobile: '',
+                                                            phone_direct: '',
+                                                            phone_other: '',
+                                                            phone_ext: '',
+                                                            primary_phone: 'work',
+                                                            country: '',
+                                                            address1: '',
+                                                            address2: '',
+                                                            city: '',
+                                                            state: '',
+                                                            zip_code: '',
+                                                            birthday: '',
+                                                            website: '',
+                                                            notes: '',
+                                                            is_primary: 0
+                                                        }
+                                                    })
+                                                    : window.confirm('Are you sure you want to proceed?')
+                                                        ? setTempSelectedContact(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                company: contactSearchCustomer?.selectedContact?.company || '',
+                                                                address1: contactSearchCustomer?.selectedContact?.address1 || '',
+                                                                address2: contactSearchCustomer?.selectedContact?.address2 || '',
+                                                                city: contactSearchCustomer?.selectedContact?.city || '',
+                                                                state: contactSearchCustomer?.selectedContact?.state || '',
+                                                                zip_code: contactSearchCustomer?.selectedContact?.zip_code || '',
+                                                                type: 'internal'
+                                                            }
+                                                        })
+                                                        : e.preventDefault()
+                                                : e.preventDefault()
+                                        }}
+                                        disabled={!isEditingContact}
+                                        checked={isEditingContact
+                                            ? tempSelectedContact?.type === 'internal'
+                                            : contactSearchCustomer?.selectedContact?.type === 'internal'
+                                        } />
+                                    <label htmlFor="cbox-panel-customer-contacts-type-btn" style={{
+                                        backgroundColor: isEditingContact
+                                            ? (tempSelectedContact?.type || 'internal') === 'internal' ? '#ffb80d' : '#0D96FF'
+                                            : (contactSearchCustomer?.selectedContact?.type || 'internal') === 'internal' ? '#ffb80d' : '#0D96FF'
+                                    }}>
+                                        <div className="label-text" style={{
+                                            textTransform: 'capitalize'
+                                        }}>{isEditingContact ? (tempSelectedContact?.type || 'internal') : (contactSearchCustomer?.selectedContact?.type || 'internal')}</div>
+                                        <div className="input-toggle-btn"></div>
+                                    </label>
+                                </div>
+
                                 <div className="right-buttons" style={{ display: 'flex' }}>
                                     {
                                         isEditingContact &&
@@ -734,6 +878,7 @@ const Contacts = (props) => {
                                         } onClick={() => {
                                             setIsEditingContact(true);
                                             setTempSelectedContact({ ...contactSearchCustomer?.selectedContact });
+                                            refPrefix.current.focus();
                                         }} style={{
                                             color: contactSearchCustomer?.selectedContact?.id !== undefined ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.5)',
                                             pointerEvents: contactSearchCustomer?.selectedContact?.id !== undefined ? 'all' : 'none'
@@ -900,17 +1045,33 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Company</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={
+                                            isEditingContact
+                                                ? (tempSelectedContact?.type || 'internal') === 'internal'
+                                                    ? true
+                                                    : false
+                                                : true
+                                        }
                                             onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    company: e.target.value
+                                                });
                                             }}
                                             onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    company: e.target.value
+                                                });
                                             }}
                                             value={
-                                                (contactSearchCustomer?.selectedContact?.id || 0) > 0
-                                                    ? contactSearchCustomer?.selectedContact?.customer
-                                                        ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
-                                                        : (contactSearchCustomer.name || '')
-                                                    : ''
+                                                isEditingContact
+                                                    ? tempSelectedContact?.company || ''
+                                                    : (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                        ? contactSearchCustomer?.selectedContact?.company || ''
+                                                        : ''
+
+
                                             } />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1186,7 +1347,11 @@ const Contacts = (props) => {
                                                 });
                                             }}
                                             value={
-                                                isEditingContact ? tempSelectedContact.address1 || '' : contactSearchCustomer?.selectedContact?.address1 || ''
+                                                isEditingContact
+                                                    ? tempSelectedContact.address1 || ''
+                                                    : (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                        ? contactSearchCustomer?.selectedContact?.address1 || ''
+                                                        : ''
                                             }
                                         />
                                         <div className={borderBottomClasses}></div>
@@ -1207,7 +1372,13 @@ const Contacts = (props) => {
                                                     address2: e.target.value
                                                 });
                                             }}
-                                            value={isEditingContact ? tempSelectedContact.address2 || '' : contactSearchCustomer?.selectedContact?.address2 || ''}
+                                            value={
+                                                isEditingContact
+                                                    ? tempSelectedContact.address2 || ''
+                                                    : (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                        ? contactSearchCustomer?.selectedContact?.address2 || ''
+                                                        : ''
+                                            }
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1227,7 +1398,13 @@ const Contacts = (props) => {
                                                     city: e.target.value
                                                 });
                                             }}
-                                            value={isEditingContact ? tempSelectedContact.city || '' : contactSearchCustomer?.selectedContact?.city || ''}
+                                            value={
+                                                isEditingContact
+                                                    ? tempSelectedContact.city || ''
+                                                    : (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                        ? contactSearchCustomer?.selectedContact?.city || ''
+                                                        : ''
+                                            }
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1248,7 +1425,13 @@ const Contacts = (props) => {
                                                     state: e.target.value.toUpperCase()
                                                 });
                                             }}
-                                            value={isEditingContact ? tempSelectedContact.state || '' : contactSearchCustomer?.selectedContact?.state || ''}
+                                            value={
+                                                isEditingContact
+                                                    ? tempSelectedContact.state || ''
+                                                    : (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                        ? contactSearchCustomer?.selectedContact?.state || ''
+                                                        : ''
+                                            }
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1268,7 +1451,13 @@ const Contacts = (props) => {
                                                     zip_code: e.target.value
                                                 });
                                             }}
-                                            value={isEditingContact ? tempSelectedContact.zip_code || '' : contactSearchCustomer?.selectedContact?.zip_code || ''}
+                                            value={
+                                                isEditingContact
+                                                    ? tempSelectedContact.zip_code || ''
+                                                    : (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                                        ? contactSearchCustomer?.selectedContact?.zip_code || ''
+                                                        : ''
+                                            }
                                         />
                                         <div className={borderBottomClasses}></div>
                                     </div>
@@ -1382,6 +1571,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         customer_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',
@@ -1401,6 +1591,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         carrier_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',
@@ -1420,6 +1611,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         factoring_company_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',
@@ -1438,6 +1630,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         division_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',
@@ -1456,6 +1649,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         employee_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',
@@ -1474,6 +1668,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         agent_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',
@@ -1492,6 +1687,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         owner_operator_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',
@@ -1510,6 +1706,7 @@ const Contacts = (props) => {
                                     setTempSelectedContact({
                                         id: 0,
                                         customer_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
                                         city: contactSearchCustomer?.city || '',

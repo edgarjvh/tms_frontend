@@ -31,6 +31,7 @@ const OrderImport = (props) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderList, setOrderList] = useState([]);
     const [groupOrderList, setGroupOrderList] = useState([]);
+    const [listTotal, setListTotal] = useState(0);
     const [orderTotalListLength, setOrderTotalListLength] = useState(0);
     const [orderCurrentListLength, setOrderCurrentListLength] = useState(0);
     const [customersShown, setCustomersShown] = useState([]);
@@ -38,9 +39,10 @@ const OrderImport = (props) => {
     const [linesRead, setLinesRead] = useState(0);
     const [readingLines, setReadingLines] = useState(false);
 
-
     const [shipperCounter, setShipperCounter] = useState(1);
     const [consigneeCounter, setConsigneeCounter] = useState(1);
+
+    const [isTriggered, setIsTriggered] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
         from: { opacity: 0 },
@@ -139,6 +141,7 @@ const OrderImport = (props) => {
                                     let trip_number = (order_group[0].trip_number || '').trim();
                                     let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
                                     let order_comments = (order_group[0].order_comments || '').trim();
+                                    let internal_order_comments = (order_group[0].internal_order_comments || '').trim();
                                     let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
                                     let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
                                     let miles = (order_group[0].miles || 0);
@@ -167,39 +170,145 @@ const OrderImport = (props) => {
                                     order.deliveries = [];
                                     order.events = [];
                                     order.internal_notes = [];
+                                    order.notes_for_carrier = [];
+
+                                    //handle notes for carrier
+                                    let original_note = order_comments;
+
+                                    if (order_comments !== '') {
+                                        order_comments = order_comments.split(':');
+
+                                        if (order_comments.length === 3) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = moment(order_comments.join(' ').trim(), 'M/D/YY HH:mm');
+
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.notes_for_carrier.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (order_comments.length === 4) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = moment(order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.notes_for_carrier.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (order_comments.length === 1) {
+                                            let message = order_comments.join(':');
+
+                                            order.notes_for_carrier.push({
+                                                date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        }
+                                    }
 
                                     //handle internal notes
-                                    order_comments = order_comments.split(':');
+                                    original_note = internal_order_comments;
 
-                                    if (order_comments.length === 3) {
-                                        let message = order_comments.pop();
-                                        order_comments = order_comments.join(':');
-                                        order_comments = order_comments.split(' ');
-                                        order_comments.shift();
-                                        order_comments.pop();
-                                        let date_time = order_comments.join(' ');
+                                    if (internal_order_comments !== '') {
+                                        internal_order_comments = internal_order_comments.split(':');
 
-                                        order.internal_notes.push({
-                                            date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
-                                            text: message.trim(),
-                                            user_code_id: props.user?.user_code?.id
-                                        });
-                                    } else if (order_comments.length === 4) {
-                                        let message = order_comments.pop();
-                                        order_comments = order_comments.join(':');
-                                        order_comments = order_comments.split(' ');
-                                        order_comments.shift();
-                                        order_comments.pop();
-                                        let date_time = order_comments.join(' ');
+                                        if (internal_order_comments.length === 3) {
+                                            let message = internal_order_comments.pop();
+                                            internal_order_comments = internal_order_comments.join(':');
+                                            internal_order_comments = internal_order_comments.split(' ');
+                                            internal_order_comments.shift();
+                                            internal_order_comments.pop();
+                                            let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YY HH:mm');
 
-                                        order.internal_notes.push({
-                                            date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
-                                            text: message.trim(),
-                                            user_code_id: props.user?.user_code?.id
-                                        });
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.internal_notes.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (internal_order_comments.length === 4) {
+                                            let message = internal_order_comments.pop();
+                                            internal_order_comments = internal_order_comments.join(':');
+                                            internal_order_comments = internal_order_comments.split(' ');
+                                            internal_order_comments.shift();
+                                            internal_order_comments.pop();
+                                            let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.internal_notes.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (internal_order_comments.length === 1) {
+                                            let message = internal_order_comments.join(':');
+
+                                            order.internal_notes.push({
+                                                date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        }
                                     }
 
                                     // handle order ratings
+                                    let rate_data = [];
+
                                     order_group.map((item, x) => {
                                         let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
 
@@ -207,46 +316,53 @@ const OrderImport = (props) => {
                                             let customer_rate = {};
                                             let carrier_rate = {};
                                             let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
-                                            let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
-                                            let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                            let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
+                                            let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
                                             let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
                                             let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
                                             let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
 
-                                            if (description !== '') {
-                                                if (charges > 0) {
-                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                    customer_rate.description = description;
-                                                    customer_rate.total_charges = charges;
+                                            if (rate_data.filter(x => x.description === description && x.charges === charges).length === 0) {
+                                                rate_data.push({ description, charges });
 
-                                                    if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                        customer_rate.pieces = pieces;
-                                                        customer_rate.pieces_unit = pieces_unit;
-                                                        customer_rate.weight = weight;
-                                                    }
+                                                if (order_number === '30022') {
+                                                    console.log(description, charges, rate_data);
+                                                }
 
-                                                    if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                        carrier_rate.description = description;
-                                                        carrier_rate.total_charges = cost;
-                                                        carrier_rate.pieces = pieces;
-                                                        carrier_rate.pieces_unit = pieces_unit;
-                                                        carrier_rate.weight = weight;
+                                                if (description !== '') {
+                                                    if (charges > 0) {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                        customer_rate.description = description;
+                                                        customer_rate.total_charges = charges;
+
+                                                        if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            customer_rate.pieces = pieces;
+                                                            customer_rate.pieces_unit = pieces_unit;
+                                                            customer_rate.weight = weight;
+                                                        }
+
+                                                        if (order.carrier_rating.find(x => x.rate_type_id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                            carrier_rate.description = description;
+                                                            carrier_rate.total_charges = cost;
+                                                            carrier_rate.pieces = pieces;
+                                                            carrier_rate.pieces_unit = pieces_unit;
+                                                            carrier_rate.weight = weight;
+                                                        } else {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                            carrier_rate.description = description;
+                                                        }
                                                     } else {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        customer_rate.description = description;
+
                                                         carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
                                                         carrier_rate.description = description;
                                                     }
 
-                                                } else {
-                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                    customer_rate.description = description;
-
-                                                    carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                    carrier_rate.description = description;
+                                                    order.customer_rating.push(customer_rate);
+                                                    order.carrier_rating.push(carrier_rate);
                                                 }
-
-                                                order.customer_rating.push(customer_rate);
-                                                order.carrier_rating.push(carrier_rate);
                                             }
                                         }
 
@@ -279,7 +395,7 @@ const OrderImport = (props) => {
                                         bol_data = (item?.bol_number || '').trim();
 
                                         if (shipper_code !== '') {
-                                            if (shipper_data.filter(x => x.position = shipper_position && x.code === shipper_code).length === 0) {
+                                            if (shipper_data.filter(x => x.position === shipper_position && x.code === shipper_code).length === 0) {
                                                 shipper_data.push({ position: shipper_position, code: shipper_code });
 
                                                 let shipper_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === shipper_code.toLowerCase());
@@ -314,7 +430,7 @@ const OrderImport = (props) => {
                                         let delivery_time2 = delivery_late_appt === '' ? '' : moment(delivery_late_appt, 'MM/DD/YYYY HH:mm:ss').format('HHmm');
 
                                         if (consignee_code !== '') {
-                                            if (consignee_data.filter(x => x.position = consignee_position && x.code === consignee_code).length === 0) {
+                                            if (consignee_data.filter(x => x.position === consignee_position && x.code === consignee_code).length === 0) {
                                                 consignee_data.push({ position: consignee_position, code: consignee_code });
 
                                                 let consignee_customer = (customers || []).find(c => (c.code + (c.code_number === 0 ? '' : c.code_number)).toLowerCase() === consignee_code.toLowerCase());
@@ -503,6 +619,10 @@ const OrderImport = (props) => {
                                     })
 
                                     order.routing.sort((a, b) => a.position - b.position);
+
+                                    if (order.order_number === '30941'){
+                                        console.log(order)
+                                    }
 
                                     order_list.push(order);
                                 }
@@ -520,6 +640,7 @@ const OrderImport = (props) => {
                                         let trip_number = (order_group[0].trip_number || '').trim();
                                         let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
                                         let order_comments = (order_group[0].order_comments || '').trim();
+                                        let internal_order_comments = (order_group[0].internal_order_comments || '').trim();
                                         let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
                                         let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
                                         let miles = (order_group[0].miles || 0);
@@ -548,39 +669,145 @@ const OrderImport = (props) => {
                                         order.deliveries = [];
                                         order.events = [];
                                         order.internal_notes = [];
+                                        order.notes_for_carrier = [];
+
+                                        //handle notes for carrier
+                                        let original_note = order_comments;
+
+                                        if (order_comments !== '') {
+                                            order_comments = order_comments.split(':');
+
+                                            if (order_comments.length === 3) {
+                                                let message = order_comments.pop();
+                                                order_comments = order_comments.join(':');
+                                                order_comments = order_comments.split(' ');
+                                                order_comments.shift();
+                                                order_comments.pop();
+                                                let date_time = moment(order_comments.join(' ').trim(), 'M/D/YY HH:mm');
+
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.notes_for_carrier.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (order_comments.length === 4) {
+                                                let message = order_comments.pop();
+                                                order_comments = order_comments.join(':');
+                                                order_comments = order_comments.split(' ');
+                                                order_comments.shift();
+                                                order_comments.pop();
+                                                let date_time = moment(order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.notes_for_carrier.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (order_comments.length === 1) {
+                                                let message = order_comments.join(':');
+
+                                                order.notes_for_carrier.push({
+                                                    date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            }
+                                        }
 
                                         //handle internal notes
-                                        order_comments = order_comments.split(':');
+                                        original_note = internal_order_comments;
 
-                                        if (order_comments.length === 3) {
-                                            let message = order_comments.pop();
-                                            order_comments = order_comments.join(':');
-                                            order_comments = order_comments.split(' ');
-                                            order_comments.shift();
-                                            order_comments.pop();
-                                            let date_time = order_comments.join(' ');
+                                        if (internal_order_comments !== '') {
+                                            internal_order_comments = internal_order_comments.split(':');
 
-                                            order.internal_notes.push({
-                                                date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
-                                                text: message.trim(),
-                                                user_code_id: props.user?.user_code?.id
-                                            });
-                                        } else if (order_comments.length === 4) {
-                                            let message = order_comments.pop();
-                                            order_comments = order_comments.join(':');
-                                            order_comments = order_comments.split(' ');
-                                            order_comments.shift();
-                                            order_comments.pop();
-                                            let date_time = order_comments.join(' ');
+                                            if (internal_order_comments.length === 3) {
+                                                let message = internal_order_comments.pop();
+                                                internal_order_comments = internal_order_comments.join(':');
+                                                internal_order_comments = internal_order_comments.split(' ');
+                                                internal_order_comments.shift();
+                                                internal_order_comments.pop();
+                                                let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YY HH:mm');
 
-                                            order.internal_notes.push({
-                                                date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
-                                                text: message.trim(),
-                                                user_code_id: props.user?.user_code?.id
-                                            });
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.internal_notes.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (internal_order_comments.length === 4) {
+                                                let message = internal_order_comments.pop();
+                                                internal_order_comments = internal_order_comments.join(':');
+                                                internal_order_comments = internal_order_comments.split(' ');
+                                                internal_order_comments.shift();
+                                                internal_order_comments.pop();
+                                                let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.internal_notes.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (internal_order_comments.length === 1) {
+                                                let message = internal_order_comments.join(':');
+
+                                                order.internal_notes.push({
+                                                    date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            }
                                         }
 
                                         // handle order ratings
+                                        let rate_data = [];
+
                                         order_group.map((item, x) => {
                                             let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
 
@@ -588,46 +815,53 @@ const OrderImport = (props) => {
                                                 let customer_rate = {};
                                                 let carrier_rate = {};
                                                 let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
-                                                let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
-                                                let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                                let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
+                                                let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
                                                 let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
                                                 let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
                                                 let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
 
-                                                if (description !== '') {
-                                                    if (charges > 0) {
-                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                        customer_rate.description = description;
-                                                        customer_rate.total_charges = charges;
+                                                if (rate_data.filter(x => x.description === description && x.charges === charges).length === 0) {
+                                                    rate_data.push({ description, charges });
 
-                                                        if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                            customer_rate.pieces = pieces;
-                                                            customer_rate.pieces_unit = pieces_unit;
-                                                            customer_rate.weight = weight;
-                                                        }
+                                                    if (order_number === '30022') {
+                                                        console.log(description, charges, rate_data);
+                                                    }
 
-                                                        if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                            carrier_rate.description = description;
-                                                            carrier_rate.total_charges = cost;
-                                                            carrier_rate.pieces = pieces;
-                                                            carrier_rate.pieces_unit = pieces_unit;
-                                                            carrier_rate.weight = weight;
+                                                    if (description !== '') {
+                                                        if (charges > 0) {
+                                                            customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                            customer_rate.description = description;
+                                                            customer_rate.total_charges = charges;
+
+                                                            if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                                customer_rate.pieces = pieces;
+                                                                customer_rate.pieces_unit = pieces_unit;
+                                                                customer_rate.weight = weight;
+                                                            }
+
+                                                            if (order.carrier_rating.find(x => x.rate_type_id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                                carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                                carrier_rate.description = description;
+                                                                carrier_rate.total_charges = cost;
+                                                                carrier_rate.pieces = pieces;
+                                                                carrier_rate.pieces_unit = pieces_unit;
+                                                                carrier_rate.weight = weight;
+                                                            } else {
+                                                                carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                                carrier_rate.description = description;
+                                                            }
                                                         } else {
+                                                            customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                            customer_rate.description = description;
+
                                                             carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
                                                             carrier_rate.description = description;
                                                         }
 
-                                                    } else {
-                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                        customer_rate.description = description;
-
-                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                        carrier_rate.description = description;
+                                                        order.customer_rating.push(customer_rate);
+                                                        order.carrier_rating.push(carrier_rate);
                                                     }
-
-                                                    order.customer_rating.push(customer_rate);
-                                                    order.carrier_rating.push(carrier_rate);
                                                 }
                                             }
 
@@ -885,6 +1119,10 @@ const OrderImport = (props) => {
 
                                         order.routing.sort((a, b) => a.position - b.position);
 
+                                        if (order.order_number === '30941'){
+                                            console.log(order)
+                                        }
+
                                         order_list.push(order);
                                     }
                                 }
@@ -897,6 +1135,7 @@ const OrderImport = (props) => {
                                     let trip_number = (order_group[0].trip_number || '').trim();
                                     let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
                                     let order_comments = (order_group[0].order_comments || '').trim();
+                                    let internal_order_comments = (order_group[0].internal_order_comments || '').trim();
                                     let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
                                     let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
                                     let miles = (order_group[0].miles || 0);
@@ -925,39 +1164,145 @@ const OrderImport = (props) => {
                                     order.deliveries = [];
                                     order.events = [];
                                     order.internal_notes = [];
+                                    order.notes_for_carrier = [];
+
+                                    //handle notes for carrier
+                                    let original_note = order_comments;
+
+                                    if (order_comments !== '') {
+                                        order_comments = order_comments.split(':');
+
+                                        if (order_comments.length === 3) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = moment(order_comments.join(' ').trim(), 'M/D/YY HH:mm');
+
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.notes_for_carrier.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (order_comments.length === 4) {
+                                            let message = order_comments.pop();
+                                            order_comments = order_comments.join(':');
+                                            order_comments = order_comments.split(' ');
+                                            order_comments.shift();
+                                            order_comments.pop();
+                                            let date_time = moment(order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.notes_for_carrier.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (order_comments.length === 1) {
+                                            let message = order_comments.join(':');
+
+                                            order.notes_for_carrier.push({
+                                                date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        }
+                                    }
 
                                     //handle internal notes
-                                    order_comments = order_comments.split(':');
+                                    original_note = internal_order_comments;
 
-                                    if (order_comments.length === 3) {
-                                        let message = order_comments.pop();
-                                        order_comments = order_comments.join(':');
-                                        order_comments = order_comments.split(' ');
-                                        order_comments.shift();
-                                        order_comments.pop();
-                                        let date_time = order_comments.join(' ');
+                                    if (internal_order_comments !== '') {
+                                        internal_order_comments = internal_order_comments.split(':');
 
-                                        order.internal_notes.push({
-                                            date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
-                                            text: message.trim(),
-                                            user_code_id: props.user?.user_code?.id
-                                        });
-                                    } else if (order_comments.length === 4) {
-                                        let message = order_comments.pop();
-                                        order_comments = order_comments.join(':');
-                                        order_comments = order_comments.split(' ');
-                                        order_comments.shift();
-                                        order_comments.pop();
-                                        let date_time = order_comments.join(' ');
+                                        if (internal_order_comments.length === 3) {
+                                            let message = internal_order_comments.pop();
+                                            internal_order_comments = internal_order_comments.join(':');
+                                            internal_order_comments = internal_order_comments.split(' ');
+                                            internal_order_comments.shift();
+                                            internal_order_comments.pop();
+                                            let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YY HH:mm');
 
-                                        order.internal_notes.push({
-                                            date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
-                                            text: message.trim(),
-                                            user_code_id: props.user?.user_code?.id
-                                        });
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.internal_notes.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (internal_order_comments.length === 4) {
+                                            let message = internal_order_comments.pop();
+                                            internal_order_comments = internal_order_comments.join(':');
+                                            internal_order_comments = internal_order_comments.split(' ');
+                                            internal_order_comments.shift();
+                                            internal_order_comments.pop();
+                                            let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                            if ((date_time.year() || 0) > 2000) {
+                                                date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                            } else {
+                                                message = original_note;
+                                                date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                            }
+
+                                            order.internal_notes.push({
+                                                date_time: date_time,
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        } else if (internal_order_comments.length === 1) {
+                                            let message = internal_order_comments.join(':');
+
+                                            order.internal_notes.push({
+                                                date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                text: message.trim(),
+                                                user_code_id: props.user?.user_code?.id
+                                            });
+                                        }
                                     }
 
                                     // handle order ratings
+                                    let rate_data = [];
+
                                     order_group.map((item, x) => {
                                         let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
 
@@ -965,46 +1310,53 @@ const OrderImport = (props) => {
                                             let customer_rate = {};
                                             let carrier_rate = {};
                                             let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
-                                            let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
-                                            let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                            let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
+                                            let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
                                             let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
                                             let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
                                             let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
 
-                                            if (description !== '') {
-                                                if (charges > 0) {
-                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                    customer_rate.description = description;
-                                                    customer_rate.total_charges = charges;
+                                            if (rate_data.filter(x => x.description === description && x.charges === charges).length === 0) {
+                                                rate_data.push({ description, charges });
 
-                                                    if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                        customer_rate.pieces = pieces;
-                                                        customer_rate.pieces_unit = pieces_unit;
-                                                        customer_rate.weight = weight;
-                                                    }
+                                                if (order_number === '30022') {
+                                                    console.log(description, charges, rate_data);
+                                                }
 
-                                                    if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                        carrier_rate.description = description;
-                                                        carrier_rate.total_charges = cost;
-                                                        carrier_rate.pieces = pieces;
-                                                        carrier_rate.pieces_unit = pieces_unit;
-                                                        carrier_rate.weight = weight;
+                                                if (description !== '') {
+                                                    if (charges > 0) {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                        customer_rate.description = description;
+                                                        customer_rate.total_charges = charges;
+
+                                                        if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            customer_rate.pieces = pieces;
+                                                            customer_rate.pieces_unit = pieces_unit;
+                                                            customer_rate.weight = weight;
+                                                        }
+
+                                                        if (order.carrier_rating.find(x => x.rate_type_id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                            carrier_rate.description = description;
+                                                            carrier_rate.total_charges = cost;
+                                                            carrier_rate.pieces = pieces;
+                                                            carrier_rate.pieces_unit = pieces_unit;
+                                                            carrier_rate.weight = weight;
+                                                        } else {
+                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                            carrier_rate.description = description;
+                                                        }
                                                     } else {
+                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                        customer_rate.description = description;
+
                                                         carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
                                                         carrier_rate.description = description;
                                                     }
 
-                                                } else {
-                                                    customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                    customer_rate.description = description;
-
-                                                    carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                    carrier_rate.description = description;
+                                                    order.customer_rating.push(customer_rate);
+                                                    order.carrier_rating.push(carrier_rate);
                                                 }
-
-                                                order.customer_rating.push(customer_rate);
-                                                order.carrier_rating.push(carrier_rate);
                                             }
                                         }
 
@@ -1262,6 +1614,10 @@ const OrderImport = (props) => {
 
                                     order.routing.sort((a, b) => a.position - b.position);
 
+                                    if (order.order_number === '30941'){
+                                        console.log(order)
+                                    }
+
                                     order_list.push(order);
                                 }
 
@@ -1278,6 +1634,7 @@ const OrderImport = (props) => {
                                         let trip_number = (order_group[0].trip_number || '').trim();
                                         let load_type = (loadTypes || []).find(l => l.name.toLowerCase() === (order_group[0].load_type || '').toLowerCase());
                                         let order_comments = (order_group[0].order_comments || '').trim();
+                                        let internal_order_comments = (order_group[0].internal_order_comments || '').trim();
                                         let haz_mat = (order_group[0].haz_mat || '').toLowerCase() === '' ? 0 : (order_group[0].haz_mat || '').toLowerCase() === 'n' ? 0 : 1;
                                         let expedited = (order_group[0].expedited || '').toLowerCase() === '' ? 0 : (order_group[0].expedited || '').toLowerCase() === 'n' ? 0 : 1;
                                         let miles = (order_group[0].miles || 0);
@@ -1306,39 +1663,145 @@ const OrderImport = (props) => {
                                         order.deliveries = [];
                                         order.events = [];
                                         order.internal_notes = [];
+                                        order.notes_for_carrier = [];
+
+                                        //handle notes for carrier
+                                        let original_note = order_comments;
+
+                                        if (order_comments !== '') {
+                                            order_comments = order_comments.split(':');
+
+                                            if (order_comments.length === 3) {
+                                                let message = order_comments.pop();
+                                                order_comments = order_comments.join(':');
+                                                order_comments = order_comments.split(' ');
+                                                order_comments.shift();
+                                                order_comments.pop();
+                                                let date_time = moment(order_comments.join(' ').trim(), 'M/D/YY HH:mm');
+
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.notes_for_carrier.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (order_comments.length === 4) {
+                                                let message = order_comments.pop();
+                                                order_comments = order_comments.join(':');
+                                                order_comments = order_comments.split(' ');
+                                                order_comments.shift();
+                                                order_comments.pop();
+                                                let date_time = moment(order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.notes_for_carrier.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (order_comments.length === 1) {
+                                                let message = order_comments.join(':');
+
+                                                order.notes_for_carrier.push({
+                                                    date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            }
+                                        }
 
                                         //handle internal notes
-                                        order_comments = order_comments.split(':');
+                                        original_note = internal_order_comments;
 
-                                        if (order_comments.length === 3) {
-                                            let message = order_comments.pop();
-                                            order_comments = order_comments.join(':');
-                                            order_comments = order_comments.split(' ');
-                                            order_comments.shift();
-                                            order_comments.pop();
-                                            let date_time = order_comments.join(' ');
+                                        if (internal_order_comments !== '') {
+                                            internal_order_comments = internal_order_comments.split(':');
 
-                                            order.internal_notes.push({
-                                                date_time: moment(date_time.trim(), 'M/D/YY HH:mm').format('YYYY-MM-DD HH:mm:ss'),
-                                                text: message.trim(),
-                                                user_code_id: props.user?.user_code?.id
-                                            });
-                                        } else if (order_comments.length === 4) {
-                                            let message = order_comments.pop();
-                                            order_comments = order_comments.join(':');
-                                            order_comments = order_comments.split(' ');
-                                            order_comments.shift();
-                                            order_comments.pop();
-                                            let date_time = order_comments.join(' ');
+                                            if (internal_order_comments.length === 3) {
+                                                let message = internal_order_comments.pop();
+                                                internal_order_comments = internal_order_comments.join(':');
+                                                internal_order_comments = internal_order_comments.split(' ');
+                                                internal_order_comments.shift();
+                                                internal_order_comments.pop();
+                                                let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YY HH:mm');
 
-                                            order.internal_notes.push({
-                                                date_time: moment(date_time.trim(), 'M/D/YYYY h:m:s A').format('YYYY-MM-DD HH:mm:ss'),
-                                                text: message.trim(),
-                                                user_code_id: props.user?.user_code?.id
-                                            });
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.internal_notes.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (internal_order_comments.length === 4) {
+                                                let message = internal_order_comments.pop();
+                                                internal_order_comments = internal_order_comments.join(':');
+                                                internal_order_comments = internal_order_comments.split(' ');
+                                                internal_order_comments.shift();
+                                                internal_order_comments.pop();
+                                                let date_time = moment(internal_order_comments.join(' ').trim(), 'M/D/YYYY h:m:s A');
+
+                                                if ((date_time.year() || 0) > 2000) {
+                                                    date_time = date_time.format('YYYY-MM-DD HH:mm:ss');
+
+                                                    if ((date_time || '').toLowerCase() === 'invalid date') {
+                                                        message = original_note;
+                                                        date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                    }
+                                                } else {
+                                                    message = original_note;
+                                                    date_time = moment().format('YYYY-MM-DD HH:mm:ss');
+                                                }
+
+                                                order.internal_notes.push({
+                                                    date_time: date_time,
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            } else if (internal_order_comments.length === 1) {
+                                                let message = internal_order_comments.join(':');
+
+                                                order.internal_notes.push({
+                                                    date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                    text: message.trim(),
+                                                    user_code_id: props.user?.user_code?.id
+                                                });
+                                            }
                                         }
 
                                         // handle order ratings
+                                        let rate_data = [];
+
                                         order_group.map((item, x) => {
                                             let check_call = (item[Object.keys(item).find(key => ['check_call'].includes(key.toLowerCase()))] || '').trim();
 
@@ -1346,46 +1809,53 @@ const OrderImport = (props) => {
                                                 let customer_rate = {};
                                                 let carrier_rate = {};
                                                 let description = item[Object.keys(item).find(key => key.toLowerCase() === 'description')] || '';
-                                                let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim());
-                                                let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim());
+                                                let charges = Number((item[Object.keys(item).find(key => ['charges'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
+                                                let cost = Number((item[Object.keys(item).find(key => ['cost'].includes(key.toLowerCase()))] || 0).toString().trim().replace('$', '').replace(',', ''));
                                                 let pieces = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')];
                                                 let pieces_unit = (item[Object.keys(item).find(key => key.toLowerCase() === 'pieces')] || '0') === '0' ? '' : 'sk';
                                                 let weight = (item[Object.keys(item).find(key => key.toLowerCase() === 'weight')] || '0') === '0' ? 0 : item[Object.keys(item).find(key => key.toLowerCase() === 'weight')];
 
-                                                if (description !== '') {
-                                                    if (charges > 0) {
-                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                        customer_rate.description = description;
-                                                        customer_rate.total_charges = charges;
+                                                if (rate_data.filter(x => x.description === description && x.charges === charges).length === 0) {
+                                                    rate_data.push({ description, charges });
 
-                                                        if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                            customer_rate.pieces = pieces;
-                                                            customer_rate.pieces_unit = pieces_unit;
-                                                            customer_rate.weight = weight;
-                                                        }
+                                                    if (order_number === '30022') {
+                                                        console.log(description, charges, rate_data);
+                                                    }
 
-                                                        if (order.carrier_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
-                                                            carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
-                                                            carrier_rate.description = description;
-                                                            carrier_rate.total_charges = cost;
-                                                            carrier_rate.pieces = pieces;
-                                                            carrier_rate.pieces_unit = pieces_unit;
-                                                            carrier_rate.weight = weight;
+                                                    if (description !== '') {
+                                                        if (charges > 0) {
+                                                            customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                            customer_rate.description = description;
+                                                            customer_rate.total_charges = charges;
+
+                                                            if (order.customer_rating.find(x => x.id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                                customer_rate.pieces = pieces;
+                                                                customer_rate.pieces_unit = pieces_unit;
+                                                                customer_rate.weight = weight;
+                                                            }
+
+                                                            if (order.carrier_rating.find(x => x.rate_type_id === (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id) === undefined) {
+                                                                carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'flat').id;
+                                                                carrier_rate.description = description;
+                                                                carrier_rate.total_charges = cost;
+                                                                carrier_rate.pieces = pieces;
+                                                                carrier_rate.pieces_unit = pieces_unit;
+                                                                carrier_rate.weight = weight;
+                                                            } else {
+                                                                carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                                carrier_rate.description = description;
+                                                            }
                                                         } else {
+                                                            customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
+                                                            customer_rate.description = description;
+
                                                             carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
                                                             carrier_rate.description = description;
                                                         }
 
-                                                    } else {
-                                                        customer_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                        customer_rate.description = description;
-
-                                                        carrier_rate.rate_type_id = (rateTypes || []).find(r => r.name.toLowerCase() === 'comment').id;
-                                                        carrier_rate.description = description;
+                                                        order.customer_rating.push(customer_rate);
+                                                        order.carrier_rating.push(carrier_rate);
                                                     }
-
-                                                    order.customer_rating.push(customer_rate);
-                                                    order.carrier_rating.push(carrier_rate);
                                                 }
                                             }
 
@@ -1643,6 +2113,10 @@ const OrderImport = (props) => {
 
                                         order.routing.sort((a, b) => a.position - b.position);
 
+                                        if (order.order_number === '30941'){
+                                            console.log(order)
+                                        }
+                                        
                                         order_list.push(order);
                                     }
                                 }
@@ -1691,9 +2165,8 @@ const OrderImport = (props) => {
                         order_date_time: item.order_date_time,
                         bill_to_customer_id: item.bill_to_customer.id,
                         carrier_id: item.carrier?.id || null,
-                        // pickups: item.pickups,
-                        // deliveries: item.deliveries,
                         routing: item.routing,
+                        notes_for_carrier: item.notes_for_carrier,
                         internal_notes: item.internal_notes,
                         customer_rating: item.customer_rating,
                         carrier_rating: item.carrier_rating,
@@ -1705,9 +2178,13 @@ const OrderImport = (props) => {
 
                 const chunkSize = 500;
 
-                setGroupOrderList(listToSend.map((e, i) => {
+                let chunkList = listToSend.map((e, i) => {
                     return i % chunkSize === 0 ? listToSend.slice(i, i + chunkSize) : null;
-                }).filter(e => { return e; }));
+                }).filter(e => { return e; });
+
+                setListTotal(chunkList.length);
+
+                setGroupOrderList(chunkList);
             }
         }
     }
@@ -1715,25 +2192,26 @@ const OrderImport = (props) => {
     useEffect(() => {
         if (groupOrderList.length > 0) {
             processSubmit();
-        }
-    }, [groupOrderList]);
-
-    const processSubmit = () => {
-        if (groupOrderList.length) {
-            axios.post(props.serverUrl + '/submitOrderImport2', { list: groupOrderList[0] }).then(res => {
-                console.log(res.data);
-            }).catch(e => {
-
-            }).finally(() => {
-                groupOrderList.shift();
-                processSubmit();
-            })
         } else {
             setIsLoading(false);
             setIsSubmitting(false);
             setOrderList([]);
+            setListTotal(0);
             refInputFile.current.value = "";
         }
+    }, [groupOrderList]);
+
+    const processSubmit = () => {
+        axios.post(props.serverUrl + '/submitOrderImport2', { list: groupOrderList[0] }).then(res => {
+            console.log(res.data);
+        }).catch(e => {
+        }).finally(() => {
+            setGroupOrderList(prev => {
+                prev.shift();
+                return [...prev];
+            })
+            // processSubmit();
+        })
     }
 
     const submitBtnClasses = classNames({
@@ -1752,8 +2230,19 @@ const OrderImport = (props) => {
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                             {
-                                !isSubmitting &&
-                                <div>please wait while file is being processed...</div>
+                                !isSubmitting
+                                    ? <div>please wait while file is being processed...</div>
+                                    : <div className="progress-bar-container" style={{
+                                        overflow: 'unset',
+                                        width: '50%',
+                                        marginTop: 10
+                                    }}>
+                                        <div
+                                            className="progress-bar-title">{isNaN(Math.floor(((listTotal - groupOrderList.length) * 100) / listTotal)) ? 0 : Math.floor(((listTotal - groupOrderList.length) * 100) / listTotal)}%
+                                        </div>
+                                        <div className="progress-bar-wrapper"
+                                            style={{ width: (isNaN(Math.floor(((listTotal - groupOrderList.length) * 100) / listTotal)) ? 0 : Math.floor(((listTotal - groupOrderList.length) * 100) / listTotal)) + '%' }}></div>
+                                    </div>
                             }
                         </div>
                     </animated.div>

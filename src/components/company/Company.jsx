@@ -804,6 +804,16 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
+                                            }}
                                             // onClick={() => {
                                             //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
                                             //     // let _panels = [...props.dispatchOpenedPanels];
@@ -872,6 +882,16 @@ function Company(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}
                                                 // onClick={() => {
                                                 //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
@@ -943,6 +963,16 @@ function Company(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}
                                             // onClick={() => {
                                             //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
@@ -1017,6 +1047,16 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
+                                            }}
                                                 // onClick={() => {
                                                 //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
                                                 //     // let _panels = [...props.dispatchOpenedPanels];
@@ -1086,6 +1126,16 @@ function Company(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}
                                                 // onClick={() => {
                                                 //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
@@ -1157,6 +1207,16 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
+                                            }}
                                             // onClick={() => {
                                             //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
                                             //     // let _panels = [...props.customerOpenedPanels];
@@ -1227,6 +1287,16 @@ function Company(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}
                                             // onClick={() => {
                                             //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);

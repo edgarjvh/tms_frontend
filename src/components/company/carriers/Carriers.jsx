@@ -2210,7 +2210,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={45 + props.tabTimes} type="text" placeholder="Address 1"
+                                <input tabIndex={45 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
@@ -2226,7 +2226,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={46 + props.tabTimes} type="text" placeholder="Address 2"
+                                <input tabIndex={46 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
@@ -2631,6 +2631,7 @@ const Carriers = (props) => {
                                                     ...selectedCarrier,
                                                     selectedContact: {
                                                         ...selectedContact,
+                                                        company: (selectedContact?.company || '') === '' ? selectedCarrier?.name || '' : selectedContact.company,
                                                         address1: (selectedCarrier?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedCarrier?.address1 || '') : (selectedContact?.address1 || ''),
                                                         address2: (selectedCarrier?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedCarrier?.address2 || '') : (selectedContact?.address2 || ''),
                                                         city: (selectedCarrier?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedCarrier?.city || '') : (selectedContact?.city || ''),
@@ -3647,11 +3648,19 @@ const Carriers = (props) => {
                                                                     owner='carrier'
                                                                     openPanel={props.openPanel}
                                                                     closePanel={props.closePanel}
-                                                                    componentId={moment().format('x')}
+                                                                    componentId={moment().format('x')}                     
 
                                                                     contactSearchCustomer={{
                                                                         ...selectedCarrier,
-                                                                        selectedContact: contact
+                                                                        selectedContact: {
+                                                                            ...selectedContact,
+                                                                            company: (contact?.company || '') === '' ? selectedCarrier?.name || '' : contact.company,
+                                                                            address1: (selectedCarrier?.address1 || '').toLowerCase() === (contact?.address1 || '').toLowerCase() ? (selectedCarrier?.address1 || '') : (contact?.address1 || ''),
+                                                                            address2: (selectedCarrier?.address2 || '').toLowerCase() === (contact?.address2 || '').toLowerCase() ? (selectedCarrier?.address2 || '') : (contact?.address2 || ''),
+                                                                            city: (selectedCarrier?.city || '').toLowerCase() === (contact?.city || '').toLowerCase() ? (selectedCarrier?.city || '') : (contact?.city || ''),
+                                                                            state: (selectedCarrier?.state || '').toLowerCase() === (contact?.state || '').toLowerCase() ? (selectedCarrier?.state || '') : (contact?.state || ''),
+                                                                            zip_code: (selectedCarrier?.zip || '').toLowerCase() === (contact?.zip_code || '').toLowerCase() ? (selectedCarrier?.zip || '') : (contact?.zip_code || ''),
+                                                                        }
                                                                     }}
                                                                 />
                                                             }
@@ -3661,10 +3670,8 @@ const Carriers = (props) => {
                                                             setSelectedContact(contact);
                                                             refCarrierContactFirstName.current.focus();
                                                         }}>
-                                                        <div
-                                                            className="contact-list-col tcol first-name">{contact.first_name}</div>
-                                                        <div
-                                                            className="contact-list-col tcol last-name">{contact.last_name}</div>
+                                                        <div className="contact-list-col tcol first-name" style={{textTransform: 'capitalize'}}>{contact.first_name}</div>
+                                                        <div className="contact-list-col tcol last-name" style={{textTransform: 'capitalize'}}>{contact.last_name}</div>
                                                         <div className="contact-list-col tcol phone-work">{
                                                             contact.primary_phone === 'work' ? contact.phone_work
                                                                 : contact.primary_phone === 'fax' ? contact.phone_work_fax
@@ -3673,7 +3680,7 @@ const Carriers = (props) => {
                                                                             : contact.primary_phone === 'other' ? contact.phone_other
                                                                                 : ''
                                                         }</div>
-                                                        <div className="contact-list-col tcol email-work">{
+                                                        <div className="contact-list-col tcol email-work" style={{textTransform: 'lowercase'}}>{
                                                             contact.primary_email === 'work' ? contact.email_work
                                                                 : contact.primary_email === 'personal' ? contact.email_personal
                                                                     : contact.primary_email === 'other' ? contact.email_other
@@ -3720,7 +3727,7 @@ const Carriers = (props) => {
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 1" onFocus={() => {
+                                            <input type="text" placeholder="Address 1" style={{textTransform:'capitalize'}} onFocus={() => {
                                                 setShowingContactList(false)
                                             }} onChange={e => setContactSearch({
                                                 ...contactSearch,
@@ -3731,7 +3738,7 @@ const Carriers = (props) => {
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 2" onFocus={() => {
+                                            <input type="text" placeholder="Address 2" style={{textTransform:'capitalize'}} onFocus={() => {
                                                 setShowingContactList(false)
                                             }} onChange={e => setContactSearch({
                                                 ...contactSearch,
@@ -4513,7 +4520,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={56 + props.tabTimes} type="text" placeholder="Address 1"
+                                <input tabIndex={56 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
@@ -4530,7 +4537,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={57 + props.tabTimes} type="text" placeholder="Address 2"
+                                <input tabIndex={57 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
@@ -6934,7 +6941,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={67 + props.tabTimes} type="text" placeholder="Address 1"
+                                <input tabIndex={67 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
@@ -6953,7 +6960,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={68 + props.tabTimes} type="text" placeholder="Address 2"
+                                <input tabIndex={68 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
@@ -7423,7 +7430,7 @@ const Carriers = (props) => {
 
                         {
                             loadingCarrierOrdersTransition((style, item) => item &&
-                                <animated.div className='loading-container' style={style}>
+                                <animated.div className='loading-container' style={{...style, zIndex: 0}}>
                                     <div className="loading-container-wrapper">
                                         <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                                     </div>

@@ -1046,7 +1046,8 @@ const RatingScreen = (props) => {
                                                             ...selectedBillToRating,
                                                             rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
                                                             description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
                                                                 ? ''
                                                                 : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
                                                             rate_subtype: {},
@@ -1073,7 +1074,8 @@ const RatingScreen = (props) => {
                                                             ...selectedBillToRating,
                                                             rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
                                                             description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
                                                                 ? ''
                                                                 : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
                                                             rate_subtype: {},
@@ -1268,7 +1270,8 @@ const RatingScreen = (props) => {
                                                                             ...selectedBillToRating,
                                                                             rate_type: item,
                                                                             description: (item.name.toLowerCase() === 'flat' ||
-                                                                                item.name.toLowerCase() === 'linehaul')
+                                                                                item.name.toLowerCase() === 'linehaul' ||
+                                                                                item.name.toLowerCase() === 'comment' )
                                                                                 ? ''
                                                                                 : item.name,
                                                                             rate_subtype: {},
@@ -4629,7 +4632,8 @@ const RatingScreen = (props) => {
                                                             ...selectedCarrierRating,
                                                             rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
                                                             description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
                                                                 ? ''
                                                                 : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
                                                             rate_subtype: {},
@@ -4656,7 +4660,8 @@ const RatingScreen = (props) => {
                                                             ...selectedCarrierRating,
                                                             rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
                                                             description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
                                                                 ? ''
                                                                 : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
                                                             rate_subtype: {},
@@ -4852,7 +4857,8 @@ const RatingScreen = (props) => {
                                                                             ...selectedCarrierRating,
                                                                             rate_type: item,
                                                                             description: (item.name.toLowerCase() === 'flat' ||
-                                                                                item.name.toLowerCase() === 'linehaul')
+                                                                                item.name.toLowerCase() === 'linehaul' ||
+                                                                                item.name.toLowerCase() === 'comment')
                                                                                 ? ''
                                                                                 : item.name,
                                                                             rate_subtype: {},

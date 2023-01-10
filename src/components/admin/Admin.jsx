@@ -757,6 +757,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
+                                            }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -808,6 +818,16 @@ function Admin(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}>
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -871,6 +891,16 @@ function Admin(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}>
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -934,6 +964,16 @@ function Admin(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}>
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -1000,6 +1040,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
+                                            }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -1062,6 +1112,16 @@ function Admin(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}
                                                 // onClick={() => {
                                                 //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
@@ -1133,6 +1193,16 @@ function Admin(props) {
                                             <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                            tabIndex='0'
+                                            onKeyDown={(e) => {
+                                                let key = e.keyCode || e.which;
+
+                                                if (key === 27){
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    closePanel(panel?.panelName, origin);
+                                                }
                                             }}
                                             // onClick={() => {
                                             //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);

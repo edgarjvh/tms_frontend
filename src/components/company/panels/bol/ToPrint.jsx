@@ -43,7 +43,7 @@ export default class ToPrint extends Component {
     }
 
     render() {
-        const totalRows = 7;
+        const totalRows = 5;
         let fillRows = [];
 
         for (let i = 0; i < totalRows - (this.props.selectedOrder?.order_customer_ratings || []).filter(

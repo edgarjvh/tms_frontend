@@ -67,7 +67,8 @@
       height  : 100%;
       top     : 0;
       left    : 0;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       padding : 10px;
 
       .documents-list-item,
@@ -82,15 +83,23 @@
         cursor         : default;
         transition     : ease 0.3s;
         align-items    : center;
+        overflow: hidden;
 
         span {
-          margin-right: 10px;
+        //   margin-right: 10px;
         }
 
         .item-info {
-          display    : flex;
+          display    : flex;          
           flex-grow  : 1;
           align-items: center;
+          text-overflow: ellipsis;
+          overflow: hidden;
+
+          span{
+            white-space: nowrap;
+            margin-right: 5px;
+          }
         }
 
         .tcol.note-text {

@@ -364,8 +364,6 @@ const Customers = (props) => {
 
     useEffect(() => {
         if ((props.selectedCustomer?.component_id || '') !== props.componentId) {
-            console.log('local', selectedCustomer);
-            console.log('props', props.selectedCustomer);
             if (((selectedCustomer?.id || 0) > 0 && (props.selectedCustomer?.id || 0) > 0) && selectedCustomer.id === props.selectedCustomer.id) {
 
                 setSelectedCustomer(prev => {
@@ -1602,7 +1600,7 @@ const Customers = (props) => {
 
             {
                 loadingTransition((style, item) => item &&
-                    <animated.div className='loading-container' style={style}>
+                    <animated.div className='loading-container' style={{ ...style, zIndex: 0 }}>
                         <div className="loading-container-wrapper">
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                         </div>
@@ -1699,7 +1697,7 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1"
+                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
@@ -1715,7 +1713,7 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2"
+                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
@@ -2124,7 +2122,7 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Address 1"
+                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
@@ -2154,7 +2152,7 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 2"
+                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
@@ -4930,6 +4928,7 @@ const Customers = (props) => {
                                                     ...selectedCustomer,
                                                     selectedContact: {
                                                         ...selectedContact,
+                                                        company: (selectedContact?.company || '') === '' ? selectedCustomer?.name || '' : selectedContact.company,
                                                         address1: (selectedCustomer?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedCustomer?.address1 || '') : (selectedContact?.address1 || ''),
                                                         address2: (selectedCustomer?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedCustomer?.address2 || '') : (selectedContact?.address2 || ''),
                                                         city: (selectedCustomer?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedCustomer?.city || '') : (selectedContact?.city || ''),
@@ -5027,7 +5026,16 @@ const Customers = (props) => {
 
                                                 contactSearchCustomer={{
                                                     ...selectedCustomer,
-                                                    selectedContact: { id: 0, customer_id: selectedCustomer?.id }
+                                                    selectedContact: {
+                                                        id: 0,
+                                                        customer_id: selectedCustomer?.id,     
+                                                        company: selectedCustomer?.name || '',                                                   
+                                                        address1: selectedCustomer?.address1 || '',
+                                                        address2: selectedCustomer?.address2 || '',
+                                                        city: selectedCustomer?.city || '',
+                                                        state: selectedCustomer?.state || '',
+                                                        zip_code: selectedCustomer?.zip || ''
+                                                    }
                                                 }}
                                             />
                                         }
@@ -7395,17 +7403,23 @@ const Customers = (props) => {
 
                                                                         contactSearchCustomer={{
                                                                             ...selectedCustomer,
-                                                                            selectedContact: contact
+                                                                            selectedContact: {
+                                                                                ...contact,
+                                                                                company: (contact?.company || '') === '' ? selectedCustomer?.name || '' : contact.company,
+                                                                                address1: (selectedCustomer?.address1 || '').toLowerCase() === (contact?.address1 || '').toLowerCase() ? (selectedCustomer?.address1 || '') : (contact?.address1 || ''),
+                                                                                address2: (selectedCustomer?.address2 || '').toLowerCase() === (contact?.address2 || '').toLowerCase() ? (selectedCustomer?.address2 || '') : (contact?.address2 || ''),
+                                                                                city: (selectedCustomer?.city || '').toLowerCase() === (contact?.city || '').toLowerCase() ? (selectedCustomer?.city || '') : (contact?.city || ''),
+                                                                                state: (selectedCustomer?.state || '').toLowerCase() === (contact?.state || '').toLowerCase() ? (selectedCustomer?.state || '') : (contact?.state || ''),
+                                                                                zip_code: (selectedCustomer?.zip || '').toLowerCase() === (contact?.zip_code || '').toLowerCase() ? (selectedCustomer?.zip || '') : (contact?.zip_code || ''),
+                                                                            }
                                                                         }}
                                                                     />
                                                                 }
 
                                                                 props.openPanel(panel, props.origin);
                                                             }} onClick={() => setSelectedContact(contact)}>
-                                                            <div
-                                                                className="contact-list-col tcol first-name">{contact.first_name}</div>
-                                                            <div
-                                                                className="contact-list-col tcol last-name">{contact.last_name}</div>
+                                                            <div className="contact-list-col tcol first-name" style={{textTransform: 'capitalize'}}>{contact.first_name}</div>
+                                                            <div className="contact-list-col tcol last-name" style={{textTransform: 'capitalize'}}>{contact.last_name}</div>
                                                             <div className="contact-list-col tcol phone-work">{
                                                                 contact.primary_phone === 'work' ? contact.phone_work
                                                                     : contact.primary_phone === 'fax' ? contact.phone_work_fax
@@ -7414,7 +7428,7 @@ const Customers = (props) => {
                                                                                 : contact.primary_phone === 'other' ? contact.phone_other
                                                                                     : ''
                                                             }</div>
-                                                            <div className="contact-list-col tcol email-work">{
+                                                            <div className="contact-list-col tcol email-work" style={{textTransform: 'lowercase'}}>{
                                                                 contact.primary_email === 'work' ? contact.email_work
                                                                     : contact.primary_email === 'personal' ? contact.email_personal
                                                                         : contact.primary_email === 'other' ? contact.email_other
@@ -7481,7 +7495,7 @@ const Customers = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 1"
+                                                <input type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
                                                     tabIndex={52 + props.tabTimes}
                                                     onFocus={() => {
                                                         setShowingContactList(false)
@@ -7494,7 +7508,7 @@ const Customers = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 2"
+                                                <input type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
                                                     tabIndex={53 + props.tabTimes}
                                                     onFocus={() => {
                                                         setShowingContactList(false)
@@ -8058,7 +8072,7 @@ const Customers = (props) => {
 
                             {
                                 loadingCustomerOrdersTransition((style, item) => item &&
-                                    <animated.div className='loading-container' style={style}>
+                                    <animated.div className='loading-container' style={{ ...style, zIndex: 0 }}>
                                         <div className="loading-container-wrapper">
                                             <Loader type="Circles" color="#009bdd" height={40} width={40}
                                                 visible={item} />

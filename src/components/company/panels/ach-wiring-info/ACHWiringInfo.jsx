@@ -7,6 +7,8 @@ import NumberFormat from "react-number-format";
 import moment from 'moment';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretRight, faCheck, faPencilAlt, faTrashAlt, faCopy } from '@fortawesome/free-solid-svg-icons';
 
 const ACHWiringInfo = (props) => {
     const [selectedOwner, setSelectedOwner] = useState({});
@@ -22,6 +24,9 @@ const ACHWiringInfo = (props) => {
     const refWiringRemittenceEmail = useRef();
 
     const [isLoading, setIsLoading] = useState(false);
+
+    const [showAchRemittenceEmailBtn, setShowAchRemittenceEmailBtn] = useState(false);
+    const [showWiringRemittenceEmailBtn, setShowWiringRemittenceEmailBtn] = useState(false);
 
     useEffect(() => {
         setSelectedOwner({
@@ -191,7 +196,27 @@ const ACHWiringInfo = (props) => {
                         />
                     </div>
 
-                    <div className={inputBoxClasses}>
+                    <div className={inputBoxClasses}
+                        style={{position: 'relative'}}
+                        onMouseEnter={() => {
+                            if ((selectedOwner?.ach_remittence_email || '') !== '') {
+                                setShowAchRemittenceEmailBtn(true);
+                            }
+                        }}
+                        onFocus={() => {
+                            if ((selectedOwner?.ach_remittence_email || '') !== '') {
+                                setShowAchRemittenceEmailBtn(true);
+                            }
+                        }}
+                        onBlur={() => {
+                            window.setTimeout(() => {
+                                setShowAchRemittenceEmailBtn(false);
+                            }, 1000);
+                        }}
+                        onMouseLeave={() => {
+                            setShowAchRemittenceEmailBtn(false);
+                        }}
+                    >
                         <input type="text" placeholder="Remittence E-mail" style={{ textTransform: 'lowercase' }}
                             readOnly={!isEditing}
                             ref={refAchRemittenceEmail}
@@ -205,6 +230,24 @@ const ACHWiringInfo = (props) => {
                             }}
                             value={(selectedOwner?.ach_remittence_email || '')}
                         />
+                        {
+                            showAchRemittenceEmailBtn &&
+                            <FontAwesomeIcon style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: 5,
+                                zIndex: 1,
+                                cursor: 'pointer',
+                                transform: 'translateY(-50%)',
+                                color: '#2bc1ff',
+                                margin: 0,
+                                transition: 'ease 0.2s',
+                                fontSize: '0.8rem'
+                            }} icon={faCopy} onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(refAchRemittenceEmail.current.value);
+                            }} />
+                        }
                     </div>
 
                     <div className={inputRadioClasses}>
@@ -334,7 +377,27 @@ const ACHWiringInfo = (props) => {
                         />
                     </div>
 
-                    <div className={inputBoxClasses}>
+                    <div className={inputBoxClasses}
+                    style={{position: 'relative'}}
+                    onMouseEnter={() => {
+                        if ((selectedOwner?.wiring_remittence_email || '') !== '') {
+                            setShowWiringRemittenceEmailBtn(true);
+                        }
+                    }}
+                    onFocus={() => {
+                        if ((selectedOwner?.wiring_remittence_email || '') !== '') {
+                            setShowWiringRemittenceEmailBtn(true);
+                        }
+                    }}
+                    onBlur={() => {
+                        window.setTimeout(() => {
+                            setShowWiringRemittenceEmailBtn(false);
+                        }, 1000);
+                    }}
+                    onMouseLeave={() => {
+                        setShowWiringRemittenceEmailBtn(false);
+                    }}
+                    >
                         <input type="text" placeholder="Remittence E-mail" style={{ textTransform: 'lowercase' }}
                             readOnly={!isEditing}
                             ref={refWiringRemittenceEmail}
@@ -348,6 +411,24 @@ const ACHWiringInfo = (props) => {
                             }}
                             value={(selectedOwner?.wiring_remittence_email || '')}
                         />
+                        {
+                            showWiringRemittenceEmailBtn &&
+                            <FontAwesomeIcon style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: 5,
+                                zIndex: 1,
+                                cursor: 'pointer',
+                                transform: 'translateY(-50%)',
+                                color: '#2bc1ff',
+                                margin: 0,
+                                transition: 'ease 0.2s',
+                                fontSize: '0.8rem'
+                            }} icon={faCopy} onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(refWiringRemittenceEmail.current.value);
+                            }} />
+                        }
                     </div>
 
                     <div className={inputRadioClasses}>
