@@ -1555,7 +1555,9 @@ const LoadBoard = (props) => {
                                         <div className="input-box-container grow" style={{ position: 'relative' }}>
                                             <input tabIndex={57 + props.tabTimes} type="text" placeholder="Driver Name"
                                                 readOnly={true}
-                                                value={selectedCarrierDriver.first_name + ((selectedCarrierDriver.last_name || '').trim() === '' ? '' : ' ' + selectedCarrierDriver.last_name)}
+                                                value={
+                                                    ((selectedCarrierDriver?.first_name || '') + ' ' + (selectedCarrierDriver?.last_name || '')).trim()
+                                                }
                                             />
                                         </div>
                                         <div className="form-h-sep"></div>

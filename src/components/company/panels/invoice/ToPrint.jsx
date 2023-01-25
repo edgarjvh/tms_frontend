@@ -239,7 +239,7 @@ export default class ToPrint extends Component {
                     {/* PAGE BLOCK */}
                     <div className="page-block" style={{
                         paddingTop: '2rem',
-                        pageBreakBefore: 'always',
+                        pageBreakBefore: 'auto',
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr 1fr',
                         minHeight: 135
@@ -352,7 +352,7 @@ export default class ToPrint extends Component {
                     {/* PAGE BLOCK */}
                     <div className="page-block body-table" style={{
                         marginTop: 10,
-                        pageBreakBefore: 'always',
+                        pageBreakBefore: 'auto',
                         display: 'grid',
                         gridTemplateColumns: '1fr',
                         boxShadow: '1px 1px 2px 1px rgba(0,0,0,0.5)'
@@ -571,7 +571,7 @@ export default class ToPrint extends Component {
 
                     {/* PAGE BLOCK */}
                     <div className="page-block" style={{
-                        pageBreakBefore: 'always',
+                        pageBreakBefore: 'auto',
                         display: 'grid',
                         gridTemplateColumns: '1.5fr 0.5fr',
                         boxShadow: '1px 1px 2px 1px rgba(0,0,0,0.5)',

@@ -199,8 +199,9 @@ const OrderHistory = (props) => {
                         let currentDateGroup = [];
                         let currentOrderGroup = [];
                         
-                        newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
-
+                        // newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
+                        newOrders.sort((a, b) => (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
+                        
                         newOrders.map((order, index) => {
                             currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                             currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
@@ -451,7 +452,8 @@ const OrderHistory = (props) => {
                 let currentDateGroup = [];
                 let currentOrderGroup = [];
 
-                newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
+                // newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
+                newOrders.sort((a, b) => (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
 
                 newOrders.map((order, index) => {
                     currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
@@ -1307,7 +1309,7 @@ const OrderHistory = (props) => {
                                                                                 'active': order.isOnConsignee
                                                                             })
                                                                             return (
-                                                                                <div
+                                                                                <div key={index4}
                                                                                     className="date-group-order-container">
                                                                                     {
                                                                                         (customerCode !== '' && props.suborigin === 'customer') &&
@@ -1325,8 +1327,7 @@ const OrderHistory = (props) => {
                                                                                         </div>
                                                                                     }
                                                                                     <div
-                                                                                        className="date-group-order-item"
-                                                                                        key={index4}
+                                                                                        className="date-group-order-item"                                                                                        
                                                                                         onClick={() => {
                                                                                             let panel = {
                                                                                                 panelName: `${props.panelName}-dispatch`,

@@ -8412,31 +8412,21 @@ const Dispatch = (props) => {
                                         tabIndex={59 + props.tabTimes}
                                         type="text"
                                         placeholder="Ext"
-                                        onKeyDown={validateCarrierContactForSaving}
-                                        onInput={(e) => {
-                                            if ((selectedCarrier?.contacts || []).length === 0) {
-                                                setSelectedCarrier({
-                                                    ...selectedCarrier,
-                                                    ext: e.target.value,
-                                                });
-                                            }
-                                        }}
+                                        // onKeyDown={validateCarrierContactForSaving}                                        
                                         onChange={(e) => {
-                                            if ((selectedCarrier?.contacts || []).length === 0) {
-                                                setSelectedCarrier({
-                                                    ...selectedCarrier,
-                                                    ext: e.target.value,
-                                                });
+                                            if ((selectedOrder?.carrier_contact_primary_phone || '') === 'work'){
+                                                setSelectedCarrierContact(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        phone_ext: e.target.value
+                                                    }
+                                                })
                                             }
                                         }}
                                         value={
-                                            (selectedCarrier?.contacts || []).find(
-                                                (c) => c.is_primary === 1
-                                            ) === undefined
-                                                ? selectedCarrier?.ext || ""
-                                                : selectedCarrier?.contacts.find(
-                                                    (c) => c.is_primary === 1
-                                                ).phone_ext
+                                            (selectedOrder?.carrier_contact_primary_phone || '') === 'work'
+                                                ? selectedCarrierContact?.phone_ext
+                                                : ''
                                         }
                                     />
                                 </div>
@@ -12867,7 +12857,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowShipperContactNames(false);
-                                                                                refShipperContactPhone.current.focus();
+                                                                                refShipperContactPhone.current.inputElement.focus();
                                                                             }
                                                                             break;
 
@@ -12969,7 +12959,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowShipperContactNames(false);
-                                                                                refShipperContactPhone.current.focus();
+                                                                                refShipperContactPhone.current.inputElement.focus();
                                                                             } else {
 
                                                                             }
@@ -13379,7 +13369,8 @@ const Dispatch = (props) => {
                                                                                                     });
 
                                                                                                     setShowShipperContactNames(false);
-                                                                                                    refShipperContactPhone.current.focus();
+                                                                                                    refShipperContactPhone.current.inputElement.focus();
+
                                                                                                 }}
                                                                                                 ref={ref => refShipperContactNamePopupItems.current.push(ref)}
                                                                                             >
@@ -14032,10 +14023,14 @@ const Dispatch = (props) => {
                                                             }}
                                                             value={
                                                                 (selectedShipperCustomer?.contact_id || 0) > 0
-                                                                    ? (selectedShipperCustomer?.contacts || []).find(x => x.id === selectedShipperCustomer.contact_id)?.phone_ext || ''
-                                                                    : (selectedShipperCustomer?.contacts || []).find(x => x.is_primary === 1)
-                                                                        ? selectedShipperCustomer.contacts.find(x => x.is_primary === 1)?.phone_ext || ''
-                                                                        : selectedShipperCustomer?.contact_phone_ext || ''
+                                                                    ? (selectedShipperCustomer?.contact_primary_phone || '') === 'work'
+                                                                        ? (selectedShipperCustomer?.contacts || []).find(x => x.id === selectedShipperCustomer.contact_id)?.phone_ext || ''
+                                                                        : ''
+                                                                    : (selectedShipperCustomer?.contact_primary_phone || '') === 'work'
+                                                                        ? (selectedShipperCustomer?.contacts || []).find(x => x.is_primary === 1)
+                                                                            ? selectedShipperCustomer.contacts.find(x => x.is_primary === 1)?.phone_ext || ''
+                                                                            : selectedShipperCustomer?.contact_phone_ext || ''
+                                                                        : ''
                                                             }
                                                         />
                                                     </div>
@@ -16444,7 +16439,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowConsigneeContactNames(false);
-                                                                                refConsigneeContactPhone.current.focus();
+                                                                                refConsigneeContactPhone.current.inputElement.focus();
                                                                             }
                                                                             break;
 
@@ -16546,7 +16541,7 @@ const Dispatch = (props) => {
                                                                                 });
 
                                                                                 setShowConsigneeContactNames(false);
-                                                                                refConsigneeContactPhone.current.focus();
+                                                                                refConsigneeContactPhone.current.inputElement.focus();
                                                                             } else {
 
                                                                             }
@@ -16953,7 +16948,7 @@ const Dispatch = (props) => {
                                                                                                     });
 
                                                                                                     setShowConsigneeContactNames(false);
-                                                                                                    refConsigneeContactPhone.current.focus();
+                                                                                                    refConsigneeContactPhone.current.inputElement.focus();
                                                                                                 }}
                                                                                                 ref={ref => refConsigneeContactNamePopupItems.current.push(ref)}
                                                                                             >
@@ -17606,10 +17601,14 @@ const Dispatch = (props) => {
                                                             }}
                                                             value={
                                                                 (selectedConsigneeCustomer?.contact_id || 0) > 0
-                                                                    ? (selectedConsigneeCustomer?.contacts || []).find(x => x.id === selectedConsigneeCustomer.contact_id)?.phone_ext || ''
-                                                                    : (selectedConsigneeCustomer?.contacts || []).find(x => x.is_primary === 1)
-                                                                        ? selectedConsigneeCustomer.contacts.find(x => x.is_primary === 1)?.phone_ext || ''
-                                                                        : selectedConsigneeCustomer?.contact_phone_ext || ''
+                                                                    ? (selectedConsigneeCustomer?.contact_primary_phone || '') === 'work'
+                                                                        ? (selectedConsigneeCustomer?.contacts || []).find(x => x.id === selectedConsigneeCustomer.contact_id)?.phone_ext || ''
+                                                                        : ''
+                                                                    : (selectedConsigneeCustomer?.contact_primary_phone || '') === 'work'
+                                                                        ? (selectedConsigneeCustomer?.contacts || []).find(x => x.is_primary === 1)
+                                                                            ? selectedConsigneeCustomer.contacts.find(x => x.is_primary === 1)?.phone_ext || ''
+                                                                            : selectedConsigneeCustomer?.contact_phone_ext || ''
+                                                                        : ''
                                                             }
                                                         />
                                                     </div>
@@ -19233,6 +19232,7 @@ const Dispatch = (props) => {
                                                     if (item !== undefined) {
                                                         let eventItem = dispatchEventItems.find((el) => el.selected);
 
+                                                        
                                                         setSelectedOrderEvent(item);
 
                                                         setDispatchEvent(eventItem);
@@ -19250,9 +19250,7 @@ const Dispatch = (props) => {
                                                             );
                                                         }
 
-                                                        if (
-                                                            (eventItem?.name || "").toLowerCase() === "loaded"
-                                                        ) {
+                                                        if ((eventItem?.name || "").toLowerCase() === "loaded") {
                                                             setDispatchEventNotes(
                                                                 "Loaded at Shipper " +
                                                                 item.customer.code +
@@ -19264,10 +19262,7 @@ const Dispatch = (props) => {
                                                             );
                                                         }
 
-                                                        if (
-                                                            (eventItem?.name || "").toLowerCase() ===
-                                                            "delivered"
-                                                        ) {
+                                                        if ((eventItem?.name || "").toLowerCase() === "delivered") {
                                                             setDispatchEventNotes(
                                                                 "Delivered at Consignee " +
                                                                 item.customer.code +
@@ -19283,16 +19278,13 @@ const Dispatch = (props) => {
                                                             setShowDispatchEventSecondPageItems(false);
                                                             setDispatchEventItems([]);
                                                             goToTabindex((74 + props.tabTimes).toString());
-                                                            
+
                                                         }, 0);
                                                     }
                                                 } else {
-                                                    let item =
-                                                        dispatchEventItems[
-                                                        dispatchEventItems.findIndex(
-                                                            (item) => item.selected
-                                                        )
-                                                        ];
+                                                    let item = dispatchEventItems[dispatchEventItems.findIndex((item) => item.selected)];
+
+                                                    console.log(item)
 
                                                     if ((item?.name || "").toLowerCase() === "arrived") {
                                                         if (
@@ -19440,7 +19432,7 @@ const Dispatch = (props) => {
                                                             refDispatchEvents.current.focus();
                                                             return;
                                                         }
-                                                    } else if (item.type === "departed") {
+                                                    } else if ((item?.name || "").toLowerCase() === "departed") {
                                                         setDispatchEventItems(
                                                             dispatchEventItems.map((item, index) => {
                                                                 item.selected =
@@ -19524,9 +19516,7 @@ const Dispatch = (props) => {
                                                                 goToTabindex((74 + props.tabTimes).toString());
                                                             }, 0);
                                                         }
-                                                    } else if (
-                                                        (item?.name || "").toLowerCase() === "loaded"
-                                                    ) {
+                                                    } else if ((item?.name || "").toLowerCase() === "loaded") {
                                                         if (
                                                             (selectedOrder?.pickups || []).length > 0 ||
                                                             (selectedOrder?.deliveries || []).length > 0
@@ -19602,9 +19592,7 @@ const Dispatch = (props) => {
                                                             refDispatchEvents.current.focus();
                                                             return;
                                                         }
-                                                    } else if (
-                                                        (item?.name || "").toLowerCase() === "delivered"
-                                                    ) {
+                                                    } else if ((item?.name || "").toLowerCase() === "delivered") {
                                                         if ((selectedOrder?.deliveries || []).length > 0) {
                                                             setDispatchEventItems(
                                                                 dispatchEventItems.map((item, index) => {
@@ -20188,9 +20176,9 @@ const Dispatch = (props) => {
                                     }
                                 }}
                                 onBlur={(e) => {
-                                    if ((dispatchEvent?.id || 0) === 0) {
-                                        setDispatchEvent({});
-                                    }
+                                    // if ((dispatchEvent?.id || 0) === 0) {
+                                    //     setDispatchEvent({});
+                                    // }
                                 }}
                                 onInput={(e) => {
                                     if (!showDispatchEventSecondPageItems) {

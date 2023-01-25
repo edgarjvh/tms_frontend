@@ -17,7 +17,8 @@ import {
     faPencilAlt,
     faPen,
     faCheck,
-    faCopy
+    faCopy,
+    faSearch
 } from '@fortawesome/free-solid-svg-icons';
 import { useDetectClickOutside } from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
@@ -56,7 +57,8 @@ import {
     FactoringCompany,
     EquipmentInformation,
     Modal as CarrierModal,
-    ACHWiringInfo
+    ACHWiringInfo,
+    MCNumbers
 } from './../panels';
 
 import {
@@ -201,6 +203,9 @@ const Carriers = (props) => {
 
 
     const [showingACHWiringInfo, setShowingACHWiringInfo] = useState(false);
+    const [showingMCNumbers, setShowingMCNumbers] = useState(false);
+    const [mcNumbersType, setMcNumbersType] = useState('mc');
+    const [mcNumbersFilter, setMcNumbersFilter] = useState('');
 
     const loadingTransition = useTransition(isLoading, {
         from: { opacity: 0, display: 'block' },
@@ -309,6 +314,14 @@ const Carriers = (props) => {
         enter: { opacity: 1 },
         leave: { opacity: 0 },
         reverse: showingACHWiringInfo,
+        config: { duration: 100 },
+    });
+
+    const mcNumbersTransition = useTransition(showingMCNumbers, {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: showingMCNumbers,
         config: { duration: 100 },
     });
 
@@ -2210,7 +2223,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={45 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
+                                <input tabIndex={45 + props.tabTimes} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
@@ -2226,7 +2239,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={46 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
+                                <input tabIndex={46 + props.tabTimes} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
@@ -2386,7 +2399,9 @@ const Carriers = (props) => {
                                         (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
                                             ? (selectedCarrier?.ext || '')
                                             // ? ''
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
+                                            : (selectedCarrier?.contacts.find(c => c.is_primary === 1)?.primary_phone || '') === 'work'
+                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
+                                                : ''
                                     }
                                 />
                             </div>
@@ -2520,20 +2535,49 @@ const Carriers = (props) => {
                             }}
                         />
 
-                        <div className="input-box-container" style={{ width: '100%' }}>
+                        <div className="input-box-container" style={{ width: '100%', position: 'relative' }}>
                             <input tabIndex={76 + props.tabTimes} type="text" placeholder='MC Number'
                                 readOnly={
                                     (props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier info')?.pivot?.edit || 0) === 0
                                 }
-                                onKeyDown={validateCarrierForSaving}
+                                onKeyDown={(e) => {
+                                    let key = e.keyCode || e.which;
+
+                                    if (key === 120){
+                                        e.stopPropagation();
+                                        setMcNumbersType('mc');
+                                        setMcNumbersFilter(selectedCarrier?.mc_number || '');
+                                        setShowingMCNumbers(true);
+                                    }else{
+                                        validateCarrierForSaving(e)
+                                    }                                    
+                                }}
                                 onChange={(e) => {
                                     setSelectedCarrier({ ...selectedCarrier, mc_number: e.target.value })
                                 }}
                                 value={selectedCarrier.mc_number || ''} />
+
+                            <FontAwesomeIcon style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: 5,
+                                zIndex: 0,
+                                cursor: 'pointer',
+                                transform: 'translateY(-50%)',
+                                color: '#2bc1ff',
+                                margin: 0,
+                                transition: 'ease 0.2s',
+                                fontSize: '0.8rem'
+                            }} icon={faSearch} onClick={(e) => {
+                                e.stopPropagation();
+                                setMcNumbersType('mc');
+                                setMcNumbersFilter(selectedCarrier?.mc_number || '');
+                                setShowingMCNumbers(true);
+                            }} />
                         </div>
-                        <div className="input-box-container" style={{ width: '100%' }}>
+                        <div className="input-box-container" style={{ width: '100%', position: 'relative' }}>
                             <input tabIndex={77 + props.tabTimes} type="text" placeholder='DOT Number'
                                 readOnly={
                                     (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -2545,8 +2589,27 @@ const Carriers = (props) => {
                                     setSelectedCarrier({ ...selectedCarrier, dot_number: e.target.value })
                                 }}
                                 value={selectedCarrier.dot_number || ''} />
+
+                            <FontAwesomeIcon style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: 5,
+                                zIndex: 0,
+                                cursor: 'pointer',
+                                transform: 'translateY(-50%)',
+                                color: '#2bc1ff',
+                                margin: 0,
+                                transition: 'ease 0.2s',
+                                fontSize: '0.8rem'
+                            }} icon={faSearch} onClick={(e) => {
+                                e.stopPropagation();
+
+                                setMcNumbersType('dot');
+                                setMcNumbersFilter(selectedCarrier?.dot_number || '');
+                                setShowingMCNumbers(true);
+                            }} />
                         </div>
-                        <div className="input-box-container" style={{ width: '100%' }}>
+                        <div className="input-box-container" style={{ width: '100%', position: 'relative' }}>
                             <input tabIndex={78 + props.tabTimes} type="text" placeholder='SCAC'
                                 readOnly={
                                     (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -2559,8 +2622,27 @@ const Carriers = (props) => {
                                     setSelectedCarrier({ ...selectedCarrier, scac: e.target.value })
                                 }}
                                 value={selectedCarrier.scac || ''} />
+
+                            <FontAwesomeIcon style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: 5,
+                                zIndex: 0,
+                                cursor: 'pointer',
+                                transform: 'translateY(-50%)',
+                                color: '#2bc1ff',
+                                margin: 0,
+                                transition: 'ease 0.2s',
+                                fontSize: '0.8rem'
+                            }} icon={faSearch} onClick={(e) => {
+                                e.stopPropagation();
+
+                                setMcNumbersType('scac');
+                                setMcNumbersFilter(selectedCarrier?.scac || '');
+                                setShowingMCNumbers(true);
+                            }} />
                         </div>
-                        <div className="input-box-container" style={{ width: '100%' }}>
+                        <div className="input-box-container" style={{ width: '100%', position: 'relative' }}>
                             <input tabIndex={79 + props.tabTimes} type="text" placeholder='FID'
                                 readOnly={
                                     (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -2572,6 +2654,25 @@ const Carriers = (props) => {
                                     setSelectedCarrier({ ...selectedCarrier, fid: e.target.value })
                                 }}
                                 value={selectedCarrier.fid || ''} />
+
+                            <FontAwesomeIcon style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: 5,
+                                zIndex: 0,
+                                cursor: 'pointer',
+                                transform: 'translateY(-50%)',
+                                color: '#2bc1ff',
+                                margin: 0,
+                                transition: 'ease 0.2s',
+                                fontSize: '0.8rem'
+                            }} icon={faSearch} onClick={(e) => {
+                                e.stopPropagation();
+
+                                setMcNumbersType('fid');
+                                setMcNumbersFilter(selectedCarrier?.fid || '');
+                                setShowingMCNumbers(true);
+                            }} />
                         </div>
                         <div className={insuranceStatusClasses()} style={{ width: '100%' }}>
                             <input type="text" placeholder='Insurance' readOnly={true} />
@@ -3149,7 +3250,7 @@ const Carriers = (props) => {
                                             ...selectedContact,
                                             phone_ext: e.target.value
                                         })}
-                                        value={selectedContact.phone_ext || ''}
+                                        value={(selectedContact?.primary_phone || '') === 'work' ? selectedContact.phone_ext || '' : ''}
                                     />
                                 </div>
                                 <div className="input-toggle-container">
@@ -3648,7 +3749,7 @@ const Carriers = (props) => {
                                                                     owner='carrier'
                                                                     openPanel={props.openPanel}
                                                                     closePanel={props.closePanel}
-                                                                    componentId={moment().format('x')}                     
+                                                                    componentId={moment().format('x')}
 
                                                                     contactSearchCustomer={{
                                                                         ...selectedCarrier,
@@ -3670,8 +3771,8 @@ const Carriers = (props) => {
                                                             setSelectedContact(contact);
                                                             refCarrierContactFirstName.current.focus();
                                                         }}>
-                                                        <div className="contact-list-col tcol first-name" style={{textTransform: 'capitalize'}}>{contact.first_name}</div>
-                                                        <div className="contact-list-col tcol last-name" style={{textTransform: 'capitalize'}}>{contact.last_name}</div>
+                                                        <div className="contact-list-col tcol first-name" style={{ textTransform: 'capitalize' }}>{contact.first_name}</div>
+                                                        <div className="contact-list-col tcol last-name" style={{ textTransform: 'capitalize' }}>{contact.last_name}</div>
                                                         <div className="contact-list-col tcol phone-work">{
                                                             contact.primary_phone === 'work' ? contact.phone_work
                                                                 : contact.primary_phone === 'fax' ? contact.phone_work_fax
@@ -3680,7 +3781,7 @@ const Carriers = (props) => {
                                                                             : contact.primary_phone === 'other' ? contact.phone_other
                                                                                 : ''
                                                         }</div>
-                                                        <div className="contact-list-col tcol email-work" style={{textTransform: 'lowercase'}}>{
+                                                        <div className="contact-list-col tcol email-work" style={{ textTransform: 'lowercase' }}>{
                                                             contact.primary_email === 'work' ? contact.email_work
                                                                 : contact.primary_email === 'personal' ? contact.email_personal
                                                                     : contact.primary_email === 'other' ? contact.email_other
@@ -3727,7 +3828,7 @@ const Carriers = (props) => {
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 1" style={{textTransform:'capitalize'}} onFocus={() => {
+                                            <input type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }} onFocus={() => {
                                                 setShowingContactList(false)
                                             }} onChange={e => setContactSearch({
                                                 ...contactSearch,
@@ -3738,7 +3839,7 @@ const Carriers = (props) => {
                                     <div className="form-v-sep"></div>
                                     <div className="form-row">
                                         <div className="input-box-container grow">
-                                            <input type="text" placeholder="Address 2" style={{textTransform:'capitalize'}} onFocus={() => {
+                                            <input type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }} onFocus={() => {
                                                 setShowingContactList(false)
                                             }} onChange={e => setContactSearch({
                                                 ...contactSearch,
@@ -4520,7 +4621,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={56 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
+                                <input tabIndex={56 + props.tabTimes} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
@@ -4537,7 +4638,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={57 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
+                                <input tabIndex={57 + props.tabTimes} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier mailing address')?.pivot?.save || 0) === 0 &&
@@ -5391,7 +5492,11 @@ const Carriers = (props) => {
                                             }
                                         })
                                     }}
-                                    value={selectedCarrier?.mailing_address?.ext || ''} />
+                                    value={selectedCarrier?.mailing_address?.mailing_contact_id
+                                        ? selectedCarrier?.mailing_address?.mailing_contact_primary_phone || '' === 'work'
+                                            ? selectedCarrier?.mailing_address?.ext || ''
+                                            : ''
+                                        : selectedCarrier?.mailing_address?.ext || ''} />
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
@@ -6941,7 +7046,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={67 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
+                                <input tabIndex={67 + props.tabTimes} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
@@ -6960,7 +7065,7 @@ const Carriers = (props) => {
                         <div className="form-v-sep"></div>
                         <div className="form-row">
                             <div className="input-box-container grow">
-                                <input tabIndex={68 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
+                                <input tabIndex={68 + props.tabTimes} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
                                     readOnly={
                                         (props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'factoring company')?.pivot?.save || 0) === 0 &&
@@ -7176,7 +7281,9 @@ const Carriers = (props) => {
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
                                             ? (selectedCarrier?.factoring_company?.ext || '')
                                             // ? ''
-                                            : selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
+                                            : (selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1)?.primary_phone || '') === 'work'
+                                                ? selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
+                                                : ''
                                     }
                                 />
                             </div>
@@ -7430,7 +7537,7 @@ const Carriers = (props) => {
 
                         {
                             loadingCarrierOrdersTransition((style, item) => item &&
-                                <animated.div className='loading-container' style={{...style, zIndex: 0}}>
+                                <animated.div className='loading-container' style={{ ...style, zIndex: 0 }}>
                                     <div className="loading-container-wrapper">
                                         <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                                     </div>
@@ -7513,6 +7620,77 @@ const Carriers = (props) => {
                     </animated.div>
                 ))
             }
+
+            {
+                mcNumbersTransition((style, item) => item && (
+                    <animated.div
+                        className="mc-numbers-main-container"
+                        style={{
+                            ...style,
+                            position: "absolute",
+                            width: "100%",
+                            height: "100%",
+                            top: 0,
+                            left: 0,
+                            backgroundColor: "rgba(0,0,0,0.3)",
+                        }} onKeyDown={e => {
+                            let key = e.keyCode || e.which;
+                
+                            if (key === 27) {
+                                setShowingMCNumbers(false);
+                            }
+                        }} tabIndex="0">
+                        <div
+                            className="mc-numbers-wrapper"
+                            style={{
+                                position: "relative",
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}>
+                            <MCNumbers
+                                panelName={`${props.panelName}-mc-numbers`}
+                                tabTimes={props.tabTimes}
+                                componentId={moment().format("x")}
+                                openPanel={props.openPanel}
+                                closePanel={props.closePanel}
+                                origin={props.origin}
+                                closeModal={() => {
+                                    setShowingMCNumbers(false);
+                                }}
+                                type={mcNumbersType}
+                                filterText={mcNumbersFilter}
+                                callback={(data) => {
+                                    setShowingMCNumbers(false);
+
+                                    setIsLoading(true);
+
+                                    axios.post(props.serverUrl + '/getCarrierById', { id: data }).then(res => {
+                                        if (res.data.result === 'OK') {
+                                            setSelectedCarrier({ ...res.data.carrier });
+                                            setSelectedContact({ ...(res.data.carrier.contact || []).find(c => c.is_primary === 1) });
+                                            setSelectedDriver({});
+                                            setSelectedInsurance({});
+                                        }
+
+                                        setIsLoading(false);
+                                        refCarrierCode.current.focus({
+                                            preventScroll: true
+                                        });
+                                    }).catch(e => {
+                                        setIsLoading(false);
+                                        console.log('error getting carrier by id', e);
+                                    })
+                                }}
+                            />
+                        </div>
+                    </animated.div>
+                ))
+            }
+
+
         </div>
     )
 }

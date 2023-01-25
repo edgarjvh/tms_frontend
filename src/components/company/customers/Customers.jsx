@@ -78,6 +78,7 @@ const Customers = (props) => {
     const refCustomerCode = useRef();
     const refCustomerName = useRef();
     const refCustomerMailingCode = useRef();
+    const refCustomerMailingName = useRef();
     const refCustomerContactFirstName = useRef();
     const [isSavingCustomer, setIsSavingCustomer] = useState(false);
     const [isSavingContact, setIsSavingContact] = useState(false);
@@ -674,8 +675,6 @@ const Customers = (props) => {
                     mailing_address.id = 0;
                 }
 
-                console.log(mailing_address);
-
                 mailing_address.customer_id = selectedCustomer.id;
 
                 if (
@@ -735,13 +734,94 @@ const Customers = (props) => {
             }).then(res => {
                 if (res.data.result === 'OK') {
                     if (res.data.customer) {
-                        setSelectedCustomer({
-                            ...res.data.customer,
-                            credit_limit_total: res.data.customer.credit_limit_total.toFixed(2)
-                        });
-                        setSelectedContact((res.data.customer.contacts || []).find(c => c.is_primary === 1) || {});
+                        let customer = { ...res.data.customer };
 
-                        getCustomerOrders(res.data.customer);
+                        let mailing_address = customer?.mailing_address || {};
+
+                        if ((customer?.remit_to_address_is_the_same || 0) === 1) {
+                            mailing_address = customer?.mailing_same || {};
+                            mailing_address.contact_name = '';
+                            mailing_address.contact_phone = '';
+                            mailing_address.ext = '';
+                            mailing_address.email = '';
+
+                            if ((customer?.mailing_customer_contact_id || 0) > 0) {
+                                mailing_address.contact_name = ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.first_name || '') + ' ' +
+                                    ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.last_name || '');
+
+                                mailing_address.contact_phone = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                    ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work || '')
+                                    : (customer?.mailing_customer_contact_primary_phone || '') === 'fax'
+                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work_fax || '')
+                                        : (customer?.mailing_customer_contact_primary_phone || '') === 'mobile'
+                                            ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_mobile || '')
+                                            : (customer?.mailing_customer_contact_primary_phone || '') === 'direct'
+                                                ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_direct || '')
+                                                : (customer?.mailing_customer_contact_primary_phone || '') === 'other'
+                                                    ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_other || '')
+                                                    : '';
+
+                                mailing_address.ext = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                    ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_ext || '')
+                                    : '';
+
+                                mailing_address.email = (customer?.mailing_customer_contact_primary_email || '') === 'work'
+                                    ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_work || '')
+                                    : (customer?.mailing_customer_contact_primary_email || '') === 'personal'
+                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_personal || '')
+                                        : (customer?.mailing_customer_contact_primary_email || '') === 'other'
+                                            ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_other || '')
+                                            : '';
+                            }
+                        }
+
+                        if ((customer?.mailing_customer_id || 0) > 0) {
+                            mailing_address = customer?.mailing_customer || {};
+                            mailing_address.contact_name = '';
+                            mailing_address.contact_phone = '';
+                            mailing_address.ext = '';
+                            mailing_address.email = '';
+
+                            if ((customer?.mailing_customer_contact_id || 0) > 0) {
+                                mailing_address.contact_name = ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.first_name || '') + ' ' +
+                                    ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.last_name || '');
+
+                                mailing_address.contact_phone = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                    ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work || '')
+                                    : (customer?.mailing_customer_contact_primary_phone || '') === 'fax'
+                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work_fax || '')
+                                        : (customer?.mailing_customer_contact_primary_phone || '') === 'mobile'
+                                            ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_mobile || '')
+                                            : (customer?.mailing_customer_contact_primary_phone || '') === 'direct'
+                                                ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_direct || '')
+                                                : (customer?.mailing_customer_contact_primary_phone || '') === 'other'
+                                                    ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_other || '')
+                                                    : '';
+
+                                mailing_address.ext = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                    ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_ext || '')
+                                    : '';
+
+                                mailing_address.email = (customer?.mailing_customer_contact_primary_email || '') === 'work'
+                                    ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_work || '')
+                                    : (customer?.mailing_customer_contact_primary_email || '') === 'personal'
+                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_personal || '')
+                                        : (customer?.mailing_customer_contact_primary_email || '') === 'other'
+                                            ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_other || '')
+                                            : '';
+                            }
+                        }
+
+                        customer.mailing_address = mailing_address;
+
+                        setSelectedCustomer({
+                            ...customer,
+                            credit_limit_total: customer.credit_limit_total.toFixed(2)
+                        });
+
+                        setSelectedContact((customer.contacts || []).find(c => c.is_primary === 1) || {});
+
+                        getCustomerOrders(customer);
                     }
                 }
                 setIsLoading(false);
@@ -829,68 +909,69 @@ const Customers = (props) => {
     ]);
 
     useEffect(async () => {
-        let phones = [];
-        (selectedCustomer?.mailing_address?.mailing_contact?.phone_work || '') !== '' && phones.push({
-            id: 1,
-            type: 'work',
-            phone: selectedCustomer?.mailing_address?.mailing_contact.phone_work
-        });
-        (selectedCustomer?.mailing_address?.mailing_contact?.phone_work_fax || '') !== '' && phones.push({
-            id: 2,
-            type: 'fax',
-            phone: selectedCustomer?.mailing_address?.mailing_contact.phone_work_fax
-        });
-        (selectedCustomer?.mailing_address?.mailing_contact?.phone_mobile || '') !== '' && phones.push({
-            id: 3,
-            type: 'mobile',
-            phone: selectedCustomer?.mailing_address?.mailing_contact.phone_mobile
-        });
-        (selectedCustomer?.mailing_address?.mailing_contact?.phone_direct || '') !== '' && phones.push({
-            id: 4,
-            type: 'direct',
-            phone: selectedCustomer?.mailing_address?.mailing_contact.phone_direct
-        });
-        (selectedCustomer?.mailing_address?.mailing_contact?.phone_other || '') !== '' && phones.push({
-            id: 5,
-            type: 'other',
-            phone: selectedCustomer?.mailing_address?.mailing_contact.phone_other
-        });
+        if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) {
+            if ((selectedCustomer?.mailing_customer_contact_id || 0) > 0) {
+                let contact = (selectedCustomer?.remit_to_address_is_the_same || 0) === 1
+                    ? (selectedCustomer?.contacts || []).find(x => x.id === selectedCustomer?.mailing_customer_contact_id)
+                    : (selectedCustomer?.mailing_address?.contacts || []).find(x => x.id === selectedCustomer?.mailing_customer_contact_id)
 
-        await setMailingContactPhoneItems(phones);
-    }, [
-        selectedCustomer?.mailing_address?.mailing_contact?.phone_work,
-        selectedCustomer?.mailing_address?.mailing_contact?.phone_work_fax,
-        selectedCustomer?.mailing_address?.mailing_contact?.phone_mobile,
-        selectedCustomer?.mailing_address?.mailing_contact?.phone_direct,
-        selectedCustomer?.mailing_address?.mailing_contact?.phone_other,
-        selectedCustomer?.mailing_address?.mailing_contact?.primary_phone
-    ]);
+                if (contact) {
+                    let phones = [];
+                    let emails = [];
 
-    useEffect(async () => {
-        let emails = [];
-        (selectedCustomer?.mailing_address?.mailing_contact?.email_work || '') !== '' && emails.push({
-            id: 1,
-            type: 'work',
-            email: selectedCustomer?.mailing_address?.mailing_contact.email_work
-        });
-        (selectedCustomer?.mailing_address?.mailing_contact?.email_personal || '') !== '' && emails.push({
-            id: 2,
-            type: 'personal',
-            email: selectedCustomer?.mailing_address?.mailing_contact.email_personal
-        });
-        (selectedCustomer?.mailing_address?.mailing_contact?.email_other || '') !== '' && emails.push({
-            id: 3,
-            type: 'other',
-            email: selectedCustomer?.mailing_address?.mailing_contact.email_other
-        });
+                    (contact?.phone_work || '') !== '' && phones.push({
+                        id: 1,
+                        type: 'work',
+                        phone: contact.phone_work,
+                        ext: contact.phone_ext
+                    });
+                    (contact?.phone_work_fax || '') !== '' && phones.push({
+                        id: 2,
+                        type: 'fax',
+                        phone: contact.phone_work_fax,
+                        ext: ''
+                    });
+                    (contact?.phone_mobile || '') !== '' && phones.push({
+                        id: 3,
+                        type: 'mobile',
+                        phone: contact.phone_mobile,
+                        ext: ''
+                    });
+                    (contact?.phone_direct || '') !== '' && phones.push({
+                        id: 4,
+                        type: 'direct',
+                        phone: contact.phone_direct,
+                        ext: ''
+                    });
+                    (contact?.phone_other || '') !== '' && phones.push({
+                        id: 5,
+                        type: 'other',
+                        phone: contact.phone_other,
+                        ext: ''
+                    });
 
-        await setMailingContactEmailItems(emails);
-    }, [
-        selectedCustomer?.mailing_address?.mailing_contact?.email_work,
-        selectedCustomer?.mailing_address?.mailing_contact?.email_personal,
-        selectedCustomer?.mailing_address?.mailing_contact?.email_other,
-        selectedCustomer?.mailing_address?.mailing_contact?.primary_email
-    ]);
+                    (contact?.email_work || '') !== '' && emails.push({
+                        id: 1,
+                        type: 'work',
+                        email: contact.email_work
+                    });
+                    (contact?.email_personal || '') !== '' && emails.push({
+                        id: 2,
+                        type: 'personal',
+                        email: contact.email_personal
+                    });
+                    (contact?.email_other || '') !== '' && emails.push({
+                        id: 3,
+                        type: 'other',
+                        email: contact.email_other
+                    });
+
+                    await setMailingContactPhoneItems(phones);
+                    await setMailingContactEmailItems(emails);
+                }
+            }
+        }
+    }, [selectedCustomer?.mailing_customer_contact_id]);
 
     const setInitialValues = (clearCode = true) => {
         setIsSavingCustomer(false);
@@ -928,25 +1009,105 @@ const Customers = (props) => {
                         if (res.data.customers.length > 0) {
                             setInitialValues();
 
+                            let customer = { ...res.data.customers[0] };
+                            let mailing_address = customer?.mailing_address || {};
+
+                            if ((customer?.remit_to_address_is_the_same || 0) === 1) {
+                                mailing_address = customer?.mailing_same || {};
+                                mailing_address.contact_name = '';
+                                mailing_address.contact_phone = '';
+                                mailing_address.ext = '';
+                                mailing_address.email = '';
+
+                                if ((customer?.mailing_customer_contact_id || 0) > 0) {
+                                    mailing_address.contact_name = ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.first_name || '') + ' ' +
+                                        ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.last_name || '');
+
+                                    mailing_address.contact_phone = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work || '')
+                                        : (customer?.mailing_customer_contact_primary_phone || '') === 'fax'
+                                            ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work_fax || '')
+                                            : (customer?.mailing_customer_contact_primary_phone || '') === 'mobile'
+                                                ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_mobile || '')
+                                                : (customer?.mailing_customer_contact_primary_phone || '') === 'direct'
+                                                    ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_direct || '')
+                                                    : (customer?.mailing_customer_contact_primary_phone || '') === 'other'
+                                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_other || '')
+                                                        : '';
+
+                                    mailing_address.ext = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_ext || '')
+                                        : '';
+
+                                    mailing_address.email = (customer?.mailing_customer_contact_primary_email || '') === 'work'
+                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_work || '')
+                                        : (customer?.mailing_customer_contact_primary_email || '') === 'personal'
+                                            ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_personal || '')
+                                            : (customer?.mailing_customer_contact_primary_email || '') === 'other'
+                                                ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_other || '')
+                                                : '';
+                                }
+                            }
+
+                            if ((customer?.mailing_customer_id || 0) > 0) {
+                                mailing_address = customer?.mailing_customer || {};
+                                mailing_address.contact_name = '';
+                                mailing_address.contact_phone = '';
+                                mailing_address.ext = '';
+                                mailing_address.email = '';
+
+                                if ((customer?.mailing_customer_contact_id || 0) > 0) {
+                                    mailing_address.contact_name = ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.first_name || '') + ' ' +
+                                        ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.last_name || '');
+
+                                    mailing_address.contact_phone = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work || '')
+                                        : (customer?.mailing_customer_contact_primary_phone || '') === 'fax'
+                                            ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work_fax || '')
+                                            : (customer?.mailing_customer_contact_primary_phone || '') === 'mobile'
+                                                ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_mobile || '')
+                                                : (customer?.mailing_customer_contact_primary_phone || '') === 'direct'
+                                                    ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_direct || '')
+                                                    : (customer?.mailing_customer_contact_primary_phone || '') === 'other'
+                                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_other || '')
+                                                        : '';
+
+                                    mailing_address.ext = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_ext || '')
+                                        : '';
+
+                                    mailing_address.email = (customer?.mailing_customer_contact_primary_email || '') === 'work'
+                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_work || '')
+                                        : (customer?.mailing_customer_contact_primary_email || '') === 'personal'
+                                            ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_personal || '')
+                                            : (customer?.mailing_customer_contact_primary_email || '') === 'other'
+                                                ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_other || '')
+                                                : '';
+                                }
+                            }
+
+                            customer.mailing_address = mailing_address;
+
                             setSelectedCustomer({
-                                ...res.data.customers[0],
-                                credit_limit_total: res.data.customers[0].credit_limit_total.toFixed(2),
+                                ...customer,
+                                credit_limit_total: customer.credit_limit_total.toFixed(2),
                                 contacts: [
-                                    ...(res.data.customers[0]?.contacts || [])
+                                    ...(customer?.contacts || [])
                                 ]
                             });
-                            setSelectedContact((res.data.customers[0].contacts || []).find(c => c.is_primary === 1) || {});
+
+                            setSelectedContact((customer.contacts || []).find(c => c.is_primary === 1) || {});
 
                             props.setSelectedCustomer({
-                                ...res.data.customers[0],
-                                credit_limit_total: res.data.customers[0].credit_limit_total.toFixed(2),
+                                ...customer,
+                                credit_limit_total: customer.credit_limit_total.toFixed(2),
                                 contacts: [
-                                    ...(res.data.customers[0]?.contacts || [])
+                                    ...(customer?.contacts || [])
                                 ],
                                 componentId: moment().format('x')
                             })
 
-                            getCustomerOrders(res.data.customers[0]);
+                            getCustomerOrders(customer);
                         } else {
                             setInitialValues(false);
                         }
@@ -1059,19 +1220,100 @@ const Customers = (props) => {
                         if ((id || 0) > 0) {
                             axios.post(props.serverUrl + '/getCustomerById', { id: id }).then(res => {
                                 if (res.data.result === 'OK') {
+
+                                    let customer = { ...res.data.customer };
+
+                                    let mailing_address = customer?.mailing_address || {};
+
+                                    if ((customer?.remit_to_address_is_the_same || 0) === 1) {
+                                        mailing_address = customer?.mailing_same || {};
+                                        mailing_address.contact_name = '';
+                                        mailing_address.contact_phone = '';
+                                        mailing_address.ext = '';
+                                        mailing_address.email = '';
+
+                                        if ((customer?.mailing_customer_contact_id || 0) > 0) {
+                                            mailing_address.contact_name = ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.first_name || '') + ' ' +
+                                                ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.last_name || '');
+
+                                            mailing_address.contact_phone = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                                ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work || '')
+                                                : (customer?.mailing_customer_contact_primary_phone || '') === 'fax'
+                                                    ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work_fax || '')
+                                                    : (customer?.mailing_customer_contact_primary_phone || '') === 'mobile'
+                                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_mobile || '')
+                                                        : (customer?.mailing_customer_contact_primary_phone || '') === 'direct'
+                                                            ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_direct || '')
+                                                            : (customer?.mailing_customer_contact_primary_phone || '') === 'other'
+                                                                ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_other || '')
+                                                                : '';
+
+                                            mailing_address.ext = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                                ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_ext || '')
+                                                : '';
+
+                                            mailing_address.email = (customer?.mailing_customer_contact_primary_email || '') === 'work'
+                                                ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_work || '')
+                                                : (customer?.mailing_customer_contact_primary_email || '') === 'personal'
+                                                    ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_personal || '')
+                                                    : (customer?.mailing_customer_contact_primary_email || '') === 'other'
+                                                        ? ((customer?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_other || '')
+                                                        : '';
+                                        }
+                                    }
+
+                                    if ((customer?.mailing_customer_id || 0) > 0) {
+                                        mailing_address = customer?.mailing_customer || {};
+                                        mailing_address.contact_name = '';
+                                        mailing_address.contact_phone = '';
+                                        mailing_address.ext = '';
+                                        mailing_address.email = '';
+
+                                        if ((customer?.mailing_customer_contact_id || 0) > 0) {
+                                            mailing_address.contact_name = ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.first_name || '') + ' ' +
+                                                ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.last_name || '');
+
+                                            mailing_address.contact_phone = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                                ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work || '')
+                                                : (customer?.mailing_customer_contact_primary_phone || '') === 'fax'
+                                                    ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_work_fax || '')
+                                                    : (customer?.mailing_customer_contact_primary_phone || '') === 'mobile'
+                                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_mobile || '')
+                                                        : (customer?.mailing_customer_contact_primary_phone || '') === 'direct'
+                                                            ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_direct || '')
+                                                            : (customer?.mailing_customer_contact_primary_phone || '') === 'other'
+                                                                ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_other || '')
+                                                                : '';
+
+                                            mailing_address.ext = (customer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                                ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.phone_ext || '')
+                                                : '';
+
+                                            mailing_address.email = (customer?.mailing_customer_contact_primary_email || '') === 'work'
+                                                ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_work || '')
+                                                : (customer?.mailing_customer_contact_primary_email || '') === 'personal'
+                                                    ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_personal || '')
+                                                    : (customer?.mailing_customer_contact_primary_email || '') === 'other'
+                                                        ? ((mailing_address?.contacts || []).find(x => x.id === customer.mailing_customer_contact_id)?.email_other || '')
+                                                        : '';
+                                        }
+                                    }
+
+                                    customer.mailing_address = mailing_address;
+
                                     setSelectedCustomer({
-                                        ...res.data.customer,
-                                        credit_limit_total: res.data.customer.credit_limit_total.toFixed(2)
+                                        ...customer,
+                                        credit_limit_total: customer.credit_limit_total.toFixed(2)
                                     });
-                                    setSelectedContact((res.data.customer.contacts || []).find(c => c.is_primary === 1) || {});
+                                    setSelectedContact((customer.contacts || []).find(c => c.is_primary === 1) || {});
 
                                     if ((props.selectedCustomer?.id || 0) === 0) {
                                         props.setSelectedCustomer({
-                                            ...res.data.customer,
+                                            ...customer,
                                             component_id: props.componentId
                                         });
                                         props.setSelectedContact({
-                                            ...((res.data.customer.contacts || []).find(c => c.is_primary === 1) || {}),
+                                            ...((customer.contacts || []).find(c => c.is_primary === 1) || {}),
                                             component_id: props.componentId
                                         });
                                     }
@@ -1080,7 +1322,7 @@ const Customers = (props) => {
                                     setAutomaticEmailsCc('');
                                     setAutomaticEmailsBcc('');
 
-                                    getCustomerOrders(res.data.customer);
+                                    getCustomerOrders(customer);
 
                                     resolve('OK');
                                 } else {
@@ -1281,33 +1523,34 @@ const Customers = (props) => {
     }
 
     const remitToAddressBtn = () => {
-        if ((selectedCustomer?.id || 0) === 0) {
+        let currentCustomer = { ...selectedCustomer };
+
+        if ((currentCustomer?.id || 0) === 0) {
             window.alert('You must select a customer first');
             return;
         }
 
+        currentCustomer.remit_to_address_is_the_same = 1;
+        currentCustomer.mailing_customer_id = null;
+        currentCustomer.mailing_address_id = null;
+
         let mailing_address = {};
 
         mailing_address.id = -1;
-        mailing_address.customer_id = selectedCustomer.id;
-        mailing_address.code = selectedCustomer.code;
-        mailing_address.code_number = selectedCustomer.code_number;
-        mailing_address.name = selectedCustomer.name;
-        mailing_address.address1 = selectedCustomer.address1;
-        mailing_address.address2 = selectedCustomer.address2;
-        mailing_address.city = selectedCustomer.city;
-        mailing_address.state = selectedCustomer.state;
-        mailing_address.zip = selectedCustomer.zip;
-        mailing_address.contact_name = selectedCustomer.contact_name;
-        mailing_address.contact_phone = selectedCustomer.contact_phone;
-        mailing_address.ext = selectedCustomer.ext;
-        mailing_address.email = selectedCustomer.email;
+        mailing_address.customer_id = currentCustomer.id;
+        mailing_address.code = currentCustomer.code;
+        mailing_address.code_number = currentCustomer.code_number;
+        mailing_address.name = currentCustomer.name;
+        mailing_address.address1 = currentCustomer.address1;
+        mailing_address.address2 = currentCustomer.address2;
+        mailing_address.city = currentCustomer.city;
+        mailing_address.state = currentCustomer.state;
+        mailing_address.zip = currentCustomer.zip;
 
         if ((selectedContact?.id || 0) > 0) {
-            mailing_address.mailing_contact_id = selectedContact.id;
-            mailing_address.mailing_contact = selectedContact;
+            currentCustomer.mailing_customer_contact_id = selectedContact.id;
 
-            mailing_address.mailing_contact_primary_phone = selectedContact.phone_work !== ''
+            currentCustomer.mailing_customer_contact_primary_phone = selectedContact.phone_work !== ''
                 ? 'work'
                 : selectedContact.phone_work_fax !== ''
                     ? 'fax'
@@ -1318,84 +1561,159 @@ const Customers = (props) => {
                             : selectedContact.phone_other !== ''
                                 ? 'other' : 'work';
 
-            mailing_address.mailing_contact_primary_email = selectedContact.email_work !== ''
+            currentCustomer.mailing_customer_contact_primary_email = selectedContact.email_work !== ''
                 ? 'work'
                 : selectedContact.email_personal !== ''
                     ? 'personal'
                     : selectedContact.email_other !== ''
                         ? 'other' : 'work';
 
-        } else if (selectedCustomer.contacts.findIndex(x => x.is_primary === 1) > -1) {
-            mailing_address.mailing_contact_id = selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].id;
-            mailing_address.mailing_contact = selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)];
+            mailing_address.contact_name = (selectedContact?.first_name || '') + ' ' + (selectedContact?.last_name || '');
 
-            mailing_address.mailing_contact_primary_phone = selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ''
+            mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                ? selectedContact?.phone_work || ''
+                : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
+                    ? selectedContact?.phone_work_fax || ''
+                    : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
+                        ? selectedContact?.phone_mobile || ''
+                        : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
+                            ? selectedContact?.phone_direct || ''
+                            : currentCustomer.mailing_customer_contact_primary_phone === 'other'
+                                ? selectedContact?.phone_other || ''
+                                : '';
+
+            mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                ? selectedContact?.phone_ext || ''
+                : '';
+
+            mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
+                ? selectedContact?.email_work || ''
+                : currentCustomer.mailing_customer_contact_primary_email === 'personal'
+                    ? selectedContact?.email_personal || ''
+                    : currentCustomer.mailing_customer_contact_primary_email === 'other'
+                        ? selectedContact?.email_other || ''
+                        : '';
+
+        } else if (currentCustomer.contacts.findIndex(x => x.is_primary === 1) > -1) {
+            currentCustomer.mailing_customer_contact_id = currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].id;
+
+            currentCustomer.mailing_customer_contact_primary_phone = currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ''
                 ? 'work'
-                : selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ''
+                : currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ''
                     ? 'fax'
-                    : selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ''
+                    : currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ''
                         ? 'mobile'
-                        : selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ''
+                        : currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ''
                             ? 'direct'
-                            : selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ''
+                            : currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ''
                                 ? 'other' : 'work';
 
-            mailing_address.mailing_contact_primary_email = selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].email_work !== ''
+            currentCustomer.mailing_customer_contact_primary_email = currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].email_work !== ''
                 ? 'work'
-                : selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].email_personal !== ''
+                : currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].email_personal !== ''
                     ? 'personal'
-                    : selectedCustomer.contacts[selectedCustomer.contacts.findIndex(x => x.is_primary === 1)].email_other !== ''
+                    : currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)].email_other !== ''
                         ? 'other' : 'work';
 
-        } else if (selectedCustomer.contacts.length > 0) {
-            mailing_address.mailing_contact_id = selectedCustomer.contacts[0].id;
-            mailing_address.mailing_contact = selectedCustomer.contacts[0];
+            mailing_address.contact_name = (currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.first_name || '') + ' ' +
+                (currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.last_name || '');
 
-            mailing_address.mailing_contact_primary_phone = selectedCustomer.contacts[0].phone_work !== ''
+            mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ''
+                : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
+                    ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ''
+                    : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
+                        ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ''
+                        : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
+                            ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ''
+                            : currentCustomer.mailing_customer_contact_primary_phone === 'other'
+                                ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ''
+                                : '';
+
+            mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || ''
+                : '';
+
+            mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
+                ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ''
+                : currentCustomer.mailing_customer_contact_primary_email === 'personal'
+                    ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ''
+                    : currentCustomer.mailing_customer_contact_primary_email === 'other'
+                        ? currentCustomer.contacts[currentCustomer.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ''
+                        : '';
+
+        } else if (currentCustomer.contacts.length > 0) {
+            currentCustomer.mailing_customer_contact_id = currentCustomer.contacts[0].id;
+
+            currentCustomer.mailing_customer_contact_primary_phone = currentCustomer.contacts[0].phone_work !== ''
                 ? 'work'
-                : selectedCustomer.contacts[0].phone_work_fax !== ''
+                : currentCustomer.contacts[0].phone_work_fax !== ''
                     ? 'fax'
-                    : selectedCustomer.contacts[0].phone_mobile !== ''
+                    : currentCustomer.contacts[0].phone_mobile !== ''
                         ? 'mobile'
-                        : selectedCustomer.contacts[0].phone_direct !== ''
+                        : currentCustomer.contacts[0].phone_direct !== ''
                             ? 'direct'
-                            : selectedCustomer.contacts[0].phone_other !== ''
+                            : currentCustomer.contacts[0].phone_other !== ''
                                 ? 'other' : 'work';
 
-            mailing_address.mailing_contact_primary_email = selectedCustomer.contacts[0].email_work !== ''
+            currentCustomer.mailing_customer_contact_primary_email = currentCustomer.contacts[0].email_work !== ''
                 ? 'work'
-                : selectedCustomer.contacts[0].email_personal !== ''
+                : currentCustomer.contacts[0].email_personal !== ''
                     ? 'personal'
-                    : selectedCustomer.contacts[0].email_other !== ''
+                    : currentCustomer.contacts[0].email_other !== ''
                         ? 'other' : 'work';
 
+            mailing_address.contact_name = (currentCustomer.contacts[0]?.first_name || '') + ' ' + (currentCustomer.contacts[0]?.last_name || '');
+
+            mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                ? currentCustomer.contacts[0]?.phone_work || ''
+                : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
+                    ? currentCustomer.contacts[0]?.phone_work_fax || ''
+                    : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
+                        ? currentCustomer.contacts[0]?.phone_mobile || ''
+                        : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
+                            ? currentCustomer.contacts[0]?.phone_direct || ''
+                            : currentCustomer.mailing_customer_contact_primary_phone === 'other'
+                                ? currentCustomer.contacts[0]?.phone_other || ''
+                                : '';
+
+            mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                ? currentCustomer.contacts[0]?.phone_ext || ''
+                : '';
+
+            mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
+                ? currentCustomer.contacts[0]?.email_work || ''
+                : currentCustomer.mailing_customer_contact_primary_email === 'personal'
+                    ? currentCustomer.contacts[0]?.email_personal || ''
+                    : currentCustomer.mailing_customer_contact_primary_email === 'other'
+                        ? currentCustomer.contacts[0]?.email_other || ''
+                        : '';
         } else {
-            mailing_address.mailing_contact_id = null;
-            mailing_address.mailing_contact = {};
-            mailing_address.mailing_contact_primary_phone = 'work';
-            mailing_address.mailing_contact_primary_email = 'work';
+            currentCustomer.mailing_customer_contact_id = null;
+            currentCustomer.mailing_customer_contact_primary_phone = 'work';
+            currentCustomer.mailing_customer_contact_primary_email = 'work';
         }
 
-        setSelectedCustomer({ ...selectedCustomer, mailing_address: mailing_address });
+        setSelectedCustomer({ ...currentCustomer, mailing_address: mailing_address });
 
-        validateMailingAddressForSaving({ keyCode: 9 });
+        validateCustomerForSaving({ keyCode: 9 });
     }
 
     const mailingAddressClearBtn = () => {
-        setSelectedCustomer({
-            ...selectedCustomer,
-            mailing_address: {}
+        setSelectedCustomer(prev => {
+            return {
+                ...prev,
+                mailing_address_id: null,
+                remit_to_address_is_the_same: 0,
+                mailing_customer_id: null,
+                mailing_customer_contact_id: null,
+                mailing_customer_contact_primary_phone: 'work',
+                mailing_customer_contact_primary_email: 'work',
+                mailing_address: {}
+            }
         });
 
-        if ((selectedCustomer?.id || 0) > 0) {
-            axios.post(props.serverUrl + '/deleteCustomerMailingAddress', {
-                customer_id: selectedCustomer.id
-            }).then(res => {
-                if (res.data.result === 'OK') {
-                    console.log('customer mailing address deleted')
-                }
-            })
-        }
+        validateCustomerForSaving({ keyCode: 9 });
         refCustomerMailingCode.current.focus();
     }
 
@@ -1697,7 +2015,7 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
+                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
@@ -1713,7 +2031,7 @@ const Customers = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
+                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
                                         readOnly={
                                             (props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
@@ -1909,11 +2227,15 @@ const Customers = (props) => {
                                         }}
                                         value={
                                             (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                                ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_ext
+                                                ? ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone || 'work') === 'work'
+                                                    ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_ext
+                                                    : ''
                                                 : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
                                                     ? (selectedCustomer?.ext || '')
                                                     // ? ''
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_ext
+                                                    : (selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone || 'work') === 'work'
+                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_ext
+                                                        : ''
 
                                         }
                                     />
@@ -2045,7 +2367,9 @@ const Customers = (props) => {
                                             ? 'mochi-button disabled' : 'mochi-button'
                                     } onClick={remitToAddressBtn}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Remit to address is the same</div>
+                                        <div className="mochi-button-base" style={{
+                                            color: (selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ? 'green' : 'black'
+                                        }}>Remit to address is the same</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                     <div className={
@@ -2063,25 +2387,185 @@ const Customers = (props) => {
                             </div>
 
                             <div className="form-row">
-                                <div className="input-box-container input-code">
+                                <div className="input-box-container input-code" style={{
+                                    backgroundColor: (selectedCustomer?.mailing_customer_id || 0) > 0 ? 'lightgreen' : 'white'
+                                }}>
                                     <input tabIndex={18 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
                                         ref={refCustomerMailingCode}
-                                        readOnly={true}
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    code: e.target.value
+                                        readOnly={
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.id || 0) === 0 ||
+                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
+                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
+                                        }
+                                        onKeyDown={(e) => {
+                                            let key = e.keyCode || e.which;
+
+                                            if (key === 9) {
+                                                if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 0 && (selectedCustomer?.mailing_customer_id || 0) === 0) {
+                                                    if (e.target.value.trim() !== '') {
+                                                        e.preventDefault();
+
+                                                        axios.post(props.serverUrl + '/getCustomerMailingAddressByCode', {
+                                                            code: e.target.value
+                                                        }).then(res => {
+                                                            if (res.data.result === 'OK') {
+                                                                if ((res.data.mailing_address || []).length > 0) {
+                                                                    let selectedCustomerCode = (selectedCustomer?.code || '') + ((selectedCustomer?.code_number || 0) === 0 ? '' : selectedCustomer.code_number);
+
+                                                                    let data = { ...res.data.mailing_address[0] };
+
+                                                                    if (data.type === 'customer') {
+                                                                        let dataCode = (data.code || '') + ((data.code_number || 0) === 0 ? '' : data.code_number);
+
+                                                                        if (selectedCustomerCode.toLowerCase() === dataCode.toLowerCase()) {
+                                                                            remitToAddressBtn();
+                                                                            refMailingContactName.current.focus();
+                                                                        } else {
+                                                                            let currentCustomer = { ...selectedCustomer };
+                                                                            currentCustomer.remit_to_address_is_the_same = 0;
+                                                                            currentCustomer.mailing_customer_id = data.id;
+                                                                            currentCustomer.mailing_address_id = null;
+
+                                                                            let mailing_address = { ...data };
+
+                                                                            if (mailing_address.contacts.findIndex(x => x.is_primary === 1) > -1) {
+                                                                                currentCustomer.mailing_customer_contact_id = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].id;
+
+                                                                                currentCustomer.mailing_customer_contact_primary_phone = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ''
+                                                                                    ? 'work'
+                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ''
+                                                                                        ? 'fax'
+                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ''
+                                                                                            ? 'mobile'
+                                                                                            : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ''
+                                                                                                ? 'direct'
+                                                                                                : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ''
+                                                                                                    ? 'other' : 'work';
+
+                                                                                currentCustomer.mailing_customer_contact_primary_email = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_work !== ''
+                                                                                    ? 'work'
+                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_personal !== ''
+                                                                                        ? 'personal'
+                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_other !== ''
+                                                                                            ? 'other' : 'work';
+
+                                                                                mailing_address.contact_name = (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.first_name || '') + ' ' +
+                                                                                    (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.last_name || '');
+
+                                                                                mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ''
+                                                                                    : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
+                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ''
+                                                                                        : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
+                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ''
+                                                                                            : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
+                                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ''
+                                                                                                : currentCustomer.mailing_customer_contact_primary_phone === 'other'
+                                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ''
+                                                                                                    : '';
+
+                                                                                mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || ''
+                                                                                    : '';
+
+                                                                                mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
+                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ''
+                                                                                    : currentCustomer.mailing_customer_contact_primary_email === 'personal'
+                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ''
+                                                                                        : currentCustomer.mailing_customer_contact_primary_email === 'other'
+                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ''
+                                                                                            : '';
+
+                                                                            } else if (mailing_address.contacts.length > 0) {
+                                                                                currentCustomer.mailing_customer_contact_id = mailing_address.contacts[0].id;
+
+                                                                                currentCustomer.mailing_customer_contact_primary_phone = mailing_address.contacts[0].phone_work !== ''
+                                                                                    ? 'work'
+                                                                                    : mailing_address.contacts[0].phone_work_fax !== ''
+                                                                                        ? 'fax'
+                                                                                        : mailing_address.contacts[0].phone_mobile !== ''
+                                                                                            ? 'mobile'
+                                                                                            : mailing_address.contacts[0].phone_direct !== ''
+                                                                                                ? 'direct'
+                                                                                                : mailing_address.contacts[0].phone_other !== ''
+                                                                                                    ? 'other' : 'work';
+
+                                                                                currentCustomer.mailing_customer_contact_primary_email = mailing_address.contacts[0].email_work !== ''
+                                                                                    ? 'work'
+                                                                                    : mailing_address.contacts[0].email_personal !== ''
+                                                                                        ? 'personal'
+                                                                                        : mailing_address.contacts[0].email_other !== ''
+                                                                                            ? 'other' : 'work';
+
+                                                                                mailing_address.contact_name = (mailing_address.contacts[0]?.first_name || '') + ' ' + (mailing_address.contacts[0]?.last_name || '');
+
+                                                                                mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                                                                                    ? mailing_address.contacts[0]?.phone_work || ''
+                                                                                    : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
+                                                                                        ? mailing_address.contacts[0]?.phone_work_fax || ''
+                                                                                        : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
+                                                                                            ? mailing_address.contacts[0]?.phone_mobile || ''
+                                                                                            : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
+                                                                                                ? mailing_address.contacts[0]?.phone_direct || ''
+                                                                                                : currentCustomer.mailing_customer_contact_primary_phone === 'other'
+                                                                                                    ? mailing_address.contacts[0]?.phone_other || ''
+                                                                                                    : '';
+
+                                                                                mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
+                                                                                    ? mailing_address.contacts[0]?.phone_ext || ''
+                                                                                    : '';
+
+                                                                                mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
+                                                                                    ? mailing_address.contacts[0]?.email_work || ''
+                                                                                    : currentCustomer.mailing_customer_contact_primary_email === 'personal'
+                                                                                        ? mailing_address.contacts[0]?.email_personal || ''
+                                                                                        : currentCustomer.mailing_customer_contact_primary_email === 'other'
+                                                                                            ? mailing_address.contacts[0]?.email_other || ''
+                                                                                            : '';
+                                                                            } else {
+                                                                                currentCustomer.mailing_customer_contact_id = null;
+                                                                                currentCustomer.mailing_customer_contact_primary_phone = 'work';
+                                                                                currentCustomer.mailing_customer_contact_primary_email = 'work';
+                                                                            }
+
+                                                                            setSelectedCustomer({ ...currentCustomer, mailing_address: mailing_address });
+                                                                            validateCustomerForSaving(e);
+                                                                            refCustomerMailingName.current.focus();
+                                                                        }
+                                                                    } else if (data.type === 'mailing') {
+                                                                        setSelectedCustomer(prev => {
+                                                                            return {
+                                                                                ...prev,
+                                                                                remit_to_address_is_the_same: 0,
+                                                                                mailing_customer_id: null,
+                                                                                mailing_address_id: data.id,
+                                                                                mailing_address: { ...data }
+                                                                            }
+                                                                        });
+
+                                                                        validateCustomerForSaving(e);
+                                                                        refCustomerMailingName.current.focus();
+                                                                    }
+                                                                }
+                                                            }
+                                                        }).catch(e => {
+                                                            console.log(e);
+                                                        })
+                                                    }
                                                 }
-                                            })
+                                            }
                                         }}
                                         onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    code: e.target.value
+                                            setSelectedCustomer(prev => {
+                                                return {
+                                                    ...prev,
+                                                    mailing_address: {
+                                                        ...prev?.mailing_address,
+                                                        code: e.target.value
+                                                    }
                                                 }
                                             })
                                         }}
@@ -2093,90 +2577,79 @@ const Customers = (props) => {
                                         style={{
                                             textTransform: 'capitalize'
                                         }}
+                                        ref={refCustomerMailingName}
                                         readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.id || 0) === 0 ||
+                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
+                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
                                         }
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    name: e.target.value
-                                                }
-                                            })
-                                        }}
                                         onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    name: e.target.value
+                                            setSelectedCustomer(prev => {
+                                                return {
+                                                    ...prev,
+                                                    mailing_address: {
+                                                        ...prev?.mailing_address,
+                                                        name: e.target.value
+                                                    }
                                                 }
                                             })
                                         }}
-                                        value={selectedCustomer?.mailing_address?.name || ''} />
+                                        value={(selectedCustomer?.mailing_address?.name || '')} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
+                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
                                         readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.id || 0) === 0 ||
+                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
+                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
                                         }
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    address1: e.target.value
-                                                }
-                                            })
-                                        }}
                                         onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    address1: e.target.value
+                                            setSelectedCustomer(prev => {
+                                                return {
+                                                    ...prev,
+                                                    mailing_address: {
+                                                        ...prev?.mailing_address,
+                                                        address1: e.target.value
+                                                    }
                                                 }
                                             })
                                         }}
-                                        value={selectedCustomer?.mailing_address?.address1 || ''} />
+                                        value={(selectedCustomer?.mailing_address?.address1 || '')} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className="input-box-container grow">
-                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
+                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
                                         readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.id || 0) === 0 ||
+                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
+                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
                                         }
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    address2: e.target.value
-                                                }
-                                            })
-                                        }}
                                         onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    address2: e.target.value
+                                            setSelectedCustomer(prev => {
+                                                return {
+                                                    ...prev,
+                                                    mailing_address: {
+                                                        ...prev?.mailing_address,
+                                                        address2: e.target.value
+                                                    }
                                                 }
                                             })
                                         }}
-                                        value={selectedCustomer?.mailing_address?.address2 || ''} />
+                                        value={(selectedCustomer?.mailing_address?.address2 || '')} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
@@ -2187,86 +2660,84 @@ const Customers = (props) => {
                                             textTransform: 'capitalize'
                                         }}
                                         readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.id || 0) === 0 ||
+                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
+                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
                                         }
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    city: e.target.value
-                                                }
-                                            })
-                                        }}
                                         onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    city: e.target.value
+                                            setSelectedCustomer(prev => {
+                                                return {
+                                                    ...prev,
+                                                    mailing_address: {
+                                                        ...prev?.mailing_address,
+                                                        city: e.target.value
+                                                    }
                                                 }
                                             })
                                         }}
-                                        value={selectedCustomer?.mailing_address?.city || ''} />
+                                        value={(selectedCustomer?.mailing_address?.city || '')} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-state">
                                     <input tabIndex={23 + props.tabTimes} type="text" placeholder="State" maxLength="2"
                                         readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.id || 0) === 0 ||
+                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
+                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
                                         }
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    state: e.target.value
-                                                }
-                                            })
-                                        }}
                                         onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    state: e.target.value
+                                            setSelectedCustomer(prev => {
+                                                return {
+                                                    ...prev,
+                                                    mailing_address: {
+                                                        ...prev?.mailing_address,
+                                                        state: e.target.value
+                                                    }
                                                 }
                                             })
                                         }}
-                                        value={selectedCustomer?.mailing_address?.state || ''} />
+                                        value={(selectedCustomer?.mailing_address?.state || '')} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container input-zip-code">
                                     <input tabIndex={24 + props.tabTimes} type="text" placeholder="Postal Code"
                                         readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.id || 0) === 0 ||
+                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
+                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
                                         }
-                                        onKeyDown={validateMailingAddressForSaving}
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    zip: e.target.value
+                                        onKeyDown={(e) => {
+                                            let key = e.keyCode || e.which;
+
+                                            if (key === 9){
+                                                if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 0 &&
+                                                (selectedCustomer?.mailing_customer_id || 0) === 0 &&
+                                                (selectedCustomer?.id || 0) > 0){
+                                                    validateMailingAddressForSaving(e)
                                                 }
-                                            })
+                                            }
                                         }}
                                         onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                mailing_address: {
-                                                    ...selectedCustomer?.mailing_address,
-                                                    zip: e.target.value
+                                            setSelectedCustomer(prev => {
+                                                return {
+                                                    ...prev,
+                                                    mailing_address: {
+                                                        ...prev?.mailing_address,
+                                                        zip: e.target.value
+                                                    }
                                                 }
                                             })
                                         }}
-                                        value={selectedCustomer?.mailing_address?.zip || ''} />
+                                        value={(selectedCustomer?.mailing_address?.zip || '')} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
@@ -2280,7 +2751,8 @@ const Customers = (props) => {
                                             readOnly={
                                                 (props.user?.user_code?.is_admin || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0 ||
+                                                (selectedCustomer?.mailing_address?.id || 0) === 0
                                             }
                                             tabIndex={25 + props.tabTimes}
                                             type="text"
@@ -2323,8 +2795,18 @@ const Customers = (props) => {
                                                                 return true;
                                                             });
                                                         } else {
-                                                            if ((selectedCustomer?.contacts || []).length > 0) {
-                                                                await setMailingContactNameItems((selectedCustomer?.contacts || []).map((item, index) => {
+                                                            let contacts = [];
+
+                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
+                                                                contacts = selectedCustomer?.contacts || [];
+                                                            }
+
+                                                            if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
+                                                                contacts = selectedCustomer?.mailing_address?.contacts || [];
+                                                            }
+
+                                                            if (contacts.length > 0) {
+                                                                await setMailingContactNameItems(contacts.map((item, index) => {
                                                                     item.selected = index === 0
                                                                     return item;
                                                                 }))
@@ -2378,8 +2860,18 @@ const Customers = (props) => {
                                                                 return true;
                                                             });
                                                         } else {
-                                                            if ((selectedCustomer?.contacts || []).length > 0) {
-                                                                await setMailingContactNameItems((selectedCustomer?.contacts || []).map((item, index) => {
+                                                            let contacts = [];
+
+                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
+                                                                contacts = selectedCustomer?.contacts || [];
+                                                            }
+
+                                                            if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
+                                                                contacts = selectedCustomer?.mailing_address?.contacts || [];
+                                                            }
+
+                                                            if (contacts.length > 0) {
+                                                                await setMailingContactNameItems(contacts.map((item, index) => {
                                                                     item.selected = index === 0
                                                                     return item;
                                                                 }))
@@ -2406,35 +2898,11 @@ const Customers = (props) => {
 
                                                     case 13: // enter
                                                         if (showMailingContactNames && mailingContactNameItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedCustomer({
-                                                                ...selectedCustomer,
-                                                                mailing_address: {
-                                                                    ...(selectedCustomer?.mailing_address || {}),
-                                                                    contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
-                                                                        + ' '
-                                                                        + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
-                                                                    contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
-                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
-                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
-                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
-                                                                                        : '',
-                                                                    ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
-                                                                    email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
-                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
-                                                                                : '',
-                                                                    mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
-                                                                    mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                                    mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                            await setSelectedCustomer(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    mailing_customer_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
+                                                                    mailing_customer_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
                                                                         ? 'work'
                                                                         : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
                                                                             ? 'fax'
@@ -2444,7 +2912,33 @@ const Customers = (props) => {
                                                                                     ? 'direct'
                                                                                     : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
                                                                                         ? 'other' :
-                                                                                        ''
+                                                                                        '',
+                                                                    mailing_address: {
+                                                                        ...(prev?.mailing_address || {}),
+                                                                        contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                            + ' '
+                                                                            + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                        contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                            : '',
+                                                                        ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                        email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                                    : ''
+
+                                                                    }
                                                                 }
                                                             });
 
@@ -2457,35 +2951,11 @@ const Customers = (props) => {
                                                     case 9: // tab
                                                         if (showMailingContactNames) {
                                                             e.preventDefault();
-                                                            await setSelectedCustomer({
-                                                                ...selectedCustomer,
-                                                                mailing_address: {
-                                                                    ...(selectedCustomer?.mailing_address || {}),
-                                                                    contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
-                                                                        + ' '
-                                                                        + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
-                                                                    contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
-                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
-                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
-                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
-                                                                                        : '',
-                                                                    ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
-                                                                    email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
-                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
-                                                                                : '',
-                                                                    mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
-                                                                    mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                                    mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                            await setSelectedCustomer(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    mailing_customer_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
+                                                                    mailing_customer_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
                                                                         ? 'work'
                                                                         : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
                                                                             ? 'fax'
@@ -2495,7 +2965,33 @@ const Customers = (props) => {
                                                                                     ? 'direct'
                                                                                     : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
                                                                                         ? 'other' :
-                                                                                        ''
+                                                                                        '',
+                                                                    mailing_address: {
+                                                                        ...(prev?.mailing_address || {}),
+                                                                        contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
+                                                                            + ' '
+                                                                            + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
+                                                                        contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
+                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
+                                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
+                                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
+                                                                                            : '',
+                                                                        ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
+                                                                        email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
+                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
+                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
+                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
+                                                                                    : ''
+
+                                                                    }
                                                                 }
                                                             });
 
@@ -2512,76 +3008,111 @@ const Customers = (props) => {
                                                 }
                                             }}
                                             onBlur={e => {
-                                                let contact = (selectedCustomer?.contacts || []).find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+                                                let contacts = [];
 
-                                                if (contact) {
-                                                    setSelectedCustomer(selectedCustomer => {
-                                                        return {
-                                                            ...selectedCustomer,
-                                                            mailing_address: {
-                                                                ...(selectedCustomer?.mailing_address || {}),
-                                                                contact_phone: (contact.primary_phone || '') === 'work'
-                                                                    ? (contact.phone_work || '')
-                                                                    : (contact.primary_phone || '') === 'fax'
-                                                                        ? (contact.phone_work_fax || '')
-                                                                        : (contact.primary_phone || '') === 'mobile'
-                                                                            ? (contact.phone_mobile || '')
-                                                                            : (contact.primary_phone || '') === 'direct'
-                                                                                ? (contact.phone_direct || '')
-                                                                                : (contact.primary_phone || '') === 'other'
-                                                                                    ? (contact.phone_other || '')
-                                                                                    : '',
-                                                                ext: (contact.phone_ext || ''),
-                                                                email: (contact.primary_email || '') === 'work'
-                                                                    ? (contact.email_work || '')
-                                                                    : (contact.primary_email || '') === 'personal'
-                                                                        ? (contact.email_personal || '')
-                                                                        : (contact.primary_email || '') === 'other'
-                                                                            ? (contact.email_other || '')
-                                                                            : '',
-                                                                mailing_contact_id: contact.id
+                                                if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
+                                                    contacts = (selectedCustomer?.contacts || []);
+
+                                                    let contact = contacts.find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+
+                                                    if (contact) {
+                                                        setSelectedCustomer(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                mailing_customer_contact_id: contact.id,
+                                                                mailing_address: {
+                                                                    ...(prev?.mailing_address || {}),
+                                                                    contact_phone: (contact.primary_phone || '') === 'work'
+                                                                        ? (contact.phone_work || '')
+                                                                        : (contact.primary_phone || '') === 'fax'
+                                                                            ? (contact.phone_work_fax || '')
+                                                                            : (contact.primary_phone || '') === 'mobile'
+                                                                                ? (contact.phone_mobile || '')
+                                                                                : (contact.primary_phone || '') === 'direct'
+                                                                                    ? (contact.phone_direct || '')
+                                                                                    : (contact.primary_phone || '') === 'other'
+                                                                                        ? (contact.phone_other || '')
+                                                                                        : '',
+                                                                    ext: (contact.phone_ext || ''),
+                                                                    email: (contact.primary_email || '') === 'work'
+                                                                        ? (contact.email_work || '')
+                                                                        : (contact.primary_email || '') === 'personal'
+                                                                            ? (contact.email_personal || '')
+                                                                            : (contact.primary_email || '') === 'other'
+                                                                                ? (contact.email_other || '')
+                                                                                : ''
+                                                                }
                                                             }
-                                                        }
-                                                    })
-                                                } else {
-                                                    setSelectedCustomer(selectedCustomer => {
-                                                        return {
-                                                            ...selectedCustomer,
-                                                            mailing_address: {
-                                                                ...(selectedCustomer?.mailing_address || {}),
-                                                                mailing_contact_id: null,
+                                                        })
+                                                    } else {
+                                                        setSelectedCustomer(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                mailing_customer_contact_id: null
                                                             }
-                                                        }
-                                                    })
+                                                        })
+                                                    }
+                                                } else if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
+                                                    contacts = (selectedCustomer?.mailing_address?.contacts || []);
+
+                                                    let contact = contacts.find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
+
+                                                    if (contact) {
+                                                        setSelectedCustomer(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                mailing_customer_contact_id: contact.id,
+                                                                mailing_address: {
+                                                                    ...(prev?.mailing_address || {}),
+                                                                    contact_phone: (contact.primary_phone || '') === 'work'
+                                                                        ? (contact.phone_work || '')
+                                                                        : (contact.primary_phone || '') === 'fax'
+                                                                            ? (contact.phone_work_fax || '')
+                                                                            : (contact.primary_phone || '') === 'mobile'
+                                                                                ? (contact.phone_mobile || '')
+                                                                                : (contact.primary_phone || '') === 'direct'
+                                                                                    ? (contact.phone_direct || '')
+                                                                                    : (contact.primary_phone || '') === 'other'
+                                                                                        ? (contact.phone_other || '')
+                                                                                        : '',
+                                                                    ext: (contact.phone_ext || ''),
+                                                                    email: (contact.primary_email || '') === 'work'
+                                                                        ? (contact.email_work || '')
+                                                                        : (contact.primary_email || '') === 'personal'
+                                                                            ? (contact.email_personal || '')
+                                                                            : (contact.primary_email || '') === 'other'
+                                                                                ? (contact.email_other || '')
+                                                                                : ''
+                                                                }
+                                                            }
+                                                        })
+                                                    } else {
+                                                        setSelectedCustomer(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                mailing_customer_contact_id: null
+                                                            }
+                                                        })
+                                                    }
                                                 }
                                             }}
-                                            onInput={e => {
-                                                setSelectedCustomer(selectedCustomer => {
-                                                    return {
-                                                        ...selectedCustomer,
-                                                        mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                            contact_name: e.target.value
-                                                        }
-                                                    }
-                                                })
-                                            }}
                                             onChange={e => {
-                                                setSelectedCustomer(selectedCustomer => {
+                                                setSelectedCustomer(prev => {
                                                     return {
-                                                        ...selectedCustomer,
+                                                        ...prev,
                                                         mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                            ...(prev?.mailing_address || {}),
                                                             contact_name: e.target.value
                                                         }
                                                     }
                                                 })
                                             }}
-                                            value={selectedCustomer?.mailing_address?.contact_name || ''}
+                                            value={(selectedCustomer?.mailing_address?.contact_name || '')}
                                         />
 
                                         {
-                                            ((selectedCustomer?.contacts || []).length > 0 && ((selectedCustomer?.mailing_address?.id || 0) > 0)) &&
+                                            (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 && (selectedCustomer?.contacts || []).length > 0) ||
+                                                ((selectedCustomer?.mailing_customer_id || 0) > 0 && (selectedCustomer?.mailing_address?.contacts || []).length > 0)) &&
                                             ((props.user?.user_code?.is_admin || 0) === 1 ||
                                                 (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
@@ -2590,14 +3121,26 @@ const Customers = (props) => {
                                                     if (showMailingContactNames) {
                                                         setShowMailingContactNames(false);
                                                     } else {
-                                                        if ((selectedCustomer?.contacts || []).length > 0) {
-                                                            await setMailingContactNameItems((selectedCustomer?.contacts || []).map((item, index) => {
+                                                        let contacts = [];
+
+                                                        if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
+                                                            contacts = selectedCustomer?.contacts || [];
+                                                        }
+
+                                                        if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
+                                                            contacts = selectedCustomer?.mailing_address?.contacts || [];
+                                                        }
+
+
+
+                                                        if (contacts.length > 0) {
+                                                            await setMailingContactNameItems(contacts.map((item, index) => {
                                                                 item.selected = index === 0
                                                                 return item;
                                                             }))
 
-                                                            window.setTimeout(async () => {
-                                                                await setShowMailingContactNames(true);
+                                                            window.setTimeout(() => {
+                                                                setShowMailingContactNames(true);
 
                                                                 refMailingContactNamePopupItems.current.map((r, i) => {
                                                                     if (r && r.classList.contains('selected')) {
@@ -2609,7 +3152,7 @@ const Customers = (props) => {
                                                                     }
                                                                     return true;
                                                                 });
-                                                            }, 0)
+                                                            }, 100);
                                                         }
                                                     }
 
@@ -2646,11 +3189,23 @@ const Customers = (props) => {
                                                                             className={mochiItemClasses}
                                                                             id={item.id}
                                                                             onClick={async () => {
-                                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                                await setSelectedCustomer(prev => {
                                                                                     return {
-                                                                                        ...selectedCustomer,
+                                                                                        ...prev,
+                                                                                        mailing_customer_contact_id: item.id,
+                                                                                        mailing_customer_contact_primary_phone: (item.phone_work || '') !== ''
+                                                                                            ? 'work'
+                                                                                            : (item.phone_work_fax || '') !== ''
+                                                                                                ? 'fax'
+                                                                                                : (item.phone_mobile || '') !== ''
+                                                                                                    ? 'mobile'
+                                                                                                    : (item.phone_direct || '') !== ''
+                                                                                                        ? 'direct'
+                                                                                                        : (item.phone_other || '') !== ''
+                                                                                                            ? 'other' :
+                                                                                                            '',
                                                                                         mailing_address: {
-                                                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                                                            ...(prev?.mailing_address || {}),
                                                                                             contact_name: (item.first_name + ' ' + item.last_name).trim(),
                                                                                             contact_phone: (item.primary_phone || '') === 'work'
                                                                                                 ? (item.phone_work || '')
@@ -2670,20 +3225,7 @@ const Customers = (props) => {
                                                                                                     ? (item.email_personal || '')
                                                                                                     : (item.primary_email || '') === 'other'
                                                                                                         ? (item.email_other || '')
-                                                                                                        : '',
-                                                                                            mailing_contact: item,
-                                                                                            mailing_contact_id: item.id,
-                                                                                            mailing_contact_primary_phone: (item.phone_work || '') !== ''
-                                                                                                ? 'work'
-                                                                                                : (item.phone_work_fax || '') !== ''
-                                                                                                    ? 'fax'
-                                                                                                    : (item.phone_mobile || '') !== ''
-                                                                                                        ? 'mobile'
-                                                                                                        : (item.phone_direct || '') !== ''
-                                                                                                            ? 'direct'
-                                                                                                            : (item.phone_other || '') !== ''
-                                                                                                                ? 'other' :
-                                                                                                                ''
+                                                                                                        : ''
                                                                                         }
                                                                                     }
                                                                                 });
@@ -2721,9 +3263,10 @@ const Customers = (props) => {
                                     <div className="select-box-wrapper">
                                         <MaskedInput tabIndex={26 + props.tabTimes}
                                             readOnly={
-                                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.mailing_address?.id || 0) === 0
                                             }
                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                             guide={true}
@@ -2848,12 +3391,15 @@ const Customers = (props) => {
 
                                                     case 13: // enter
                                                         if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedCustomer({
-                                                                ...selectedCustomer,
-                                                                mailing_address: {
-                                                                    ...(selectedCustomer?.mailing_address || {}),
-                                                                    contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
-                                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                            await setSelectedCustomer(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    mailing_customer_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
+                                                                    mailing_address: {
+                                                                        ...(prev?.mailing_address || {}),
+                                                                        contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
+                                                                        ext: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].ext
+                                                                    }
                                                                 }
                                                             });
 
@@ -2866,12 +3412,15 @@ const Customers = (props) => {
                                                     case 9: // tab
                                                         if (showMailingContactPhones) {
                                                             e.preventDefault();
-                                                            await setSelectedCustomer({
-                                                                ...selectedCustomer,
-                                                                mailing_address: {
-                                                                    ...(selectedCustomer?.mailing_address || {}),
-                                                                    contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
-                                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                            await setSelectedCustomer(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    mailing_customer_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
+                                                                    mailing_address: {
+                                                                        ...(prev?.mailing_address || {}),
+                                                                        contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
+                                                                        ext: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].ext
+                                                                    }
                                                                 }
                                                             });
 
@@ -2886,44 +3435,34 @@ const Customers = (props) => {
                                                         break;
                                                 }
                                             }}
-                                            onInput={(e) => {
-                                                setSelectedCustomer(selectedCustomer => {
-                                                    return {
-                                                        ...selectedCustomer,
-                                                        mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                            contact_phone: e.target.value
-                                                        }
-                                                    }
-                                                })
-                                            }}
                                             onChange={(e) => {
-                                                setSelectedCustomer(selectedCustomer => {
+                                                setSelectedCustomer(prev => {
                                                     return {
-                                                        ...selectedCustomer,
+                                                        ...prev,
                                                         mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                            ...(prev?.mailing_address || {}),
                                                             contact_phone: e.target.value
                                                         }
                                                     }
                                                 })
                                             }}
-                                            value={selectedCustomer?.mailing_address?.contact_phone}
+                                            value={selectedCustomer?.mailing_address?.contact_phone || ''}
                                         />
 
                                         {
-                                            ((selectedCustomer?.id || 0) > 0 && (selectedCustomer?.mailing_address?.id !== undefined)) &&
+                                            (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) &&
+                                                (selectedCustomer?.mailing_customer_contact_id || 0) > 0) &&
                                             <div
                                                 className={classnames({
                                                     'selected-mailing-contact-primary-phone': true,
                                                     'pushed': (mailingContactPhoneItems.length > 1)
                                                 })}>
-                                                {selectedCustomer?.mailing_address?.mailing_contact_id ? (selectedCustomer?.mailing_address?.mailing_contact_primary_phone || '') : ''}
+                                                {selectedCustomer?.mailing_customer_contact_primary_phone || ''}
                                             </div>
                                         }
 
                                         {
-                                            (mailingContactPhoneItems.length > 1 && ((selectedCustomer?.mailing_address?.mailing_contact_id || 0) > 0)) &&
+                                            (mailingContactPhoneItems.length > 1 && ((selectedCustomer?.mailing_customer_contact_id || 0) > 0)) &&
                                             ((props.user?.user_code?.is_admin || 0) === 1 ||
                                                 (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
@@ -2988,12 +3527,15 @@ const Customers = (props) => {
                                                                             className={mochiItemClasses}
                                                                             id={item.id}
                                                                             onClick={async () => {
-                                                                                await setSelectedCustomer({
-                                                                                    ...selectedCustomer,
-                                                                                    mailing_address: {
-                                                                                        ...(selectedCustomer?.mailing_address || {}),
-                                                                                        contact_phone: item.phone,
-                                                                                        mailing_contact_primary_phone: item.type
+                                                                                await setSelectedCustomer(prev => {
+                                                                                    return {
+                                                                                        ...prev,
+                                                                                        mailing_customer_contact_primary_phone: item.type,
+                                                                                        mailing_address: {
+                                                                                            ...(prev?.mailing_address || {}),
+                                                                                            contact_phone: item.phone,
+                                                                                            ext: item.ext
+                                                                                        }
                                                                                     }
                                                                                 });
 
@@ -3043,33 +3585,29 @@ const Customers = (props) => {
                                 <div className="input-box-container input-phone-ext">
                                     <input tabIndex={27 + props.tabTimes} type="text" placeholder="Ext"
                                         readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                            (selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0
                                         }
-                                        onInput={e => {
-                                            setSelectedCustomer(selectedCustomer => {
-                                                return {
-                                                    ...selectedCustomer,
-                                                    mailing_address: {
-                                                        ...(selectedCustomer?.mailing_address || {}),
-                                                        ext: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
                                         onChange={e => {
-                                            setSelectedCustomer(selectedCustomer => {
+                                            setSelectedCustomer(prev => {
                                                 return {
-                                                    ...selectedCustomer,
+                                                    ...prev,
                                                     mailing_address: {
-                                                        ...(selectedCustomer?.mailing_address || {}),
+                                                        ...(prev?.mailing_address || {}),
                                                         ext: e.target.value
                                                     }
                                                 }
                                             })
                                         }}
-                                        value={selectedCustomer?.mailing_address?.ext || ''} />
+                                        value={
+                                            (selectedCustomer?.mailing_customer_contact_id || 0) > 0
+                                                ? (selectedCustomer?.mailing_customer_contact_primary_phone || '') === 'work'
+                                                    ? selectedCustomer?.mailing_address?.ext || ''
+                                                    : ''
+                                                : selectedCustomer?.mailing_address?.ext || ''
+                                        } />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
@@ -3097,9 +3635,10 @@ const Customers = (props) => {
                                     <div className="select-box-wrapper">
                                         <input tabIndex={28 + props.tabTimes} type="text" placeholder="E-Mail"
                                             readOnly={
-                                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0
+                                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
+                                                (selectedCustomer?.mailing_address?.id || 0) === 0
                                             }
                                             ref={refMailingContactEmail}
                                             onKeyDown={async (e) => {
@@ -3222,12 +3761,14 @@ const Customers = (props) => {
 
                                                     case 13: // enter
                                                         if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedCustomer({
-                                                                ...selectedCustomer,
-                                                                mailing_address: {
-                                                                    ...(selectedCustomer?.mailing_address || {}),
-                                                                    email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
-                                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                            await setSelectedCustomer(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    mailing_customer_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
+                                                                    mailing_address: {
+                                                                        ...(prev?.mailing_address || {}),
+                                                                        email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email
+                                                                    }
                                                                 }
                                                             });
 
@@ -3240,20 +3781,31 @@ const Customers = (props) => {
                                                     case 9: // tab
                                                         if (showMailingContactEmails) {
                                                             e.preventDefault();
-                                                            await setSelectedCustomer({
-                                                                ...selectedCustomer,
-                                                                mailing_address: {
-                                                                    ...(selectedCustomer?.mailing_address || {}),
-                                                                    email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email,
-                                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                            await setSelectedCustomer(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    mailing_customer_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
+                                                                    mailing_address: {
+                                                                        ...(prev?.mailing_address || {}),
+                                                                        email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email
+                                                                    }
                                                                 }
                                                             });
 
-                                                            validateMailingAddressForSaving({ keyCode: 9 });
+                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) {
+                                                                validateCustomerForSaving({ keyCode: 9 });
+                                                            } else if ((selectedCustomer?.id || 0) > 0) {
+                                                                validateMailingAddressForSaving({ keyCode: 9 });
+                                                            }
+
                                                             setShowMailingContactEmails(false);
                                                             refMailingContactEmail.current.focus();
                                                         } else {
-                                                            validateMailingAddressForSaving({ keyCode: 9 });
+                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) {
+                                                                validateCustomerForSaving({ keyCode: 9 });
+                                                            } else if ((selectedCustomer?.id || 0) > 0) {
+                                                                validateMailingAddressForSaving({ keyCode: 9 });
+                                                            }
                                                         }
                                                         break;
 
@@ -3261,23 +3813,12 @@ const Customers = (props) => {
                                                         break;
                                                 }
                                             }}
-                                            onInput={e => {
-                                                setSelectedCustomer(selectedCustomer => {
-                                                    return {
-                                                        ...selectedCustomer,
-                                                        mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                            email: e.target.value
-                                                        }
-                                                    }
-                                                })
-                                            }}
                                             onChange={e => {
-                                                setSelectedCustomer(selectedCustomer => {
+                                                setSelectedCustomer(prev => {
                                                     return {
-                                                        ...selectedCustomer,
+                                                        ...prev,
                                                         mailing_address: {
-                                                            ...(selectedCustomer?.mailing_address || {}),
+                                                            ...(prev?.mailing_address || {}),
                                                             email: e.target.value
                                                         }
                                                     }
@@ -3287,13 +3828,14 @@ const Customers = (props) => {
                                         />
 
                                         {
-                                            ((selectedCustomer?.id || 0) > 0 && (selectedCustomer?.mailing_address?.id !== undefined)) &&
+                                            (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) &&
+                                                (selectedCustomer?.mailing_customer_contact_id || 0) > 0) &&
                                             <div
                                                 className={classnames({
                                                     'selected-mailing-contact-primary-email': true,
                                                     'pushed': (mailingContactEmailItems.length > 1)
                                                 })}>
-                                                {(selectedCustomer?.mailing_address?.mailing_contact_id || 0) > 0 ? (selectedCustomer?.mailing_address?.mailing_contact_primary_email || '') : ''}
+                                                {selectedCustomer?.mailing_customer_contact_primary_email || ''}
                                             </div>
                                         }
 
@@ -3317,7 +3859,7 @@ const Customers = (props) => {
                                         }
 
                                         {
-                                            (mailingContactEmailItems.length > 1 && ((selectedCustomer?.mailing_address?.mailing_contact_id || 0) > 0)) &&
+                                            (mailingContactEmailItems.length > 1 && ((selectedCustomer?.mailing_customer_contact_id || 0) > 0)) &&
                                             ((props.user?.user_code?.is_admin || 0) === 1 ||
                                                 (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
@@ -3345,7 +3887,7 @@ const Customers = (props) => {
                                                                     }
                                                                     return true;
                                                                 });
-                                                            }, 0)
+                                                            }, 100)
                                                         }
                                                     }
 
@@ -3382,18 +3924,18 @@ const Customers = (props) => {
                                                                             className={mochiItemClasses}
                                                                             id={item.id}
                                                                             onClick={async () => {
-                                                                                await setSelectedCustomer(selectedCustomer => {
+                                                                                await setSelectedCustomer(prev => {
                                                                                     return {
-                                                                                        ...selectedCustomer,
+                                                                                        ...prev,
+                                                                                        mailing_customer_contact_primary_email: item.type,
                                                                                         mailing_address: {
-                                                                                            ...(selectedCustomer?.mailing_address || {}),
-                                                                                            email: item.email,
-                                                                                            mailing_contact_primary_email: item.type
+                                                                                            ...(prev?.mailing_address || {}),
+                                                                                            email: item.email
                                                                                         }
                                                                                     }
                                                                                 });
 
-                                                                                validateMailingAddressForSaving({ keyCode: 9 });
+                                                                                validateCustomerForSaving({ keyCode: 9 });
                                                                                 setShowMailingContactEmails(false);
                                                                                 refMailingContactEmail.current.focus();
                                                                             }}
@@ -5028,8 +5570,8 @@ const Customers = (props) => {
                                                     ...selectedCustomer,
                                                     selectedContact: {
                                                         id: 0,
-                                                        customer_id: selectedCustomer?.id,     
-                                                        company: selectedCustomer?.name || '',                                                   
+                                                        customer_id: selectedCustomer?.id,
+                                                        company: selectedCustomer?.name || '',
                                                         address1: selectedCustomer?.address1 || '',
                                                         address2: selectedCustomer?.address2 || '',
                                                         city: selectedCustomer?.city || '',
@@ -5508,7 +6050,7 @@ const Customers = (props) => {
                                                 ...selectedContact,
                                                 phone_ext: e.target.value
                                             })}
-                                            value={selectedContact.phone_ext || ''} />
+                                            value={(selectedContact?.primary_phone || '') === 'work' ? selectedContact.phone_ext || '' : ''} />
                                     </div>
                                     <div className="input-toggle-container">
                                         <input type="checkbox"
@@ -7418,8 +7960,8 @@ const Customers = (props) => {
 
                                                                 props.openPanel(panel, props.origin);
                                                             }} onClick={() => setSelectedContact(contact)}>
-                                                            <div className="contact-list-col tcol first-name" style={{textTransform: 'capitalize'}}>{contact.first_name}</div>
-                                                            <div className="contact-list-col tcol last-name" style={{textTransform: 'capitalize'}}>{contact.last_name}</div>
+                                                            <div className="contact-list-col tcol first-name" style={{ textTransform: 'capitalize' }}>{contact.first_name}</div>
+                                                            <div className="contact-list-col tcol last-name" style={{ textTransform: 'capitalize' }}>{contact.last_name}</div>
                                                             <div className="contact-list-col tcol phone-work">{
                                                                 contact.primary_phone === 'work' ? contact.phone_work
                                                                     : contact.primary_phone === 'fax' ? contact.phone_work_fax
@@ -7428,7 +7970,7 @@ const Customers = (props) => {
                                                                                 : contact.primary_phone === 'other' ? contact.phone_other
                                                                                     : ''
                                                             }</div>
-                                                            <div className="contact-list-col tcol email-work" style={{textTransform: 'lowercase'}}>{
+                                                            <div className="contact-list-col tcol email-work" style={{ textTransform: 'lowercase' }}>{
                                                                 contact.primary_email === 'work' ? contact.email_work
                                                                     : contact.primary_email === 'personal' ? contact.email_personal
                                                                         : contact.primary_email === 'other' ? contact.email_other
@@ -7495,7 +8037,7 @@ const Customers = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 1" style={{textTransform:'capitalize'}}
+                                                <input type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
                                                     tabIndex={52 + props.tabTimes}
                                                     onFocus={() => {
                                                         setShowingContactList(false)
@@ -7508,7 +8050,7 @@ const Customers = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 2" style={{textTransform:'capitalize'}}
+                                                <input type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
                                                     tabIndex={53 + props.tabTimes}
                                                     onFocus={() => {
                                                         setShowingContactList(false)
@@ -8135,7 +8677,9 @@ const Customers = (props) => {
                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                         (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer crm')?.pivot?.edit || 0) === 0))
                         ? 'mochi-button disabled wrap' : 'mochi-button wrap'
-                }>
+                } onClick={() => {
+                    window.open('https://crm.et3.dev/index.php?module=Users&action=Login', '_blank').focus();
+                }}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">CRM</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>

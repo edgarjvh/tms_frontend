@@ -887,48 +887,43 @@ export default class ToPrint extends Component {
                                 }}>
                                     <div style={{ ...this.styleFlexRow, marginBottom: 5 }}><span
                                         style={{ ...this.styleFieldName, width: '4rem' }}>CONTACT:</span> <span
-                                            style={{ ...this.styleFieldData }}>{
-                                                (this.props.selectedOrder?.carrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                    ? (this.props.selectedOrder?.carrier?.contact_name || '').toUpperCase()
-                                                    : (this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).first_name + ' ' + this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).last_name).toUpperCase()
-                                            }</span></div>
+                                            style={{ ...this.styleFieldData, textTransform: 'capitalize' }}>{
+                                                (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.first_name || ''
+                                            } {
+                                                (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.last_name || ''
+                                            }
+                                        </span>
+                                    </div>
+
                                     <div style={{ ...this.styleFlexRow, marginBottom: 5 }}>
                                         <span style={{ ...this.styleFieldName, width: '4rem' }}>PHONE:</span><span
                                             style={{ ...this.styleFieldData, marginRight: 5 }}>{
-                                                (this.props.selectedOrder?.carrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                    ? (this.props.selectedOrder?.carrier?.contact_phone || '')
-                                                    : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'work'
-                                                        ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).phone_work
-                                                        : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'fax'
-                                                            ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                                            : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'mobile'
-                                                                ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                                                : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'direct'
-                                                                    ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).phone_direct
-                                                                    : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_phone === 'other'
-                                                                        ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).phone_other
-                                                                        : ''
+                                                (this.props.selectedOrder?.carrier_contact_primary_phone || '') === 'work'
+                                                    ? (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.phone_work || ''
+                                                    : (this.props.selectedOrder?.carrier_contact_primary_phone || '') === 'fax'
+                                                        ? (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.phone_work_fax || ''
+                                                        : (this.props.selectedOrder?.carrier_contact_primary_phone || '') === 'mobile'
+                                                            ? (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.phone_mobile || ''
+                                                            : (this.props.selectedOrder?.carrier_contact_primary_phone || '') === 'direct'
+                                                                ? (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.phone_direct || ''
+                                                                : (this.props.selectedOrder?.carrier_contact_primary_phone || '') === 'other'
+                                                                    ? (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.phone_other || ''
+                                                                    : ''
                                             }</span>
                                         <span style={{ ...this.styleFieldName, width: '1.5rem' }}>Ext:</span><span
                                             style={{ ...this.styleFieldData }}>{
-                                                (this.props.selectedOrder?.carrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                    ? (this.props.selectedOrder?.carrier?.ext || '')
-                                                    : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).phone_ext
+                                                (this.props.selectedOrder?.carrier_contact_primary_phone || '') === 'work'
+                                                    ? (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.phone_ext || ''
+                                                    : ''
                                             }</span>
                                     </div>
                                     <div style={{ ...this.styleFlexRow }}><span
                                         style={{ ...this.styleFieldName, width: '4rem' }}>E-MAIL:</span> <span
-                                            style={{ ...this.styleFieldData }}>{(
-                                                (this.props.selectedOrder?.carrier?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                                    ? (this.props.selectedOrder?.carrier?.contact_phone || '')
-                                                    : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_email === 'work'
-                                                        ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).email_work
-                                                        : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_email === 'personal'
-                                                            ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).email_personal
-                                                            : this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).primary_email === 'other'
-                                                                ? this.props.selectedOrder?.carrier?.contacts.find(c => c.is_primary === 1).email_other
-                                                                : ''
-                                            ).toLowerCase()}</span></div>
+                                            style={{ ...this.styleFieldData, textTransform: 'lowercase' }}>
+                                                {
+                                                    (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.email_work || ''
+                                                }
+                                            </span></div>
                                 </div>
                             </div>
                         </div>

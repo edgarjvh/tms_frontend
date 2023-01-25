@@ -158,7 +158,7 @@ import {
 
 } from '../../actions/carriersActions';
 
-import {Dispatch, Customers, Carriers, Reports, Invoice} from './../company';
+import { Dispatch, Customers, Carriers, Reports, Invoice } from './../company';
 import { AdminHome, CompanySetup } from './';
 
 function Admin(props) {
@@ -628,23 +628,23 @@ function Admin(props) {
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
-                        {/*<div className="section chat-video-buttons">*/}
-                        {/*    <div className="mochi-button" onClick={() => {*/}
-                        {/*        window.open('', '_blank').focus();*/}
-                        {/*    }}>*/}
-                        {/*        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>*/}
-                        {/*        <div className="mochi-button-base">Chat</div>*/}
-                        {/*        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>*/}
-                        {/*    </div>*/}
+                        <div className="section chat-video-buttons">
+                            <div className="mochi-button" onClick={() => {
+                                window.open('https://mm.et3.dev', '_blank').focus();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Chat</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
 
-                        {/*    <div className="mochi-button" onClick={() => {*/}
-                        {/*        window.open('', '_blank').focus();*/}
-                        {/*    }}>*/}
-                        {/*        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>*/}
-                        {/*        <div className="mochi-button-base">Video</div>*/}
-                        {/*        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+                            <div className="mochi-button" onClick={() => {
+                                window.open('https://meet.et3.dev/', '_blank').focus();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Video</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
                         <div className="section">
                             <div className="mochi-input-decorator">
                                 <input type="search" placeholder="just type" id="txt-main-search" />
@@ -757,16 +757,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            tabIndex='0'
-                                            onKeyDown={(e) => {
-                                                let key = e.keyCode || e.which;
+                                                tabIndex='0'
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                if (key === 27){
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    closePanel(panel?.panelName, origin);
-                                                }
-                                            }}
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -819,16 +819,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            tabIndex='0'
-                                            onKeyDown={(e) => {
-                                                let key = e.keyCode || e.which;
+                                                tabIndex='0'
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                if (key === 27){
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    closePanel(panel?.panelName, origin);
-                                                }
-                                            }}>
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}>
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
                                                 {
@@ -892,16 +892,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            tabIndex='0'
-                                            onKeyDown={(e) => {
-                                                let key = e.keyCode || e.which;
+                                                tabIndex='0'
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                if (key === 27){
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    closePanel(panel?.panelName, origin);
-                                                }
-                                            }}>
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}>
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
                                                 {
@@ -965,16 +965,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            tabIndex='0'
-                                            onKeyDown={(e) => {
-                                                let key = e.keyCode || e.which;
+                                                tabIndex='0'
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                if (key === 27){
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    closePanel(panel?.panelName, origin);
-                                                }
-                                            }}>
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}>
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
                                                 {
@@ -1040,16 +1040,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            tabIndex='0'
-                                            onKeyDown={(e) => {
-                                                let key = e.keyCode || e.which;
+                                                tabIndex='0'
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                if (key === 27){
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    closePanel(panel?.panelName, origin);
-                                                }
-                                            }}
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -1113,23 +1113,23 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            tabIndex='0'
-                                            onKeyDown={(e) => {
-                                                let key = e.keyCode || e.which;
+                                                tabIndex='0'
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                if (key === 27){
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    closePanel(panel?.panelName, origin);
-                                                }
-                                            }}
-                                                // onClick={() => {
-                                                //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                                //     // let _panels = [...props.customerOpenedPanels];
-                                                //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
+                                            // onClick={() => {
+                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                            //     // let _panels = [...props.customerOpenedPanels];
+                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
 
-                                                //     // props.setCustomerOpenedPanels(_panels);
-                                                // }}
+                                            //     // props.setCustomerOpenedPanels(_panels);
+                                            // }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -1194,16 +1194,16 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                            tabIndex='0'
-                                            onKeyDown={(e) => {
-                                                let key = e.keyCode || e.which;
+                                                tabIndex='0'
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                if (key === 27){
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    closePanel(panel?.panelName, origin);
-                                                }
-                                            }}
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             // onClick={() => {
                                             //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
                                             //     // let _panels = [...props.customerOpenedPanels];
