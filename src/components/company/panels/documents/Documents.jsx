@@ -535,7 +535,7 @@ const Documents = (props) => {
                         </div>
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -561,7 +561,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || (props.suborigin === 'order' && (props.origin === 'invoice' || props.origin === 'dispatch'))) &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || (props.suborigin === 'order' && (props.origin === 'invoice' || props.origin === 'dispatch')))) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -587,7 +587,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing' && props.origin === 'invoice') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing' && props.origin === 'invoice')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -613,7 +613,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -639,7 +639,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -665,7 +665,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -691,7 +691,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -717,7 +717,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-agent' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -743,7 +743,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -769,7 +769,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring-company') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier' || props.suborigin === 'factoring-company')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -795,7 +795,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'carrier')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -821,7 +821,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (props.suborigin === 'carrier' || props.suborigin === 'factoring-company') &&
+                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'carrier' || props.suborigin === 'factoring-company')) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -851,6 +851,7 @@ const Documents = (props) => {
                         <div className="input-box-container">
                             <input
                                 readOnly={
+                                    (selectedOwner?.is_cancelled || 0) === 1 ||
                                     (selectedOwnerDocument.id || 0) > 0 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -875,6 +876,7 @@ const Documents = (props) => {
                                     setSelectedOwnerDocument({ ...selectedOwnerDocument, subject: e.target.value })
                                 }}
                                 readOnly={
+                                    (selectedOwner?.is_cancelled || 0) === 1 ||
                                     (selectedOwnerDocument.id || 0) > 0 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -930,6 +932,7 @@ const Documents = (props) => {
                                     setSelectedOwnerDocumentTags(e.target.value)
                                 }}
                                 readOnly={
+                                    (selectedOwner?.is_cancelled || 0) === 1 ||
                                     (selectedOwnerDocument.id || 0) > 0 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -941,6 +944,7 @@ const Documents = (props) => {
 
                 <div className="documents-right-side">
                     <div className={
+                        (selectedOwner?.is_cancelled || 0) === 1 ||
                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                             (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
@@ -953,6 +957,7 @@ const Documents = (props) => {
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                     </div>
                     <div className={
+                        (selectedOwner?.is_cancelled || 0) === 1 ||
                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                             (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
@@ -965,13 +970,14 @@ const Documents = (props) => {
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                     </div>
                     <div className={
+                        (selectedOwner?.is_cancelled || 0) === 1 ||
                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                             (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
                             ? 'mochi-button disabled' : 'mochi-button'
                     } style={{
                         fontSize: '1.5rem',
-                        pointerEvents: (selectedOwnerDocument.id || 0) > 0 ||
+                        pointerEvents: (selectedOwner?.is_cancelled || 0) === 1 || (selectedOwnerDocument.id || 0) > 0 ||
                             ((props.user?.user_code?.is_admin || 0) === 0 &&
                                 (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
@@ -1027,52 +1033,54 @@ const Documents = (props) => {
 
                                     return (
                                         <div className={itemClasses} key={index} onClick={() => {
-                                            let getDocumentNotesUrl = '';
-
-                                            switch (props.suborigin) {
-                                                case 'company-employee':
-                                                    getDocumentNotesUrl = '/getNotesByEmployeeDocument';
-                                                    break;
-                                                case 'company-agent':
-                                                    getDocumentNotesUrl = '/getNotesByAgentDocument';
-                                                    break;
-                                                case 'company-driver':
-                                                    getDocumentNotesUrl = '/getNotesByDriverDocument';
-                                                    break;
-                                                case 'company-operator':
-                                                    getDocumentNotesUrl = '/getNotesByOperatorDocument';
-                                                    break;
-                                                case 'customer':
-                                                    getDocumentNotesUrl = '/getNotesByCustomerDocument';
-                                                    break;
-                                                case 'carrier':
-                                                    getDocumentNotesUrl = '/getNotesByCarrierDocument';
-                                                    break;
-                                                case 'factoring-company':
-                                                    getDocumentNotesUrl = '/getNotesByFactoringCompanyDocument';
-                                                    break;
-                                                case 'order':
-                                                    getDocumentNotesUrl = '/getNotesByOrderDocument';
-                                                    break;
-                                                case 'order-billing':
-                                                    getDocumentNotesUrl = '/getNotesByOrderBillingDocument';
-                                                    break;
-                                                case 'division':
-                                                    getDocumentNotesUrl = '/getNotesByDivisionDocument';
-                                                    break;
-                                                default:
-                                                    break;
-                                            }
-
-                                            axios.post(props.serverUrl + getDocumentNotesUrl, {
-                                                doc_id: document.id,
-                                            }).then(res => {
-                                                if (res.data.result === 'OK') {
-                                                    document.notes = [...res.data.documentNotes]
+                                            if ((selectedOwner?.is_cancelled || 0) === 0){
+                                                let getDocumentNotesUrl = '';
+    
+                                                switch (props.suborigin) {
+                                                    case 'company-employee':
+                                                        getDocumentNotesUrl = '/getNotesByEmployeeDocument';
+                                                        break;
+                                                    case 'company-agent':
+                                                        getDocumentNotesUrl = '/getNotesByAgentDocument';
+                                                        break;
+                                                    case 'company-driver':
+                                                        getDocumentNotesUrl = '/getNotesByDriverDocument';
+                                                        break;
+                                                    case 'company-operator':
+                                                        getDocumentNotesUrl = '/getNotesByOperatorDocument';
+                                                        break;
+                                                    case 'customer':
+                                                        getDocumentNotesUrl = '/getNotesByCustomerDocument';
+                                                        break;
+                                                    case 'carrier':
+                                                        getDocumentNotesUrl = '/getNotesByCarrierDocument';
+                                                        break;
+                                                    case 'factoring-company':
+                                                        getDocumentNotesUrl = '/getNotesByFactoringCompanyDocument';
+                                                        break;
+                                                    case 'order':
+                                                        getDocumentNotesUrl = '/getNotesByOrderDocument';
+                                                        break;
+                                                    case 'order-billing':
+                                                        getDocumentNotesUrl = '/getNotesByOrderBillingDocument';
+                                                        break;
+                                                    case 'division':
+                                                        getDocumentNotesUrl = '/getNotesByDivisionDocument';
+                                                        break;
+                                                    default:
+                                                        break;
                                                 }
-
-                                                setSelectedOwnerDocument(document);
-                                            });
+    
+                                                axios.post(props.serverUrl + getDocumentNotesUrl, {
+                                                    doc_id: document.id,
+                                                }).then(res => {
+                                                    if (res.data.result === 'OK') {
+                                                        document.notes = [...res.data.documentNotes]
+                                                    }
+    
+                                                    setSelectedOwnerDocument(document);
+                                                });
+                                            }
                                         }}>
                                             <div className="item-info">
                                                 <span className={docIconClasses}></span>
@@ -1090,8 +1098,8 @@ const Documents = (props) => {
                                                 }
                                             </div>
                                             {
-                                                ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 1)) &&
+                                                ((selectedOwner?.is_cancelled || 0) === 0 && ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 1))) &&
                                                 <div className="item-btn" style={{ marginLeft: 5 }} onClick={(e) => {
                                                     e.stopPropagation();
 
@@ -1268,6 +1276,7 @@ const Documents = (props) => {
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
                             <div className={
+                                (selectedOwner?.is_cancelled || 0) === 1 ||
                                 ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
@@ -1399,7 +1408,7 @@ const Documents = (props) => {
                     <Modal
                         selectedData={selectedOwnerDocumentNote}
                         setSelectedData={setSelectedOwnerDocumentNote}
-                        selectedParent={selectedOwnerDocument}
+                        selectedParent={{...selectedOwnerDocument, is_cancelled: selectedOwner?.is_cancelled || 0}}
 
                         setSelectedParent={(data) => {
                             setSelectedOwnerDocument({

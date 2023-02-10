@@ -111,7 +111,7 @@ const Modal = (props) => {
 
                     <textarea placeholder='Type some text'
                         ref={refText}
-                        disabled={!isEditing && !props.isAdding}
+                        disabled={!isEditing && !props.isAdding && (props.selectedParent?.is_cancelled || 0) === 1}
                         value={
                             (isEditing || props.isAdding)
                                 ? props.selectedData.text
@@ -149,43 +149,57 @@ const Modal = (props) => {
                             {
                                 (props.isDeletable && !isEditing && !props.isAdding) &&
                                 <div className="mochi-button" style={{
-                                    marginRight: 5
+                                    marginRight: 5,
+                                    pointerEvents: (props.selectedParent?.is_cancelled || 0) === 0 ? 'all' : 'none'
                                 }}
                                     onClick={deleteData}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Delete</div>
+                                    <div className="mochi-button-base" style={{
+                                        color: (props.selectedParent?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
+                                    }}>Delete</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             }
                             {
                                 (props.isEditable && !isEditing && !props.isAdding) &&
-                                <div className="mochi-button" onClick={() => {
+                                <div className="mochi-button" style={{
+                                    pointerEvents: (props.selectedParent?.is_cancelled || 0) === 0 ? 'all' : 'none'
+                                }} onClick={() => {
                                     props.setSelectedData({...props.selectedData, oldText: props.selectedData.text})
                                     setIsEditing(true);
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Edit</div>
+                                    <div className="mochi-button-base" style={{
+                                        color: (props.selectedParent?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
+                                    }}>Edit</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             }
                             {
                                 (isEditing && !props.isAdding) &&
                                 <div className="mochi-button" style={{
-                                    marginRight: 5
+                                    marginRight: 5,
+                                    pointerEvents: (props.selectedParent?.is_cancelled || 0) === 0 ? 'all' : 'none'
                                 }} onClick={() => {
                                     props.setSelectedData({...props.selectedData, text: props.selectedData.oldText})
                                     setIsEditing(false);                                   
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Cancel</div>
+                                    <div className="mochi-button-base" style={{
+                                        color: (props.selectedParent?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
+                                    }}>Cancel</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             }
                             {
                                 (isEditing || props.isAdding) &&
-                                <div className="mochi-button" onClick={saveData}>
+                                <div className="mochi-button" style={{
+                                    pointerEvents: (props.selectedParent?.is_cancelled || 0) === 0 ? 'all' : 'none'
+                                }} onClick={saveData}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Save</div>
+                                    <div className="mochi-button-base" style={{
+                                        color: (props.selectedParent?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
+                                    }}>Save</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             }

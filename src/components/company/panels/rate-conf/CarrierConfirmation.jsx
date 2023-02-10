@@ -50,6 +50,14 @@ export default class CarrierConfirmation extends Component {
         /> */}
 
             <div className="container-sheet">
+                {/* CANCELLED WATERMARK */}
+                {
+                    (this.props.selected_order?.is_cancelled || 0) === 1 &&
+                    <div className='watermark-container'>
+                        <p>CANCELLED</p>
+                    </div>
+                }
+
                 {/* PAGE BLOCK */}
                 <div className="page-block" style={{ paddingTop: "2rem" }}>
                     <div
@@ -623,6 +631,13 @@ export default class CarrierConfirmation extends Component {
             <div className="no-print" style={{ height: "2rem" }}></div>
 
             <div className="container-sheet">
+                {/* CANCELLED WATERMARK */}
+                {
+                    (this.props.selected_order?.is_cancelled || 0) === 1 &&
+                    <div className='watermark-container'>
+                        <p>CANCELLED</p>
+                    </div>
+                }
                 {/* PAGE BLOCK */}
                 <div
                     className="page-block"

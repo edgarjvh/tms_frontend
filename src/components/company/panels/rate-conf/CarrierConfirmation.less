@@ -2,6 +2,28 @@
     background-color: white;
     box-shadow: 2px 2px 2px 0 rgba(0,0,0,0.7);
     padding: 0 15mm;
+    position: relative;
+
+    .watermark-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: rotate(315deg) translate(-50%, -50%);
+        transform-origin: 0 0;
+        transform-style: preserve-3d;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        p {
+            font-size: 10rem;
+            margin: 0;
+            padding: 0;
+            color: rgba(255, 0, 0,0.1)
+
+            
+        }
+    }
 
     &:last-child{
         margin-bottom: 2rem;

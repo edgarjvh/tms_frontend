@@ -58,6 +58,15 @@ export default class ToPrint extends Component {
 
 
                 <div className="container-sheet">
+
+                    {/* CANCELLED WATERMARK */}
+                    {
+                        (this.props.selectedOrder?.is_cancelled || 0) === 1 &&
+                        <div className='watermark-container'>
+                            <p>CANCELLED</p>
+                        </div>
+                    }
+
                     {/* PAGE BLOCK */}
                     <div className="page-block" style={{ paddingTop: '1.5rem' }}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
@@ -920,10 +929,10 @@ export default class ToPrint extends Component {
                                     <div style={{ ...this.styleFlexRow }}><span
                                         style={{ ...this.styleFieldName, width: '4rem' }}>E-MAIL:</span> <span
                                             style={{ ...this.styleFieldData, textTransform: 'lowercase' }}>
-                                                {
-                                                    (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.email_work || ''
-                                                }
-                                            </span></div>
+                                            {
+                                                (this.props.selectedOrder?.carrier?.contacts || []).find(x => x.id === this.props.selectedOrder?.carrier_contact_id)?.email_work || ''
+                                            }
+                                        </span></div>
                                 </div>
                             </div>
                         </div>

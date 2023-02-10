@@ -70,6 +70,13 @@ export default class ToPrint extends Component {
                     gridTemplateColumns: '1fr',
                     gridTemplateRows: 'auto auto 1fr auto'
                 }}>
+                    {/* CANCELLED WATERMARK */}
+                    {
+                        (this.props.selectedOrder?.is_cancelled || 0) === 1 &&
+                        <div className='watermark-container'>
+                            <p>CANCELLED</p>
+                        </div>
+                    }
 
                     <div style={{
                         marginTop: '2rem',

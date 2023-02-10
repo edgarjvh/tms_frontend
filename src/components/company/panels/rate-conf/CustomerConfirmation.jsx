@@ -53,6 +53,14 @@ export default class CustomerConfirmation extends Component {
 
 
                 <div className="container-sheet">
+                    {/* CANCELLED WATERMARK */}
+                    {
+                        (this.props.selected_order?.is_cancelled || 0) === 1 &&
+                        <div className='watermark-container'>
+                            <p>CANCELLED</p>
+                        </div>
+                    }
+
                     {/* PAGE BLOCK */}
                     <div className="page-block" style={{ paddingTop: '2rem' }}>
 

@@ -703,8 +703,10 @@ const Customers = (props) => {
 
                 axios.post(props.serverUrl + '/saveCustomerMailingAddress', mailing_address).then(res => {
                     if (res.data.result === 'OK') {
-                        setSelectedCustomer(_selectedCustomer => {
-                            return { ..._selectedCustomer, mailing_address: res.data.mailing_address }
+                        setSelectedCustomer(prev => {
+                            {
+                                return { ...prev, mailing_address: res.data.mailing_address }
+                            }
                         });
 
                         props.setSelectedCustomer({

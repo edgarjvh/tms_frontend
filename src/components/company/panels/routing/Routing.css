@@ -10,6 +10,18 @@
   align-items: center;
   color: #333738;
 }
+.panel-content.routing .selected-carrier-contact-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.panel-content.routing .selected-carrier-contact-primary-phone.pushed {
+  right: 20px;
+}
 .panel-content.routing .routing-pickup-container {
   flex-grow: 1;
   position: relative;

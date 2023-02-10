@@ -20,7 +20,7 @@ import {
     setSelectedOrder
 } from './../../../../actions';
 
-import {RatingModal} from './../../panels';
+import { RatingModal } from './../../panels';
 
 var delayTimer = null;
 
@@ -542,9 +542,9 @@ const RatingScreen = (props) => {
 
                         setSelectedBillToRating({});
                         refBillToRateTypes.current.focus();
-                    }else if(res.data.result === 'OVERDRAWN'){
+                    } else if (res.data.result === 'OVERDRAWN') {
                         setShowApprovalRequired(true);
-                    }else {
+                    } else {
                         window.alert('An error occurred while saving');
                         refBillToTotalCharges.current.inputElement.focus();
                     }
@@ -734,12 +734,12 @@ const RatingScreen = (props) => {
                     }
 
                     if ((selectedCarrierRating.total_charges || 0) === 0) {
-                        if ((selectedCarrierRating?.rate_type?.name || '').toLowerCase() !== 'comment'){
+                        if ((selectedCarrierRating?.rate_type?.name || '').toLowerCase() !== 'comment') {
                             window.alert('You must enter the total charges!');
                             refCarrierTotalCharges.current.inputElement.focus();
                             return;
                         }
-                        
+
                     }
                 }
 
@@ -777,7 +777,7 @@ const RatingScreen = (props) => {
 
                         setSelectedCarrierRating({});
                         refCarrierRateTypes.current.focus();
-                    } else {                        
+                    } else {
                         window.alert('An error occurred while saving');
                         refCarrierTotalCharges.current.inputElement.focus();
                     }
@@ -808,12 +808,16 @@ const RatingScreen = (props) => {
                         <div className='form-title'>Customer Charges</div>
                         <div className='top-border top-border-middle'></div>
                         <div className="form-buttons">
-                            <div className="mochi-button" onClick={() => {
+                            <div className="mochi-button" style={{
+                                pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
+                            }} onClick={() => {
                                 setSelectedBillToRating({});
                                 refBillToRateTypes.current.focus();
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Clear</div>
+                                <div className="mochi-button-base" style={{
+                                    color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
+                                }}>Clear</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -914,195 +918,199 @@ const RatingScreen = (props) => {
                                     className={classnames({
                                         'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
                                     })}
-                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                    readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1 || (selectedOrder?.is_cancelled || 0) === 1}
                                     ref={refBillToRateTypes}
                                     onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (billToRateTypeItems.length > 0) {
-                                                        let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (billToRateTypeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refBillToRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (billToRateTypeItems.length > 0) {
-                                                        let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === (billToRateTypeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refBillToRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setBillToRateTypeItems([]);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (billToRateTypeItems.length > 0 && billToRateTypeItems.findIndex(item => item.selected) > -1) {
-                                                        setSelectedBillToRating({
-                                                            ...selectedBillToRating,
-                                                            rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
-                                                                ? ''
-                                                                : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
-
-                                                        window.setTimeout(() => {
-                                                            setBillToRateTypeItems([]);
-                                                            refBillToDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
-
-                                                case 9: // tab
-                                                    if (billToRateTypeItems.length > 0) {
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            let key = e.keyCode || e.which;
+                                            if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                                switch (key) {
+                                                    case 37: case 38: // arrow left | arrow up
                                                         e.preventDefault();
-                                                        setSelectedBillToRating({
-                                                            ...selectedBillToRating,
-                                                            rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
-                                                                ? ''
-                                                                : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                        if (billToRateTypeItems.length > 0) {
+                                                            let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
 
-                                                        window.setTimeout(() => {
-                                                            setBillToRateTypeItems([]);
-                                                            refBillToDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                            if (selectedIndex === -1) {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (billToRateTypeItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                default:
-                                                    break;
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedBillToRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 39: case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (billToRateTypeItems.length > 0) {
+                                                            let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
+
+                                                            if (selectedIndex === -1) {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === (billToRateTypeItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
+
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedBillToRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 27: // escape
+                                                        setBillToRateTypeItems([]);
+                                                        break;
+
+                                                    case 13: // enter
+                                                        if (billToRateTypeItems.length > 0 && billToRateTypeItems.findIndex(item => item.selected) > -1) {
+                                                            setSelectedBillToRating({
+                                                                ...selectedBillToRating,
+                                                                rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                    billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
+                                                                    ? ''
+                                                                    : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setBillToRateTypeItems([]);
+                                                                refBillToDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    case 9: // tab
+                                                        if (billToRateTypeItems.length > 0) {
+                                                            e.preventDefault();
+                                                            setSelectedBillToRating({
+                                                                ...selectedBillToRating,
+                                                                rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                    billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
+                                                                    ? ''
+                                                                    : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setBillToRateTypeItems([]);
+                                                                refBillToDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
                                             }
                                         }
                                     }}
                                     onBlur={() => {
-                                        if ((selectedBillToRating.rate_type?.id || 0) === 0) {
-                                            setSelectedBillToRating({})
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            if ((selectedBillToRating.rate_type?.id || 0) === 0) {
+                                                setSelectedBillToRating({})
+                                            }
                                         }
                                     }}
                                     onInput={(e) => {
@@ -1172,67 +1180,70 @@ const RatingScreen = (props) => {
                                     }}
                                     value={selectedBillToRating.rate_type?.name || ''}
                                 />
-                                <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                        if (billToRateTypeItems.length > 0) {
-                                            setBillToRateTypeItems([]);
-                                        } else {
-                                            if ((selectedBillToRating.rate_type?.id || 0) === 0 && (selectedBillToRating.rate_type?.name || '') !== '') {
-                                                axios.post(props.serverUrl + '/getRateTypes', {
-                                                    name: selectedBillToRating.rate_type?.name
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_type?.id;
-                                                            return item;
-                                                        }))
-
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                {
+                                    (selectedOrder?.is_cancelled || 0) === 0 &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                            if (billToRateTypeItems.length > 0) {
+                                                setBillToRateTypeItems([]);
                                             } else {
-                                                axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_type?.id;
-                                                            return item;
-                                                        }))
+                                                if ((selectedBillToRating.rate_type?.id || 0) === 0 && (selectedBillToRating.rate_type?.name || '') !== '') {
+                                                    axios.post(props.serverUrl + '/getRateTypes', {
+                                                        name: selectedBillToRating.rate_type?.name
+                                                    }).then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedBillToRating.rate_type?.id;
+                                                                return item;
+                                                            }))
 
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedBillToRating.rate_type?.id;
+                                                                return item;
+                                                            }))
+
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                }
                                             }
-                                        }
 
-                                        refBillToRateTypes.current.focus();
-                                    }
-                                }} />
+                                            refBillToRateTypes.current.focus();
+                                        }
+                                    }} />
+                                }
                             </div>
                             {
                                 billToRateTypeTransition((style, item) => item && (
@@ -1271,7 +1282,7 @@ const RatingScreen = (props) => {
                                                                             rate_type: item,
                                                                             description: (item.name.toLowerCase() === 'flat' ||
                                                                                 item.name.toLowerCase() === 'linehaul' ||
-                                                                                item.name.toLowerCase() === 'comment' )
+                                                                                item.name.toLowerCase() === 'comment')
                                                                                 ? ''
                                                                                 : item.name,
                                                                             rate_subtype: {},
@@ -1327,21 +1338,25 @@ const RatingScreen = (props) => {
                                 className={classnames({
                                     'disabled': (selectedOrder?.invoice_customer_reviewed || 0) === 1
                                 })}
-                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_customer_reviewed || 0) === 1 || (selectedOrder?.is_cancelled || 0) === 1}
                                 ref={refBillToDescription}
                                 onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
+                                    if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                        let key = e.keyCode || e.which;
 
-                                    if (key === 9) {
-                                        if ((selectedBillToRating?.rate_type?.id || 0) === 0 || (selectedBillToRating?.rate_type?.name || '').toLowerCase() === 'comment') {
-                                            validateCustomerRatingForSaving(e);
+                                        if (key === 9) {
+                                            if ((selectedBillToRating?.rate_type?.id || 0) === 0 || (selectedBillToRating?.rate_type?.name || '').toLowerCase() === 'comment') {
+                                                validateCustomerRatingForSaving(e);
+                                            }
                                         }
                                     }
                                 }}
                                 onBlur={(e) => {
-                                    if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'flat' ||
-                                        (selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
-                                        setSelectedCarrierRating({ ...selectedBillToRating });
+                                    if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                        if ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'flat' ||
+                                            (selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') {
+                                            setSelectedCarrierRating({ ...selectedBillToRating });
+                                        }
                                     }
                                 }}
                                 onInput={(e) => {
@@ -1534,7 +1549,7 @@ const RatingScreen = (props) => {
                                         }).then(response => {
                                             setSelectedCarrierRating({ ...selectedBillToRating });
                                         }).catch(e => {
-                                           
+
                                         });
                                     }}
                                     onChange={(e) => {
@@ -1703,7 +1718,7 @@ const RatingScreen = (props) => {
                                     }).then(response => {
                                         setSelectedCarrierRating({ ...selectedBillToRating });
                                     }).catch(e => {
-                                        
+
                                     });
                                 }}
                                 onChange={(e) => {
@@ -1771,7 +1786,7 @@ const RatingScreen = (props) => {
                                     }).then(response => {
                                         setSelectedCarrierRating({ ...selectedBillToRating });
                                     }).catch(e => {
-                                       
+
                                     });
                                 }}
                                 onChange={(e) => {
@@ -4064,14 +4079,16 @@ const RatingScreen = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedBillToRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {                                                    
-                                                    const { rate, linehaul, total_charges } = rating;
+                                                if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                                    if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
+                                                        const { rate, linehaul, total_charges } = rating;
 
-                                                    setSelectedBillToRating({
-                                                        ...rating,
-                                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(rate)),
-                                                        total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(total_charges)) : ''
-                                                    });
+                                                        setSelectedBillToRating({
+                                                            ...rating,
+                                                            rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(rate)),
+                                                            total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(total_charges)) : ''
+                                                        });
+                                                    }
                                                 }
                                             }}>
                                                 <div className="tcol rate-type">{
@@ -4264,12 +4281,16 @@ const RatingScreen = (props) => {
                         <div className='form-title'>Carrier Payments</div>
                         <div className='top-border top-border-middle'></div>
                         <div className="form-buttons">
-                            <div className="mochi-button" onClick={() => {
+                            <div className="mochi-button" style={{
+                                pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
+                            }} onClick={() => {
                                 setSelectedCarrierRating({});
                                 refCarrierRateTypes.current.focus();
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Clear</div>
+                                <div className="mochi-button-base" style={{
+                                    color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
+                                }}>Clear</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -4499,196 +4520,200 @@ const RatingScreen = (props) => {
                                     className={classnames({
                                         'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
                                     })}
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 || (selectedOrder?.is_cancelled || 0) === 1}
                                     ref={refCarrierRateTypes}
                                     onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                            switch (key) {
-                                                case 37: case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (carrierRateTypeItems.length > 0) {
-                                                        let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierRateTypeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 39: case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (carrierRateTypeItems.length > 0) {
-                                                        let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierRateTypeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setCarrierRateTypeItems([]);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (carrierRateTypeItems.length > 0 && carrierRateTypeItems.findIndex(item => item.selected) > -1) {
-                                                        setSelectedCarrierRating({
-                                                            ...selectedCarrierRating,
-                                                            rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
-                                                                ? ''
-                                                                : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
-
-                                                        window.setTimeout(() => {
-                                                            setCarrierRateTypeItems([]);
-                                                            refCarrierDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
-
-                                                case 9: // tab
-                                                    if (carrierRateTypeItems.length > 0) {
+                                            if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                                switch (key) {
+                                                    case 37: case 38: // arrow left | arrow up
                                                         e.preventDefault();
-                                                        setSelectedCarrierRating({
-                                                            ...selectedCarrierRating,
-                                                            rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
-                                                                ? ''
-                                                                : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                        if (carrierRateTypeItems.length > 0) {
+                                                            let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
 
-                                                        window.setTimeout(() => {
-                                                            setCarrierRateTypeItems([]);
-                                                            refCarrierDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                            if (selectedIndex === -1) {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (carrierRateTypeItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                default:
-                                                    break;
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCarrierRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 39: case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (carrierRateTypeItems.length > 0) {
+                                                            let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
+
+                                                            if (selectedIndex === -1) {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === (carrierRateTypeItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
+
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCarrierRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 27: // escape
+                                                        setCarrierRateTypeItems([]);
+                                                        break;
+
+                                                    case 13: // enter
+                                                        if (carrierRateTypeItems.length > 0 && carrierRateTypeItems.findIndex(item => item.selected) > -1) {
+                                                            setSelectedCarrierRating({
+                                                                ...selectedCarrierRating,
+                                                                rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                    carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
+                                                                    ? ''
+                                                                    : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setCarrierRateTypeItems([]);
+                                                                refCarrierDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    case 9: // tab
+                                                        if (carrierRateTypeItems.length > 0) {
+                                                            e.preventDefault();
+                                                            setSelectedCarrierRating({
+                                                                ...selectedCarrierRating,
+                                                                rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul' ||
+                                                                    carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'comment')
+                                                                    ? ''
+                                                                    : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setCarrierRateTypeItems([]);
+                                                                refCarrierDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
                                             }
                                         }
                                     }}
                                     onBlur={() => {
-                                        if ((selectedCarrierRating.rate_type?.id || 0) === 0) {
-                                            setSelectedCarrierRating({})
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            if ((selectedCarrierRating.rate_type?.id || 0) === 0) {
+                                                setSelectedCarrierRating({})
+                                            }
                                         }
                                     }}
                                     onInput={(e) => {
@@ -4758,67 +4783,70 @@ const RatingScreen = (props) => {
                                     }}
                                     value={selectedCarrierRating.rate_type?.name || ''}
                                 />
-                                <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                        if (carrierRateTypeItems.length > 0) {
-                                            setCarrierRateTypeItems([]);
-                                        } else {
-                                            if ((selectedCarrierRating.rate_type?.id || 0) === 0 && (selectedCarrierRating.rate_type?.name || '') !== '') {
-                                                axios.post(props.serverUrl + '/getRateTypes', {
-                                                    name: selectedCarrierRating.rate_type?.name
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_type?.id;
-                                                            return item;
-                                                        }))
-
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                {
+                                    (selectedOrder?.is_cancelled || 0) === 0 &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                            if (carrierRateTypeItems.length > 0) {
+                                                setCarrierRateTypeItems([]);
                                             } else {
-                                                axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_type?.id;
-                                                            return item;
-                                                        }))
+                                                if ((selectedCarrierRating.rate_type?.id || 0) === 0 && (selectedCarrierRating.rate_type?.name || '') !== '') {
+                                                    axios.post(props.serverUrl + '/getRateTypes', {
+                                                        name: selectedCarrierRating.rate_type?.name
+                                                    }).then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedCarrierRating.rate_type?.id;
+                                                                return item;
+                                                            }))
 
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedCarrierRating.rate_type?.id;
+                                                                return item;
+                                                            }))
+
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                }
                                             }
-                                        }
 
-                                        refCarrierRateTypes.current.focus();
-                                    }
-                                }} />
+                                            refCarrierRateTypes.current.focus();
+                                        }
+                                    }} />
+                                }
                             </div>
                             {
                                 carrierRateTypeTransition((style, item) => item && (
@@ -4914,15 +4942,17 @@ const RatingScreen = (props) => {
                                 className={classnames({
                                     'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 1
                                 })}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1}
+                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 || (selectedOrder?.is_cancelled || 0) === 1}
                                 ref={refCarrierDescription}
                                 onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
-
-                                    if (key === 9) {                                        
+                                    if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        let key = e.keyCode || e.which;
+    
                                         if (key === 9) {
-                                            if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
-                                                validateCarrierRatingForSaving(e);
+                                            if (key === 9) {
+                                                if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
+                                                    validateCarrierRatingForSaving(e);
+                                                }
                                             }
                                         }
                                     }
@@ -7607,14 +7637,16 @@ const RatingScreen = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedCarrierRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {                                                    
-                                                    const { rate, linehaul, total_charges } = rating;
-
-                                                    setSelectedCarrierRating({
-                                                        ...rating,
-                                                        rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(rate)),
-                                                        total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(total_charges)) : ''
-                                                    });
+                                                if ((selectedOrder?.is_cancelled || 0) === 0){
+                                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
+                                                        const { rate, linehaul, total_charges } = rating;
+    
+                                                        setSelectedCarrierRating({
+                                                            ...rating,
+                                                            rate: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(rate)),
+                                                            total_charges: total_charges > 0 ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(total_charges)) : ''
+                                                        });
+                                                    }
                                                 }
                                             }}>
                                                 <div className="tcol rate-type">{(rating.rate_type?.name || '').toLowerCase() === 'comment' ? '' : (rating.rate_type?.name || '')}</div>
