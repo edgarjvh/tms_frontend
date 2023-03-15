@@ -762,7 +762,8 @@ const LoadBoard = (props) => {
                                 availableOrders.map((item, i) => {
                                     const itemClasses = classnames({
                                         'lb-form-item': true,
-                                        'selected': (selectedOrder.id || 0) === item.id
+                                        'selected': (selectedOrder.id || 0) === item.id,
+                                        'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
                                         <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {
@@ -875,7 +876,8 @@ const LoadBoard = (props) => {
                                 bookedOrders.map((item, i) => {
                                     const itemClasses = classnames({
                                         'lb-form-item': true,
-                                        'selected': (selectedOrder.id || 0) === item.id
+                                        'selected': (selectedOrder.id || 0) === item.id,
+                                        'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
                                         <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {
@@ -989,7 +991,8 @@ const LoadBoard = (props) => {
                                 inTransitOrders.map((item, i) => {
                                     const itemClasses = classnames({
                                         'lb-form-item': true,
-                                        'selected': (selectedOrder.id || 0) === item.id
+                                        'selected': (selectedOrder.id || 0) === item.id,
+                                        'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
                                         <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {
@@ -2442,7 +2445,8 @@ const LoadBoard = (props) => {
                                 deliveredNotInvoiceOrders.map((item, i) => {
                                     const itemClasses = classnames({
                                         'lb-form-item': true,
-                                        'selected': (selectedOrder.id || 0) === item.id
+                                        'selected': (selectedOrder.id || 0) === item.id,
+                                        'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
                                         <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {

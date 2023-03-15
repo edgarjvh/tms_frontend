@@ -816,7 +816,9 @@ const Drivers = (props) => {
                                 </div>
 
                                 <div className="driver-data">
-                                    <div className="driver-name">
+                                    <div className="driver-name" style={{
+                                        textTransform: 'capitalize'
+                                    }}>
                                         {(driverSearchCompany?.selectedDriver?.prefix || '') + " " + (driverSearchCompany?.selectedDriver?.first_name || '') + " " + (driverSearchCompany?.selectedDriver?.middle_name || '') + " " + (driverSearchCompany?.selectedDriver?.last_name || '')}
                                     </div>
                                     <div className="online-status">
@@ -1025,7 +1027,9 @@ const Drivers = (props) => {
                                 <div className="driver-form-wrapper">
                                     <div className="field-container">
                                         <div className="field-title">Prefix</div>
-                                        <input ref={refPrefix} type="text" readOnly={!isEditingDriver}
+                                        <input ref={refPrefix} type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, prefix: e.target.value });
                                             }}
@@ -1039,7 +1043,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">First Name</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, first_name: e.target.value });
                                             }}
@@ -1053,7 +1059,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Middle Name</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, middle_name: e.target.value });
                                             }}
@@ -1067,7 +1075,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Last Name</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, last_name: e.target.value });
                                             }}
@@ -1081,7 +1091,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Suffix</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, suffix: e.target.value });
                                             }}
@@ -1095,7 +1107,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Company</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => { }}
                                             onChange={e => { }}
                                             value={driverSearchCompany?.selectedDriver?.id !== undefined ? driverSearchCompany.name : ''} />
@@ -1104,7 +1118,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Title</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, title: e.target.value });
                                             }}
@@ -1118,7 +1134,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Department</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, department: e.target.value });
                                             }}
@@ -1273,7 +1291,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Country</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, country: e.target.value });
                                             }}
@@ -1287,7 +1307,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 1</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, address1: e.target.value });
                                             }}
@@ -1301,7 +1323,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 2</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, address2: e.target.value });
                                             }}
@@ -1315,7 +1339,9 @@ const Drivers = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">City</div>
-                                        <input type="text" readOnly={!isEditingDriver}
+                                        <input type="text" readOnly={!isEditingDriver} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedDriver({ ...tempSelectedDriver, city: e.target.value });
                                             }}
@@ -1377,10 +1403,10 @@ const Drivers = (props) => {
                                         <div className="field-title">Website</div>
                                         <input type="text" readOnly={!isEditingDriver}
                                             onInput={(e) => {
-                                                setTempSelectedDriver({ ...tempSelectedDriver, website: e.target.value });
+                                                setTempSelectedDriver({ ...tempSelectedDriver, website: e.target.value.toLowerCase() });
                                             }}
                                             onChange={e => {
-                                                setTempSelectedDriver({ ...tempSelectedDriver, website: e.target.value });
+                                                setTempSelectedDriver({ ...tempSelectedDriver, website: e.target.value.toLowerCase() });
                                             }}
                                             value={isEditingDriver ? tempSelectedDriver.website || '' : driverSearchCompany?.selectedDriver?.website || ''}
                                         />

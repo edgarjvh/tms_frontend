@@ -693,20 +693,16 @@ const Agents = (props) => {
             },
             {
                 field: 'State',
-                data: (selectedAgent?.state || '').toLowerCase()
+                data: (selectedAgent?.state || '').toLowerCase() 
             },
             {
                 field: 'Postal Code',
                 data: selectedAgent?.zip || ''
             },
             {
-                field: 'Contact First Name',
-                data: (selectedAgent?.contact_first_name || '').toLowerCase()
-            },
-            {
-                field: 'Contact Last Name',
-                data: (selectedAgent?.contact_last_name || '').toLowerCase()
-            },
+                field: 'Contact Name',
+                data: (selectedAgent?.first_name || '').toLowerCase()
+            },            
             {
                 field: 'Contact Phone',
                 data: selectedAgent?.contact_phone || ''
@@ -714,6 +710,14 @@ const Agents = (props) => {
             {
                 field: 'E-Mail',
                 data: (selectedAgent?.email || '').toLowerCase()
+            },
+            {
+                field: 'User Code',
+                data: ''
+            },
+            {
+                field: 'Origin',
+                data: 'agent'
             }
         ]
 
@@ -1328,7 +1332,9 @@ const Agents = (props) => {
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name"
+                                    <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            ref={refAgentName}
                                            onChange={e => {
                                                setSelectedAgent({
@@ -1342,7 +1348,9 @@ const Agents = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1"
+                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onChange={e => {
                                                setSelectedAgent({
                                                    ...selectedAgent,
@@ -1355,7 +1363,9 @@ const Agents = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2"
+                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onChange={e => {
                                                setSelectedAgent({
                                                    ...selectedAgent,
@@ -1368,7 +1378,9 @@ const Agents = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={5 + props.tabTimes} type="text" placeholder="City"
+                                    <input tabIndex={5 + props.tabTimes} type="text" placeholder="City" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onChange={e => {
                                                setSelectedAgent({
                                                    ...selectedAgent,
@@ -1403,7 +1415,9 @@ const Agents = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact First Name"
+                                    <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact First Name" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onChange={e => {
                                                setSelectedPrimaryContact({
                                                    ...selectedPrimaryContact,
@@ -1414,7 +1428,9 @@ const Agents = (props) => {
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={9 + props.tabTimes} type="text" placeholder="Contact Last Name"
+                                    <input tabIndex={9 + props.tabTimes} type="text" placeholder="Contact Last Name" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onChange={e => {
                                                setSelectedPrimaryContact({
                                                    ...selectedPrimaryContact,
@@ -1757,8 +1773,10 @@ const Agents = (props) => {
                             </div>
 
                             <div className="form-row">
-                                <div className={disabledAgentContactFields + ' input-box-container grow'}>
-                                    <input tabIndex={13 + props.tabTimes} type="text" placeholder="First Name"
+                                <div className={disabledAgentContactFields + ' input-box-container grow'}> 
+                                    <input tabIndex={13 + props.tabTimes} type="text" placeholder="First Name" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            ref={refAgentContactFirstName}
                                            onChange={e => {
                                                setSelectedContact({...selectedContact, first_name: e.target.value})
@@ -1767,7 +1785,9 @@ const Agents = (props) => {
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledAgentContactFields + ' input-box-container grow'}>
-                                    <input tabIndex={14 + props.tabTimes} type="text" placeholder="Last Name"
+                                    <input tabIndex={14 + props.tabTimes} type="text" placeholder="Last Name" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onChange={e => setSelectedContact({
                                                ...selectedContact,
                                                last_name: e.target.value
@@ -2396,14 +2416,14 @@ const Agents = (props) => {
                                                 if ((selectedContact?.id || 0) === 0) {
                                                     setSelectedContact({
                                                         ...selectedContact,
-                                                        email_work: e.target.value,
+                                                        email_work: e.target.value.toLowerCase(),
                                                         primary_email: 'work'
                                                     });
                                                 } else {
                                                     if ((selectedContact?.primary_email || '') === '') {
                                                         setSelectedContact({
                                                             ...selectedContact,
-                                                            email_work: e.target.value,
+                                                            email_work: e.target.value.toLowerCase(),
                                                             primary_email: 'work'
                                                         });
                                                     } else {
@@ -2411,19 +2431,19 @@ const Agents = (props) => {
                                                             case 'work':
                                                                 setSelectedContact({
                                                                     ...selectedContact,
-                                                                    email_work: e.target.value
+                                                                    email_work: e.target.value.toLowerCase()
                                                                 });
                                                                 break;
                                                             case 'personal':
                                                                 setSelectedContact({
                                                                     ...selectedContact,
-                                                                    email_personal: e.target.value
+                                                                    email_personal: e.target.value.toLowerCase()
                                                                 });
                                                                 break;
                                                             case 'other':
                                                                 setSelectedContact({
                                                                     ...selectedContact,
-                                                                    email_other: e.target.value
+                                                                    email_other: e.target.value.toLowerCase()
                                                                 });
                                                                 break;
                                                         }
@@ -2434,14 +2454,14 @@ const Agents = (props) => {
                                                 if ((selectedContact?.id || 0) === 0) {
                                                     setSelectedContact({
                                                         ...selectedContact,
-                                                        email_work: e.target.value,
+                                                        email_work: e.target.value.toLowerCase(),
                                                         primary_email: 'work'
                                                     });
                                                 } else {
                                                     if ((selectedContact?.primary_email || '') === '') {
                                                         setSelectedContact({
                                                             ...selectedContact,
-                                                            email_work: e.target.value,
+                                                            email_work: e.target.value.toLowerCase(),
                                                             primary_email: 'work'
                                                         });
                                                     } else {
@@ -2449,19 +2469,19 @@ const Agents = (props) => {
                                                             case 'work':
                                                                 setSelectedContact({
                                                                     ...selectedContact,
-                                                                    email_work: e.target.value
+                                                                    email_work: e.target.value.toLowerCase()
                                                                 });
                                                                 break;
                                                             case 'personal':
                                                                 setSelectedContact({
                                                                     ...selectedContact,
-                                                                    email_personal: e.target.value
+                                                                    email_personal: e.target.value.toLowerCase()
                                                                 });
                                                                 break;
                                                             case 'other':
                                                                 setSelectedContact({
                                                                     ...selectedContact,
-                                                                    email_other: e.target.value
+                                                                    email_other: e.target.value.toLowerCase()
                                                                 });
                                                                 break;
                                                         }
@@ -2718,9 +2738,13 @@ const Agents = (props) => {
                                                                  props.openPanel(panel, props.origin);
                                                              }} onClick={() => setSelectedContact(contact)}>
                                                             <div
-                                                                className="contact-list-col tcol first-name">{contact.first_name}</div>
+                                                                className="contact-list-col tcol first-name" style={{
+                                                                    textTransform: 'capitalize'
+                                                                }}>{contact.first_name}</div>
                                                             <div
-                                                                className="contact-list-col tcol last-name">{contact.last_name}</div>
+                                                                className="contact-list-col tcol last-name" style={{
+                                                                    textTransform: 'capitalize'
+                                                                }}>{contact.last_name}</div>
                                                             <div className="contact-list-col tcol phone-work">{
                                                                 contact.primary_phone === 'work' ? contact.phone_work
                                                                     : contact.primary_phone === 'fax' ? contact.phone_work_fax
@@ -2757,7 +2781,9 @@ const Agents = (props) => {
                                     <div className="contact-search-box">
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="First Name"
+                                                <input type="text" placeholder="First Name" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                                        onChange={e => setContactSearch({
                                                            ...contactSearch,
                                                            first_name: e.target.value
@@ -2765,7 +2791,9 @@ const Agents = (props) => {
                                             </div>
                                             <div className="form-h-sep"></div>
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Last Name" onFocus={() => {
+                                                <input type="text" placeholder="Last Name" style={{
+                                        textTransform: 'capitalize'
+                                    }} onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -2776,7 +2804,9 @@ const Agents = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 1" onFocus={() => {
+                                                <input type="text" placeholder="Address 1" style={{
+                                        textTransform: 'capitalize'
+                                    }} onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -2787,7 +2817,9 @@ const Agents = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 2" onFocus={() => {
+                                                <input type="text" placeholder="Address 2" style={{
+                                        textTransform: 'capitalize'
+                                    }} onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -2798,7 +2830,9 @@ const Agents = (props) => {
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
-                                                <input type="text" placeholder="City" onFocus={() => {
+                                                <input type="text" placeholder="City" style={{
+                                        textTransform: 'capitalize'
+                                    }} onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
@@ -2981,7 +3015,9 @@ const Agents = (props) => {
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Name"
+                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Name" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onInput={e => {
                                                setSelectedAgent({
                                                    ...selectedAgent,
@@ -3006,7 +3042,9 @@ const Agents = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 1"
+                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 1" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onInput={e => {
                                                setSelectedAgent({
                                                    ...selectedAgent,
@@ -3031,7 +3069,9 @@ const Agents = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={22 + props.tabTimes} type="text" placeholder="Address 2"
+                                    <input tabIndex={22 + props.tabTimes} type="text" placeholder="Address 2" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onInput={e => {
                                                setSelectedAgent({
                                                    ...selectedAgent,
@@ -3056,7 +3096,9 @@ const Agents = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={23 + props.tabTimes} type="text" placeholder="City"
+                                    <input tabIndex={23 + props.tabTimes} type="text" placeholder="City" style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                            onInput={e => {
                                                setSelectedAgent({
                                                    ...selectedAgent,
@@ -3136,6 +3178,9 @@ const Agents = (props) => {
                                             type="text"
                                             placeholder="Contact Name"
                                             ref={refMailingContactName}
+                                            style={{
+                                                textTransform: 'capitalize'
+                                            }}
                                             onKeyDown={async (e) => {
                                                 let key = e.keyCode || e.which;
 

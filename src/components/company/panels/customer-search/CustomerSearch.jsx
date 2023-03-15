@@ -84,24 +84,25 @@ const CustomerSearch = (props) => {
             <div className="input-box-container" style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                 {
                     (props.customerSearch || []).map((item, index) => {
-
-                        if (item.data.trim() !== '') {
-                            return (
-                                <div key={index} style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    fontSize: '0.7rem',
-                                    backgroundColor: 'rgba(0,0,0,0.2)',
-                                    padding: '2px 10px',
-                                    borderRadius: '10px',
-                                    marginRight: '10px',
-                                    cursor: 'default'
-                                }} title={item}>
-                                    <span style={{ fontWeight: 'bold', marginRight: 5 }}>{item.field}: </span>
-                                    <span style={{ whiteSpace: 'nowrap' }}>{item.data}</span>
-                                </div>
-                            )
-                        }
+                        if (item.field !== 'User Code' && item.field !== 'Origin'){
+                            if (item.data.trim() !== '') {
+                                return (
+                                    <div key={index} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        fontSize: '0.7rem',
+                                        backgroundColor: 'rgba(0,0,0,0.2)',
+                                        padding: '2px 10px',
+                                        borderRadius: '10px',
+                                        marginRight: '10px',
+                                        cursor: 'default'
+                                    }} title={item}>
+                                        <span style={{ fontWeight: 'bold', marginRight: 5 }}>{item.field}: </span>
+                                        <span style={{ whiteSpace: 'nowrap' }}>{item.data}</span>
+                                    </div>
+                                )
+                            }
+                        }                        
 
                         return false;
                     })

@@ -773,7 +773,9 @@ const Operators = (props) => {
                                 </div>
 
                                 <div className="operator-data">
-                                    <div className="operator-name">
+                                    <div className="operator-name" style={{
+                                        textTransform: 'capitalize'
+                                    }}>
                                         {(operatorSearchCompany?.selectedOperator?.prefix || '') + " " + (operatorSearchCompany?.selectedOperator?.first_name || '') + " " + (operatorSearchCompany?.selectedOperator?.middle_name || '') + " " + (operatorSearchCompany?.selectedOperator?.last_name || '')}
                                     </div>
                                     <div className="online-status">
@@ -815,12 +817,16 @@ const Operators = (props) => {
 
                                 <div className="info-row">
                                     <div className="info-row-label">Driver Manager:</div>
-                                    <div className="info-row-input">{operatorSearchCompany?.selectedOperator?.operator_manager || '-'}</div>
+                                    <div className="info-row-input" style={{
+                                        textTransform: 'capitalize'
+                                    }}>{operatorSearchCompany?.selectedOperator?.operator_manager || '-'}</div>
                                 </div>
 
                                 <div className="info-row">
                                     <div className="info-row-label">Division:</div>
-                                    <div className="info-row-input">{operatorSearchCompany?.selectedOperator?.division || '-'}</div>
+                                    <div className="info-row-input" style={{
+                                        textTransform: 'capitalize'
+                                    }}>{operatorSearchCompany?.selectedOperator?.division || '-'}</div>
                                 </div>
 
                                 <div className="info-row">
@@ -1070,7 +1076,9 @@ const Operators = (props) => {
                                 <div className="operator-form-wrapper">
                                     <div className="field-container">
                                         <div className="field-title">Prefix</div>
-                                        <input ref={refPrefix} type="text" readOnly={!isEditingOperator}
+                                        <input ref={refPrefix} type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, prefix: e.target.value });
                                             }}
@@ -1084,7 +1092,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">First Name</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, first_name: e.target.value });
                                             }}
@@ -1098,7 +1108,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Middle Name</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, middle_name: e.target.value });
                                             }}
@@ -1112,7 +1124,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Last Name</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, last_name: e.target.value });
                                             }}
@@ -1126,7 +1140,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Suffix</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, suffix: e.target.value });
                                             }}
@@ -1140,7 +1156,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Company</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => { }}
                                             onChange={e => { }}
                                             value={operatorSearchCompany?.selectedOperator?.id !== undefined ? operatorSearchCompany.name : ''} />
@@ -1149,7 +1167,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Title</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, title: e.target.value });
                                             }}
@@ -1163,7 +1183,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Department</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, department: e.target.value });
                                             }}
@@ -1318,7 +1340,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Country</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, country: e.target.value });
                                             }}
@@ -1332,7 +1356,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 1</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, address1: e.target.value });
                                             }}
@@ -1346,7 +1372,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 2</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, address2: e.target.value });
                                             }}
@@ -1360,7 +1388,9 @@ const Operators = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">City</div>
-                                        <input type="text" readOnly={!isEditingOperator}
+                                        <input type="text" readOnly={!isEditingOperator} style={{
+                                        textTransform: 'capitalize'
+                                    }}
                                             onInput={(e) => {
                                                 setTempSelectedOperator({ ...tempSelectedOperator, city: e.target.value });
                                             }}

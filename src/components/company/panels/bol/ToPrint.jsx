@@ -292,21 +292,33 @@ export default class ToPrint extends Component {
                                     <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>BOL Number: </span> {
                                         (this.props.selectedOrder?.pickups || []).map((item, index) => {
                                             return (
-                                                <span style={{ fontWeight: 'normal' }}>{item.bol_numbers}</span>
+                                                <span style={{ fontWeight: 'normal' }}>{
+                                                    (item.bol_numbers || '').split('|').map((item, index) => {
+                                                        return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
+                                                    })
+                                                }</span>
                                             )
                                         })
                                     }</div>
                                     <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>PO Numbers: </span> {
                                         (this.props.selectedOrder?.pickups || []).map((item, index) => {
                                             return (
-                                                <span style={{ fontWeight: 'normal' }}>{item.po_numbers}</span>
+                                                <span style={{ fontWeight: 'normal' }}>{
+                                                    (item.po_numbers || '').split('|').map((item, index) => {
+                                                        return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
+                                                    })
+                                                }</span>
                                             )
                                         })
                                     }</div>
                                     <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>REF Numbers: </span> {
                                         (this.props.selectedOrder?.pickups || []).map((item, index) => {
                                             return (
-                                                <span style={{ fontWeight: 'normal' }}>{item.ref_numbers}</span>
+                                                <span style={{ fontWeight: 'normal' }}>{
+                                                    (item.ref_numbers || '').split('|').map((item, index) => {
+                                                        return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
+                                                    })
+                                                }</span>
                                             )
                                         })
                                     }</div>

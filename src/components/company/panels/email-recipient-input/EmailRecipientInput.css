@@ -1,0 +1,12 @@
+.email-recipient-input .email-item {
+  border: 1px solid transparent;
+}
+.email-recipient-input .email-item.primary {
+  color: blue !important;
+}
+.email-recipient-input .email-item:hover {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.email-recipient-input .email-item:hover .delete-email-button {
+  display: block !important;
+}

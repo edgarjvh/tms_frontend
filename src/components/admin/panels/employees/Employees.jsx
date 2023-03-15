@@ -359,7 +359,9 @@ const Employees = (props) => {
                                 </div>
 
                                 <div className="employee-data">
-                                    <div className="employee-name">
+                                    <div className="employee-name" style={{
+                                            textTransform: 'capitalize'
+                                        }}>
                                         {(employeeSearchCompany?.selectedEmployee?.prefix || '') + " " + (employeeSearchCompany?.selectedEmployee?.first_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.middle_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.last_name || '')}
                                     </div>
                                     <div className="online-status">
@@ -603,7 +605,9 @@ const Employees = (props) => {
                                 <div className="employee-form-wrapper">
                                     <div className="field-container">
                                         <div className="field-title">Prefix</div>
-                                        <input ref={refPrefix} type="text" readOnly={!isEditingEmployee}
+                                        <input ref={refPrefix} type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, prefix: e.target.value });
                                             }}
@@ -617,7 +621,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">First Name</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, first_name: e.target.value });
                                             }}
@@ -631,7 +637,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Middle Name</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, middle_name: e.target.value });
                                             }}
@@ -645,7 +653,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Last Name</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, last_name: e.target.value });
                                             }}
@@ -659,7 +669,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Suffix</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, suffix: e.target.value });
                                             }}
@@ -673,7 +685,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Company</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => { }}
                                             onChange={e => { }}
                                             value={employeeSearchCompany?.selectedEmployee?.id !== undefined ? employeeSearchCompany.name : ''} />
@@ -682,7 +696,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Title</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, title: e.target.value });
                                             }}
@@ -696,7 +712,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Department</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, department: e.target.value });
                                             }}
@@ -851,7 +869,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Country</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, country: e.target.value });
                                             }}
@@ -865,7 +885,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 1</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, address1: e.target.value });
                                             }}
@@ -879,7 +901,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 2</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, address2: e.target.value });
                                             }}
@@ -893,7 +917,9 @@ const Employees = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">City</div>
-                                        <input type="text" readOnly={!isEditingEmployee}
+                                        <input type="text" readOnly={!isEditingEmployee} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedEmployee({ ...tempSelectedEmployee, city: e.target.value });
                                             }}
@@ -955,10 +981,10 @@ const Employees = (props) => {
                                         <div className="field-title">Website</div>
                                         <input type="text" readOnly={!isEditingEmployee}
                                             onInput={(e) => {
-                                                setTempSelectedEmployee({ ...tempSelectedEmployee, website: e.target.value });
+                                                setTempSelectedEmployee({ ...tempSelectedEmployee, website: e.target.value.toLowerCase() });
                                             }}
                                             onChange={e => {
-                                                setTempSelectedEmployee({ ...tempSelectedEmployee, website: e.target.value });
+                                                setTempSelectedEmployee({ ...tempSelectedEmployee, website: e.target.value.toLowerCase() });
                                             }}
                                             value={isEditingEmployee ? tempSelectedEmployee.website || '' : employeeSearchCompany?.selectedEmployee?.website || ''}
                                         />

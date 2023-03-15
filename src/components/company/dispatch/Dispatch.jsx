@@ -1125,6 +1125,7 @@ const Dispatch = (props) => {
             if (e.target.value !== "") {
                 axios.post(props.serverUrl + "/customers", {
                     code: e.target.value.toLowerCase(),
+                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
                 }).then(async (res) => {
                     if (res.data.result === "OK") {
                         if (res.data.customers.length > 0) {
@@ -1168,6 +1169,7 @@ const Dispatch = (props) => {
             if (e.target.value !== "") {
                 axios.post(props.serverUrl + "/customers", {
                     code: e.target.value.toLowerCase(),
+                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
                 }).then((res) => {
                     if (res.data.result === "OK") {
                         if (res.data.customers.length > 0) {
@@ -1231,6 +1233,7 @@ const Dispatch = (props) => {
                                     if ((res.data.customers[0]?.bill_to_code || "") !== "") {
                                         axios.post(props.serverUrl + "/customers", {
                                             code: (res.data.customers[0]?.bill_to_code || "") + ((res.data.customers[0]?.bill_to_code_number || 0) === 0 ? "" : res.data.customers[0].bill_to_code_number),
+                                            user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
                                         }).then((res) => {
                                             if (res.data.result === "OK") {
                                                 if (res.data.customers.length > 0) {
@@ -1293,7 +1296,10 @@ const Dispatch = (props) => {
                 }
 
                 setIsLoading(true);
-                axios.post(props.serverUrl + "/customers", { code: e.target.value.toLowerCase() }).then(async (res) => {
+                axios.post(props.serverUrl + "/customers", {
+                    code: e.target.value.toLowerCase(),
+                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+                }).then(async (res) => {
                     if (res.data.result === "OK") {
                         if (res.data.customers.length > 0) {
                             let delivery_id = -1;
@@ -1390,6 +1396,10 @@ const Dispatch = (props) => {
                 field: "E-Mail",
                 data: (selectedBillToCustomer?.email || "").toLowerCase(),
             },
+            {
+                field: 'User Code',
+                data: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+            }
         ];
 
         let panel = {
@@ -1497,6 +1507,10 @@ const Dispatch = (props) => {
                 field: "E-Mail",
                 data: (selectedShipperCustomer?.email || "").toLowerCase(),
             },
+            {
+                field: 'User Code',
+                data: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+            }
         ];
 
         let panel = {
@@ -1608,7 +1622,8 @@ const Dispatch = (props) => {
                                                     if ((customer?.bill_to_code || "") !== "") {
                                                         setIsLoading(true);
                                                         axios.post(props.serverUrl + "/customers", {
-                                                            code: (customer?.bill_to_code || "") + ((customer?.bill_to_code_number || 0) === 0 ? "" : customer.bill_to_code_number)
+                                                            code: (customer?.bill_to_code || "") + ((customer?.bill_to_code_number || 0) === 0 ? "" : customer.bill_to_code_number),
+                                                            user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
                                                         }).then((res) => {
                                                             if (res.data.result === "OK") {
                                                                 if (res.data.customers.length > 0) {
@@ -1721,6 +1736,10 @@ const Dispatch = (props) => {
                 field: "E-Mail",
                 data: (selectedConsigneeCustomer?.email || "").toLowerCase(),
             },
+            {
+                field: 'User Code',
+                data: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+            }
         ];
 
         let panel = {
@@ -1870,7 +1889,7 @@ const Dispatch = (props) => {
                                 selected_order.equipment_id = res.data.carriers[0].drivers[0].equipment_id;
                             }
 
-                            if ((selected_order.events || []).find((el) => el.event_type === "carrier asigned") === undefined) {
+                            if ((selected_order.events || []).find((el) => el.event_type === "carrier assigned") === undefined) {
                                 let event_parameters = {
                                     order_id: selected_order.id,
                                     time: moment().format("HHmm"),
@@ -1909,6 +1928,56 @@ const Dispatch = (props) => {
                                                 console.log("error saving order", e);
                                                 setIsSavingOrder(false);
                                             });
+
+                                            let user_first_name = (selected_order?.user_code?.type || '') === 'agent'
+                                                ? (((selected_order.user_code?.agent?.contacts || []).find(x => x.id === (selected_order.user_code?.agent_contact_id || 0))?.first_name || '')).trim()
+                                                : (selected_order?.user_code?.type || '') === 'employee'
+                                                    ? ((selected_order.user_code?.employee?.first_name || '')).trim()
+                                                    : '';
+
+                                            let user_last_name = (selected_order?.user_code?.type || '') === 'agent'
+                                                ? (((selected_order.user_code?.agent?.contacts || []).find(x => x.id === (selected_order.user_code?.agent_contact_id || 0))?.last_name || '')).trim()
+                                                : (selected_order?.user_code?.type || '') === 'employee'
+                                                    ? ((selected_order.user_code?.employee?.last_name || '')).trim()
+                                                    : '';
+
+                                            let recipient_to = [];
+                                            let recipient_cc = [];
+                                            let recipient_bcc = [];
+
+                                            (selected_order?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                if ((item?.booked_load || 0) === 1) {
+                                                    if ((item?.type || '') === 'to') {
+                                                        recipient_to.push(item.email);
+                                                    }
+
+                                                    if ((item?.type || '') === 'cc') {
+                                                        recipient_cc.push(item.email);
+                                                    }
+
+                                                    if ((item?.type || '') === 'bcc') {
+                                                        recipient_bcc.push(item.email);
+                                                    }
+                                                }
+
+                                                return true;
+                                            });
+
+                                            if (recipient_to.length > 0) {
+                                                axios.post(props.serverUrl + '/sendBookedLoadEmail', {
+                                                    order_number: selected_order?.order_number,
+                                                    user_first_name,
+                                                    user_last_name,
+                                                    recipient_to,
+                                                    recipient_cc,
+                                                    recipient_bcc
+                                                }).then(res => {
+                                                    console.log(res.data.result);
+                                                }).catch(e => {
+                                                    console.log(e);
+                                                })
+                                            }
                                         } else if (res.data.result === "ORDER ID NOT VALID") {
                                             window.alert("The order number is not valid!");
                                             goToTabindex((74 + props.tabTimes).toString());
@@ -2268,7 +2337,7 @@ const Dispatch = (props) => {
                                             selected_order.carrier_driver_id = null;
                                         }
 
-                                        if ((selected_order.events || []).find((el) => el.event_type === "carrier asigned") === undefined) {
+                                        if ((selected_order.events || []).find((el) => el.event_type === "carrier assigned") === undefined) {
                                             let event_parameters = {
                                                 order_id: selected_order.id,
                                                 time: moment().format("HHmm"),
@@ -2307,6 +2376,56 @@ const Dispatch = (props) => {
                                                             console.log("error saving order", e);
                                                             setIsSavingOrder(false);
                                                         });
+
+                                                        let user_first_name = (selected_order?.user_code?.type || '') === 'agent'
+                                                            ? (((selected_order.user_code?.agent?.contacts || []).find(x => x.id === (selected_order.user_code?.agent_contact_id || 0))?.first_name || '')).trim()
+                                                            : (selected_order?.user_code?.type || '') === 'employee'
+                                                                ? ((selected_order.user_code?.employee?.first_name || '')).trim()
+                                                                : '';
+
+                                                        let user_last_name = (selected_order?.user_code?.type || '') === 'agent'
+                                                            ? (((selected_order.user_code?.agent?.contacts || []).find(x => x.id === (selected_order.user_code?.agent_contact_id || 0))?.last_name || '')).trim()
+                                                            : (selected_order?.user_code?.type || '') === 'employee'
+                                                                ? ((selected_order.user_code?.employee?.last_name || '')).trim()
+                                                                : '';
+
+                                                        let recipient_to = [];
+                                                        let recipient_cc = [];
+                                                        let recipient_bcc = [];
+
+                                                        (selected_order?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                            if ((item?.booked_load || 0) === 1) {
+                                                                if ((item?.type || '') === 'to') {
+                                                                    recipient_to.push(item.email);
+                                                                }
+
+                                                                if ((item?.type || '') === 'cc') {
+                                                                    recipient_cc.push(item.email);
+                                                                }
+
+                                                                if ((item?.type || '') === 'bcc') {
+                                                                    recipient_bcc.push(item.email);
+                                                                }
+                                                            }
+
+                                                            return true;
+                                                        });
+
+                                                        if (recipient_to.length > 0) {
+                                                            axios.post(props.serverUrl + '/sendBookedLoadEmail', {
+                                                                order_number: selected_order?.order_number,
+                                                                user_first_name,
+                                                                user_last_name,
+                                                                recipient_to,
+                                                                recipient_cc,
+                                                                recipient_bcc
+                                                            }).then(res => {
+                                                                console.log(res.data.result);
+                                                            }).catch(e => {
+                                                                console.log(e);
+                                                            })
+                                                        }
                                                     } else if (res.data.result === "ORDER ID NOT VALID") {
                                                         window.alert("The order number is not valid!");
                                                         goToTabindex((74 + props.tabTimes).toString());
@@ -3604,6 +3723,7 @@ const Dispatch = (props) => {
 
             if (!selected_order?.user_code) {
                 selected_order.user_code_id = props.user.user_code.id;
+                selected_order.agent_code = props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
             }
 
             setSelectedOrder({ ...selected_order });
@@ -4316,6 +4436,7 @@ const Dispatch = (props) => {
                 setIsLoading(true);
                 axios.post(props.serverUrl + "/getOrderByOrderNumber", {
                     order_number: selectedOrder.order_number,
+                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
                 }).then((res) => {
                     if (res.data.result === "OK") {
                         let order = JSON.parse(JSON.stringify(res.data.order));
@@ -4445,6 +4566,7 @@ const Dispatch = (props) => {
                         refDispatchEvents.current.focus();
                     } else {
                         setIsLoading(false);
+                        dispatchClearBtnClick();
                         refOrderNumber.current.focus();
                     }
                 }).catch((e) => {
@@ -4461,118 +4583,121 @@ const Dispatch = (props) => {
         if (key === 9) {
             if ((props.trip_number || "") !== "") {
                 setIsLoading(true);
-                axios
-                    .post(props.serverUrl + "/getOrderByTripNumber", {
-                        trip_number: props.trip_number,
-                    })
-                    .then((res) => {
-                        if (res.data.result === "OK") {
-                            let order = JSON.parse(JSON.stringify(res.data.order));
+                axios.post(props.serverUrl + "/getOrderByTripNumber", {
+                    trip_number: props.trip_number,
+                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+                }).then((res) => {
+                    if (res.data.result === "OK") {
+                        let order = JSON.parse(JSON.stringify(res.data.order));
 
-                            setSelectedOrder({});
-                            setSelectedOrder(order);
-                            // await setTempRouting(order.routing);
+                        setSelectedOrder({});
+                        setSelectedOrder(order);
+                        // await setTempRouting(order.routing);
 
-                            setSelectedBillToCustomer({ ...order.bill_to_company });
+                        setSelectedBillToCustomer({ ...order.bill_to_company });
 
-                            setSelectedBillToCustomerContact({
-                                ...(order.bill_to_company?.contacts || []).find(
-                                    (c) => c.is_primary === 1
-                                ),
-                            });
+                        setSelectedBillToCustomerContact({
+                            ...(order.bill_to_company?.contacts || []).find(
+                                (c) => c.is_primary === 1
+                            ),
+                        });
 
-                            let pickup_id = (order.routing || []).find((r) => r.type === "pickup")?.pickup_id || 0;
-                            let pickup = {
-                                ...((order.pickups || []).find((p) => p.id === pickup_id) ||
-                                    (order.pickups || [])[0]),
-                            };
+                        let pickup_id = (order.routing || []).find((r) => r.type === "pickup")?.pickup_id || 0;
+                        let pickup = {
+                            ...((order.pickups || []).find((p) => p.id === pickup_id) ||
+                                (order.pickups || [])[0]),
+                        };
 
-                            setSelectedShipperCustomer(
-                                pickup.id === undefined
-                                    ? {}
-                                    : {
-                                        ...pickup.customer,
-                                        pickup_id: pickup.id,
-                                        contact_id: pickup.contact_id,
-                                        contact_name: pickup.contact_name,
-                                        contact_phone: pickup.contact_phone,
-                                        contact_primary_phone: pickup.contact_primary_phone,
-                                        contact_phone_ext: pickup.contact_phone_ext,
-                                        pu_date1: pickup.pu_date1,
-                                        pu_date2: pickup.pu_date2,
-                                        pu_time1: pickup.pu_time1,
-                                        pu_time2: pickup.pu_time2,
-                                        bol_numbers: pickup.bol_numbers,
-                                        po_numbers: pickup.po_numbers,
-                                        ref_numbers: pickup.ref_numbers,
-                                        seal_number: pickup.seal_number,
-                                        special_instructions: pickup.special_instructions,
-                                        type: pickup.type,
-                                    }
-                            );
+                        setSelectedShipperCustomer(
+                            pickup.id === undefined
+                                ? {}
+                                : {
+                                    ...pickup.customer,
+                                    pickup_id: pickup.id,
+                                    contact_id: pickup.contact_id,
+                                    contact_name: pickup.contact_name,
+                                    contact_phone: pickup.contact_phone,
+                                    contact_primary_phone: pickup.contact_primary_phone,
+                                    contact_phone_ext: pickup.contact_phone_ext,
+                                    pu_date1: pickup.pu_date1,
+                                    pu_date2: pickup.pu_date2,
+                                    pu_time1: pickup.pu_time1,
+                                    pu_time2: pickup.pu_time2,
+                                    bol_numbers: pickup.bol_numbers,
+                                    po_numbers: pickup.po_numbers,
+                                    ref_numbers: pickup.ref_numbers,
+                                    seal_number: pickup.seal_number,
+                                    special_instructions: pickup.special_instructions,
+                                    type: pickup.type,
+                                }
+                        );
 
-                            setSelectedShipperCustomerContact({
-                                ...(pickup.contacts || []).find((c) => c.is_primary === 1),
-                            });
+                        setSelectedShipperCustomerContact({
+                            ...(pickup.contacts || []).find((c) => c.is_primary === 1),
+                        });
 
-                            let delivery_id =
-                                (order.routing || []).find((r) => r.type === "delivery")
-                                    ?.delivery_id || 0;
-                            let delivery = {
-                                ...((order.deliveries || []).find(
-                                    (d) => d.id === delivery_id
-                                ) || (order.deliveries || [])[0]),
-                            };
+                        let delivery_id =
+                            (order.routing || []).find((r) => r.type === "delivery")
+                                ?.delivery_id || 0;
+                        let delivery = {
+                            ...((order.deliveries || []).find(
+                                (d) => d.id === delivery_id
+                            ) || (order.deliveries || [])[0]),
+                        };
 
-                            setSelectedConsigneeCustomer(
-                                delivery.id === undefined
-                                    ? {}
-                                    : {
-                                        ...delivery.customer,
-                                        delivery_id: delivery.id,
-                                        contact_id: delivery.contact_id,
-                                        contact_name: delivery.contact_name,
-                                        contact_phone: delivery.contact_phone,
-                                        contact_primary_phone: delivery.contact_primary_phone,
-                                        contact_phone_ext: delivery.contact_phone_ext,
-                                        delivery_date1: delivery.delivery_date1,
-                                        delivery_date2: delivery.delivery_date2,
-                                        delivery_time1: delivery.delivery_time1,
-                                        delivery_time2: delivery.delivery_time2,
-                                        bol_numbers: delivery.bol_numbers,
-                                        po_numbers: delivery.po_numbers,
-                                        ref_numbers: delivery.ref_numbers,
-                                        seal_number: delivery.seal_number,
-                                        special_instructions: delivery.special_instructions,
-                                        type: delivery.type,
-                                    }
-                            );
+                        setSelectedConsigneeCustomer(
+                            delivery.id === undefined
+                                ? {}
+                                : {
+                                    ...delivery.customer,
+                                    delivery_id: delivery.id,
+                                    contact_id: delivery.contact_id,
+                                    contact_name: delivery.contact_name,
+                                    contact_phone: delivery.contact_phone,
+                                    contact_primary_phone: delivery.contact_primary_phone,
+                                    contact_phone_ext: delivery.contact_phone_ext,
+                                    delivery_date1: delivery.delivery_date1,
+                                    delivery_date2: delivery.delivery_date2,
+                                    delivery_time1: delivery.delivery_time1,
+                                    delivery_time2: delivery.delivery_time2,
+                                    bol_numbers: delivery.bol_numbers,
+                                    po_numbers: delivery.po_numbers,
+                                    ref_numbers: delivery.ref_numbers,
+                                    seal_number: delivery.seal_number,
+                                    special_instructions: delivery.special_instructions,
+                                    type: delivery.type,
+                                }
+                        );
 
-                            setSelectedConsigneeCustomerContact({
-                                ...(delivery.contacts || []).find((c) => c.is_primary === 1),
-                            });
+                        setSelectedConsigneeCustomerContact({
+                            ...(delivery.contacts || []).find((c) => c.is_primary === 1),
+                        });
 
-                            setSelectedCarrier({ ...order.carrier });
-                            setSelectedCarrierContact({
-                                ...(order.carrier?.contacts || []).find(
-                                    (c) => c.is_primary === 1
-                                ),
-                            });
+                        setSelectedCarrier({ ...order.carrier });
+                        setSelectedCarrierContact({
+                            ...(order.carrier?.contacts || []).find(
+                                (c) => c.is_primary === 1
+                            ),
+                        });
 
-                            setSelectedCarrierDriver({
-                                ...order.driver,
-                                name:
-                                    (order.driver?.first_name || "") +
-                                    ((order.driver?.last_name || "").trim() === ""
-                                        ? ""
-                                        : " " + (order.driver?.last_name || "")),
-                            });
+                        setSelectedCarrierDriver({
+                            ...order.driver,
+                            name:
+                                (order.driver?.first_name || "") +
+                                ((order.driver?.last_name || "").trim() === ""
+                                    ? ""
+                                    : " " + (order.driver?.last_name || "")),
+                        });
 
-                            setIsLoading(false);
+                        setIsLoading(false);
 
-                            refDispatchEvents.current.focus();
-                        }
-                    })
+                        refDispatchEvents.current.focus();
+                    } else {
+                        setIsLoading(false);
+                        dispatchClearBtnClick();
+                        refOrderNumber.current.focus();
+                    }
+                })
                     .catch((e) => {
                         console.log("error getting order by trip number", e);
                         setIsLoading(false);
@@ -21001,18 +21126,18 @@ const Dispatch = (props) => {
                             ref={refEventTime}
                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                             onKeyDown={async (e) => {
-                                if ((selectedOrder?.is_cancelled || 0) === 0){
+                                if ((selectedOrder?.is_cancelled || 0) === 0) {
                                     let key = e.keyCode || e.which;
-    
+
                                     e.stopPropagation();
-    
+
                                     if (key === 9) {
                                         e.preventDefault();
-    
+
                                         let formatted = getFormattedHours(e.target.value);
-    
+
                                         await setDispatchEventTime(formatted);
-    
+
                                         if ((dispatchEvent?.name || "") === "") {
                                             goToTabindex((1 + props.tabTimes).toString());
                                         } else {
@@ -21020,7 +21145,7 @@ const Dispatch = (props) => {
                                                 goToTabindex((1 + props.tabTimes).toString());
                                                 return;
                                             }
-    
+
                                             let event_parameters = {
                                                 order_id: selectedOrder.id,
                                                 time: moment().format("HHmm"),
@@ -21032,70 +21157,194 @@ const Dispatch = (props) => {
                                                 event_notes: dispatchEventNotes,
                                                 event_type_id: dispatchEvent.id,
                                             };
-    
+
+                                            console.log(selectedOrderEvent);
+
                                             if (dispatchEvent.id === 1) {
-                                                event_parameters.arrived_customer_id =
-                                                    selectedOrderEvent.customer.id;
-                                                event_parameters.shipper_id =
-                                                    (selectedOrderEvent.customer.type || "") === "pickup"
-                                                        ? selectedOrderEvent.customer.id
-                                                        : null;
-                                                event_parameters.consignee_id =
-                                                    (selectedOrderEvent.customer.type || "") === "delivery"
-                                                        ? selectedOrderEvent.customer.id
-                                                        : null;
+                                                event_parameters.arrived_customer_id = selectedOrderEvent.customer.id;
+                                                event_parameters.shipper_id = (selectedOrderEvent.customer.type || "") === "pickup"
+                                                    ? selectedOrderEvent.customer.id
+                                                    : null;
+                                                event_parameters.consignee_id = (selectedOrderEvent.customer.type || "") === "delivery"
+                                                    ? selectedOrderEvent.customer.id
+                                                    : null;
                                             } else if (dispatchEvent.id === 7) {
-                                                event_parameters.departed_customer_id =
-                                                    selectedOrderEvent.id;
+                                                event_parameters.departed_customer_id = selectedOrderEvent.id;
                                             } else if (dispatchEvent.id === 9) {
-                                                event_parameters.shipper_id =
-                                                    selectedOrderEvent.customer.id;
+                                                event_parameters.shipper_id = selectedOrderEvent.customer.id;
                                             } else if (dispatchEvent.id === 6) {
-                                                event_parameters.consignee_id =
-                                                    selectedOrderEvent.customer.id;
+                                                event_parameters.consignee_id = selectedOrderEvent.customer.id;
                                             } else {
                                                 if (event_parameters.event_notes.trim() === "") {
                                                     window.alert("You must include some notes!");
                                                     refEventTime.current.focus();
                                                     return;
                                                 }
-    
+
                                                 if (event_parameters.event_date.trim() === "") {
                                                     window.alert("You must include the event date!");
                                                     refEventTime.current.focus();
                                                     return;
                                                 }
-    
+
                                                 if (event_parameters.event_time.trim() === "") {
                                                     window.alert("You must include the event time!");
                                                     refEventTime.current.focus();
                                                     return;
                                                 }
                                             }
-    
+
                                             if (window.confirm("Save this event?")) {
                                                 e.preventDefault();
-                                                axios.post(
-                                                    props.serverUrl + "/saveOrderEvent",
-                                                    event_parameters
-                                                ).then(async (res) => {
+                                                axios.post(props.serverUrl + "/saveOrderEvent", event_parameters).then(async (res) => {
                                                     if (res.data.result === "OK") {
                                                         await setSelectedOrder({
                                                             ...selectedOrder,
                                                             events: res.data.order_events,
                                                         });
-    
+
                                                         setDispatchEvent({});
                                                         setDispatchEventLocation("");
                                                         setDispatchEventNotes("");
                                                         setDispatchEventDate("");
                                                         setDispatchEventTime("");
-    
+
                                                         setDispatchEventItems([]);
                                                         setShowDispatchEventSecondPageItems(false);
                                                         setDispatchEventSecondPageItems([]);
-    
+
                                                         refDispatchEvents.current.focus();
+
+                                                        let user_first_name = (selectedOrder?.user_code?.type || '') === 'agent'
+                                                            ? (((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.first_name || '')).trim()
+                                                            : (selectedOrder?.user_code?.type || '') === 'employee'
+                                                                ? ((selectedOrder.user_code?.employee?.first_name || '')).trim()
+                                                                : '';
+
+                                                        let user_last_name = (selectedOrder?.user_code?.type || '') === 'agent'
+                                                            ? (((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.last_name || '')).trim()
+                                                            : (selectedOrder?.user_code?.type || '') === 'employee'
+                                                                ? ((selectedOrder.user_code?.employee?.last_name || '')).trim()
+                                                                : '';
+
+                                                        let recipient_to = [];
+                                                        let recipient_cc = [];
+                                                        let recipient_bcc = [];
+                                                        let emailUrl = '';
+                                                        let customer_id = null;
+
+                                                        if ((dispatchEvent?.id || 0) === 1) { // Arrived
+                                                            if ((selectedOrderEvent?.type || '') === 'pickup') {
+                                                                emailUrl = '/sendCarrierArrivedShipperEmail';
+                                                                customer_id = selectedOrderEvent.customer.id;
+
+                                                                (selectedOrder?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                                    if ((item?.carrier_arrival_shipper || 0) === 1) {
+                                                                        if ((item?.type || '') === 'to') {
+                                                                            recipient_to.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'cc') {
+                                                                            recipient_cc.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'bcc') {
+                                                                            recipient_bcc.push(item.email);
+                                                                        }
+                                                                    }
+
+                                                                    return true;
+                                                                });
+                                                            } else if ((selectedOrderEvent?.type || '') === 'delivery') {
+                                                                emailUrl = '/sendCarrierArrivedConsigneeEmail';
+                                                                customer_id = selectedOrderEvent.customer.id;
+
+                                                                (selectedOrder?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                                    if ((item?.carrier_arrival_consignee || 0) === 1) {
+                                                                        if ((item?.type || '') === 'to') {
+                                                                            recipient_to.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'cc') {
+                                                                            recipient_cc.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'bcc') {
+                                                                            recipient_bcc.push(item.email);
+                                                                        }
+                                                                    }
+
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+
+                                                        if ((dispatchEvent?.id || 0) === 9) { // Loaded at shipper
+                                                            emailUrl = '/sendCarrierLoadedShipperEmail';
+                                                            customer_id = event_parameters.shipper_id;
+
+                                                            (selectedOrder?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                                if ((item?.loaded || 0) === 1) {
+                                                                    if ((item?.type || '') === 'to') {
+                                                                        recipient_to.push(item.email);
+                                                                    }
+
+                                                                    if ((item?.type || '') === 'cc') {
+                                                                        recipient_cc.push(item.email);
+                                                                    }
+
+                                                                    if ((item?.type || '') === 'bcc') {
+                                                                        recipient_bcc.push(item.email);
+                                                                    }
+                                                                }
+
+                                                                return true;
+                                                            });
+                                                        }
+
+                                                        if ((dispatchEvent?.id || 0) === 6) { // Delivered at consignee
+                                                            emailUrl = '/sendCarrierUnloadedConsigneeEmail';
+                                                            customer_id = event_parameters.consignee_id;
+
+                                                            (selectedOrder?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                                if ((item?.empty || 0) === 1) {
+                                                                    if ((item?.type || '') === 'to') {
+                                                                        recipient_to.push(item.email);
+                                                                    }
+
+                                                                    if ((item?.type || '') === 'cc') {
+                                                                        recipient_cc.push(item.email);
+                                                                    }
+
+                                                                    if ((item?.type || '') === 'bcc') {
+                                                                        recipient_bcc.push(item.email);
+                                                                    }
+                                                                }
+
+                                                                return true;
+                                                            });
+                                                        }
+
+                                                        if (recipient_to.length > 0) {
+                                                            axios.post(props.serverUrl + emailUrl, {
+                                                                order_number: selectedOrder?.order_number,
+                                                                customer_id,
+                                                                user_first_name,
+                                                                user_last_name,
+                                                                recipient_to,
+                                                                recipient_cc,
+                                                                recipient_bcc
+                                                            }).then(res => {
+                                                                console.log(res.data.result);
+                                                            }).catch(e => {
+                                                                console.log(e);
+                                                            })
+                                                        }
+
                                                     } else if (res.data.result === "ORDER ID NOT VALID") {
                                                         window.alert("The order number is not valid!");
                                                         refEventTime.current.focus();
@@ -21105,11 +21354,11 @@ const Dispatch = (props) => {
                                                 });
                                             } else {
                                                 e.preventDefault();
-    
+
                                                 setDispatchEventItems([]);
                                                 setShowDispatchEventSecondPageItems(false);
                                                 setDispatchEventSecondPageItems([]);
-    
+
                                                 refEventTime.current.focus();
                                             }
                                         }

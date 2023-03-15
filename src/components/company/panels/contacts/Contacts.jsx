@@ -593,7 +593,7 @@ const Contacts = (props) => {
                                                         <div className="contact-name" style={{
                                                             display: 'flex', alignItems: 'center'
                                                         }}>
-                                                            <div style={{ flexGrow: 1 }}>
+                                                            <div style={{ flexGrow: 1, textTransform: 'capitalize' }}>
                                                                 {(contact.prefix || '') + " " + contact.first_name + " " + (contact.middle_name || '') + " " + contact.last_name}
                                                             </div>
                                                             {
@@ -945,7 +945,9 @@ const Contacts = (props) => {
                                 <div className="contact-form-wrapper">
                                     <div className="field-container">
                                         <div className="field-title">Prefix</div>
-                                        <input ref={refPrefix} type="text" readOnly={!isEditingContact}
+                                        <input ref={refPrefix} type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -965,7 +967,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">First Name</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -985,7 +989,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Middle Name</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1005,7 +1011,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Last Name</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1025,7 +1033,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Suffix</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1051,7 +1061,9 @@ const Contacts = (props) => {
                                                     ? true
                                                     : false
                                                 : true
-                                        }
+                                        } style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1078,7 +1090,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Title</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1098,7 +1112,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Department</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1118,7 +1134,7 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">E-mail Work</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} 
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1313,7 +1329,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Country</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1333,7 +1351,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 1</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1359,7 +1379,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">Address 2</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1385,7 +1407,9 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">City</div>
-                                        <input type="text" readOnly={!isEditingContact}
+                                        <input type="text" readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
+                                        }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1491,13 +1515,13 @@ const Contacts = (props) => {
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
-                                                    website: e.target.value
+                                                    website: e.target.value.toLowerCase()
                                                 });
                                             }}
                                             onChange={e => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
-                                                    website: e.target.value
+                                                    website: e.target.value.toLowerCase()
                                                 });
                                             }}
                                             value={isEditingContact ? tempSelectedContact.website || '' : contactSearchCustomer?.selectedContact?.website || ''}

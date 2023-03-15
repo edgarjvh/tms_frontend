@@ -1998,7 +1998,7 @@ const Invoice = (props) => {
                         <div className="form-buttons">
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
@@ -2011,7 +2011,7 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0),
                                 'active': (selectedOrder?.invoice_customer_reviewed || 0) === 1
@@ -2090,7 +2090,7 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
@@ -2134,7 +2134,7 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0),
                                 'active': (selectedOrder?.order_invoiced || 0) === 1
@@ -2182,7 +2182,7 @@ const Invoice = (props) => {
                         <div className="form-buttons">
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((selectedOrder?.id || 0) === 0 || (selectedBillToRating.id || 0) === 0) ||
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((selectedOrder?.id || 0) === 0 || (selectedBillToRating.id || 0) === 0) ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -2271,204 +2271,209 @@ const Invoice = (props) => {
                                     textAlign: 'left',
                                 }}
                                     readOnly={
-                                        ((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
+                                        (((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0))
                                     }
                                     placeholder='Rate Type'
                                     ref={refBillToRateTypes}
                                     onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_customer_reviewed || 0) === 0 &&
-                                            ((props.user?.user_code?.is_admin || 0) === 1 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                            switch (key) {
-                                                case 37:
-                                                case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (billToRateTypeItems.length > 0) {
-                                                        let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (billToRateTypeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refBillToRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 39:
-                                                case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (billToRateTypeItems.length > 0) {
-                                                        let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === (billToRateTypeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedBillToRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refBillToRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setBillToRateTypeItems([]);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (billToRateTypeItems.length > 0 && billToRateTypeItems.findIndex(item => item.selected) > -1) {
-                                                        setSelectedBillToRating({
-                                                            ...selectedBillToRating,
-                                                            rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
-
-                                                        window.setTimeout(() => {
-                                                            setBillToRateTypeItems([]);
-                                                            refBillToDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
-
-                                                case 9: // tab
-                                                    if (billToRateTypeItems.length > 0) {
+                                            if ((selectedOrder?.invoice_customer_reviewed || 0) === 0 &&
+                                                ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                switch (key) {
+                                                    case 37:
+                                                    case 38: // arrow left | arrow up
                                                         e.preventDefault();
-                                                        setSelectedBillToRating({
-                                                            ...selectedBillToRating,
-                                                            rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                        if (billToRateTypeItems.length > 0) {
+                                                            let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
 
-                                                        window.setTimeout(() => {
-                                                            setBillToRateTypeItems([]);
-                                                            refBillToDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                            if (selectedIndex === -1) {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (billToRateTypeItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                default:
-                                                    break;
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedBillToRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 39:
+                                                    case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (billToRateTypeItems.length > 0) {
+                                                            let selectedIndex = billToRateTypeItems.findIndex(item => item.selected);
+
+                                                            if (selectedIndex === -1) {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setBillToRateTypeItems(billToRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === (billToRateTypeItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
+
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedBillToRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 27: // escape
+                                                        setBillToRateTypeItems([]);
+                                                        break;
+
+                                                    case 13: // enter
+                                                        if (billToRateTypeItems.length > 0 && billToRateTypeItems.findIndex(item => item.selected) > -1) {
+                                                            setSelectedBillToRating({
+                                                                ...selectedBillToRating,
+                                                                rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                    ? ''
+                                                                    : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setBillToRateTypeItems([]);
+                                                                refBillToDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    case 9: // tab
+                                                        if (billToRateTypeItems.length > 0) {
+                                                            e.preventDefault();
+                                                            setSelectedBillToRating({
+                                                                ...selectedBillToRating,
+                                                                rate_type: billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                    ? ''
+                                                                    : billToRateTypeItems[billToRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setBillToRateTypeItems([]);
+                                                                refBillToDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
                                             }
                                         }
                                     }}
                                     onBlur={() => {
-                                        if ((selectedBillToRating.rate_type?.id || 0) === 0) {
-                                            setSelectedBillToRating({})
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            if ((selectedBillToRating.rate_type?.id || 0) === 0) {
+                                                setSelectedBillToRating({})
+                                            }
                                         }
                                     }}
                                     onInput={(e) => {
@@ -2538,70 +2543,73 @@ const Invoice = (props) => {
                                     }}
                                     value={selectedBillToRating.rate_type?.name || ''}
                                 />
-                                <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
-                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                        if (billToRateTypeItems.length > 0) {
-                                            setBillToRateTypeItems([]);
-                                        } else {
-                                            if ((selectedBillToRating.rate_type?.id || 0) === 0 && (selectedBillToRating.rate_type?.name || '') !== '') {
-                                                axios.post(props.serverUrl + '/getRateTypes', {
-                                                    name: selectedBillToRating.rate_type?.name
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_type?.id;
-                                                            return item;
-                                                        }))
-
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                {
+                                    (selectedOrder?.is_cancelled || 0) === 0 &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                        if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                            if (billToRateTypeItems.length > 0) {
+                                                setBillToRateTypeItems([]);
                                             } else {
-                                                axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedBillToRating.rate_type?.id;
-                                                            return item;
-                                                        }))
+                                                if ((selectedBillToRating.rate_type?.id || 0) === 0 && (selectedBillToRating.rate_type?.name || '') !== '') {
+                                                    axios.post(props.serverUrl + '/getRateTypes', {
+                                                        name: selectedBillToRating.rate_type?.name
+                                                    }).then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedBillToRating.rate_type?.id;
+                                                                return item;
+                                                            }))
 
-                                                        refBillToRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setBillToRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedBillToRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedBillToRating.rate_type?.id;
+                                                                return item;
+                                                            }))
+
+                                                            refBillToRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                }
                                             }
-                                        }
 
-                                        refBillToRateTypes.current.focus();
-                                    }
-                                }} />
+                                            refBillToRateTypes.current.focus();
+                                        }
+                                    }} />
+                                }
                             </div>
                             {
                                 billToRateTypeTransition((style, item) => item && (
@@ -2694,19 +2702,21 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Description</div> */}
                             <input type="text" style={{ textAlign: 'left' }}
-                                readOnly={((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
+                                readOnly={(selectedOrder?.is_cancelled || 0) === 1 || (((selectedOrder?.invoice_customer_reviewed || 0) === 1) ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0))}
 
                                 placeholder='Description'
                                 ref={refBillToDescription}
                                 onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
+                                    if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                        let key = e.keyCode || e.which;
 
-                                    if (key === 9) {
-                                        if ((selectedBillToRating?.rate_type?.id || 0) === 0 || (selectedBillToRating?.rate_type?.name || '').toLowerCase() === 'comment') {
-                                            validateCustomerRatingForSaving(e);
+                                        if (key === 9) {
+                                            if ((selectedBillToRating?.rate_type?.id || 0) === 0 || (selectedBillToRating?.rate_type?.name || '').toLowerCase() === 'comment') {
+                                                validateCustomerRatingForSaving(e);
+                                            }
                                         }
                                     }
                                 }}
@@ -5503,11 +5513,12 @@ const Invoice = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedBillToRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
+                                                if ((selectedOrder?.is_cancelled || 0) === 0 && (((selectedOrder?.invoice_customer_reviewed || 0) === 0) &&
                                                     ((props.user?.user_code?.is_admin || 0) === 1 &&
                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                                    const { rate, linehaul, total_charges } = rating;
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1))) {
+                                                    
+                                                            const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedBillToRating({
                                                         ...rating,
@@ -5715,7 +5726,7 @@ const Invoice = (props) => {
                         <div className="form-buttons">
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
@@ -5729,7 +5740,7 @@ const Invoice = (props) => {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'active': (selectedOrder?.invoice_carrier_previewed || 0) === 1,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} style={{
@@ -5804,7 +5815,7 @@ const Invoice = (props) => {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'carrier invoice') !== undefined,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })}>
@@ -5815,7 +5826,7 @@ const Invoice = (props) => {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'signed bill of lading') !== undefined,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })}>
@@ -5826,7 +5837,7 @@ const Invoice = (props) => {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'active': (selectedOrder?.documents || []).find(d => (d.title || '').toLowerCase() === 'signed rate confirmation') !== undefined,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })}>
@@ -5836,7 +5847,7 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                             })} onClick={() => {
@@ -5880,10 +5891,10 @@ const Invoice = (props) => {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': (selectedOrder?.invoice_carrier_previewed || 0) === 0 ||
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || ((selectedOrder?.invoice_carrier_previewed || 0) === 0 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0),
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)),
                                 'active': (selectedOrder?.invoice_carrier_approved || 0) === 1
                             })} style={{
                                 pointerEvents: ((selectedOrder?.invoice_carrier_previewed || 0) === 0 || (selectedOrder?.invoice_carrier_approved || 0) === 1) ? 'none' : 'all'
@@ -6118,10 +6129,10 @@ const Invoice = (props) => {
                         <div className="form-buttons">
                             <div className={classnames({
                                 'mochi-button': true,
-                                'disabled': ((selectedOrder?.id || 0) === 0 || (selectedCarrierRating.id || 0) === 0) ||
+                                'disabled': (selectedOrder?.is_cancelled || 0) === 1 || (((selectedOrder?.id || 0) === 0 || (selectedCarrierRating.id || 0) === 0) ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0))
                             })} style={{ marginRight: 10 }} onClick={() => {
                                 if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
                                     if (window.confirm('Are you sure you want to delete this item?')) {
@@ -6205,203 +6216,207 @@ const Invoice = (props) => {
                                 {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Rate Type</div> */}
                                 <input type="text" style={{ textAlign: 'left' }}
 
-                                    readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                    readOnly={(selectedOrder?.is_cancelled || 0) === 1 || ((selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0))}
                                     placeholder='Rate Type'
                                     ref={refCarrierRateTypes}
                                     onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            let key = e.keyCode || e.which;
 
-                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
-                                            ((props.user?.user_code?.is_admin || 0) === 1 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                            switch (key) {
-                                                case 37:
-                                                case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (carrierRateTypeItems.length > 0) {
-                                                        let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (carrierRateTypeItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 39:
-                                                case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (carrierRateTypeItems.length > 0) {
-                                                        let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
-                                                                if (selectedIndex === (carrierRateTypeItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1);
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                                    item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedCarrierRating.rate_type?.id;
-                                                                    return item;
-                                                                }))
-
-                                                                refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log('error getting rate types', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setCarrierRateTypeItems([]);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (carrierRateTypeItems.length > 0 && carrierRateTypeItems.findIndex(item => item.selected) > -1) {
-                                                        setSelectedCarrierRating({
-                                                            ...selectedCarrierRating,
-                                                            rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
-
-                                                        window.setTimeout(() => {
-                                                            setCarrierRateTypeItems([]);
-                                                            refCarrierDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
-
-                                                case 9: // tab
-                                                    if (carrierRateTypeItems.length > 0) {
+                                            if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                                ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                switch (key) {
+                                                    case 37:
+                                                    case 38: // arrow left | arrow up
                                                         e.preventDefault();
-                                                        setSelectedCarrierRating({
-                                                            ...selectedCarrierRating,
-                                                            rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
-                                                            description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
-                                                                carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
-                                                                ? ''
-                                                                : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
-                                                            rate_subtype: {},
-                                                            pieces: '',
-                                                            weight: '',
-                                                            feet_required: '',
-                                                            rate: '',
-                                                            days: '',
-                                                            hours: '',
-                                                            total_charges: ''
-                                                        })
+                                                        if (carrierRateTypeItems.length > 0) {
+                                                            let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
 
-                                                        window.setTimeout(() => {
-                                                            setCarrierRateTypeItems([]);
-                                                            refCarrierDescription.current.focus();
-                                                        }, 0);
-                                                    }
-                                                    break;
+                                                            if (selectedIndex === -1) {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (carrierRateTypeItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                default:
-                                                    break;
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCarrierRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 39:
+                                                    case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (carrierRateTypeItems.length > 0) {
+                                                            let selectedIndex = carrierRateTypeItems.findIndex(item => item.selected);
+
+                                                            if (selectedIndex === -1) {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                setCarrierRateTypeItems(carrierRateTypeItems.map((item, index) => {
+                                                                    if (selectedIndex === (carrierRateTypeItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1);
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
+
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                        item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedCarrierRating.rate_type?.id;
+                                                                        return item;
+                                                                    }))
+
+                                                                    refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log('error getting rate types', e);
+                                                            })
+                                                        }
+                                                        break;
+
+                                                    case 27: // escape
+                                                        setCarrierRateTypeItems([]);
+                                                        break;
+
+                                                    case 13: // enter
+                                                        if (carrierRateTypeItems.length > 0 && carrierRateTypeItems.findIndex(item => item.selected) > -1) {
+                                                            setSelectedCarrierRating({
+                                                                ...selectedCarrierRating,
+                                                                rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                    ? ''
+                                                                    : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setCarrierRateTypeItems([]);
+                                                                refCarrierDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    case 9: // tab
+                                                        if (carrierRateTypeItems.length > 0) {
+                                                            e.preventDefault();
+                                                            setSelectedCarrierRating({
+                                                                ...selectedCarrierRating,
+                                                                rate_type: carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)],
+                                                                description: (carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'flat' ||
+                                                                    carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name.toLowerCase() === 'linehaul')
+                                                                    ? ''
+                                                                    : carrierRateTypeItems[carrierRateTypeItems.findIndex(item => item.selected)].name,
+                                                                rate_subtype: {},
+                                                                pieces: '',
+                                                                weight: '',
+                                                                feet_required: '',
+                                                                rate: '',
+                                                                days: '',
+                                                                hours: '',
+                                                                total_charges: ''
+                                                            })
+
+                                                            window.setTimeout(() => {
+                                                                setCarrierRateTypeItems([]);
+                                                                refCarrierDescription.current.focus();
+                                                            }, 0);
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
                                             }
                                         }
                                     }}
                                     onBlur={() => {
-                                        if ((selectedCarrierRating.rate_type?.id || 0) === 0) {
-                                            setSelectedCarrierRating({})
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            if ((selectedCarrierRating.rate_type?.id || 0) === 0) {
+                                                setSelectedCarrierRating({})
+                                            }
                                         }
                                     }}
                                     onInput={(e) => {
@@ -6471,70 +6486,73 @@ const Invoice = (props) => {
                                     }}
                                     value={selectedCarrierRating.rate_type?.name || ''}
                                 />
-                                <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
-                                    if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
-                                        ((props.user?.user_code?.is_admin || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                        if (carrierRateTypeItems.length > 0) {
-                                            setCarrierRateTypeItems([]);
-                                        } else {
-                                            if ((selectedCarrierRating.rate_type?.id || 0) === 0 && (selectedCarrierRating.rate_type?.name || '') !== '') {
-                                                axios.post(props.serverUrl + '/getRateTypes', {
-                                                    name: selectedCarrierRating.rate_type?.name
-                                                }).then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_type?.id;
-                                                            return item;
-                                                        }))
-
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                {
+                                    (selectedOrder?.is_cancelled || 0) === 0 &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                        if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                            if (carrierRateTypeItems.length > 0) {
+                                                setCarrierRateTypeItems([]);
                                             } else {
-                                                axios.post(props.serverUrl + '/getRateTypes').then(res => {
-                                                    if (res.data.result === 'OK') {
-                                                        setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
-                                                            item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
-                                                                ? index === 0
-                                                                : item.id === selectedCarrierRating.rate_type?.id;
-                                                            return item;
-                                                        }))
+                                                if ((selectedCarrierRating.rate_type?.id || 0) === 0 && (selectedCarrierRating.rate_type?.name || '') !== '') {
+                                                    axios.post(props.serverUrl + '/getRateTypes', {
+                                                        name: selectedCarrierRating.rate_type?.name
+                                                    }).then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedCarrierRating.rate_type?.id;
+                                                                return item;
+                                                            }))
 
-                                                        refCarrierRateTypePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                }).catch(e => {
-                                                    console.log('error getting rate types', e);
-                                                })
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getRateTypes').then(res => {
+                                                        if (res.data.result === 'OK') {
+                                                            setCarrierRateTypeItems(res.data.rate_types.map((item, index) => {
+                                                                item.selected = (selectedCarrierRating.rate_type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedCarrierRating.rate_type?.id;
+                                                                return item;
+                                                            }))
+
+                                                            refCarrierRateTypePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(e => {
+                                                        console.log('error getting rate types', e);
+                                                    })
+                                                }
                                             }
-                                        }
 
-                                        refCarrierRateTypes.current.focus();
-                                    }
-                                }} />
+                                            refCarrierRateTypes.current.focus();
+                                        }
+                                    }} />
+                                }
                             </div>
                             {
                                 carrierRateTypeTransition((style, item) => item && (
@@ -6628,18 +6646,20 @@ const Invoice = (props) => {
                         }}>
                             {/* <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Description</div> */}
                             <input type="text" style={{ textAlign: 'left' }}
-                                readOnly={(selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
+                                readOnly={(selectedOrder?.is_cancelled || 0) === 1 || ((selectedOrder?.invoice_carrier_previewed || 0) === 1 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)}
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0))}
                                 placeholder='Description'
                                 ref={refCarrierDescription}
                                 onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
-
-                                    if (key === 9) {
-                                        if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
-                                            validateCarrierRatingForSaving(e);
+                                    if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        let key = e.keyCode || e.which;
+    
+                                        if (key === 9) {
+                                            if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
+                                                validateCarrierRatingForSaving(e);
+                                            }
                                         }
                                     }
                                 }}
@@ -9413,11 +9433,12 @@ const Invoice = (props) => {
                                                 'rating-item': true,
                                                 'selected': rating.id === (selectedCarrierRating.id || 0)
                                             })} key={index} onClick={() => {
-                                                if ((selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
+                                                if ((selectedOrder?.is_cancelled || 0) === 0 && (selectedOrder?.invoice_carrier_previewed || 0) === 0 &&
                                                     ((props.user?.user_code?.is_admin || 0) === 1 &&
                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                                    const { rate, linehaul, total_charges } = rating;
+                                                    
+                                                            const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedCarrierRating({
                                                         ...rating,
@@ -9724,6 +9745,7 @@ const Invoice = (props) => {
                             <div className='top-border top-border-middle'></div>
                             <div className="form-buttons">
                                 <div className={
+                                    (selectedOrder?.is_cancelled || 0) === 1 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -9843,6 +9865,7 @@ const Invoice = (props) => {
                             <div className='top-border top-border-middle'></div>
                             <div className="form-buttons">
                                 <div className={
+                                    (selectedOrder?.is_cancelled || 0) === 1 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -10323,13 +10346,40 @@ const Invoice = (props) => {
                             gridGap: 5
                         }}>
                             <div className='selected-pickup-number'>
-                                <span>BOL Numbers:</span> <span>{selectedRoute?.bol_numbers || ''}</span>
+                                <span>BOL Numbers:</span> 
+                                {
+                                    (selectedRoute?.bol_numbers || '').split('|').map((item, index) => {
+                                        if (item.trim() !== ''){
+                                            return (<span>{item}</span>)
+                                        }else{
+                                            return ''
+                                        }
+                                    })
+                                }
                             </div>
                             <div className='selected-pickup-number'>
-                                <span>Ref Numbers:</span> <span>{selectedRoute?.ref_numbers || ''}</span>
+                                <span>Ref Numbers:</span> 
+                                {
+                                    (selectedRoute?.ref_numbers || '').split('|').map((item, index) => {
+                                        if (item.trim() !== ''){
+                                            return (<span>{item}</span>)
+                                        }else{
+                                            return ''
+                                        }
+                                    })
+                                }
                             </div>
                             <div className='selected-pickup-number'>
-                                <span>PO Numbers:</span> <span>{selectedRoute?.po_numbers || ''}</span>
+                                <span>PO Numbers:</span> 
+                                {
+                                    (selectedRoute?.po_numbers || '').split('|').map((item, index) => {
+                                        if (item.trim() !== ''){
+                                            return (<span>{item}</span>)
+                                        }else{
+                                            return ''
+                                        }
+                                    })
+                                }
                             </div>
                             <div className='selected-pickup-number'>
                                 <span>Seal Number:</span> <span>{selectedRoute?.seal_number || ''}</span>
@@ -10349,6 +10399,7 @@ const Invoice = (props) => {
                                 <div className='top-border top-border-middle'></div>
                                 <div className='form-buttons'>
                                     <div className={
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -10390,6 +10441,7 @@ const Invoice = (props) => {
                                 <div className='top-border top-border-middle'></div>
                                 <div className='form-buttons'>
                                     <div className={
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
                                         (selectedOrder?.invoice_customer_reviewed || 0) === 1 ||
                                             ((props.user?.user_code?.is_admin || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
@@ -11470,6 +11522,7 @@ const Invoice = (props) => {
                         marginTop: -2
                     }}>
                         <div className={
+                            (selectedOrder?.is_cancelled || 0) === 1 ||
                             (selectedOrder?.order_invoiced || 0) === 0 ||
                                 ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
@@ -11496,6 +11549,7 @@ const Invoice = (props) => {
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                         <div className={
+                            (selectedOrder?.is_cancelled || 0) === 1 ||
                             ((props.user?.user_code?.is_admin || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -11507,6 +11561,7 @@ const Invoice = (props) => {
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                         <div className={
+                            (selectedOrder?.is_cancelled || 0) === 1 ||
                             ((props.user?.user_code?.is_admin || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -11522,18 +11577,21 @@ const Invoice = (props) => {
                                 <input type="text" placeholder="Check Number"
                                     tabIndex={73 + props.tabTimes}
                                     readOnly={
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                     }
                                     onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
-
-                                        if (((props.user?.user_code?.is_admin || 0) === 1 ||
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                            if (key === 9) {
-                                                validateOrderForSaving(e);
+                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            let key = e.keyCode || e.which;
+    
+                                            if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                if (key === 9) {
+                                                    validateOrderForSaving(e);
+                                                }
                                             }
                                         }
                                     }}
@@ -11564,102 +11622,107 @@ const Invoice = (props) => {
                                         guide={false}
                                         type="text" placeholder="Date Received"
                                         readOnly={
+                                            (selectedOrder?.is_cancelled || 0) === 1 ||
                                             ((props.user?.user_code?.is_admin || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                         }
                                         onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
-
-                                            if (((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                                if (key >= 37 && key <= 40) {
-                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                    await setPreSelectedDateReceived(event_date);
-
-                                                    if (isDateReceivedCalendarShown) {
-                                                        e.preventDefault();
-
-                                                        if (key === 37) { // left - minus 1
-                                                            setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(1, 'day'));
-                                                        }
-
-                                                        if (key === 38) { // up - minus 7
-                                                            setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(7, 'day'));
-                                                        }
-
-                                                        if (key === 39) { // right - plus 1
-                                                            setPreSelectedDateReceived(preSelectedDateReceived.clone().add(1, 'day'));
-                                                        }
-
-                                                        if (key === 40) { // down - plus 7
-                                                            setPreSelectedDateReceived(preSelectedDateReceived.clone().add(7, 'day'));
-                                                        }
-                                                    } else {
-                                                        await setIsDateReceivedCalendarShown(true);
-                                                    }
-                                                }
-
-                                                if (key === 13) {
-                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                    await setPreSelectedDateReceived(event_date);
-
-                                                    if (isDateReceivedCalendarShown) {
-                                                        event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
-
-                                                        await setSelectedOrder(selectedOrder => {
-                                                            return {
-                                                                ...selectedOrder,
-                                                                customer_date_received: event_date
+                                            if ((selectedOrder?.is_cancelled || 0) === 0){
+                                                let key = e.keyCode || e.which;
+    
+                                                if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                    if (key >= 37 && key <= 40) {
+                                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                        await setPreSelectedDateReceived(event_date);
+    
+                                                        if (isDateReceivedCalendarShown) {
+                                                            e.preventDefault();
+    
+                                                            if (key === 37) { // left - minus 1
+                                                                setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(1, 'day'));
                                                             }
-                                                        })
-
-                                                        await validateOrderForSaving({ keyCode: 9 });
-
-                                                        await setIsDateReceivedCalendarShown(false);
-                                                    }
-                                                }
-
-                                                if (key === 9) {
-                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
-                                                    await setPreSelectedDateReceived(event_date);
-
-                                                    if (isDateReceivedCalendarShown) {
-                                                        event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
-
-                                                        await setSelectedOrder(selectedOrder => {
-                                                            return {
-                                                                ...selectedOrder,
-                                                                customer_date_received: event_date
+    
+                                                            if (key === 38) { // up - minus 7
+                                                                setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(7, 'day'));
                                                             }
-                                                        })
-
-                                                        await validateOrderForSaving({ keyCode: 9 });
-
-                                                        await setIsDateReceivedCalendarShown(false);
-                                                    } else {
-                                                        if (e.target.value.trim() === '') {
+    
+                                                            if (key === 39) { // right - plus 1
+                                                                setPreSelectedDateReceived(preSelectedDateReceived.clone().add(1, 'day'));
+                                                            }
+    
+                                                            if (key === 40) { // down - plus 7
+                                                                setPreSelectedDateReceived(preSelectedDateReceived.clone().add(7, 'day'));
+                                                            }
+                                                        } else {
+                                                            await setIsDateReceivedCalendarShown(true);
+                                                        }
+                                                    }
+    
+                                                    if (key === 13) {
+                                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                        await setPreSelectedDateReceived(event_date);
+    
+                                                        if (isDateReceivedCalendarShown) {
+                                                            event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
+    
                                                             await setSelectedOrder(selectedOrder => {
                                                                 return {
                                                                     ...selectedOrder,
-                                                                    customer_date_received: null
+                                                                    customer_date_received: event_date
                                                                 }
                                                             })
-
+    
                                                             await validateOrderForSaving({ keyCode: 9 });
+    
+                                                            await setIsDateReceivedCalendarShown(false);
+                                                        }
+                                                    }
+    
+                                                    if (key === 9) {
+                                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
+                                                        await setPreSelectedDateReceived(event_date);
+    
+                                                        if (isDateReceivedCalendarShown) {
+                                                            event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
+    
+                                                            await setSelectedOrder(selectedOrder => {
+                                                                return {
+                                                                    ...selectedOrder,
+                                                                    customer_date_received: event_date
+                                                                }
+                                                            })
+    
+                                                            await validateOrderForSaving({ keyCode: 9 });
+    
+                                                            await setIsDateReceivedCalendarShown(false);
+                                                        } else {
+                                                            if (e.target.value.trim() === '') {
+                                                                await setSelectedOrder(selectedOrder => {
+                                                                    return {
+                                                                        ...selectedOrder,
+                                                                        customer_date_received: null
+                                                                    }
+                                                                })
+    
+                                                                await validateOrderForSaving({ keyCode: 9 });
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }}
                                         onBlur={e => {
-                                            setSelectedOrder(selectedOrder => {
-                                                return {
-                                                    ...selectedOrder,
-                                                    customer_date_received: getFormattedDates(selectedOrder?.customer_date_received)
-                                                }
-                                            })
+                                            if ((selectedOrder?.is_cancelled || 0) === 0){
+                                                setSelectedOrder(selectedOrder => {
+                                                    return {
+                                                        ...selectedOrder,
+                                                        customer_date_received: getFormattedDates(selectedOrder?.customer_date_received)
+                                                    }
+                                                })
+                                            }
                                         }}
                                         onInput={e => {
                                             setSelectedOrder(selectedOrder => {
@@ -11682,6 +11745,7 @@ const Invoice = (props) => {
                                     />
 
                                     {
+                                        (selectedOrder?.is_cancelled || 0) === 0 &&
                                         ((props.user?.user_code?.is_admin || 0) === 1 ||
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
@@ -11779,104 +11843,107 @@ const Invoice = (props) => {
                                     guide={false}
                                     type="text" placeholder="Invoice Rec'd Date"
                                     readOnly={
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                     }
                                     onKeyDown={async (e) => {
-                                        let key = e.keyCode || e.which;
-
-                                        if (((props.user?.user_code?.is_admin || 0) === 1 ||
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                            if (key >= 37 && key <= 40) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedInvoiceReceivedDate(event_date);
-
-                                                if (isInvoiceReceivedDateCalendarShown) {
-                                                    e.preventDefault();
-
-                                                    if (key === 37) { // left - minus 1
-                                                        setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(1, 'day'));
-                                                    }
-
-                                                    if (key === 38) { // up - minus 7
-                                                        setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(7, 'day'));
-                                                    }
-
-                                                    if (key === 39) { // right - plus 1
-                                                        setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(1, 'day'));
-                                                    }
-
-                                                    if (key === 40) { // down - plus 7
-                                                        setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(7, 'day'));
-                                                    }
-                                                } else {
-                                                    await setIsInvoiceReceivedDateCalendarShown(true);
-                                                }
-                                            }
-
-                                            if (key === 13) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedInvoiceReceivedDate(event_date);
-
-                                                if (isInvoiceReceivedDateCalendarShown) {
-                                                    event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
-
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            invoice_received_date: event_date
+                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            let key = e.keyCode || e.which;
+    
+                                            if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                if (key >= 37 && key <= 40) {
+                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                    await setPreSelectedInvoiceReceivedDate(event_date);
+    
+                                                    if (isInvoiceReceivedDateCalendarShown) {
+                                                        e.preventDefault();
+    
+                                                        if (key === 37) { // left - minus 1
+                                                            setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(1, 'day'));
                                                         }
-                                                    })
-
-                                                    await validateOrderForSaving({ keyCode: 9 });
-
-                                                    await setIsInvoiceReceivedDateCalendarShown(false);
-                                                }
-                                            }
-
-                                            if (key === 9) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedInvoiceReceivedDate(event_date);
-
-                                                if (isInvoiceReceivedDateCalendarShown) {
-                                                    event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
-
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            invoice_received_date: event_date
+    
+                                                        if (key === 38) { // up - minus 7
+                                                            setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(7, 'day'));
                                                         }
-                                                    })
-
-                                                    await validateOrderForSaving({ keyCode: 9 });
-
-                                                    await setIsInvoiceReceivedDateCalendarShown(false);
-                                                } else {
-                                                    if (e.target.value.trim() === '') {
+    
+                                                        if (key === 39) { // right - plus 1
+                                                            setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(1, 'day'));
+                                                        }
+    
+                                                        if (key === 40) { // down - plus 7
+                                                            setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(7, 'day'));
+                                                        }
+                                                    } else {
+                                                        await setIsInvoiceReceivedDateCalendarShown(true);
+                                                    }
+                                                }
+    
+                                                if (key === 13) {
+                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                    await setPreSelectedInvoiceReceivedDate(event_date);
+    
+                                                    if (isInvoiceReceivedDateCalendarShown) {
+                                                        event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
+    
                                                         await setSelectedOrder(selectedOrder => {
                                                             return {
                                                                 ...selectedOrder,
-                                                                invoice_received_date: null
+                                                                invoice_received_date: event_date
                                                             }
                                                         })
-
+    
                                                         await validateOrderForSaving({ keyCode: 9 });
+    
+                                                        await setIsInvoiceReceivedDateCalendarShown(false);
+                                                    }
+                                                }
+    
+                                                if (key === 9) {
+                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
+                                                    await setPreSelectedInvoiceReceivedDate(event_date);
+    
+                                                    if (isInvoiceReceivedDateCalendarShown) {
+                                                        event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
+    
+                                                        await setSelectedOrder(selectedOrder => {
+                                                            return {
+                                                                ...selectedOrder,
+                                                                invoice_received_date: event_date
+                                                            }
+                                                        })
+    
+                                                        await validateOrderForSaving({ keyCode: 9 });
+    
+                                                        await setIsInvoiceReceivedDateCalendarShown(false);
+                                                    } else {
+                                                        if (e.target.value.trim() === '') {
+                                                            await setSelectedOrder(selectedOrder => {
+                                                                return {
+                                                                    ...selectedOrder,
+                                                                    invoice_received_date: null
+                                                                }
+                                                            })
+    
+                                                            await validateOrderForSaving({ keyCode: 9 });
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
-
-
                                     }}
                                     onBlur={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_received_date: getFormattedDates(selectedOrder?.invoice_received_date)
-                                            }
-                                        })
+                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            setSelectedOrder(selectedOrder => {
+                                                return {
+                                                    ...selectedOrder,
+                                                    invoice_received_date: getFormattedDates(selectedOrder?.invoice_received_date)
+                                                }
+                                            })
+                                        }
                                     }}
                                     onInput={e => {
                                         setSelectedOrder(selectedOrder => {
@@ -11899,6 +11966,7 @@ const Invoice = (props) => {
                                 />
 
                                 {
+                                    (selectedOrder?.is_cancelled || 0) === 0 &&
                                     ((props.user?.user_code?.is_admin || 0) === 1 ||
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
@@ -11979,18 +12047,21 @@ const Invoice = (props) => {
                             <input type="text" placeholder="Invoice Number"
                                 tabIndex={76 + props.tabTimes}
                                 readOnly={
+                                    (selectedOrder?.is_cancelled || 0) === 1 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                 }
                                 onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
-
-                                    if (((props.user?.user_code?.is_admin || 0) === 1 ||
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                        if (key === 9) {
-                                            validateOrderForSaving(e);
+                                    if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        let key = e.keyCode || e.which;
+    
+                                        if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                            if (key === 9) {
+                                                validateOrderForSaving(e);
+                                            }
                                         }
                                     }
                                 }}
@@ -12018,182 +12089,186 @@ const Invoice = (props) => {
                                 <input type="text" placeholder="Terms"
                                     tabIndex={77 + props.tabTimes}
                                     readOnly={
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                     }
                                     ref={refTerms}
                                     onKeyDown={async (e) => {
-                                        let key = e.keyCode || e.which;
-
-                                        if (((props.user?.user_code?.is_admin || 0) === 1 ||
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                            switch (key) {
-                                                case 37:
-                                                case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (termsItems.length > 0) {
-                                                        let selectedIndex = termsItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            await setTermsItems(termsItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setTermsItems(termsItems.map((item, index) => {
-                                                                if (selectedIndex === 0) {
-                                                                    item.selected = index === (termsItems.length - 1);
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex - 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refTermsPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getTerms').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setTermsItems(res.data.terms.map((item, index) => {
-                                                                    item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedOrder?.term?.id
-                                                                    return item;
-                                                                }))
-
-                                                                refTermsPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting terms', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 39:
-                                                case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (termsItems.length > 0) {
-                                                        let selectedIndex = termsItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            await setTermsItems(termsItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-                                                        } else {
-                                                            await setTermsItems(termsItems.map((item, index) => {
-                                                                if (selectedIndex === (termsItems.length - 1)) {
-                                                                    item.selected = index === 0;
-                                                                } else {
-                                                                    item.selected = index === (selectedIndex + 1)
-                                                                }
-                                                                return item;
-                                                            }))
-                                                        }
-
-                                                        refTermsPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains('selected')) {
-                                                                r.scrollIntoView({
-                                                                    behavior: 'auto',
-                                                                    block: 'center',
-                                                                    inline: 'nearest'
-                                                                })
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + '/getTerms').then(async res => {
-                                                            if (res.data.result === 'OK') {
-                                                                await setTermsItems(res.data.terms.map((item, index) => {
-                                                                    item.selected = (selectedOrder?.term?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedOrder?.term?.id
-                                                                    return item;
-                                                                }))
-
-                                                                refTermsPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async e => {
-                                                            console.log('error getting terms', e);
-                                                        })
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setTermsItems([]);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
-                                                        setSelectedOrder(selectedOrder => {
-                                                            return {
-                                                                ...selectedOrder,
-                                                                term: termsItems[termsItems.findIndex(item => item.selected)],
-                                                                term_id: termsItems[termsItems.findIndex(item => item.selected)].id
-                                                            }
-                                                        })
-
-                                                        validateOrderForSaving({ keyCode: 9 });
-                                                        setTermsItems([]);
-                                                        refTerms.current.focus();
-                                                    }
-                                                    break;
-
-                                                case 9: // tab
-                                                    if (termsItems.length > 0) {
+                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            let key = e.keyCode || e.which;
+    
+                                            if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                switch (key) {
+                                                    case 37:
+                                                    case 38: // arrow left | arrow up
                                                         e.preventDefault();
-                                                        setSelectedOrder(selectedOrder => {
-                                                            return {
-                                                                ...selectedOrder,
-                                                                term: termsItems[termsItems.findIndex(item => item.selected)],
-                                                                term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                        if (termsItems.length > 0) {
+                                                            let selectedIndex = termsItems.findIndex(item => item.selected);
+    
+                                                            if (selectedIndex === -1) {
+                                                                await setTermsItems(termsItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setTermsItems(termsItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (termsItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
                                                             }
-                                                        })
-
-                                                        validateOrderForSaving({ keyCode: 9 });
+    
+                                                            refTermsPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    await setTermsItems(res.data.terms.map((item, index) => {
+                                                                        item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedOrder?.term?.id
+                                                                        return item;
+                                                                    }))
+    
+                                                                    refTermsPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(async e => {
+                                                                console.log('error getting terms', e);
+                                                            })
+                                                        }
+                                                        break;
+    
+                                                    case 39:
+                                                    case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (termsItems.length > 0) {
+                                                            let selectedIndex = termsItems.findIndex(item => item.selected);
+    
+                                                            if (selectedIndex === -1) {
+                                                                await setTermsItems(termsItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setTermsItems(termsItems.map((item, index) => {
+                                                                    if (selectedIndex === (termsItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
+    
+                                                            refTermsPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            axios.post(props.serverUrl + '/getTerms').then(async res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    await setTermsItems(res.data.terms.map((item, index) => {
+                                                                        item.selected = (selectedOrder?.term?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedOrder?.term?.id
+                                                                        return item;
+                                                                    }))
+    
+                                                                    refTermsPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains('selected')) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: 'auto',
+                                                                                block: 'center',
+                                                                                inline: 'nearest'
+                                                                            })
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                }
+                                                            }).catch(async e => {
+                                                                console.log('error getting terms', e);
+                                                            })
+                                                        }
+                                                        break;
+    
+                                                    case 27: // escape
                                                         setTermsItems([]);
-                                                        refTerms.current.focus();
-                                                    }
-                                                    break;
-
-                                                default:
-                                                    break;
+                                                        break;
+    
+                                                    case 13: // enter
+                                                        if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
+                                                            setSelectedOrder(selectedOrder => {
+                                                                return {
+                                                                    ...selectedOrder,
+                                                                    term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                                    term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                                }
+                                                            })
+    
+                                                            validateOrderForSaving({ keyCode: 9 });
+                                                            setTermsItems([]);
+                                                            refTerms.current.focus();
+                                                        }
+                                                        break;
+    
+                                                    case 9: // tab
+                                                        if (termsItems.length > 0) {
+                                                            e.preventDefault();
+                                                            setSelectedOrder(selectedOrder => {
+                                                                return {
+                                                                    ...selectedOrder,
+                                                                    term: termsItems[termsItems.findIndex(item => item.selected)],
+                                                                    term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                                }
+                                                            })
+    
+                                                            validateOrderForSaving({ keyCode: 9 });
+                                                            setTermsItems([]);
+                                                            refTerms.current.focus();
+                                                        }
+                                                        break;
+    
+                                                    default:
+                                                        break;
+                                                }
                                             }
                                         }
-
                                     }}
                                     onBlur={async () => {
-                                        if ((selectedOrder?.term?.id || 0) === 0) {
-                                            await setTerm({});
+                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            if ((selectedOrder?.term?.id || 0) === 0) {
+                                                await setTerm({});
+                                            }
                                         }
                                     }}
                                     onInput={async (e) => {
@@ -12201,9 +12276,9 @@ const Invoice = (props) => {
                                         term.id = 0;
                                         term.name = e.target.value;
                                         await setSelectedOrder(prev => {
-                                            return { 
-                                                ...prev, 
-                                                term: term 
+                                            return {
+                                                ...prev,
+                                                term: term
                                             }
                                         });
 
@@ -12231,15 +12306,16 @@ const Invoice = (props) => {
                                         term.id = 0;
                                         term.name = e.target.value;
                                         await setSelectedOrder(prev => {
-                                            return { 
-                                                ...prev, 
-                                                term: term 
+                                            return {
+                                                ...prev,
+                                                term: term
                                             }
                                         });
                                     }}
                                     value={selectedOrder?.term?.name || ''}
                                 />
                                 {
+                                    (selectedOrder?.is_cancelled || 0) === 0 &&
                                     ((props.user?.user_code?.is_admin || 0) === 1 ||
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
@@ -12395,104 +12471,107 @@ const Invoice = (props) => {
                                     guide={false}
                                     type="text" placeholder="Date Paid"
                                     readOnly={
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                     }
                                     onKeyDown={async (e) => {
-                                        let key = e.keyCode || e.which;
-
-                                        if (((props.user?.user_code?.is_admin || 0) === 1 ||
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                            if (key >= 37 && key <= 40) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedDatePaid(event_date);
-
-                                                if (isDatePaidCalendarShown) {
-                                                    e.preventDefault();
-
-                                                    if (key === 37) { // left - minus 1
-                                                        setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(1, 'day'));
-                                                    }
-
-                                                    if (key === 38) { // up - minus 7
-                                                        setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(7, 'day'));
-                                                    }
-
-                                                    if (key === 39) { // right - plus 1
-                                                        setPreSelectedDatePaid(preSelectedDatePaid.clone().add(1, 'day'));
-                                                    }
-
-                                                    if (key === 40) { // down - plus 7
-                                                        setPreSelectedDatePaid(preSelectedDatePaid.clone().add(7, 'day'));
-                                                    }
-                                                } else {
-                                                    await setIsDatePaidCalendarShown(true);
-                                                }
-                                            }
-
-                                            if (key === 13) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedDatePaid(event_date);
-
-                                                if (isDatePaidCalendarShown) {
-                                                    event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
-
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            invoice_date_paid: event_date
+                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            let key = e.keyCode || e.which;
+    
+                                            if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                if (key >= 37 && key <= 40) {
+                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                    await setPreSelectedDatePaid(event_date);
+    
+                                                    if (isDatePaidCalendarShown) {
+                                                        e.preventDefault();
+    
+                                                        if (key === 37) { // left - minus 1
+                                                            setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(1, 'day'));
                                                         }
-                                                    })
-
-                                                    await validateOrderForSaving({ keyCode: 9 });
-
-                                                    await setIsDatePaidCalendarShown(false);
-                                                }
-                                            }
-
-                                            if (key === 9) {
-                                                let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
-                                                await setPreSelectedDatePaid(event_date);
-
-                                                if (isDatePaidCalendarShown) {
-                                                    event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
-
-                                                    await setSelectedOrder(selectedOrder => {
-                                                        return {
-                                                            ...selectedOrder,
-                                                            invoice_date_paid: event_date
+    
+                                                        if (key === 38) { // up - minus 7
+                                                            setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(7, 'day'));
                                                         }
-                                                    })
-
-                                                    await validateOrderForSaving({ keyCode: 9 });
-
-                                                    await setIsDatePaidCalendarShown(false);
-                                                } else {
-                                                    if (e.target.value.trim() === '') {
+    
+                                                        if (key === 39) { // right - plus 1
+                                                            setPreSelectedDatePaid(preSelectedDatePaid.clone().add(1, 'day'));
+                                                        }
+    
+                                                        if (key === 40) { // down - plus 7
+                                                            setPreSelectedDatePaid(preSelectedDatePaid.clone().add(7, 'day'));
+                                                        }
+                                                    } else {
+                                                        await setIsDatePaidCalendarShown(true);
+                                                    }
+                                                }
+    
+                                                if (key === 13) {
+                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                    await setPreSelectedDatePaid(event_date);
+    
+                                                    if (isDatePaidCalendarShown) {
+                                                        event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
+    
                                                         await setSelectedOrder(selectedOrder => {
                                                             return {
                                                                 ...selectedOrder,
-                                                                invoice_date_paid: null
+                                                                invoice_date_paid: event_date
                                                             }
                                                         })
-
+    
                                                         await validateOrderForSaving({ keyCode: 9 });
+    
+                                                        await setIsDatePaidCalendarShown(false);
+                                                    }
+                                                }
+    
+                                                if (key === 9) {
+                                                    let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
+                                                    await setPreSelectedDatePaid(event_date);
+    
+                                                    if (isDatePaidCalendarShown) {
+                                                        event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
+    
+                                                        await setSelectedOrder(selectedOrder => {
+                                                            return {
+                                                                ...selectedOrder,
+                                                                invoice_date_paid: event_date
+                                                            }
+                                                        })
+    
+                                                        await validateOrderForSaving({ keyCode: 9 });
+    
+                                                        await setIsDatePaidCalendarShown(false);
+                                                    } else {
+                                                        if (e.target.value.trim() === '') {
+                                                            await setSelectedOrder(selectedOrder => {
+                                                                return {
+                                                                    ...selectedOrder,
+                                                                    invoice_date_paid: null
+                                                                }
+                                                            })
+    
+                                                            await validateOrderForSaving({ keyCode: 9 });
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
-
-
                                     }}
                                     onBlur={e => {
-                                        setSelectedOrder(selectedOrder => {
-                                            return {
-                                                ...selectedOrder,
-                                                invoice_date_paid: getFormattedDates(selectedOrder?.invoice_date_paid)
-                                            }
-                                        })
+                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            setSelectedOrder(selectedOrder => {
+                                                return {
+                                                    ...selectedOrder,
+                                                    invoice_date_paid: getFormattedDates(selectedOrder?.invoice_date_paid)
+                                                }
+                                            })
+                                        }
                                     }}
                                     onInput={e => {
                                         setSelectedOrder(selectedOrder => {
@@ -12514,6 +12593,7 @@ const Invoice = (props) => {
                                     ref={refDatePaid}
                                 />
                                 {
+                                    (selectedOrder?.is_cancelled || 0) === 0 &&
                                     ((props.user?.user_code?.is_admin || 0) === 1 ||
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
@@ -12589,21 +12669,24 @@ const Invoice = (props) => {
                             <input type="text" placeholder="Check Number"
                                 tabIndex={79 + props.tabTimes}
                                 readOnly={
+                                    (selectedOrder?.is_cancelled || 0) === 1 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                 }
                                 onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
-
-                                    if (((props.user?.user_code?.is_admin || 0) === 1 ||
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                        if (key === 9) {
-                                            e.preventDefault();
-                                            validateOrderForSaving(e);
-
-                                            refOrderNumber.current.focus();
+                                    if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        let key = e.keyCode || e.which;
+    
+                                        if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                            if (key === 9) {
+                                                e.preventDefault();
+                                                validateOrderForSaving(e);
+    
+                                                refOrderNumber.current.focus();
+                                            }
                                         }
                                     }
                                 }}

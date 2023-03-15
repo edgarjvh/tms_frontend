@@ -58,9 +58,16 @@
   .selected-pickup-number{
     font-size: 0.7rem;
 
-    span:not(:last-child){
+    span:first-child{
       font-weight: bold;
       margin-right: 5px;
+    }
+
+    span:not(:first-child){
+        margin-right: 5px;
+        &:nth-child(odd){
+            color: blue;
+        }
     }
   }
 

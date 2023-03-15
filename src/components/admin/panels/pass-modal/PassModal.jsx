@@ -49,7 +49,7 @@ const PassModal = (props) => {
                         textAlign: 'center',
                         fontWeight: 'bold',
                         fontSize: 30,
-                        color:'darkred',
+                        color: (props.type || 'ERROR') === 'ERROR' ? 'darkred' : (props.type || 'ERROR') === 'WARNING' ? 'yellow' : 'darkgreen',
                         border: '1px dashed rgba(0,0,0,0.5)',
                         padding: 50,
                         borderRadius: 5                        

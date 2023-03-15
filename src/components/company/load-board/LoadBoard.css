@@ -133,6 +133,9 @@
   display: flex;
   align-items: center;
 }
+.load-board-main-container .lb-form-container .lb-form-wrapper .lb-form-item.cancelled {
+  color: darkred;
+}
 .load-board-main-container .lb-form-container .lb-form-wrapper .lb-form-item.selected {
   background-color: rgba(0, 0, 0, 0.05);
 }

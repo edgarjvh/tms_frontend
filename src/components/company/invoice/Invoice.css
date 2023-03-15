@@ -45,9 +45,15 @@
 .invoice-main-container .selected-pickup-number {
   font-size: 0.7rem;
 }
-.invoice-main-container .selected-pickup-number span:not(:last-child) {
+.invoice-main-container .selected-pickup-number span:first-child {
   font-weight: bold;
   margin-right: 5px;
+}
+.invoice-main-container .selected-pickup-number span:not(:first-child) {
+  margin-right: 5px;
+}
+.invoice-main-container .selected-pickup-number span:not(:first-child):nth-child(odd) {
+  color: blue;
 }
 .invoice-main-container .selected-customer-contact-primary-phone {
   position: absolute;

@@ -15,12 +15,16 @@ import Loader from 'react-loader-spinner';
 import classNames from 'classnames';
 import axios from 'axios';
 
+import { EmailRecipientInput } from '../../panels/index';
+
 const RateConf = (props) => {
     const [showingCarrierConfirmation, setShowingCarrierConfirmation] = useState(true);
     const carrierComponentRef = useRef();
     const customerComponentRef = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const [showEmailRecipientInput, setShowEmailRecipientInput] = useState(false);
+    const [dataEmail, setDataEmail] = useState({});
 
     const carrierConfirmationTransition = useTransition(showingCarrierConfirmation, {
         from: { opacity: 0 },
@@ -38,6 +42,14 @@ const RateConf = (props) => {
         config: { duration: 100 }
     });
 
+    const emailRecipientInputTransition = useTransition(showEmailRecipientInput, {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: showEmailRecipientInput,
+        config: { duration: 100 }
+    });
+
     const handlePrint = useReactToPrint({
         pageStyle: () => {
             return `
@@ -48,7 +60,7 @@ const RateConf = (props) => {
                     }
                     .page-block {
                         page-break-after: auto !important;
-                        page-break-beforer: auto !important; 
+                        page-break-before: auto !important; 
                         page-break-inside: avoid !important;
                     } 
                     .no-print{
@@ -127,7 +139,130 @@ const RateConf = (props) => {
                         </div>
                 }
 
-                <div className="mochi-button">
+                <div className="mochi-button" onClick={() => {
+                    let user_first_name = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? (((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.first_name || '')).trim()
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? ((selectedOrder.user_code?.employee?.first_name || '')).trim()
+                            : '';
+
+                    let user_last_name = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? (((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.last_name || '')).trim()
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? ((selectedOrder.user_code?.employee?.last_name || '')).trim()
+                            : '';
+
+                    let user_email_address = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_email || '') === 'work'
+                            ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.email_work || '')
+                            : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_email || '') === 'personal'
+                                ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.email_personal || '')
+                                : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_email || '') === 'other'
+                                    ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.email_other || '')
+                                    : ''
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? (selectedOrder.user_code?.employee?.primary_email || '') === 'work'
+                                ? (selectedOrder.user_code?.employee?.email_work || '')
+                                : (selectedOrder.user_code?.employee?.primary_email || '') === 'personal'
+                                    ? (selectedOrder.user_code?.employee?.email_personal || '')
+                                    : (selectedOrder.user_code?.employee?.primary_email || '') === 'other'
+                                        ? (selectedOrder.user_code?.employee?.email_other || '')
+                                        : ''
+                            : ''
+
+                    let user_phone = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'work'
+                            ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_work || '')
+                            : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'fax'
+                                ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_work_fax || '')
+                                : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'mobile'
+                                    ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_mobile || '')
+                                    : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'direct'
+                                        ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_direct || '')
+                                        : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'other'
+                                            ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_other || '')
+                                            : ''
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? (selectedOrder.user_code?.employee?.primary_phone || '') === 'work'
+                                ? (selectedOrder.user_code?.employee?.phone_work || '')
+                                : (selectedOrder.user_code?.employee?.primary_phone || '') === 'fax'
+                                    ? (selectedOrder.user_code?.employee?.phone_work_fax || '')
+                                    : (selectedOrder.user_code?.employee?.primary_phone || '') === 'mobile'
+                                        ? (selectedOrder.user_code?.employee?.phone_mobile || '')
+                                        : (selectedOrder.user_code?.employee?.primary_phone || '') === 'direct'
+                                            ? (selectedOrder.user_code?.employee?.phone_direct || '')
+                                            : (selectedOrder.user_code?.employee?.primary_phone || '') === 'other'
+                                                ? (selectedOrder.user_code?.employee?.phone_other || '')
+                                                : ''
+                            : ''
+
+                    let dataEmail = {
+                        order_number: selectedOrder.order_number,
+                        user_first_name,
+                        user_last_name,
+                        user_email_address,
+                        user_phone,
+                        type: showingCarrierConfirmation ? 'carrier' : 'customer',
+                        recipient_to: [],
+                        recipient_cc: [],
+                        recipient_bcc: []
+                    }
+
+                    let primaryContact = showingCarrierConfirmation
+                        ? (selectedOrder?.carrier?.contacts || []).find(x => x.is_primary === 1)
+                        : (selectedOrder?.bill_to_company?.contacts || []).find(x => x.is_primary === 1);
+
+                    if (primaryContact) {
+                        dataEmail.recipient_to = [{
+                            email: (primaryContact?.primary_email || 'work') === 'work'
+                                ? primaryContact?.email_work || ''
+                                : (primaryContact?.primary_email || 'work') === 'personal'
+                                    ? primaryContact?.email_personal || ''
+                                    : (primaryContact?.primary_email || 'work') === 'other'
+                                        ? primaryContact?.email_other || ''
+                                        : '',
+                            name: ((primaryContact?.first_name || '') + ' ' + (primaryContact?.last_name || '')).trim(),
+                            primary: true
+                        }]
+                    }
+
+                    setDataEmail(dataEmail);
+
+                    window.setTimeout(() => {
+                        setShowEmailRecipientInput(true);
+                    }, 100);
+
+                    // axios.post(props.serverUrl + '/sendRateConfEmail', {
+                    //     order_number: selectedOrder?.order_number,
+                    //     user_first_name: user_first_name,
+                    //     user_last_name: user_last_name,
+                    //     user_email_address: user_email_address,
+                    //     user_phone: user_phone,
+                    //     type: showingCarrierConfirmation ? 'carrier' : 'customer'
+                    // }).then(res => {
+                    //     if (res.data.result === 'SENT') {
+                    //         setMessageType('SUCCESS');
+                    //         setEmailMessage(`${showingCarrierConfirmation ? 'Carrier' : 'Customer'} Rate Conf has been sent!`);
+                    //         window.setTimeout(() => {
+                    //             setShowEmailMessage(true);
+                    //         }, 100);
+                    //     } else if (res.data.result === 'NO EMAIL ADDRESS') {
+                    //         setMessageType('WARNING');
+                    //         setEmailMessage("There was an error with the recipient email address");
+                    //         
+                    //     } else {
+                    //         setMessageType('ERROR');
+                    //         setEmailMessage(`There was an error sending the email to the ${showingCarrierConfirmation ? 'carrier' : 'customer'}`);
+                    //         window.setTimeout(() => {
+                    //             setShowEmailMessage(true);
+                    //         }, 100);
+                    //     }
+                    // }).catch(e => {
+                    //     console.log(e);
+                    // }).finally(() => {
+                    //     setIsLoading(false);
+                    // });
+                }}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">E-Mail Rate Conf</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -181,6 +316,21 @@ const RateConf = (props) => {
                 </div>
 
             </div>
+
+            {
+                emailRecipientInputTransition((style, item) => item && (
+                    <animated.div style={{ ...style }}>
+                        <EmailRecipientInput
+                            title={showingCarrierConfirmation ? 'E-Mail Carrier Confirmation' : 'E-Mail Customer Confirmation'}
+                            dataEmail={dataEmail}
+                            close={() => {
+                                setShowEmailRecipientInput(false);
+                            }}
+                        />
+                    </animated.div>
+                ))
+            }
+
         </div>
     )
 }
@@ -189,6 +339,7 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user,
         selectedCompany: state.companySetupReducers.selectedCompany,
         companyOpenedPanels: state.companyReducers.companyOpenedPanels,
         adminOpenedPanels: state.adminReducers.adminOpenedPanels,
