@@ -1,15 +1,15 @@
 // noinspection BadExpressionStatementJS
 
-import React, {useState, useRef, useEffect} from 'react';
-import {connect} from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
 import axios from 'axios';
 import Draggable from 'react-draggable';
-import {useTransition, animated} from 'react-spring';
+import { useTransition, animated } from 'react-spring';
 import './Agents.css';
 import MaskedInput from 'react-text-mask';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faCaretDown,
     faCaretRight,
@@ -20,7 +20,7 @@ import {
     faCopy
 } from '@fortawesome/free-solid-svg-icons';
 
-import {useDetectClickOutside} from "react-detect-click-outside";
+import { useDetectClickOutside } from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
 import "react-datepicker/dist/react-datepicker.css";
 import Loader from 'react-loader-spinner';
@@ -47,8 +47,8 @@ import {
     Modal as AgentModal,
     CustomerSearch, ContactSearch, RevenueInformation, OrderHistory
 } from './../../../company/panels';
-import {Dispatch} from "../../../company";
-import {useReactToPrint} from "react-to-print";
+import { Dispatch } from "../../../company";
+import { useReactToPrint } from "react-to-print";
 
 const Agents = (props) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -172,87 +172,112 @@ const Agents = (props) => {
         }
     });
 
+    const [selectedDriver, setSelectedDriver] = useState({});
+    const [isSavingDriver, setIsSavingDriver] = useState(false);
+    const refDriverCode = useRef();
+    const refDriverName = useRef();
+
+    const [showAgentDriverEmailCopyBtn, setShowAgentDriverEmailCopyBtn] = useState(false);
+    const refAgentDriverEmail = useRef();
+    const refEquipment = useRef();
+
+    const [driverEquipmentDropdownItems, setDriverEquipmentDropdownItems] = useState([]);
+    const refDriverEquipmentDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setDriverEquipmentDropdownItems([])
+        }
+    });
+    const refDriverEquipmentPopupItems = useRef([]);
+
+    const equipmentTransition = useTransition(driverEquipmentDropdownItems.length > 0, {
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
+        reverse: driverEquipmentDropdownItems.length > 0
+    });
+
     const refDivision = useRef();
     const [divisionItems, setDivisionItems] = useState([]);
     const refDivisionDropDown = useDetectClickOutside({ onTriggered: async () => { await setDivisionItems([]); } });
     const refDivisionPopupItems = useRef([]);
 
     const loadingTransition = useTransition(isLoading, {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: isLoading,
     });
 
     const agentContactPhonesTransition = useTransition(showAgentContactPhones, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showAgentContactPhones
     });
 
     const agentContactEmailsTransition = useTransition(showAgentContactEmails, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showAgentContactEmails
     });
 
     const noteTransition = useTransition(selectedNote?.id !== undefined, {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: selectedNote?.id !== undefined,
-        config: {duration: 100}
+        config: { duration: 100 }
     });
 
     const mailingContactNamesTransition = useTransition(showMailingContactNames, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showMailingContactNames
     });
 
     const mailingContactPhonesTransition = useTransition(showMailingContactPhones, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showMailingContactPhones
     });
 
     const mailingContactEmailsTransition = useTransition(showMailingContactEmails, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showMailingContactEmails
     });
 
     const loadingAgentOrdersTransition = useTransition(isLoadingAgentOrders, {
-        from: {opacity: 0, display: 'block'},
-        enter: {opacity: 1, display: 'block'},
-        leave: {opacity: 0, display: 'none'},
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
         reverse: isLoadingAgentOrders,
     });
 
     const addedDateTransition = useTransition(isAddedDateCalendarShown, {
-        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
         reverse: isAddedDateCalendarShown,
-        config: {duration: 100}
+        config: { duration: 100 }
     });
 
     const terminationDateTransition = useTransition(isTerminationDateCalendarShown, {
-        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
         reverse: isTerminationDateCalendarShown,
-        config: {duration: 100}
+        config: { duration: 100 }
     });
 
     const divisionTransition = useTransition(divisionItems.length > 0, {
@@ -321,12 +346,12 @@ const Agents = (props) => {
         if ((props.selectedAgent?.id || 0) > 0) {
             setIsLoading(true);
 
-            axios.post(props.serverUrl + '/getAgentById', {id: props.selectedAgent.id}).then(res => {
-                setSelectedAgent({...(res.data.agent || {})});
-                setSelectedContact({...((res.data.agent?.contacts || []).find(c => c.is_primary === 1) || {})});
+            axios.post(props.serverUrl + '/getAgentById', { id: props.selectedAgent.id }).then(res => {
+                setSelectedAgent({ ...(res.data.agent || {}) });
+                setSelectedContact({ ...((res.data.agent?.contacts || []).find(c => c.is_primary === 1) || {}) });
                 setIsLoading(false);
             }).catch(e => {
-               console.log('error getting agent', e);
+                console.log('error getting agent', e);
                 setIsLoading(false);
             });
         }
@@ -416,7 +441,7 @@ const Agents = (props) => {
                 setIsSavingAgent(true);
             }
 
-            if (fromLast){
+            if (fromLast) {
                 refAgentName.current.focus();
             }
         }
@@ -437,7 +462,7 @@ const Agents = (props) => {
             if (selectedAgent.id === undefined || selectedAgent.id === -1) {
                 selectedAgent.id = 0;
                 setSelectedAgent(selectedAgent => {
-                    return {...selectedAgent, id: 0}
+                    return { ...selectedAgent, id: 0 }
                 });
             }
 
@@ -579,7 +604,7 @@ const Agents = (props) => {
 
                 axios.post(props.serverUrl + '/saveAgentMailingAddress', mailing_address).then(res => {
                     if (res.data.result === 'OK') {
-                        setSelectedAgent({...selectedAgent, mailing_address: res.data.mailing_address});
+                        setSelectedAgent({ ...selectedAgent, mailing_address: res.data.mailing_address });
 
                     }
 
@@ -619,7 +644,7 @@ const Agents = (props) => {
 
         refAgentCode.current.focus();
 
-        setSelectedAgent({id: 0, code: clearCode ? '' : selectedAgent?.code});
+        setSelectedAgent({ id: 0, code: clearCode ? '' : selectedAgent?.code });
     }
 
     const searchAgentByCode = (e) => {
@@ -693,7 +718,7 @@ const Agents = (props) => {
             },
             {
                 field: 'State',
-                data: (selectedAgent?.state || '').toLowerCase() 
+                data: (selectedAgent?.state || '').toLowerCase()
             },
             {
                 field: 'Postal Code',
@@ -702,7 +727,7 @@ const Agents = (props) => {
             {
                 field: 'Contact Name',
                 data: (selectedAgent?.first_name || '').toLowerCase()
-            },            
+            },
             {
                 field: 'Contact Phone',
                 data: selectedAgent?.contact_phone || ''
@@ -737,7 +762,7 @@ const Agents = (props) => {
                 callback={(id) => {
                     new Promise((resolve, reject) => {
                         if ((id || 0) > 0) {
-                            axios.post(props.serverUrl + '/getAgentById', {id: id}).then(res => {
+                            axios.post(props.serverUrl + '/getAgentById', { id: id }).then(res => {
                                 if (res.data.result === 'OK') {
                                     setSelectedAgent(res.data.agent);
                                     setSelectedContact((res.data.agent.contacts || []).find(c => c.is_primary === 1) || {});
@@ -817,7 +842,7 @@ const Agents = (props) => {
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
                 componentId={moment().format('x')}
-                contactSearch={{search: filters}}
+                contactSearch={{ search: filters }}
 
                 callback={(contact) => {
                     new Promise((resolve, reject) => {
@@ -940,9 +965,9 @@ const Agents = (props) => {
             mailing_address.mailing_contact_primary_email = 'work';
         }
 
-        setSelectedAgent({...selectedAgent, mailing_address: mailing_address});
+        setSelectedAgent({ ...selectedAgent, mailing_address: mailing_address });
 
-        saveMailingAddress({keyCode: 9});
+        saveMailingAddress({ keyCode: 9 });
     }
 
     const mailingAddressClearBtn = () => {
@@ -993,7 +1018,7 @@ const Agents = (props) => {
 
         setSelectedAgent({ ...selectedAgent, hours: hours });
 
-        if (name === 'hours close 2'){
+        if (name === 'hours close 2') {
             axios.post(props.serverUrl + '/saveAgentHours', hours).then(async res => {
                 if (res.data.result === 'OK') {
                     await setSelectedAgent({ ...selectedAgent, hours: res.data.hours });
@@ -1226,7 +1251,7 @@ const Agents = (props) => {
                     openPanel={props.openPanel}
                     closePanel={props.closePanel}
                     componentId={moment().format('x')}
-                    selectedOwner={{...selectedAgent}}
+                    selectedOwner={{ ...selectedAgent }}
                     isAdmin={props.isAdmin}
                     selectedOwnerDocument={{
                         id: 0,
@@ -1248,6 +1273,68 @@ const Agents = (props) => {
         }
     }
 
+    useEffect(() => {
+        if (isSavingDriver) {
+            if ((props.user?.is_admin || 0) === 0) {
+                if ((selectedDriver?.id || 0) > 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0) {
+                        setIsSavingDriver(false);
+                        return;
+                    }
+                } else {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0) {
+                        setIsSavingDriver(false);
+                        return;
+                    }
+                }
+            }
+
+            if ((selectedAgent?.id || 0) > 0) {
+                let driver = { ...selectedDriver, agent_id: selectedAgent.id };
+
+                console.log(driver);
+
+                if ((driver?.first_name || '').trim() !== '') {
+
+                    axios.post(props.serverUrl + '/saveAgentDriver', driver).then(res => {
+                        if (res.data.result === 'OK') {
+                            setSelectedAgent(selectedAgent => {
+                                return {
+                                    ...selectedAgent,
+                                    drivers: res.data.drivers
+                                }
+                            });
+
+                            setSelectedDriver(selectedDriver => {
+                                return {
+                                    ...selectedDriver,
+                                    id: res.data.driver.id
+                                }
+                            });
+                        }
+
+                        setIsSavingDriver(false);
+                    }).catch(e => {
+                        console.log('error on saving agent driver', e);
+                        setIsSavingDriver(false);
+                    });
+                } else {
+                    setIsSavingDriver(false);
+                }
+            }
+        }
+    }, [isSavingDriver])
+
+    const validateDriverForSaving = (e) => {
+        let key = e.keyCode || e.which;
+
+        if (key === 9) {
+            if (!isSavingDriver) {
+                setIsSavingDriver(true);
+            }
+        }
+    }
+
     return (
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
@@ -1263,7 +1350,7 @@ const Agents = (props) => {
                             position: 'absolute',
                             flexDirection: 'column'
                         }}>
-                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                         </div>
                     </animated.div>
                 )
@@ -1271,7 +1358,7 @@ const Agents = (props) => {
 
             {
                 (selectedAgent?.id || 0) > 0 &&
-                <div style={{display: 'none'}}>
+                <div style={{ display: 'none' }}>
                     <ToPrint
                         ref={refPrintAgentInformation}
                         selectedAgent={selectedAgent}
@@ -1281,367 +1368,3289 @@ const Agents = (props) => {
             }
 
             <div className="agents-main-content">
-                <div className="fields-container-col">
-                    <div className="fields-container-row">
-                        {/*AGENT FORM*/}
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Agents</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => {
-                                        searchAgentBtnClick();
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Search</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className="mochi-button" onClick={() => {
-                                        setInitialValues()
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Clear</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                </div>
-                                <div className="top-border top-border-right"></div>
+                {/*AGENT FORM*/}
+                <div className="form-bordered-box">
+                    <div className="form-header">
+                        <div className="top-border top-border-left"></div>
+                        <div className="form-title">Agents</div>
+                        <div className="top-border top-border-middle"></div>
+                        <div className="form-buttons">
+                            <div className="mochi-button" onClick={() => {
+                                searchAgentBtnClick();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Search</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
+                            <div className="mochi-button" onClick={() => {
+                                setInitialValues()
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Clear</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
+                        <div className="top-border top-border-right"></div>
+                    </div>
 
-                            <div className="form-row">
-                                <div className={disabledAgentCodeField}>
-                                    <input tabIndex={1 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                           id="txt-agent-code"
-                                           ref={refAgentCode}
-                                           onKeyDown={(e) => {
-                                               searchAgentByCode(e)
-                                           }}
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   code: e.target.value
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   code: e.target.value
-                                               })
-                                           }}
-                                           value={selectedAgent?.code || ''}/>
+                    <div className="form-row">
+                        <div className={disabledAgentCodeField}>
+                            <input tabIndex={1 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
+                                id="txt-agent-code"
+                                ref={refAgentCode}
+                                onKeyDown={(e) => {
+                                    searchAgentByCode(e)
+                                }}
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        code: e.target.value
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        code: e.target.value
+                                    })
+                                }}
+                                value={selectedAgent?.code || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledOnAddingEditing + ' grow'}>
+                            <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                ref={refAgentName}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        name: e.target.value
+                                    })
+                                }}
+                                value={selectedAgent?.name || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledOnAddingEditing + ' grow'}>
+                            <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        address1: e.target.value
+                                    })
+                                }}
+                                value={selectedAgent?.address1 || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledOnAddingEditing + ' grow'}>
+                            <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        address2: e.target.value
+                                    })
+                                }}
+                                value={selectedAgent?.address2 || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledOnAddingEditing + ' grow'}>
+                            <input tabIndex={5 + props.tabTimes} type="text" placeholder="City" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        city: e.target.value
+                                    })
+                                }}
+                                value={selectedAgent?.city || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledOnAddingEditing + ' input-state'}>
+                            <input tabIndex={6 + props.tabTimes} type="text" placeholder="State" maxLength="2"
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        state: e.target.value
+                                    })
+                                }}
+                                value={selectedAgent?.state || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledOnAddingEditing + ' input-zip-code'}>
+                            <input tabIndex={7 + props.tabTimes} type="text" placeholder="Postal Code"
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        zip: e.target.value
+                                    })
+                                }}
+                                value={selectedAgent?.zip || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledOnAddingEditing + ' grow'}>
+                            <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact First Name" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onChange={e => {
+                                    setSelectedPrimaryContact({
+                                        ...selectedPrimaryContact,
+                                        first_name: e.target.value
+                                    })
+                                }}
+                                value={selectedPrimaryContact.first_name || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledOnAddingEditing + ' grow'}>
+                            <input tabIndex={9 + props.tabTimes} type="text" placeholder="Contact Last Name" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onChange={e => {
+                                    setSelectedPrimaryContact({
+                                        ...selectedPrimaryContact,
+                                        last_name: e.target.value
+                                    })
+                                }}
+                                value={selectedPrimaryContact.last_name || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledOnAddingEditing + ' input-phone'}
+                            style={{ position: 'relative' }}>
+                            <MaskedInput
+                                tabIndex={10 + props.tabTimes}
+                                mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                guide={true}
+                                type="text" placeholder="Contact Phone"
+                                onInput={(e) => {
+                                    setSelectedPrimaryContact(selectedPrimaryContact => {
+                                        return {
+                                            ...selectedPrimaryContact,
+                                            primary_phone: (selectedPrimaryContact?.primary_phone || '') === '' ? 'work' : selectedPrimaryContact.primary_phone,
+                                            phone_work: ((selectedPrimaryContact?.primary_phone || '') === 'work' ||
+                                                (selectedPrimaryContact?.primary_phone || '') === '')
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_work || ''),
+                                            phone_work_fax: (selectedPrimaryContact?.primary_phone || '') === 'fax'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_work_fax || ''),
+                                            phone_mobile: (selectedPrimaryContact?.primary_phone || '') === 'mobile'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_mobile || ''),
+                                            phone_direct: (selectedPrimaryContact?.primary_phone || '') === 'direct'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_direct || ''),
+                                            phone_other: (selectedPrimaryContact?.primary_phone || '') === 'other'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_other || '')
+                                        }
+                                    })
+                                }}
+                                onChange={(e) => {
+                                    setSelectedPrimaryContact(selectedPrimaryContact => {
+                                        return {
+                                            ...selectedPrimaryContact,
+                                            primary_phone: (selectedPrimaryContact?.primary_phone || '') === '' ? 'work' : selectedPrimaryContact.primary_phone,
+                                            phone_work: ((selectedPrimaryContact?.primary_phone || '') === 'work' ||
+                                                (selectedPrimaryContact?.primary_phone || '') === '')
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_work || ''),
+                                            phone_work_fax: (selectedPrimaryContact?.primary_phone || '') === 'fax'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_work_fax || ''),
+                                            phone_mobile: (selectedPrimaryContact?.primary_phone || '') === 'mobile'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_mobile || ''),
+                                            phone_direct: (selectedPrimaryContact?.primary_phone || '') === 'direct'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_direct || ''),
+                                            phone_other: (selectedPrimaryContact?.primary_phone || '') === 'other'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.phone_other || '')
+                                        }
+                                    })
+                                }}
+                                value={
+                                    selectedPrimaryContact?.primary_phone === 'work'
+                                        ? (selectedPrimaryContact?.phone_work || '')
+                                        : selectedPrimaryContact?.primary_phone === 'fax'
+                                            ? (selectedPrimaryContact?.phone_work_fax || '')
+                                            : selectedPrimaryContact?.primary_phone === 'mobile'
+                                                ? (selectedPrimaryContact?.phone_mobile || '')
+                                                : selectedPrimaryContact?.primary_phone === 'direct'
+                                                    ? (selectedPrimaryContact?.phone_direct || '')
+                                                    : selectedPrimaryContact?.primary_phone === 'other'
+                                                        ? (selectedPrimaryContact?.phone_other || '')
+                                                        : ''
+                                }
+                            />
+
+                            {
+                                (selectedPrimaryContact?.id || 0 > 0) &&
+                                <div
+                                    className={classnames({
+                                        'selected-agent-contact-primary-phone': true,
+                                        'pushed': false
+                                    })}>
+                                    {selectedPrimaryContact?.primary_phone || ''}
                                 </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name" style={{
+                            }
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledOnAddingEditing + ' input-phone-ext'}>
+                            <input tabIndex={11 + props.tabTimes} type="text" placeholder="Ext"
+                                onInput={e => {
+                                    setSelectedPrimaryContact(selectedPrimaryContact => {
+                                        return {
+                                            ...selectedPrimaryContact,
+                                            phone_ext: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedPrimaryContact(selectedPrimaryContact => {
+                                        return {
+                                            ...selectedPrimaryContact,
+                                            phone_ext: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedPrimaryContact?.phone_ext || ''}
+                            />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledOnAddingEditing}
+                            style={{ position: 'relative', flexGrow: 1, minWidth: '50%' }}
+                            onMouseEnter={() => {
+                                if ((selectedPrimaryContact?.email_work || '') !== '' ||
+                                    (selectedPrimaryContact?.email_personal || '') !== '' ||
+                                    (selectedPrimaryContact?.email_other || '') !== '') {
+                                    setShowAgentEmailCopyBtn(true);
+                                }
+                            }}
+                            onFocus={() => {
+                                if ((selectedPrimaryContact?.email_work || '') !== '' ||
+                                    (selectedPrimaryContact?.email_personal || '') !== '' ||
+                                    (selectedPrimaryContact?.email_other || '') !== '') {
+                                    setShowAgentEmailCopyBtn(true);
+                                }
+                            }}
+                            onBlur={() => {
+                                window.setTimeout(() => {
+                                    setShowAgentEmailCopyBtn(false);
+                                }, 1000);
+                            }}
+                            onMouseLeave={() => {
+                                setShowAgentEmailCopyBtn(false);
+                            }}
+                        >
+                            <input tabIndex={12 + props.tabTimes}
+                                ref={refAgentEmail}
+                                type="text"
+                                placeholder="E-Mail"
+                                style={{ textTransform: 'lowercase' }}
+                                onKeyDown={(e) => {
+                                    let key = e.keyCode || e.which;
+
+                                    if (key === 9) {
+                                        saveAgent(e);
+                                    }
+                                }}
+                                onInput={e => {
+                                    setSelectedPrimaryContact(selectedPrimaryContact => {
+                                        return {
+                                            ...selectedPrimaryContact,
+                                            primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
+                                            email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
+                                                (selectedPrimaryContact?.primary_email || '') === '')
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.email_work || ''),
+                                            email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.email_personal || ''),
+                                            email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.email_other || '')
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedPrimaryContact(selectedPrimaryContact => {
+                                        return {
+                                            ...selectedPrimaryContact,
+                                            primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
+                                            email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
+                                                (selectedPrimaryContact?.primary_email || '') === '')
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.email_work || ''),
+                                            email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.email_personal || ''),
+                                            email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
+                                                ? e.target.value
+                                                : (selectedPrimaryContact?.email_other || '')
+                                        }
+                                    })
+                                }}
+                                value={
+                                    selectedPrimaryContact?.primary_email === 'work'
+                                        ? (selectedPrimaryContact?.email_work || '')
+                                        : selectedPrimaryContact?.primary_email === 'personal'
+                                            ? (selectedPrimaryContact?.email_personal || '')
+                                            : selectedPrimaryContact?.primary_email === 'other'
+                                                ? (selectedPrimaryContact?.email_other || '')
+                                                : ''
+                                }
+                            />
+                            {
+                                (selectedPrimaryContact?.id || 0 > 0) &&
+                                <div
+                                    className={classnames({
+                                        'selected-agent-contact-primary-email': true,
+                                        'pushed': false
+                                    })}>
+                                    {selectedPrimaryContact?.primary_email || ''}
+                                </div>
+                            }
+
+                            {
+                                showAgentEmailCopyBtn &&
+                                <FontAwesomeIcon style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    right: 30,
+                                    zIndex: 1,
+                                    cursor: 'pointer',
+                                    transform: 'translateY(-50%)',
+                                    color: '#2bc1ff',
+                                    margin: 0,
+                                    transition: 'ease 0.2s',
+                                    fontSize: '1rem'
+                                }} icon={faCopy} onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(refAgentEmail.current.value);
+                                }} />
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                {/*MAILING ADDRESS FORM*/}
+                <div className="form-bordered-box">
+                    <div className="form-header">
+                        <div className="top-border top-border-left"></div>
+                        <div className="form-title">Mailing Address</div>
+                        <div className="top-border top-border-middle"></div>
+                        <div className="form-buttons">
+                            <div className="mochi-button" onClick={remitToAddressBtn}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Remit to address is the same</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className="mochi-button" onClick={mailingAddressClearBtn}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Clear</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
+                        <div className="top-border top-border-right"></div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className={disabledAgentMailingAddressFields + ' input-box-container input-code'}>
+                            <input tabIndex={19 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
+                                ref={refAgentMailingCode}
+                                readOnly={true}
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            code: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            code: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.mailing_address?.code || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
+                            <input tabIndex={20 + props.tabTimes} type="text" placeholder="Name" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            name: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            name: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.mailing_address?.name || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
+                            <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 1" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            address1: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            address1: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.mailing_address?.address1 || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
+                            <input tabIndex={22 + props.tabTimes} type="text" placeholder="Address 2" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            address2: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            address2: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.mailing_address?.address2 || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
+                            <input tabIndex={23 + props.tabTimes} type="text" placeholder="City" style={{
+                                textTransform: 'capitalize'
+                            }}
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            city: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            city: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.mailing_address?.city || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledAgentMailingAddressFields + ' input-box-container input-state'}>
+                            <input tabIndex={24 + props.tabTimes} type="text" placeholder="State" maxLength="2"
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            state: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            state: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.mailing_address?.state || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className={disabledAgentMailingAddressFields + ' input-box-container input-zip-code'}>
+                            <input tabIndex={25 + props.tabTimes} type="text" placeholder="Postal Code"
+                                onKeyDown={saveMailingAddress}
+                                onInput={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            zip: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent({
+                                        ...selectedAgent,
+                                        mailing_address: {
+                                            ...selectedAgent?.mailing_address,
+                                            zip: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.mailing_address?.zip || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledAgentMailingAddressFields + ' select-box-container'}
+                            style={{ flexGrow: 1 }}>
+                            <div className="select-box-wrapper">
+                                <input
+                                    tabIndex={26 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Contact Name"
+                                    ref={refMailingContactName}
+                                    style={{
                                         textTransform: 'capitalize'
                                     }}
-                                           ref={refAgentName}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   name: e.target.value
-                                               })
-                                           }}
-                                           value={selectedAgent?.name || ''}/>
+                                    onKeyDown={async (e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        switch (key) {
+                                            case 37:
+                                            case 38: // arrow left | arrow up
+                                                e.preventDefault();
+                                                if (showMailingContactNames) {
+                                                    let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
+                                                            if (selectedIndex === 0) {
+                                                                item.selected = index === (mailingContactNameItems.length - 1);
+                                                            } else {
+                                                                item.selected = index === (selectedIndex - 1)
+                                                            }
+                                                            return item;
+                                                        }))
+                                                    }
+
+                                                    refMailingContactNamePopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    if (mailingContactNameItems.length > 1) {
+                                                        await setMailingContactNameItems((selectedAgent?.contacts || []).map((item, index) => {
+                                                            item.selected = index === 0
+                                                            return item;
+                                                        }))
+
+                                                        setShowMailingContactNames(true);
+
+                                                        refMailingContactNamePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }
+                                                break;
+
+                                            case 39:
+                                            case 40: // arrow right | arrow down
+                                                e.preventDefault();
+                                                if (showMailingContactNames) {
+                                                    let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
+                                                            if (selectedIndex === (mailingContactNameItems.length - 1)) {
+                                                                item.selected = index === 0;
+                                                            } else {
+                                                                item.selected = index === (selectedIndex + 1)
+                                                            }
+                                                            return item;
+                                                        }))
+                                                    }
+
+                                                    refMailingContactNamePopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    if (mailingContactNameItems.length > 1) {
+                                                        await setMailingContactNameItems((selectedAgent?.contacts || []).map((item, index) => {
+                                                            item.selected = index === 0
+                                                            return item;
+                                                        }))
+
+                                                        setShowMailingContactNames(true);
+
+                                                        refMailingContactNamePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }
+                                                break;
+
+                                            case 27: // escape
+                                                setShowMailingContactNames(false);
+                                                break;
+
+                                            case 13: // enter
+                                                if (showMailingContactNames && mailingContactNameItems.findIndex(item => item.selected) > -1) {
+                                                    await setSelectedAgent({
+                                                        ...selectedAgent,
+                                                        mailing_address: {
+                                                            ...selectedAgent?.mailing_address,
+                                                            mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
+                                                            mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
+                                                            mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                ? 'work'
+                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                    ? 'fax'
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                        ? 'mobile'
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                            ? 'direct'
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                ? 'other' :
+                                                                                ''
+                                                        }
+                                                    });
+
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                    setShowMailingContactNames(false);
+                                                    refMailingContactName.current.focus();
+                                                }
+                                                break;
+
+                                            case 9: // tab
+                                                if (showMailingContactNames) {
+                                                    e.preventDefault();
+                                                    await setSelectedAgent({
+                                                        ...selectedAgent,
+                                                        mailing_address: {
+                                                            ...selectedAgent?.mailing_address,
+                                                            mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
+                                                            mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
+                                                            mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                ? 'work'
+                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                    ? 'fax'
+                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                        ? 'mobile'
+                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                            ? 'direct'
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                ? 'other' :
+                                                                                ''
+                                                        }
+                                                    });
+
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                    setShowMailingContactNames(false);
+                                                    refMailingContactName.current.focus();
+                                                } else {
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                }
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        // setSelectedAgent({
+                                        //     ...selectedAgent,
+                                        //     mailing_contact_name: e.target.value
+                                        // })
+                                    }}
+                                    onChange={(e) => {
+                                        // setSelectedAgent({
+                                        //     ...selectedAgent,
+                                        //     mailing_contact_name: e.target.value
+                                        // })
+                                    }}
+                                    value={
+                                        (selectedAgent?.mailing_address?.mailing_contact?.first_name || '') +
+                                        ((selectedAgent?.mailing_address?.mailing_contact?.last_name || '') === ''
+                                            ? ''
+                                            : ' ' + selectedAgent?.mailing_address?.mailing_contact?.last_name)
+                                    }
+                                />
+
+                                {
+                                    ((selectedAgent?.contacts || []).length > 1 && (selectedAgent?.mailing_address?.code || '') !== '') &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                        onClick={async () => {
+                                            if (showMailingContactNames) {
+                                                setShowMailingContactNames(false);
+                                            } else {
+                                                if ((selectedAgent?.contacts || []).length > 1) {
+                                                    await setMailingContactNameItems((selectedAgent?.contacts || []).map((item, index) => {
+                                                        item.selected = index === 0
+                                                        return item;
+                                                    }))
+
+                                                    window.setTimeout(async () => {
+                                                        await setShowMailingContactNames(true);
+
+                                                        refMailingContactNamePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }, 0)
+                                                }
+                                            }
+
+                                            refMailingContactName.current.focus();
+                                        }} />
+                                }
+                            </div>
+                            {
+                                mailingContactNamesTransition((style, item) => item && (
+                                    <animated.div
+                                        className="mochi-contextual-container"
+                                        id="mochi-contextual-container-contact-names"
+                                        style={{
+                                            ...style,
+                                            left: '0',
+                                            display: 'block'
+                                        }}
+                                        ref={refMailingContactNameDropDown}
+                                    >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                            style={{ height: 150 }}>
+                                            <div className="mochi-contextual-popup-content">
+                                                <div className="mochi-contextual-popup-wrapper">
+                                                    {
+                                                        mailingContactNameItems.map((item, index) => {
+                                                            const mochiItemClasses = classnames({
+                                                                'mochi-item': true,
+                                                                'selected': item.selected
+                                                            });
+
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    className={mochiItemClasses}
+                                                                    id={item.id}
+                                                                    onClick={async () => {
+                                                                        await setSelectedAgent({
+                                                                            ...selectedAgent,
+                                                                            mailing_address: {
+                                                                                ...selectedAgent?.mailing_address,
+                                                                                mailing_contact: item,
+                                                                                mailing_contact_id: item.id,
+                                                                                mailing_contact_primary_phone: (item.phone_work || '') !== ''
+                                                                                    ? 'work'
+                                                                                    : (item.phone_work_fax || '') !== ''
+                                                                                        ? 'fax'
+                                                                                        : (item.phone_mobile || '') !== ''
+                                                                                            ? 'mobile'
+                                                                                            : (item.phone_direct || '') !== ''
+                                                                                                ? 'direct'
+                                                                                                : (item.phone_other || '') !== ''
+                                                                                                    ? 'other' :
+                                                                                                    ''
+                                                                            }
+                                                                        });
+
+                                                                        saveMailingAddress({ keyCode: 9 });
+                                                                        setShowMailingContactNames(false);
+                                                                        refMailingContactName.current.focus();
+                                                                    }}
+                                                                    ref={ref => refMailingContactNamePopupItems.current.push(ref)}
+                                                                >
+                                                                    {
+                                                                        item.first_name + ((item.last_name || '') === '' ? '' : ' ' + item.last_name)
+                                                                    }
+
+                                                                    {
+                                                                        item.selected &&
+                                                                        <FontAwesomeIcon
+                                                                            className="dropdown-selected"
+                                                                            icon={faCaretRight} />
+                                                                    }
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </animated.div>
+                                ))
+                            }
+                        </div>
+
+                        <div className="form-h-sep"></div>
+                        <div
+                            className={disabledAgentMailingAddressFields + ' select-box-container input-phone'}>
+                            <div className="select-box-wrapper">
+                                <MaskedInput tabIndex={27 + props.tabTimes}
+                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                    guide={true}
+                                    type="text"
+                                    placeholder="Contact Phone"
+                                    ref={refMailingContactPhone}
+                                    onKeyDown={async (e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        switch (key) {
+                                            case 37:
+                                            case 38: // arrow left | arrow up
+                                                e.preventDefault();
+                                                if (showMailingContactPhones) {
+                                                    let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                            if (selectedIndex === 0) {
+                                                                item.selected = index === (mailingContactPhoneItems.length - 1);
+                                                            } else {
+                                                                item.selected = index === (selectedIndex - 1)
+                                                            }
+                                                            return item;
+                                                        }))
+                                                    }
+
+                                                    refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    if (mailingContactPhoneItems.length > 1) {
+                                                        await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+
+                                                        setShowMailingContactPhones(true);
+
+                                                        refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }
+                                                break;
+
+                                            case 39:
+                                            case 40: // arrow right | arrow down
+                                                e.preventDefault();
+                                                if (showMailingContactPhones) {
+                                                    let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                            if (selectedIndex === (mailingContactPhoneItems.length - 1)) {
+                                                                item.selected = index === 0;
+                                                            } else {
+                                                                item.selected = index === (selectedIndex + 1)
+                                                            }
+                                                            return item;
+                                                        }))
+                                                    }
+
+                                                    refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    if (mailingContactPhoneItems.length > 1) {
+                                                        await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+
+                                                        setShowMailingContactPhones(true);
+
+                                                        refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }
+                                                break;
+
+                                            case 27: // escape
+                                                setShowMailingContactPhones(false);
+                                                break;
+
+                                            case 13: // enter
+                                                if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                    await setSelectedAgent({
+                                                        ...selectedAgent,
+                                                        mailing_address: {
+                                                            ...selectedAgent.mailing_address,
+                                                            mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                        }
+                                                    });
+
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                    setShowMailingContactPhones(false);
+                                                    refMailingContactPhone.current.inputElement.focus();
+                                                }
+                                                break;
+
+                                            case 9: // tab
+                                                if (showMailingContactPhones) {
+                                                    e.preventDefault();
+                                                    await setSelectedAgent({
+                                                        ...selectedAgent,
+                                                        mailing_address: {
+                                                            ...selectedAgent.mailing_address,
+                                                            mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                        }
+                                                    });
+
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                    setShowMailingContactPhones(false);
+                                                    refMailingContactPhone.current.inputElement.focus();
+                                                } else {
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                }
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        // setSelectedAgent({
+                                        //     ...selectedAgent,
+                                        //     mailing_contact_phone: e.target.value
+                                        // });
+                                    }}
+                                    onChange={(e) => {
+                                        // setSelectedAgent({
+                                        //     ...selectedAgent,
+                                        //     mailing_contact_phone: e.target.value
+                                        // });
+                                    }}
+                                    value={
+                                        (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'work'
+                                            ? (selectedAgent?.mailing_address?.mailing_contact?.phone_work || '')
+                                            : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'fax'
+                                                ? (selectedAgent?.mailing_address?.mailing_contact?.phone_work_fax || '')
+                                                : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'mobile'
+                                                    ? (selectedAgent?.mailing_address?.mailing_contact?.phone_mobile || '')
+                                                    : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'direct'
+                                                        ? (selectedAgent?.mailing_address?.mailing_contact?.phone_direct || '')
+                                                        : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'other'
+                                                            ? (selectedAgent?.mailing_address?.mailing_contact?.phone_other || '')
+                                                            : ''
+                                    }
+                                />
+
+                                {
+                                    ((selectedAgent?.id || 0) > 0 && (selectedAgent?.mailing_address?.code || '') !== '') &&
+                                    <div
+                                        className={classnames({
+                                            'selected-mailing-contact-primary-phone': true,
+                                            'pushed': (mailingContactPhoneItems.length > 1)
+                                        })}>
+                                        {selectedAgent?.mailing_address?.mailing_contact_primary_phone || ''}
+                                    </div>
+                                }
+
+                                {
+                                    mailingContactPhoneItems.length > 1 &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                        onClick={async () => {
+                                            if (showMailingContactPhones) {
+                                                setShowMailingContactPhones(false);
+                                            } else {
+                                                if (mailingContactPhoneItems.length > 1) {
+                                                    await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                        item.selected = index === 0;
+                                                        return item;
+                                                    }))
+
+                                                    window.setTimeout(async () => {
+                                                        await setShowMailingContactPhones(true);
+
+                                                        refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }, 0)
+                                                }
+                                            }
+
+                                            refMailingContactPhone.current.inputElement.focus();
+                                        }} />
+                                }
+                            </div>
+                            {
+                                mailingContactPhonesTransition((style, item) => item && (
+                                    <animated.div
+                                        className="mochi-contextual-container"
+                                        id="mochi-contextual-container-contact-phone"
+                                        style={{
+                                            ...style,
+                                            left: '0',
+                                            display: 'block'
+                                        }}
+                                        ref={refMailingContactPhoneDropDown}
+                                    >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                            style={{ height: 150 }}>
+                                            <div className="mochi-contextual-popup-content">
+                                                <div className="mochi-contextual-popup-wrapper">
+                                                    {
+                                                        mailingContactPhoneItems.map((item, index) => {
+                                                            const mochiItemClasses = classnames({
+                                                                'mochi-item': true,
+                                                                'selected': item.selected
+                                                            });
+
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    className={mochiItemClasses}
+                                                                    id={item.id}
+                                                                    onClick={async () => {
+                                                                        await setSelectedAgent({
+                                                                            ...selectedAgent,
+                                                                            mailing_address: {
+                                                                                ...selectedAgent?.mailing_address,
+                                                                                mailing_contact_primary_phone: item.type
+                                                                            }
+                                                                        });
+
+                                                                        saveMailingAddress({ keyCode: 9 });
+                                                                        setShowMailingContactPhones(false);
+                                                                        refMailingContactPhone.current.inputElement.focus();
+                                                                    }}
+                                                                    ref={ref => refMailingContactPhonePopupItems.current.push(ref)}
+                                                                >
+                                                                    {
+                                                                        item.type === 'work' ? `Phone Work `
+                                                                            : item.type === 'fax' ? `Phone Work Fax `
+                                                                                : item.type === 'mobile' ? `Phone Mobile `
+                                                                                    : item.type === 'direct' ? `Phone Direct `
+                                                                                        : item.type === 'other' ? `Phone Other ` : ''
+                                                                    }
+
+                                                                    (<b>
+                                                                        {
+                                                                            item.type === 'work' ? item.phone
+                                                                                : item.type === 'fax' ? item.phone
+                                                                                    : item.type === 'mobile' ? item.phone
+                                                                                        : item.type === 'direct' ? item.phone
+                                                                                            : item.type === 'other' ? item.phone : ''
+                                                                        }
+                                                                    </b>)
+
+                                                                    {
+                                                                        item.selected &&
+                                                                        <FontAwesomeIcon
+                                                                            className="dropdown-selected"
+                                                                            icon={faCaretRight} />
+                                                                    }
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </animated.div>
+                                ))
+                            }
+                        </div>
+
+                        <div className="form-h-sep"></div>
+                        <div
+                            className={disabledAgentMailingAddressFields + ' input-box-container input-phone-ext'}>
+                            <input tabIndex={28 + props.tabTimes} type="text" placeholder="Ext"
+                                onKeyDown={saveMailingAddress}
+                                onChange={e => {
+                                    // setSelectedAgent({ ...selectedAgent, mailing_ext: e.target.value })
+                                }}
+                                value={selectedAgent?.mailing_address?.mailing_contact?.phone_ext || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className={disabledAgentMailingAddressFields + ' select-box-container'}
+                            style={{ flexGrow: 1 }}
+                            onMouseEnter={() => {
+                                if ((selectedAgent?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                    (selectedAgent?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                    (selectedAgent?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                    setShowMailingContactEmailCopyBtn(true);
+                                }
+                            }}
+                            onFocus={() => {
+                                if ((selectedAgent?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                    (selectedAgent?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                    (selectedAgent?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                    setShowMailingContactEmailCopyBtn(true);
+                                }
+                            }}
+                            onBlur={() => {
+                                window.setTimeout(() => {
+                                    setShowMailingContactEmailCopyBtn(false);
+                                }, 1000);
+                            }}
+                            onMouseLeave={() => {
+                                setShowMailingContactEmailCopyBtn(false);
+                            }}>
+
+                            <div className="select-box-wrapper">
+                                <input tabIndex={29 + props.tabTimes} type="text" placeholder="E-Mail"
+                                    ref={refMailingContactEmail}
+                                    onKeyDown={async (e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        switch (key) {
+                                            case 37:
+                                            case 38: // arrow left | arrow up
+                                                e.preventDefault();
+                                                if (showMailingContactEmails) {
+                                                    let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                            if (selectedIndex === 0) {
+                                                                item.selected = index === (mailingContactEmailItems.length - 1);
+                                                            } else {
+                                                                item.selected = index === (selectedIndex - 1)
+                                                            }
+                                                            return item;
+                                                        }))
+                                                    }
+
+                                                    refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    if (mailingContactEmailItems.length > 1) {
+                                                        await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+
+                                                        setShowMailingContactEmails(true);
+
+                                                        refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }
+                                                break;
+
+                                            case 39:
+                                            case 40: // arrow right | arrow down
+                                                e.preventDefault();
+                                                if (showMailingContactEmails) {
+                                                    let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                            if (selectedIndex === (mailingContactEmailItems.length - 1)) {
+                                                                item.selected = index === 0;
+                                                            } else {
+                                                                item.selected = index === (selectedIndex + 1)
+                                                            }
+                                                            return item;
+                                                        }))
+                                                    }
+
+                                                    refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    if (mailingContactEmailItems.length > 1) {
+                                                        await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+
+                                                        setShowMailingContactEmails(true);
+
+                                                        refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }
+                                                break;
+
+                                            case 27: // escape
+                                                setShowMailingContactEmails(false);
+                                                break;
+
+                                            case 13: // enter
+                                                if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
+                                                    await setSelectedAgent({
+                                                        ...selectedAgent,
+                                                        mailing_address: {
+                                                            ...selectedAgent?.mailing_address,
+                                                            mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                        }
+                                                    });
+
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                    setShowMailingContactEmails(false);
+                                                    refMailingContactEmail.current.focus();
+                                                }
+                                                break;
+
+                                            case 9: // tab
+                                                if (showMailingContactEmails) {
+                                                    e.preventDefault();
+                                                    await setSelectedAgent({
+                                                        ...selectedAgent,
+                                                        mailing_address: {
+                                                            ...selectedAgent?.mailing_address,
+                                                            mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                        }
+                                                    });
+
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                    setShowMailingContactEmails(false);
+                                                    refMailingContactEmail.current.focus();
+                                                } else {
+                                                    saveMailingAddress({ keyCode: 9 });
+                                                }
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }}
+                                    onChange={e => {
+                                    }}
+                                    value={
+                                        (selectedAgent?.mailing_address?.mailing_contact_primary_email || '') === 'work'
+                                            ? (selectedAgent?.mailing_address?.mailing_contact?.email_work || '')
+                                            : (selectedAgent?.mailing_address?.mailing_contact_primary_email || '') === 'personal'
+                                                ? (selectedAgent?.mailing_address?.mailing_contact?.email_personal || '')
+                                                : (selectedAgent?.mailing_address?.mailing_contact_primary_email || '') === 'other'
+                                                    ? (selectedAgent?.mailing_address?.mailing_contact?.email_other || '')
+                                                    : ''
+                                    }
+                                />
+
+                                {
+                                    ((selectedAgent?.id || 0) > 0 && (selectedAgent?.mailing_address?.code || '') !== '') &&
+                                    <div
+                                        className={classnames({
+                                            'selected-mailing-contact-primary-email': true,
+                                            'pushed': (mailingContactEmailItems.length > 1)
+                                        })}>
+                                        {selectedAgent?.mailing_address?.mailing_contact_primary_email || ''}
+                                    </div>
+                                }
+
+                                {
+                                    showMailingContactEmailCopyBtn &&
+                                    <FontAwesomeIcon style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: 30,
+                                        zIndex: 1,
+                                        cursor: 'pointer',
+                                        transform: 'translateY(-50%)',
+                                        color: '#2bc1ff',
+                                        margin: 0,
+                                        transition: 'ease 0.2s',
+                                        fontSize: '1rem'
+                                    }} icon={faCopy} onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(refMailingContactEmail.current.value);
+                                    }} />
+                                }
+
+                                {
+                                    mailingContactEmailItems.length > 1 &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                        onClick={async () => {
+                                            if (showMailingContactEmails) {
+                                                setShowMailingContactEmails(false);
+                                            } else {
+                                                if (mailingContactEmailItems.length > 1) {
+                                                    await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                        item.selected = index === 0;
+                                                        return item;
+                                                    }))
+
+                                                    window.setTimeout(async () => {
+                                                        await setShowMailingContactEmails(true);
+
+                                                        refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }, 0)
+                                                }
+                                            }
+
+                                            refMailingContactEmail.current.focus();
+                                        }} />
+                                }
+                            </div>
+                            {
+                                mailingContactEmailsTransition((style, item) => item && (
+                                    <animated.div
+                                        className="mochi-contextual-container"
+                                        id="mochi-contextual-container-contact-email"
+                                        style={{
+                                            ...style,
+                                            left: '0',
+                                            display: 'block'
+                                        }}
+                                        ref={refMailingContactEmailDropDown}
+                                    >
+                                        <div className="mochi-contextual-popup vertical below right"
+                                            style={{ height: 150 }}>
+                                            <div className="mochi-contextual-popup-content">
+                                                <div className="mochi-contextual-popup-wrapper">
+                                                    {
+                                                        mailingContactEmailItems.map((item, index) => {
+                                                            const mochiItemClasses = classnames({
+                                                                'mochi-item': true,
+                                                                'selected': item.selected
+                                                            });
+
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    className={mochiItemClasses}
+                                                                    id={item.id}
+                                                                    onClick={async () => {
+                                                                        await setSelectedAgent({
+                                                                            ...selectedAgent,
+                                                                            mailing_address: {
+                                                                                ...selectedAgent?.mailing_address,
+                                                                                mailing_contact_primary_email: item.type
+                                                                            }
+                                                                        });
+
+                                                                        saveMailingAddress({ keyCode: 9 });
+                                                                        setShowMailingContactEmails(false);
+                                                                        refMailingContactEmail.current.focus();
+                                                                    }}
+                                                                    ref={ref => refMailingContactEmailPopupItems.current.push(ref)}
+                                                                >
+                                                                    {
+                                                                        item.type === 'work' ? `Email Work `
+                                                                            : item.type === 'personal' ? `Email Personal `
+                                                                                : item.type === 'other' ? `Email Other ` : ''
+                                                                    }
+
+                                                                    (<b>
+                                                                        {
+                                                                            item.type === 'work' ? item.email
+                                                                                : item.type === 'personal' ? item.email
+                                                                                    : item.type === 'other' ? item.email : ''
+                                                                        }
+                                                                    </b>)
+
+                                                                    {
+                                                                        item.selected &&
+                                                                        <FontAwesomeIcon
+                                                                            className="dropdown-selected"
+                                                                            icon={faCaretRight} />
+                                                                    }
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </animated.div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                {/*ADDED DATE*/}
+                <div className="form-bordered-box"
+                    style={{ flexGrow: 1, justifyContent: 'space-between' }}>
+                    <div className="form-header">
+                        <div className="top-border top-border-left"></div>
+                        <div className="top-border top-border-middle"></div>
+                        <div className="top-border top-border-right"></div>
+                    </div>
+
+                    <div className="select-box-container">
+                        <div className="select-box-wrapper">
+                            <MaskedInput tabIndex={39 + props.tabTimes}
+                                mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                                guide={false}
+                                type="text" placeholder="Added Date"
+                                onKeyDown={async (e) => {
+                                    let key = e.keyCode || e.which;
+
+                                    if (key >= 37 && key <= 40) {
+                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.added_date || ''), 'MM/DD/YYYY');
+                                        await setPreSelectedAddedDate(event_date);
+
+                                        if (isAddedDateCalendarShown) {
+                                            e.preventDefault();
+
+                                            if (key === 37) { // left - minus 1
+                                                setPreSelectedAddedDate(preSelectedAddedDate.clone().subtract(1, 'day'));
+                                            }
+
+                                            if (key === 38) { // up - minus 7
+                                                setPreSelectedAddedDate(preSelectedAddedDate.clone().subtract(7, 'day'));
+                                            }
+
+                                            if (key === 39) { // right - plus 1
+                                                setPreSelectedAddedDate(preSelectedAddedDate.clone().add(1, 'day'));
+                                            }
+
+                                            if (key === 40) { // down - plus 7
+                                                setPreSelectedAddedDate(preSelectedAddedDate.clone().add(7, 'day'));
+                                            }
+                                        } else {
+                                            await setIsAddedDateCalendarShown(true);
+                                        }
+                                    }
+
+                                    if (key === 13) {
+                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.added_date || ''), 'MM/DD/YYYY');
+                                        await setPreSelectedAddedDate(event_date);
+
+                                        if (isAddedDateCalendarShown) {
+                                            event_date = preSelectedAddedDate.clone().format('MM/DD/YYYY');
+
+                                            await setSelectedAgent(selectedAgent => {
+                                                return {
+                                                    ...selectedAgent,
+                                                    added_date: event_date
+                                                }
+                                            })
+
+                                            // await saveAgent({keyCode: 9});
+
+                                            await setIsAddedDateCalendarShown(false);
+                                        }
+                                    }
+
+                                    if (key === 9) {
+                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.added_date || ''), 'MM/DD/YYYY');
+                                        await setPreSelectedAddedDate(event_date);
+
+                                        if (isAddedDateCalendarShown) {
+                                            event_date = preSelectedAddedDate.clone().format('MM/DD/YYYY');
+
+                                            await setSelectedAgent(selectedAgent => {
+                                                return {
+                                                    ...selectedAgent,
+                                                    added_date: event_date
+                                                }
+                                            })
+
+                                            // await saveAgent({keyCode: 9});
+
+                                            await setIsAddedDateCalendarShown(false);
+                                        } else {
+                                            if (e.target.value.trim() === '') {
+                                                await setSelectedAgent(selectedAgent => {
+                                                    return {
+                                                        ...selectedAgent,
+                                                        added_date: null
+                                                    }
+                                                })
+
+                                                // await saveAgent({keyCode: 9});
+                                            }
+                                        }
+                                    }
+                                }}
+                                onBlur={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            added_date: getFormattedDates(selectedAgent?.added_date)
+                                        }
+                                    })
+                                }}
+                                onInput={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            added_date: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            added_date: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.added_date || ''}
+                                ref={refAddedDate}
+                            />
+
+                            <FontAwesomeIcon className="dropdown-button calendar added-date-calendar"
+                                icon={faCalendarAlt} onClick={(e) => {
+                                    if (isAddedDateCalendarShown) {
+                                        setIsAddedDateCalendarShown(false);
+                                    } else {
+                                        // e.stopPropagation();
+
+
+                                        new Promise((resolve, reject) => {
+                                            if (moment((selectedAgent?.added_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.added_date || '').trim()) {
+                                                setPreSelectedAddedDate(moment(selectedAgent?.added_date, 'MM/DD/YYYY'));
+                                            } else {
+                                                setPreSelectedAddedDate(moment());
+                                            }
+
+                                            resolve('OK');
+                                        }).then(res => {
+                                            setIsAddedDateCalendarShown(true);
+                                            refAddedDate.current.inputElement.focus();
+                                        }).catch(e => {
+
+                                        });
+
+                                    }
+                                }} />
+                        </div>
+                        {
+                            addedDateTransition((style, item) => item && (
+                                <animated.div
+                                    className="mochi-contextual-container"
+                                    id="mochi-contextual-container-date-received"
+                                    style={{
+                                        ...style,
+                                        left: '-150px',
+                                        display: 'block'
+                                    }}
+                                    ref={refAddedDateCalendarDropDown}
+                                >
+                                    <div className="mochi-contextual-popup vertical below left"
+                                        style={{ height: 275 }}>
+                                        <div className="mochi-contextual-popup-content">
+                                            <div className="mochi-contextual-popup-wrapper">
+                                                <Calendar
+                                                    value={moment((selectedAgent?.added_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.added_date || '').trim()
+                                                        ? moment(selectedAgent?.added_date, 'MM/DD/YYYY')
+                                                        : moment()}
+                                                    onChange={(day) => {
+                                                        new Promise(async (resolve, reject) => {
+                                                            await setSelectedAgent(selectedAgent => {
+                                                                return {
+                                                                    ...selectedAgent,
+                                                                    added_date: day.format('MM/DD/YYYY')
+                                                                }
+                                                            })
+
+                                                            resolve('OK')
+                                                        }).then(response => {
+                                                            // saveAgent({keyCode: 9});
+                                                        })
+                                                    }}
+                                                    closeCalendar={() => {
+                                                        setIsAddedDateCalendarShown(false);
+                                                    }}
+                                                    preDay={preSelectedAddedDate}
+                                                    onChangePreDay={(preDay) => {
+                                                        setPreSelectedAddedDate(preDay);
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </animated.div>
+                            ))
+                        }
+                    </div>
+
+                    <div className="select-box-container">
+                        <div className="select-box-wrapper">
+                            <MaskedInput tabIndex={40 + props.tabTimes}
+                                mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                                guide={false}
+                                type="text" placeholder="Termination Date"
+                                onKeyDown={async (e) => {
+                                    let key = e.keyCode || e.which;
+
+                                    if (key >= 37 && key <= 40) {
+                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.termination_date || ''), 'MM/DD/YYYY');
+                                        await setPreSelectedTerminationDate(event_date);
+
+                                        if (isTerminationDateCalendarShown) {
+                                            e.preventDefault();
+
+                                            if (key === 37) { // left - minus 1
+                                                setPreSelectedTerminationDate(preSelectedTerminationDate.clone().subtract(1, 'day'));
+                                            }
+
+                                            if (key === 38) { // up - minus 7
+                                                setPreSelectedTerminationDate(preSelectedTerminationDate.clone().subtract(7, 'day'));
+                                            }
+
+                                            if (key === 39) { // right - plus 1
+                                                setPreSelectedTerminationDate(preSelectedTerminationDate.clone().add(1, 'day'));
+                                            }
+
+                                            if (key === 40) { // down - plus 7
+                                                setPreSelectedTerminationDate(preSelectedTerminationDate.clone().add(7, 'day'));
+                                            }
+                                        } else {
+                                            await setIsTerminationDateCalendarShown(true);
+                                        }
+                                    }
+
+                                    if (key === 13) {
+                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.termination_date || ''), 'MM/DD/YYYY');
+                                        await setPreSelectedTerminationDate(event_date);
+
+                                        if (isTerminationDateCalendarShown) {
+                                            event_date = preSelectedTerminationDate.clone().format('MM/DD/YYYY');
+
+                                            await setSelectedAgent(selectedAgent => {
+                                                return {
+                                                    ...selectedAgent,
+                                                    termination_date: event_date
+                                                }
+                                            })
+
+                                            // await saveAgent({keyCode: 9});
+
+                                            await setIsTerminationDateCalendarShown(false);
+                                        }
+                                    }
+
+                                    if (key === 9) {
+                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.termination_date || ''), 'MM/DD/YYYY');
+                                        await setPreSelectedTerminationDate(event_date);
+
+                                        if (isTerminationDateCalendarShown) {
+                                            event_date = preSelectedTerminationDate.clone().format('MM/DD/YYYY');
+
+                                            await setSelectedAgent(selectedAgent => {
+                                                return {
+                                                    ...selectedAgent,
+                                                    termination_date: event_date
+                                                }
+                                            })
+
+                                            // await saveAgent({keyCode: 9});
+
+                                            await setIsTerminationDateCalendarShown(false);
+                                        } else {
+                                            if (e.target.value.trim() === '') {
+                                                await setSelectedAgent(selectedAgent => {
+                                                    return {
+                                                        ...selectedAgent,
+                                                        termination_date: null
+                                                    }
+                                                })
+
+                                                // await saveAgent({keyCode: 9});
+                                            }
+                                        }
+                                    }
+                                }}
+                                onBlur={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            termination_date: getFormattedDates(selectedAgent?.termination_date)
+                                        }
+                                    })
+                                }}
+                                onInput={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            termination_date: e.target.value
+                                        }
+                                    })
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            termination_date: e.target.value
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.termination_date || ''}
+                                ref={refTerminationDate}
+                            />
+
+                            <FontAwesomeIcon className="dropdown-button calendar termination-date-calendar"
+                                icon={faCalendarAlt} onClick={(e) => {
+                                    if (isTerminationDateCalendarShown) {
+                                        setIsTerminationDateCalendarShown(false);
+                                    } else {
+                                        // e.stopPropagation();
+
+
+                                        new Promise((resolve, reject) => {
+                                            if (moment((selectedAgent?.termination_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.termination_date || '').trim()) {
+                                                setPreSelectedTerminationDate(moment(selectedAgent?.termination_date, 'MM/DD/YYYY'));
+                                            } else {
+                                                setPreSelectedTerminationDate(moment());
+                                            }
+
+                                            resolve('OK');
+                                        }).then(res => {
+                                            setIsTerminationDateCalendarShown(true);
+                                            refTerminationDate.current.inputElement.focus();
+                                        }).catch(e => {
+
+                                        });
+
+                                    }
+                                }} />
+                        </div>
+                        {
+                            terminationDateTransition((style, item) => item && (
+                                <animated.div
+                                    className="mochi-contextual-container"
+                                    id="mochi-contextual-container-date-received"
+                                    style={{
+                                        ...style,
+                                        left: '-150px',
+                                        display: 'block'
+                                    }}
+                                    ref={refTerminationDateCalendarDropDown}
+                                >
+                                    <div className="mochi-contextual-popup vertical below left"
+                                        style={{ height: 275 }}>
+                                        <div className="mochi-contextual-popup-content">
+                                            <div className="mochi-contextual-popup-wrapper">
+                                                <Calendar
+                                                    value={moment((selectedAgent?.termination_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.termination_date || '').trim()
+                                                        ? moment(selectedAgent?.termination_date, 'MM/DD/YYYY')
+                                                        : moment()}
+                                                    onChange={(day) => {
+                                                        new Promise(async (resolve, reject) => {
+                                                            await setSelectedAgent(selectedAgent => {
+                                                                return {
+                                                                    ...selectedAgent,
+                                                                    termination_date: day.format('MM/DD/YYYY')
+                                                                }
+                                                            })
+
+                                                            resolve('OK')
+                                                        }).then(response => {
+                                                            // saveAgent({keyCode: 9});
+                                                        })
+                                                    }}
+                                                    closeCalendar={() => {
+                                                        setIsTerminationDateCalendarShown(false);
+                                                    }}
+                                                    preDay={preSelectedTerminationDate}
+                                                    onChangePreDay={(preDay) => {
+                                                        setPreSelectedTerminationDate(preDay);
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </animated.div>
+                            ))
+                        }
+                    </div>
+
+                    <div className="input-box-container">
+                        <input tabIndex={41 + props.tabTimes} type="text" placeholder="Regional Manager"
+                            onInput={(e) => {
+                                setSelectedAgent(selectedAgent => {
+                                    return {
+                                        ...selectedAgent,
+                                        regional_manager: e.target.value
+                                    }
+                                })
+                            }}
+                            onChange={e => {
+                                setSelectedAgent(selectedAgent => {
+                                    return {
+                                        ...selectedAgent,
+                                        regional_manager: e.target.value
+                                    }
+                                })
+                            }}
+                            value={selectedAgent?.regional_manager || ''} />
+                    </div>
+
+                    <div className="select-box-container">
+                        <div className="select-box-wrapper">
+                            <input
+                                type="text"
+                                readOnly={!props.isAdmin}
+                                tabIndex={42 + props.tabTimes}
+                                placeholder="Division"
+                                ref={refDivision}
+                                onKeyDown={async (e) => {
+                                    let key = e.keyCode || e.which;
+
+                                    if (!props.isAdmin) {
+                                        e.preventDefault();
+                                    } else {
+                                        switch (key) {
+                                            case 37: case 38: // arrow left | arrow up
+                                                e.preventDefault();
+                                                if (divisionItems.length > 0) {
+                                                    let selectedIndex = divisionItems.findIndex((item) => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setDivisionItems(
+                                                            divisionItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            })
+                                                        );
+                                                    } else {
+                                                        await setDivisionItems(
+                                                            divisionItems.map((item, index) => {
+                                                                if (selectedIndex === 0) {
+                                                                    item.selected =
+                                                                        index === divisionItems.length - 1;
+                                                                } else {
+                                                                    item.selected =
+                                                                        index === selectedIndex - 1;
+                                                                }
+                                                                return item;
+                                                            })
+                                                        );
+                                                    }
+
+                                                    refDivisionPopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains("selected")) {
+                                                            r.scrollIntoView({
+                                                                behavior: "auto",
+                                                                block: "center",
+                                                                inline: "nearest",
+                                                            });
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                        if (res.data.result === "OK") {
+                                                            await setDivisionItems(res.data.divisions.map((item, index) => {
+                                                                item.selected =
+                                                                    (selectedAgent?.division?.id ||
+                                                                        0) === 0
+                                                                        ? index === 0
+                                                                        : item.id ===
+                                                                        selectedAgent.division.id;
+                                                                return item;
+                                                            }));
+
+                                                            refDivisionPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(async (e) => {
+                                                        console.log("error getting divisions", e);
+                                                    });
+                                                }
+                                                break;
+
+                                            case 39: case 40: // arrow right | arrow down
+                                                e.preventDefault();
+                                                if (divisionItems.length > 0) {
+                                                    let selectedIndex = divisionItems.findIndex((item) => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setDivisionItems(divisionItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }));
+                                                    } else {
+                                                        await setDivisionItems(divisionItems.map((item, index) => {
+                                                            if (selectedIndex === divisionItems.length - 1) {
+                                                                item.selected = index === 0;
+                                                            } else {
+                                                                item.selected = index === selectedIndex + 1;
+                                                            }
+                                                            return item;
+                                                        }));
+                                                    }
+
+                                                    refDivisionPopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains("selected")) {
+                                                            r.scrollIntoView({
+                                                                behavior: "auto",
+                                                                block: "center",
+                                                                inline: "nearest",
+                                                            });
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                        if (res.data.result === "OK") {
+                                                            await setDivisionItems(res.data.divisions.map(
+                                                                (item, index) => {
+                                                                    item.selected =
+                                                                        (selectedAgent?.division?.id ||
+                                                                            0) === 0
+                                                                            ? index === 0
+                                                                            : item.id ===
+                                                                            selectedAgent?.division.id;
+                                                                    return item;
+                                                                }
+                                                            )
+                                                            );
+
+                                                            refDivisionPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(async (e) => {
+                                                        console.log("error getting divisions", e);
+                                                    });
+                                                }
+                                                break;
+
+                                            case 27: // escape
+                                                setDivisionItems([]);
+                                                break;
+
+                                            case 13: // enter
+                                                if (divisionItems.length > 0 && divisionItems.findIndex((item) => item.selected) > -1) {
+                                                    await setSelectedAgent(selectedAgent => {
+                                                        return {
+                                                            ...selectedAgent,
+                                                            division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                            division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
+                                                        }
+                                                    })
+
+                                                    // saveAgent({ keyCode: 9 });
+                                                    setDivisionItems([]);
+                                                    refDivision.current.focus();
+                                                }
+                                                break;
+
+                                            case 9: // tab
+                                                if (divisionItems.length > 0) {
+                                                    e.preventDefault();
+                                                    await setSelectedAgent(selectedAgent => {
+                                                        return {
+                                                            ...selectedAgent,
+                                                            division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                            division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
+                                                        }
+                                                    })
+
+                                                    // saveAgent({ keyCode: 9 });
+                                                    setDivisionItems([]);
+                                                    refDivision.current.focus();
+                                                }
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }}
+                                onBlur={async () => {
+                                    if ((selectedAgent?.division?.id || 0) === 0) {
+                                        await setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                division: {},
+                                                division_id: null
+                                            }
+                                        })
+                                    }
+                                }}
+                                onInput={async (e) => {
+                                    let division = selectedAgent?.division || {};
+
+                                    division.id = 0;
+                                    division.name = e.target.value;
+
+                                    await setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            division: division,
+                                            division_id: division.id
+                                        }
+                                    })
+
+                                    if (e.target.value.trim() === "") {
+                                        setDivisionItems([]);
+                                    } else {
+                                        axios.post(props.serverUrl + "/getDivisions", { name: e.target.value.trim() }).then(async (res) => {
+                                            if (res.data.result === "OK") {
+                                                await setDivisionItems(
+                                                    res.data.divisions.map((item, index) => {
+                                                        item.selected = (selectedAgent?.division?.id || 0) === 0
+                                                            ? index === 0
+                                                            : item.id ===
+                                                            selectedAgent.division.id;
+                                                        return item;
+                                                    })
+                                                );
+                                            }
+                                        }).catch(async (e) => {
+                                            console.log("error getting divisions", e);
+                                        });
+                                    }
+                                }}
+                                onChange={async (e) => {
+                                    let division = selectedAgent?.division || {};
+
+                                    division.id = 0;
+                                    division.name = e.target.value;
+
+                                    await setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            division: division,
+                                            division_id: division.id
+                                        }
+                                    })
+                                }}
+                                value={selectedAgent?.division?.name || ""}
+                            />
+                            {
+                                props.isAdmin &&
+                                <FontAwesomeIcon
+                                    className="dropdown-button"
+                                    icon={faCaretDown}
+                                    style={{
+                                        pointerEvents: props.isAdmin ? 'all' : 'none'
+                                    }}
+                                    onClick={() => {
+                                        if (divisionItems.length > 0) {
+                                            setDivisionItems([]);
+                                        } else {
+                                            if ((selectedAgent?.division?.id || 0) === 0 && (selectedAgent?.division?.name || "") !== "") {
+                                                axios.post(props.serverUrl + "/getDivisions", { name: selectedAgent.division.name }).then(async (res) => {
+                                                    if (res.data.result === "OK") {
+                                                        await setDivisionItems(res.data.divisions.map((item, index) => {
+                                                            item.selected = (selectedAgent?.division?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === selectedAgent.division.id;
+                                                            return item;
+                                                        }));
+
+                                                        refDivisionPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async (e) => {
+                                                    console.log("error getting divisions", e);
+                                                });
+                                            } else {
+                                                axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                    if (res.data.result === "OK") {
+                                                        await setDivisionItems(res.data.divisions.map((item, index) => {
+                                                            item.selected = (selectedAgent?.division?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === selectedAgent.division.id;
+                                                            return item;
+                                                        }));
+
+                                                        refDivisionPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async (e) => {
+                                                    console.log("error getting divisions", e);
+                                                });
+                                            }
+                                        }
+
+                                        refDivision.current.focus();
+                                    }}
+                                />
+                            }
+                        </div>
+
+                        {
+                            divisionTransition((style, item) => item && (
+                                <animated.div
+                                    className="mochi-contextual-container"
+                                    id="mochi-contextual-container-division"
+                                    style={{
+                                        ...style,
+                                        left: "-50%",
+                                        display: "block",
+                                    }}
+                                    ref={refDivisionDropDown}>
+
+                                    <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
+                                        <div className="mochi-contextual-popup-content">
+                                            <div className="mochi-contextual-popup-wrapper">
+                                                {divisionItems.map((item, index) => {
+                                                    const mochiItemClasses = classnames({
+                                                        "mochi-item": true,
+                                                        selected: item.selected,
+                                                    });
+
+                                                    const searchValue = (selectedAgent?.division?.id || 0) === 0 && (selectedAgent?.division?.name || "") !== ""
+                                                        ? selectedAgent?.division?.name
+                                                        : undefined;
+
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className={mochiItemClasses}
+                                                            id={item.id}
+                                                            onClick={() => {
+                                                                setSelectedAgent(selectedAgent => {
+                                                                    return {
+                                                                        ...selectedAgent,
+                                                                        division: item,
+                                                                        division_id: item.id
+                                                                    }
+                                                                })
+
+                                                                window.setTimeout(() => {
+                                                                    // saveAgent({ keyCode: 9 });
+                                                                    setDivisionItems([]);
+                                                                    refDivision.current.focus();
+                                                                }, 0);
+                                                            }}
+                                                            ref={(ref) => refDivisionPopupItems.current.push(ref)}
+                                                        >
+                                                            {searchValue === undefined ? (item.name) : (
+                                                                <Highlighter
+                                                                    highlightClassName="mochi-item-highlight-text"
+                                                                    searchWords={[searchValue]}
+                                                                    autoEscape={true}
+                                                                    textToHighlight={item.name}
+                                                                />
+                                                            )}
+                                                            {item.selected && (
+                                                                <FontAwesomeIcon
+                                                                    className="dropdown-selected"
+                                                                    icon={faCaretRight}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </animated.div>
+                            ))
+                        }
+                    </div>
+
+                    <div className="input-box-container">
+                        <input tabIndex={43 + props.tabTimes} type="text" placeholder="FID"
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    saveAgent(e);
+                                }
+                            }}
+                            onInput={(e) => {
+                                setSelectedAgent(selectedAgent => {
+                                    return {
+                                        ...selectedAgent,
+                                        fid: e.target.value
+                                    }
+                                })
+                            }}
+                            onChange={e => {
+                                setSelectedAgent(selectedAgent => {
+                                    return {
+                                        ...selectedAgent,
+                                        fid: e.target.value
+                                    }
+                                })
+                            }}
+                            value={selectedAgent?.fid || ''} />
+                    </div>
+                </div>
+
+                {/*BUTTONS SECTION*/}
+                <div className="buttons-container" style={{ marginLeft: '0px' }}>
+                    <div className="mochi-button wrap" onClick={revenueInformationBtnClick}>
+                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                        <div className="mochi-button-base">Revenue Information</div>
+                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                    </div>
+
+                    <div className="mochi-button wrap" onClick={orderHistoryBtnClick}>
+                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                        <div className="mochi-button-base">Order History</div>
+                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                    </div>
+
+                    <div className="mochi-button wrap" onClick={documentsBtnClick}>
+                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                        <div className="mochi-button-base">Documents</div>
+                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                    </div>
+
+                    <div className="mochi-button wrap" onClick={() => {
+                        if ((selectedAgent?.id || 0) === 0) {
+                            window.alert('There is nothing to print!');
+                            return;
+                        }
+
+                        handledPrintAgentInformation();
+                    }}>
+                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                        <div className="mochi-button-base">Print Agent Information</div>
+                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                    </div>
+                </div>
+
+                <div className="fields-container-col" style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr',
+                    gridTemplateRows: 'auto 1fr',
+                    gridGap: '10px'
+                }}>
+                    {/*CONTACTS FORM*/}
+                    <div className="form-bordered-box">
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Contacts</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="form-buttons">
+                                <div className="mochi-button" onClick={async () => {
+                                    if (selectedAgent?.id === undefined) {
+                                        window.alert('You must select a agent first!');
+                                        return;
+                                    }
+
+                                    if (selectedContact.id === undefined) {
+                                        window.alert('You must select a contact');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-contacts`,
+                                        component: <Contacts
+                                            title='Contacts'
+                                            tabTimes={22000 + props.tabTimes}
+                                            panelName={`${props.panelName}-contacts`}
+                                            savingContactUrl='/saveAgentContact'
+                                            deletingContactUrl='/deleteAgentContact'
+                                            uploadAvatarUrl='/uploadAgentContactAvatar'
+                                            removeAvatarUrl='/removeDivisioContactAvatar'
+                                            origin={props.origin}
+                                            owner='agent'
+                                            openPanel={props.openPanel}
+                                            closePanel={props.closePanel}
+                                            componentId={moment().format('x')}
+
+                                            contactSearchCustomer={{
+                                                ...selectedAgent,
+                                                selectedContact: {
+                                                    ...selectedContact,
+                                                    address1: (selectedAgent?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedAgent?.address1 || '') : (selectedContact?.address1 || ''),
+                                                    address2: (selectedAgent?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedAgent?.address2 || '') : (selectedContact?.address2 || ''),
+                                                    city: (selectedAgent?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedAgent?.city || '') : (selectedContact?.city || ''),
+                                                    state: (selectedAgent?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedAgent?.state || '') : (selectedContact?.state || ''),
+                                                    zip_code: (selectedAgent?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedAgent?.zip || '') : (selectedContact?.zip_code || ''),
+                                                }
+                                            }}
+                                            selectedAgent={selectedAgent}
+                                            setSelectedAgent={setSelectedAgent}
+                                            setSelectedAgentContact={setSelectedContact}
+                                        />
+                                    }
+
+                                    props.openPanel(panel, props.origin);
+                                }}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">More</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div className="mochi-button" onClick={() => {
+                                    if ((selectedAgent?.id || 0) === 0) {
+                                        window.alert('You must select a agent first!');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-contacts`,
+                                        component: <Contacts
+                                            title='Contacts'
+                                            tabTimes={22000 + props.tabTimes}
+                                            panelName={`${props.panelName}-contacts`}
+                                            savingContactUrl='/saveAgentContact'
+                                            deletingContactUrl='/deleteAgentContact'
+                                            uploadAvatarUrl='/uploadAgentContactAvatar'
+                                            removeAvatarUrl='/removeDivisioContactAvatar'
+                                            origin={props.origin}
+                                            owner='agent'
+                                            openPanel={props.openPanel}
+                                            closePanel={props.closePanel}
+                                            componentId={moment().format('x')}
+                                            isEditingContact={true}
+
+                                            contactSearchCustomer={{
+                                                ...selectedAgent,
+                                                selectedContact: { id: 0, agent_id: selectedAgent?.id }
+                                            }}
+
+                                            selectedAgent={selectedAgent}
+                                            setSelectedAgent={setSelectedAgent}
+                                            setSelectedAgentContact={setSelectedContact}
+                                        />
+                                    }
+
+                                    props.openPanel(panel, props.origin);
+                                }}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Add Contact</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div className="mochi-button" onClick={() => {
+                                    setSelectedContact({});
+                                    refAgentContactFirstName.current.focus();
+                                }}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Clear</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1" style={{
-                                        textTransform: 'capitalize'
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className={disabledAgentContactFields + ' input-box-container grow'}>
+                                <input tabIndex={13 + props.tabTimes} type="text" placeholder="First Name" style={{
+                                    textTransform: 'capitalize'
+                                }}
+                                    ref={refAgentContactFirstName}
+                                    onChange={e => {
+                                        setSelectedContact({ ...selectedContact, first_name: e.target.value })
                                     }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   address1: e.target.value
-                                               })
-                                           }}
-                                           value={selectedAgent?.address1 || ''}/>
-                                </div>
+                                    value={selectedContact?.first_name || ''} />
                             </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   address2: e.target.value
-                                               })
-                                           }}
-                                           value={selectedAgent?.address2 || ''}/>
-                                </div>
+                            <div className="form-h-sep"></div>
+                            <div className={disabledAgentContactFields + ' input-box-container grow'}>
+                                <input tabIndex={14 + props.tabTimes} type="text" placeholder="Last Name" style={{
+                                    textTransform: 'capitalize'
+                                }}
+                                    onChange={e => setSelectedContact({
+                                        ...selectedContact,
+                                        last_name: e.target.value
+                                    })}
+                                    value={selectedContact?.last_name || ''} />
                             </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={5 + props.tabTimes} type="text" placeholder="City" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   city: e.target.value
-                                               })
-                                           }}
-                                           value={selectedAgent?.city || ''}/>
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledOnAddingEditing + ' input-state'}>
-                                    <input tabIndex={6 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   state: e.target.value
-                                               })
-                                           }}
-                                           value={selectedAgent?.state || ''}/>
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledOnAddingEditing + ' input-zip-code'}>
-                                    <input tabIndex={7 + props.tabTimes} type="text" placeholder="Postal Code"
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   zip: e.target.value
-                                               })
-                                           }}
-                                           value={selectedAgent?.zip || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact First Name" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact({
-                                                   ...selectedPrimaryContact,
-                                                   first_name: e.target.value
-                                               })
-                                           }}
-                                           value={selectedPrimaryContact.first_name || ''}/>
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledOnAddingEditing + ' grow'}>
-                                    <input tabIndex={9 + props.tabTimes} type="text" placeholder="Contact Last Name" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact({
-                                                   ...selectedPrimaryContact,
-                                                   last_name: e.target.value
-                                               })
-                                           }}
-                                           value={selectedPrimaryContact.last_name || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledOnAddingEditing + ' input-phone'}
-                                     style={{position: 'relative'}}>
-                                    <MaskedInput
-                                        tabIndex={10 + props.tabTimes}
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div className={disabledAgentContactFields + ' select-box-container'}
+                                style={{ width: '50%' }}>
+                                <div className="select-box-wrapper">
+                                    <MaskedInput tabIndex={15 + props.tabTimes}
                                         mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                         guide={true}
-                                        type="text" placeholder="Contact Phone"
+                                        type="text"
+                                        placeholder="Phone"
+                                        ref={refAgentContactPhone}
+                                        onKeyDown={async (e) => {
+                                            let key = e.keyCode || e.which;
+
+                                            switch (key) {
+                                                case 37:
+                                                case 38: // arrow left | arrow up
+                                                    e.preventDefault();
+                                                    if (showAgentContactPhones) {
+                                                        let selectedIndex = agentContactPhoneItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            }))
+                                                        } else {
+                                                            await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                if (selectedIndex === 0) {
+                                                                    item.selected = index === (agentContactPhoneItems.length - 1);
+                                                                } else {
+                                                                    item.selected = index === (selectedIndex - 1)
+                                                                }
+                                                                return item;
+                                                            }))
+                                                        }
+
+                                                        refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (agentContactPhoneItems.length > 1) {
+                                                            await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                return item;
+                                                            }))
+
+                                                            setShowAgentContactPhones(true);
+
+                                                            refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 39:
+                                                case 40: // arrow right | arrow down
+                                                    e.preventDefault();
+                                                    if (showAgentContactPhones) {
+                                                        let selectedIndex = agentContactPhoneItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            }))
+                                                        } else {
+                                                            await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                if (selectedIndex === (agentContactPhoneItems.length - 1)) {
+                                                                    item.selected = index === 0;
+                                                                } else {
+                                                                    item.selected = index === (selectedIndex + 1)
+                                                                }
+                                                                return item;
+                                                            }))
+                                                        }
+
+                                                        refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (agentContactPhoneItems.length > 1) {
+                                                            await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                return item;
+                                                            }))
+
+                                                            setShowAgentContactPhones(true);
+
+                                                            refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 27: // escape
+                                                    setShowAgentContactPhones(false);
+                                                    break;
+
+                                                case 13: // enter
+                                                    if (showAgentContactPhones && agentContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_phone: agentContactPhoneItems[agentContactPhoneItems.findIndex(item => item.selected)].type
+                                                        });
+
+                                                        // validateContactForSaving({ keyCode: 9 });
+                                                        setShowAgentContactPhones(false);
+                                                        refAgentContactPhone.current.inputElement.focus();
+                                                    }
+                                                    break;
+
+                                                case 9: // tab
+                                                    if (showAgentContactPhones) {
+                                                        e.preventDefault();
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_phone: agentContactPhoneItems[agentContactPhoneItems.findIndex(item => item.selected)].type
+                                                        });
+
+                                                        // validateContactForSaving({ keyCode: 9 });
+                                                        setShowAgentContactPhones(false);
+                                                        refAgentContactPhone.current.inputElement.focus();
+                                                    } else {
+                                                        // validateContactForSaving({ keyCode: 9 });
+                                                    }
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                        }}
                                         onInput={(e) => {
-                                            setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                return {
-                                                    ...selectedPrimaryContact,
-                                                    primary_phone: (selectedPrimaryContact?.primary_phone || '') === '' ? 'work' : selectedPrimaryContact.primary_phone,
-                                                    phone_work: ((selectedPrimaryContact?.primary_phone || '') === 'work' ||
-                                                        (selectedPrimaryContact?.primary_phone || '') === '')
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_work || ''),
-                                                    phone_work_fax: (selectedPrimaryContact?.primary_phone || '') === 'fax'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_work_fax || ''),
-                                                    phone_mobile: (selectedPrimaryContact?.primary_phone || '') === 'mobile'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_mobile || ''),
-                                                    phone_direct: (selectedPrimaryContact?.primary_phone || '') === 'direct'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_direct || ''),
-                                                    phone_other: (selectedPrimaryContact?.primary_phone || '') === 'other'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_other || '')
+                                            if ((selectedContact?.id || 0) === 0) {
+                                                setSelectedContact({
+                                                    ...selectedContact,
+                                                    phone_work: e.target.value,
+                                                    primary_phone: 'work'
+                                                });
+                                            } else {
+                                                if ((selectedContact?.primary_phone || '') === '') {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        phone_work: e.target.value,
+                                                        primary_phone: 'work'
+                                                    });
+                                                } else {
+                                                    switch (selectedContact?.primary_phone) {
+                                                        case 'work':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'fax':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work_fax: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'mobile':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_mobile: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'direct':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_direct: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'other':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_other: e.target.value
+                                                            });
+                                                            break;
+                                                    }
                                                 }
-                                            })
+                                            }
                                         }}
                                         onChange={(e) => {
-                                            setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                return {
-                                                    ...selectedPrimaryContact,
-                                                    primary_phone: (selectedPrimaryContact?.primary_phone || '') === '' ? 'work' : selectedPrimaryContact.primary_phone,
-                                                    phone_work: ((selectedPrimaryContact?.primary_phone || '') === 'work' ||
-                                                        (selectedPrimaryContact?.primary_phone || '') === '')
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_work || ''),
-                                                    phone_work_fax: (selectedPrimaryContact?.primary_phone || '') === 'fax'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_work_fax || ''),
-                                                    phone_mobile: (selectedPrimaryContact?.primary_phone || '') === 'mobile'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_mobile || ''),
-                                                    phone_direct: (selectedPrimaryContact?.primary_phone || '') === 'direct'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_direct || ''),
-                                                    phone_other: (selectedPrimaryContact?.primary_phone || '') === 'other'
-                                                        ? e.target.value
-                                                        : (selectedPrimaryContact?.phone_other || '')
+                                            if ((selectedContact?.id || 0) === 0) {
+                                                setSelectedContact({
+                                                    ...selectedContact,
+                                                    phone_work: e.target.value,
+                                                    primary_phone: 'work'
+                                                });
+                                            } else {
+                                                if ((selectedContact?.primary_phone || '') === '') {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        phone_work: e.target.value,
+                                                        primary_phone: 'work'
+                                                    });
+                                                } else {
+                                                    switch (selectedContact?.primary_phone) {
+                                                        case 'work':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'fax':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work_fax: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'mobile':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_mobile: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'direct':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_direct: e.target.value
+                                                            });
+                                                            break;
+                                                        case 'other':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_other: e.target.value
+                                                            });
+                                                            break;
+                                                    }
                                                 }
-                                            })
+                                            }
                                         }}
                                         value={
-                                            selectedPrimaryContact?.primary_phone === 'work'
-                                                ? (selectedPrimaryContact?.phone_work || '')
-                                                : selectedPrimaryContact?.primary_phone === 'fax'
-                                                    ? (selectedPrimaryContact?.phone_work_fax || '')
-                                                    : selectedPrimaryContact?.primary_phone === 'mobile'
-                                                        ? (selectedPrimaryContact?.phone_mobile || '')
-                                                        : selectedPrimaryContact?.primary_phone === 'direct'
-                                                            ? (selectedPrimaryContact?.phone_direct || '')
-                                                            : selectedPrimaryContact?.primary_phone === 'other'
-                                                                ? (selectedPrimaryContact?.phone_other || '')
+                                            (selectedContact?.primary_phone || '') === 'work'
+                                                ? (selectedContact?.phone_work || '')
+                                                : (selectedContact?.primary_phone || '') === 'fax'
+                                                    ? (selectedContact?.phone_work_fax || '')
+                                                    : (selectedContact?.primary_phone || '') === 'mobile'
+                                                        ? (selectedContact?.phone_mobile || '')
+                                                        : (selectedContact?.primary_phone || '') === 'direct'
+                                                            ? (selectedContact?.phone_direct || '')
+                                                            : (selectedContact?.primary_phone || '') === 'other'
+                                                                ? (selectedContact?.phone_other || '')
                                                                 : ''
                                         }
                                     />
 
                                     {
-                                        (selectedPrimaryContact?.id || 0 > 0) &&
+                                        (selectedContact?.id || 0) > 0 &&
                                         <div
                                             className={classnames({
                                                 'selected-agent-contact-primary-phone': true,
-                                                'pushed': false
+                                                'pushed': (agentContactPhoneItems.length > 1)
                                             })}>
-                                            {selectedPrimaryContact?.primary_phone || ''}
-                                        </div>
-                                    }
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledOnAddingEditing + ' input-phone-ext'}>
-                                    <input tabIndex={11 + props.tabTimes} type="text" placeholder="Ext"
-                                           onInput={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       phone_ext: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       phone_ext: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedPrimaryContact?.phone_ext || ''}
-                                    />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledOnAddingEditing}
-                                     style={{position: 'relative', flexGrow: 1, minWidth: '50%'}}
-                                     onMouseEnter={() => {
-                                         if ((selectedPrimaryContact?.email_work || '') !== '' ||
-                                             (selectedPrimaryContact?.email_personal || '') !== '' ||
-                                             (selectedPrimaryContact?.email_other || '') !== '') {
-                                             setShowAgentEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onFocus={() => {
-                                         if ((selectedPrimaryContact?.email_work || '') !== '' ||
-                                             (selectedPrimaryContact?.email_personal || '') !== '' ||
-                                             (selectedPrimaryContact?.email_other || '') !== '') {
-                                             setShowAgentEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onBlur={() => {
-                                         window.setTimeout(() => {
-                                             setShowAgentEmailCopyBtn(false);
-                                         }, 1000);
-                                     }}
-                                     onMouseLeave={() => {
-                                         setShowAgentEmailCopyBtn(false);
-                                     }}
-                                >
-                                    <input tabIndex={12 + props.tabTimes}
-                                           ref={refAgentEmail}
-                                           type="text"
-                                           placeholder="E-Mail"
-                                           style={{textTransform: 'lowercase'}}
-                                           onKeyDown={(e) => {
-                                               let key = e.keyCode || e.which;
-
-                                               if (key === 9){
-                                                   saveAgent(e);
-                                               }
-                                           }}
-                                           onInput={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
-                                                       email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
-                                                           (selectedPrimaryContact?.primary_email || '') === '')
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_work || ''),
-                                                       email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_personal || ''),
-                                                       email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_other || '')
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
-                                                       email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
-                                                           (selectedPrimaryContact?.primary_email || '') === '')
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_work || ''),
-                                                       email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_personal || ''),
-                                                       email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_other || '')
-                                                   }
-                                               })
-                                           }}
-                                           value={
-                                               selectedPrimaryContact?.primary_email === 'work'
-                                                   ? (selectedPrimaryContact?.email_work || '')
-                                                   : selectedPrimaryContact?.primary_email === 'personal'
-                                                       ? (selectedPrimaryContact?.email_personal || '')
-                                                       : selectedPrimaryContact?.primary_email === 'other'
-                                                           ? (selectedPrimaryContact?.email_other || '')
-                                                           : ''
-                                           }
-                                    />
-                                    {
-                                        (selectedPrimaryContact?.id || 0 > 0) &&
-                                        <div
-                                            className={classnames({
-                                                'selected-agent-contact-primary-email': true,
-                                                'pushed': false
-                                            })}>
-                                            {selectedPrimaryContact?.primary_email || ''}
+                                            {selectedContact?.primary_phone || ''}
                                         </div>
                                     }
 
                                     {
-                                        showAgentEmailCopyBtn &&
+                                        agentContactPhoneItems.length > 1 &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                            onClick={async () => {
+                                                if (showAgentContactPhones) {
+                                                    setShowAgentContactPhones(false);
+                                                } else {
+                                                    if (agentContactPhoneItems.length > 1) {
+                                                        await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
+                                                            item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                            return item;
+                                                        }))
+
+                                                        window.setTimeout(async () => {
+                                                            await setShowAgentContactPhones(true);
+
+                                                            refAgentContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }, 0)
+                                                    }
+                                                }
+
+                                                refAgentContactPhone.current.inputElement.focus();
+                                            }} />
+                                    }
+                                </div>
+                                {
+                                    agentContactPhonesTransition((style, item) => item && (
+                                        <animated.div
+                                            className="mochi-contextual-container"
+                                            id="mochi-contextual-container-contact-phone"
+                                            style={{
+                                                ...style,
+                                                left: '0',
+                                                display: 'block'
+                                            }}
+                                            ref={refAgentContactPhoneDropDown}
+                                        >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup-content">
+                                                    <div className="mochi-contextual-popup-wrapper">
+                                                        {
+                                                            agentContactPhoneItems.map((item, index) => {
+                                                                const mochiItemClasses = classnames({
+                                                                    'mochi-item': true,
+                                                                    'selected': item.selected
+                                                                });
+
+                                                                return (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={mochiItemClasses}
+                                                                        id={item.id}
+                                                                        onClick={async () => {
+                                                                            await setSelectedContact({
+                                                                                ...selectedContact,
+                                                                                primary_phone: item.type
+                                                                            });
+
+                                                                            // validateContactForSaving({ keyCode: 9 });
+                                                                            setShowAgentContactPhones(false);
+                                                                            refAgentContactPhone.current.inputElement.focus();
+                                                                        }}
+                                                                        ref={ref => refAgentContactPhonePopupItems.current.push(ref)}
+                                                                    >
+                                                                        {
+                                                                            item.type === 'work' ? `Phone Work `
+                                                                                : item.type === 'fax' ? `Phone Work Fax `
+                                                                                    : item.type === 'mobile' ? `Phone Mobile `
+                                                                                        : item.type === 'direct' ? `Phone Direct `
+                                                                                            : item.type === 'other' ? `Phone Other ` : ''
+                                                                        }
+
+                                                                        (<b>
+                                                                            {
+                                                                                item.type === 'work' ? item.phone
+                                                                                    : item.type === 'fax' ? item.phone
+                                                                                        : item.type === 'mobile' ? item.phone
+                                                                                            : item.type === 'direct' ? item.phone
+                                                                                                : item.type === 'other' ? item.phone : ''
+                                                                            }
+                                                                        </b>)
+
+                                                                        {
+                                                                            item.selected &&
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight} />
+                                                                        }
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </animated.div>
+                                    ))
+                                }
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
+                                <div
+                                    className={disabledAgentContactFields + ' input-box-container input-phone-ext'}>
+                                    <input tabIndex={16 + props.tabTimes} type="text" placeholder="Ext"
+                                        // onKeyDown={validateContactForSaving}
+                                        onChange={e => setSelectedContact({
+                                            ...selectedContact,
+                                            phone_ext: e.target.value
+                                        })}
+                                        value={selectedContact.phone_ext || ''} />
+                                </div>
+                                <div className={disabledAgentContactFields + ' input-toggle-container'}>
+                                    <input type="checkbox"
+                                        id={props.panelName + '-cbox-agent-contacts-primary-btn'}
+                                        onChange={(e) => {
+                                            setSelectedContact({
+                                                ...selectedContact,
+                                                is_primary: e.target.checked ? 1 : 0
+                                            });
+
+                                            saveContact({ keyCode: 9 });
+                                        }}
+                                        checked={(selectedContact.is_primary || 0) === 1} />
+                                    <label htmlFor={props.panelName + '-cbox-agent-contacts-primary-btn'}>
+                                        <div className="label-text">Primary</div>
+                                        <div className="input-toggle-btn"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div className={disabledAgentContactFields + ' select-box-container'}
+                                style={{ flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedContact?.email_work || '') !== '' ||
+                                        (selectedContact?.email_personal || '') !== '' ||
+                                        (selectedContact?.email_other || '') !== '') {
+                                        setShowAgentContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedContact?.email_work || '') !== '' ||
+                                        (selectedContact?.email_personal || '') !== '' ||
+                                        (selectedContact?.email_other || '') !== '') {
+                                        setShowAgentContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowAgentContactEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowAgentContactEmailCopyBtn(false);
+                                }}>
+                                <div className="select-box-wrapper">
+                                    <input
+                                        style={{
+                                            width: 'calc(100% - 25px)',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                        tabIndex={17 + props.tabTimes}
+                                        type="text"
+                                        placeholder="E-Mail"
+                                        ref={refAgentContactEmail}
+                                        onKeyDown={async (e) => {
+                                            let key = e.keyCode || e.which;
+
+                                            switch (key) {
+                                                case 37:
+                                                case 38: // arrow left | arrow up
+                                                    e.preventDefault();
+                                                    if (showAgentContactEmails) {
+                                                        let selectedIndex = agentContactEmailItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            }))
+                                                        } else {
+                                                            await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                if (selectedIndex === 0) {
+                                                                    item.selected = index === (agentContactEmailItems.length - 1);
+                                                                } else {
+                                                                    item.selected = index === (selectedIndex - 1)
+                                                                }
+                                                                return item;
+                                                            }))
+                                                        }
+
+                                                        refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (agentContactEmailItems.length > 1) {
+                                                            await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_email || '')
+                                                                return item;
+                                                            }))
+
+                                                            setShowAgentContactEmails(true);
+
+                                                            refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 39:
+                                                case 40: // arrow right | arrow down
+                                                    e.preventDefault();
+                                                    if (showAgentContactEmails) {
+                                                        let selectedIndex = agentContactEmailItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            }))
+                                                        } else {
+                                                            await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                if (selectedIndex === (agentContactEmailItems.length - 1)) {
+                                                                    item.selected = index === 0;
+                                                                } else {
+                                                                    item.selected = index === (selectedIndex + 1)
+                                                                }
+                                                                return item;
+                                                            }))
+                                                        }
+
+                                                        refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (agentContactEmailItems.length > 1) {
+                                                            await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_email || '')
+                                                                return item;
+                                                            }))
+
+                                                            setShowAgentContactEmails(true);
+
+                                                            refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 27: // escape
+                                                    setShowAgentContactEmails(false);
+                                                    break;
+
+                                                case 13: // enter
+                                                    if (showAgentContactEmails && agentContactEmailItems.findIndex(item => item.selected) > -1) {
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_email: agentContactEmailItems[agentContactEmailItems.findIndex(item => item.selected)].type
+                                                        });
+
+                                                        // validateContactForSaving({ keyCode: 9 });
+                                                        setShowAgentContactEmails(false);
+                                                        refAgentContactEmail.current.focus();
+                                                    }
+                                                    break;
+
+                                                case 9: // tab
+                                                    if (showAgentContactEmails) {
+                                                        e.preventDefault();
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_email: agentContactEmailItems[agentContactEmailItems.findIndex(item => item.selected)].type
+                                                        });
+
+                                                        // validateContactForSaving({ keyCode: 9 });
+                                                        setShowAgentContactEmails(false);
+                                                        refAgentContactEmail.current.focus();
+                                                    } else {
+                                                        // validateContactForSaving({ keyCode: 9 });
+                                                    }
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                        }}
+                                        onInput={(e) => {
+                                            if ((selectedContact?.id || 0) === 0) {
+                                                setSelectedContact({
+                                                    ...selectedContact,
+                                                    email_work: e.target.value.toLowerCase(),
+                                                    primary_email: 'work'
+                                                });
+                                            } else {
+                                                if ((selectedContact?.primary_email || '') === '') {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_work: e.target.value.toLowerCase(),
+                                                        primary_email: 'work'
+                                                    });
+                                                } else {
+                                                    switch (selectedContact?.primary_email) {
+                                                        case 'work':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                email_work: e.target.value.toLowerCase()
+                                                            });
+                                                            break;
+                                                        case 'personal':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                email_personal: e.target.value.toLowerCase()
+                                                            });
+                                                            break;
+                                                        case 'other':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                email_other: e.target.value.toLowerCase()
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                        onChange={(e) => {
+                                            if ((selectedContact?.id || 0) === 0) {
+                                                setSelectedContact({
+                                                    ...selectedContact,
+                                                    email_work: e.target.value.toLowerCase(),
+                                                    primary_email: 'work'
+                                                });
+                                            } else {
+                                                if ((selectedContact?.primary_email || '') === '') {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_work: e.target.value.toLowerCase(),
+                                                        primary_email: 'work'
+                                                    });
+                                                } else {
+                                                    switch (selectedContact?.primary_email) {
+                                                        case 'work':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                email_work: e.target.value.toLowerCase()
+                                                            });
+                                                            break;
+                                                        case 'personal':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                email_personal: e.target.value.toLowerCase()
+                                                            });
+                                                            break;
+                                                        case 'other':
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                email_other: e.target.value.toLowerCase()
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                        value={
+                                            (selectedContact?.primary_email || '') === 'work'
+                                                ? (selectedContact?.email_work || '')
+                                                : (selectedContact?.primary_email || '') === 'personal'
+                                                    ? (selectedContact?.email_personal || '')
+                                                    : (selectedContact?.primary_email || '') === 'other'
+                                                        ? (selectedContact?.email_other || '')
+                                                        : ''
+                                        }
+                                    />
+
+                                    {
+                                        showAgentContactEmailCopyBtn &&
                                         <FontAwesomeIcon style={{
                                             position: 'absolute',
                                             top: '50%',
@@ -1655,961 +4664,102 @@ const Agents = (props) => {
                                             fontSize: '1rem'
                                         }} icon={faCopy} onClick={(e) => {
                                             e.stopPropagation();
-                                            navigator.clipboard.writeText(refAgentEmail.current.value);
-                                        }}/>
+                                            navigator.clipboard.writeText(refAgentContactEmail.current.value);
+                                        }} />
                                     }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="fields-container-row">
-                        {/*CONTACTS FORM*/}
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Contacts</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    <div className="mochi-button" onClick={async () => {
-                                        if (selectedAgent?.id === undefined) {
-                                            window.alert('You must select a agent first!');
-                                            return;
-                                        }
 
-                                        if (selectedContact.id === undefined) {
-                                            window.alert('You must select a contact');
-                                            return;
-                                        }
-
-                                        let panel = {
-                                            panelName: `${props.panelName}-contacts`,
-                                            component: <Contacts
-                                                title='Contacts'
-                                                tabTimes={22000 + props.tabTimes}
-                                                panelName={`${props.panelName}-contacts`}
-                                                savingContactUrl='/saveAgentContact'
-                                                deletingContactUrl='/deleteAgentContact'
-                                                uploadAvatarUrl='/uploadAgentContactAvatar'
-                                                removeAvatarUrl='/removeDivisioContactAvatar'
-                                                origin={props.origin}
-                                                owner='agent'
-                                                openPanel={props.openPanel}
-                                                closePanel={props.closePanel}
-                                                componentId={moment().format('x')}
-
-                                                contactSearchCustomer={{
-                                                    ...selectedAgent,
-                                                    selectedContact: {
-                                                        ...selectedContact,
-                                                        address1: (selectedAgent?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedAgent?.address1 || '') : (selectedContact?.address1 || ''),
-                                                        address2: (selectedAgent?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedAgent?.address2 || '') : (selectedContact?.address2 || ''),
-                                                        city: (selectedAgent?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedAgent?.city || '') : (selectedContact?.city || ''),
-                                                        state: (selectedAgent?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedAgent?.state || '') : (selectedContact?.state || ''),
-                                                        zip_code: (selectedAgent?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedAgent?.zip || '') : (selectedContact?.zip_code || ''),
-                                                    }
-                                                }}
-                                                selectedAgent={selectedAgent}
-                                                setSelectedAgent={setSelectedAgent}
-                                                setSelectedAgentContact={setSelectedContact}
-                                            />
-                                        }
-
-                                        props.openPanel(panel, props.origin);
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">More</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className="mochi-button" onClick={() => {
-                                        if ((selectedAgent?.id || 0) === 0) {
-                                            window.alert('You must select a agent first!');
-                                            return;
-                                        }
-
-                                        let panel = {
-                                            panelName: `${props.panelName}-contacts`,
-                                            component: <Contacts
-                                                title='Contacts'
-                                                tabTimes={22000 + props.tabTimes}
-                                                panelName={`${props.panelName}-contacts`}
-                                                savingContactUrl='/saveAgentContact'
-                                                deletingContactUrl='/deleteAgentContact'
-                                                uploadAvatarUrl='/uploadAgentContactAvatar'
-                                                removeAvatarUrl='/removeDivisioContactAvatar'
-                                                origin={props.origin}
-                                                owner='agent'
-                                                openPanel={props.openPanel}
-                                                closePanel={props.closePanel}
-                                                componentId={moment().format('x')}
-                                                isEditingContact={true}
-
-                                                contactSearchCustomer={{
-                                                    ...selectedAgent,
-                                                    selectedContact: {id: 0, agent_id: selectedAgent?.id}
-                                                }}
-
-                                                selectedAgent={selectedAgent}
-                                                setSelectedAgent={setSelectedAgent}
-                                                setSelectedAgentContact={setSelectedContact}
-                                            />
-                                        }
-
-                                        props.openPanel(panel, props.origin);
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Add Contact</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className="mochi-button" onClick={() => {
-                                        setSelectedContact({});
-                                        refAgentContactFirstName.current.focus();
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Clear</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                </div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className={disabledAgentContactFields + ' input-box-container grow'}> 
-                                    <input tabIndex={13 + props.tabTimes} type="text" placeholder="First Name" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           ref={refAgentContactFirstName}
-                                           onChange={e => {
-                                               setSelectedContact({...selectedContact, first_name: e.target.value})
-                                           }}
-                                           value={selectedContact?.first_name || ''}/>
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledAgentContactFields + ' input-box-container grow'}>
-                                    <input tabIndex={14 + props.tabTimes} type="text" placeholder="Last Name" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onChange={e => setSelectedContact({
-                                               ...selectedContact,
-                                               last_name: e.target.value
-                                           })}
-                                           value={selectedContact?.last_name || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledAgentContactFields + ' select-box-container'}
-                                     style={{width: '50%'}}>
-                                    <div className="select-box-wrapper">
-                                        <MaskedInput tabIndex={15 + props.tabTimes}
-                                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                                     guide={true}
-                                                     type="text"
-                                                     placeholder="Phone"
-                                                     ref={refAgentContactPhone}
-                                                     onKeyDown={async (e) => {
-                                                         let key = e.keyCode || e.which;
-
-                                                         switch (key) {
-                                                             case 37:
-                                                             case 38: // arrow left | arrow up
-                                                                 e.preventDefault();
-                                                                 if (showAgentContactPhones) {
-                                                                     let selectedIndex = agentContactPhoneItems.findIndex(item => item.selected);
-
-                                                                     if (selectedIndex === -1) {
-                                                                         await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === 0) {
-                                                                                 item.selected = index === (agentContactPhoneItems.length - 1);
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex - 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
-
-                                                                     refAgentContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (agentContactPhoneItems.length > 1) {
-                                                                         await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                             return item;
-                                                                         }))
-
-                                                                         setShowAgentContactPhones(true);
-
-                                                                         refAgentContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
-
-                                                             case 39:
-                                                             case 40: // arrow right | arrow down
-                                                                 e.preventDefault();
-                                                                 if (showAgentContactPhones) {
-                                                                     let selectedIndex = agentContactPhoneItems.findIndex(item => item.selected);
-
-                                                                     if (selectedIndex === -1) {
-                                                                         await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === (agentContactPhoneItems.length - 1)) {
-                                                                                 item.selected = index === 0;
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex + 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
-
-                                                                     refAgentContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (agentContactPhoneItems.length > 1) {
-                                                                         await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                             return item;
-                                                                         }))
-
-                                                                         setShowAgentContactPhones(true);
-
-                                                                         refAgentContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
-
-                                                             case 27: // escape
-                                                                 setShowAgentContactPhones(false);
-                                                                 break;
-
-                                                             case 13: // enter
-                                                                 if (showAgentContactPhones && agentContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                                     await setSelectedContact({
-                                                                         ...selectedContact,
-                                                                         primary_phone: agentContactPhoneItems[agentContactPhoneItems.findIndex(item => item.selected)].type
-                                                                     });
-
-                                                                     // validateContactForSaving({ keyCode: 9 });
-                                                                     setShowAgentContactPhones(false);
-                                                                     refAgentContactPhone.current.inputElement.focus();
-                                                                 }
-                                                                 break;
-
-                                                             case 9: // tab
-                                                                 if (showAgentContactPhones) {
-                                                                     e.preventDefault();
-                                                                     await setSelectedContact({
-                                                                         ...selectedContact,
-                                                                         primary_phone: agentContactPhoneItems[agentContactPhoneItems.findIndex(item => item.selected)].type
-                                                                     });
-
-                                                                     // validateContactForSaving({ keyCode: 9 });
-                                                                     setShowAgentContactPhones(false);
-                                                                     refAgentContactPhone.current.inputElement.focus();
-                                                                 } else {
-                                                                     // validateContactForSaving({ keyCode: 9 });
-                                                                 }
-                                                                 break;
-
-                                                             default:
-                                                                 break;
-                                                         }
-                                                     }}
-                                                     onInput={(e) => {
-                                                         if ((selectedContact?.id || 0) === 0) {
-                                                             setSelectedContact({
-                                                                 ...selectedContact,
-                                                                 phone_work: e.target.value,
-                                                                 primary_phone: 'work'
-                                                             });
-                                                         } else {
-                                                             if ((selectedContact?.primary_phone || '') === '') {
-                                                                 setSelectedContact({
-                                                                     ...selectedContact,
-                                                                     phone_work: e.target.value,
-                                                                     primary_phone: 'work'
-                                                                 });
-                                                             } else {
-                                                                 switch (selectedContact?.primary_phone) {
-                                                                     case 'work':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'fax':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work_fax: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'mobile':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_mobile: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'direct':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_direct: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'other':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_other: e.target.value
-                                                                         });
-                                                                         break;
-                                                                 }
-                                                             }
-                                                         }
-                                                     }}
-                                                     onChange={(e) => {
-                                                         if ((selectedContact?.id || 0) === 0) {
-                                                             setSelectedContact({
-                                                                 ...selectedContact,
-                                                                 phone_work: e.target.value,
-                                                                 primary_phone: 'work'
-                                                             });
-                                                         } else {
-                                                             if ((selectedContact?.primary_phone || '') === '') {
-                                                                 setSelectedContact({
-                                                                     ...selectedContact,
-                                                                     phone_work: e.target.value,
-                                                                     primary_phone: 'work'
-                                                                 });
-                                                             } else {
-                                                                 switch (selectedContact?.primary_phone) {
-                                                                     case 'work':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'fax':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work_fax: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'mobile':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_mobile: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'direct':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_direct: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'other':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_other: e.target.value
-                                                                         });
-                                                                         break;
-                                                                 }
-                                                             }
-                                                         }
-                                                     }}
-                                                     value={
-                                                         (selectedContact?.primary_phone || '') === 'work'
-                                                             ? (selectedContact?.phone_work || '')
-                                                             : (selectedContact?.primary_phone || '') === 'fax'
-                                                                 ? (selectedContact?.phone_work_fax || '')
-                                                                 : (selectedContact?.primary_phone || '') === 'mobile'
-                                                                     ? (selectedContact?.phone_mobile || '')
-                                                                     : (selectedContact?.primary_phone || '') === 'direct'
-                                                                         ? (selectedContact?.phone_direct || '')
-                                                                         : (selectedContact?.primary_phone || '') === 'other'
-                                                                             ? (selectedContact?.phone_other || '')
-                                                                             : ''
-                                                     }
-                                        />
-
-                                        {
-                                            (selectedContact?.id || 0) > 0 &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-agent-contact-primary-phone': true,
-                                                    'pushed': (agentContactPhoneItems.length > 1)
-                                                })}>
-                                                {selectedContact?.primary_phone || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            agentContactPhoneItems.length > 1 &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showAgentContactPhones) {
-                                                                     setShowAgentContactPhones(false);
-                                                                 } else {
-                                                                     if (agentContactPhoneItems.length > 1) {
-                                                                         await setAgentContactPhoneItems(agentContactPhoneItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                             return item;
-                                                                         }))
-
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowAgentContactPhones(true);
-
-                                                                             refAgentContactPhonePopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
-
-                                                                 refAgentContactPhone.current.inputElement.focus();
-                                                             }}/>
-                                        }
-                                    </div>
                                     {
-                                        agentContactPhonesTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-phone"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refAgentContactPhoneDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                agentContactPhoneItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
+                                        (selectedContact?.id || 0) > 0 &&
+                                        <div
+                                            className={classnames({
+                                                'selected-agent-contact-primary-email': true,
+                                                'pushed': (agentContactEmailItems.length > 1)
+                                            })}>
+                                            {selectedContact?.primary_email || ''}
+                                        </div>
+                                    }
 
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedContact({
-                                                                                    ...selectedContact,
-                                                                                    primary_phone: item.type
-                                                                                });
+                                    {
+                                        agentContactEmailItems.length > 1 &&
+                                        <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
+                                            onClick={async () => {
+                                                if (showAgentContactEmails) {
+                                                    setShowAgentContactEmails(false);
+                                                } else {
+                                                    if (agentContactEmailItems.length > 1) {
+                                                        await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
+                                                            item.selected = item.type === (selectedContact?.primary_email || '')
+                                                            return item;
+                                                        }))
 
-                                                                                // validateContactForSaving({ keyCode: 9 });
-                                                                                setShowAgentContactPhones(false);
-                                                                                refAgentContactPhone.current.inputElement.focus();
-                                                                            }}
-                                                                            ref={ref => refAgentContactPhonePopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Phone Work `
-                                                                                    : item.type === 'fax' ? `Phone Work Fax `
-                                                                                        : item.type === 'mobile' ? `Phone Mobile `
-                                                                                            : item.type === 'direct' ? `Phone Direct `
-                                                                                                : item.type === 'other' ? `Phone Other ` : ''
-                                                                            }
+                                                        window.setTimeout(async () => {
+                                                            await setShowAgentContactEmails(true);
 
-                                                                            (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                            refAgentContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }, 0)
+                                                    }
+                                                }
 
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
+                                                refAgentContactEmail.current.focus();
+                                            }} />
                                     }
                                 </div>
-                                <div className="form-h-sep"></div>
-                                <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
-                                    <div
-                                        className={disabledAgentContactFields + ' input-box-container input-phone-ext'}>
-                                        <input tabIndex={16 + props.tabTimes} type="text" placeholder="Ext"
-                                            // onKeyDown={validateContactForSaving}
-                                               onChange={e => setSelectedContact({
-                                                   ...selectedContact,
-                                                   phone_ext: e.target.value
-                                               })}
-                                               value={selectedContact.phone_ext || ''}/>
-                                    </div>
-                                    <div className={disabledAgentContactFields + ' input-toggle-container'}>
-                                        <input type="checkbox"
-                                               id={props.panelName + '-cbox-agent-contacts-primary-btn'}
-                                               onChange={(e) => {
-                                                   setSelectedContact({
-                                                       ...selectedContact,
-                                                       is_primary: e.target.checked ? 1 : 0
-                                                   });
-
-                                                   saveContact({keyCode: 9});
-                                               }}
-                                               checked={(selectedContact.is_primary || 0) === 1}/>
-                                        <label htmlFor={props.panelName + '-cbox-agent-contacts-primary-btn'}>
-                                            <div className="label-text">Primary</div>
-                                            <div className="input-toggle-btn"></div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledAgentContactFields + ' select-box-container'}
-                                     style={{flexGrow: 1}}
-                                     onMouseEnter={() => {
-                                         if ((selectedContact?.email_work || '') !== '' ||
-                                             (selectedContact?.email_personal || '') !== '' ||
-                                             (selectedContact?.email_other || '') !== '') {
-                                             setShowAgentContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onFocus={() => {
-                                         if ((selectedContact?.email_work || '') !== '' ||
-                                             (selectedContact?.email_personal || '') !== '' ||
-                                             (selectedContact?.email_other || '') !== '') {
-                                             setShowAgentContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onBlur={() => {
-                                         window.setTimeout(() => {
-                                             setShowAgentContactEmailCopyBtn(false);
-                                         }, 1000);
-                                     }}
-                                     onMouseLeave={() => {
-                                         setShowAgentContactEmailCopyBtn(false);
-                                     }}>
-                                    <div className="select-box-wrapper">
-                                        <input
+                                {
+                                    agentContactEmailsTransition((style, item) => item && (
+                                        <animated.div
+                                            className="mochi-contextual-container"
+                                            id="mochi-contextual-container-contact-email"
                                             style={{
-                                                width: 'calc(100% - 25px)',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap'
+                                                ...style,
+                                                left: '0',
+                                                display: 'block'
                                             }}
-                                            tabIndex={17 + props.tabTimes}
-                                            type="text"
-                                            placeholder="E-Mail"
-                                            ref={refAgentContactEmail}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
-
-                                                switch (key) {
-                                                    case 37:
-                                                    case 38: // arrow left | arrow up
-                                                        e.preventDefault();
-                                                        if (showAgentContactEmails) {
-                                                            let selectedIndex = agentContactEmailItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (agentContactEmailItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refAgentContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (agentContactEmailItems.length > 1) {
-                                                                await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                    return item;
-                                                                }))
-
-                                                                setShowAgentContactEmails(true);
-
-                                                                refAgentContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
+                                            ref={refAgentContactEmailDropDown}
+                                        >
+                                            <div className="mochi-contextual-popup vertical below right"
+                                                style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup-content">
+                                                    <div className="mochi-contextual-popup-wrapper">
+                                                        {
+                                                            agentContactEmailItems.map((item, index) => {
+                                                                const mochiItemClasses = classnames({
+                                                                    'mochi-item': true,
+                                                                    'selected': item.selected
                                                                 });
-                                                            }
-                                                        }
-                                                        break;
 
-                                                    case 39:
-                                                    case 40: // arrow right | arrow down
-                                                        e.preventDefault();
-                                                        if (showAgentContactEmails) {
-                                                            let selectedIndex = agentContactEmailItems.findIndex(item => item.selected);
+                                                                return (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={mochiItemClasses}
+                                                                        id={item.id}
+                                                                        onClick={async () => {
+                                                                            await setSelectedContact({
+                                                                                ...selectedContact,
+                                                                                primary_email: item.type
+                                                                            });
 
-                                                            if (selectedIndex === -1) {
-                                                                await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === (agentContactEmailItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
+                                                                            // validateContactForSaving({ keyCode: 9 });
+                                                                            setShowAgentContactEmails(false);
+                                                                            refAgentContactEmail.current.focus();
+                                                                        }}
+                                                                        ref={ref => refAgentContactEmailPopupItems.current.push(ref)}
+                                                                    >
+                                                                        {
+                                                                            item.type === 'work' ? `Email Work `
+                                                                                : item.type === 'personal' ? `Email Personal `
+                                                                                    : item.type === 'other' ? `Email Other ` : ''
+                                                                        }
 
-                                                            refAgentContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (agentContactEmailItems.length > 1) {
-                                                                await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                    return item;
-                                                                }))
-
-                                                                setShowAgentContactEmails(true);
-
-                                                                refAgentContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setShowAgentContactEmails(false);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (showAgentContactEmails && agentContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedContact({
-                                                                ...selectedContact,
-                                                                primary_email: agentContactEmailItems[agentContactEmailItems.findIndex(item => item.selected)].type
-                                                            });
-
-                                                            // validateContactForSaving({ keyCode: 9 });
-                                                            setShowAgentContactEmails(false);
-                                                            refAgentContactEmail.current.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (showAgentContactEmails) {
-                                                            e.preventDefault();
-                                                            await setSelectedContact({
-                                                                ...selectedContact,
-                                                                primary_email: agentContactEmailItems[agentContactEmailItems.findIndex(item => item.selected)].type
-                                                            });
-
-                                                            // validateContactForSaving({ keyCode: 9 });
-                                                            setShowAgentContactEmails(false);
-                                                            refAgentContactEmail.current.focus();
-                                                        } else {
-                                                            // validateContactForSaving({ keyCode: 9 });
-                                                        }
-                                                        break;
-
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onInput={(e) => {
-                                                if ((selectedContact?.id || 0) === 0) {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value.toLowerCase(),
-                                                        primary_email: 'work'
-                                                    });
-                                                } else {
-                                                    if ((selectedContact?.primary_email || '') === '') {
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_work: e.target.value.toLowerCase(),
-                                                            primary_email: 'work'
-                                                        });
-                                                    } else {
-                                                        switch (selectedContact?.primary_email) {
-                                                            case 'work':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_work: e.target.value.toLowerCase()
-                                                                });
-                                                                break;
-                                                            case 'personal':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_personal: e.target.value.toLowerCase()
-                                                                });
-                                                                break;
-                                                            case 'other':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_other: e.target.value.toLowerCase()
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                            onChange={(e) => {
-                                                if ((selectedContact?.id || 0) === 0) {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value.toLowerCase(),
-                                                        primary_email: 'work'
-                                                    });
-                                                } else {
-                                                    if ((selectedContact?.primary_email || '') === '') {
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_work: e.target.value.toLowerCase(),
-                                                            primary_email: 'work'
-                                                        });
-                                                    } else {
-                                                        switch (selectedContact?.primary_email) {
-                                                            case 'work':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_work: e.target.value.toLowerCase()
-                                                                });
-                                                                break;
-                                                            case 'personal':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_personal: e.target.value.toLowerCase()
-                                                                });
-                                                                break;
-                                                            case 'other':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_other: e.target.value.toLowerCase()
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                            value={
-                                                (selectedContact?.primary_email || '') === 'work'
-                                                    ? (selectedContact?.email_work || '')
-                                                    : (selectedContact?.primary_email || '') === 'personal'
-                                                        ? (selectedContact?.email_personal || '')
-                                                        : (selectedContact?.primary_email || '') === 'other'
-                                                            ? (selectedContact?.email_other || '')
-                                                            : ''
-                                            }
-                                        />
-
-                                        {
-                                            showAgentContactEmailCopyBtn &&
-                                            <FontAwesomeIcon style={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                right: 30,
-                                                zIndex: 1,
-                                                cursor: 'pointer',
-                                                transform: 'translateY(-50%)',
-                                                color: '#2bc1ff',
-                                                margin: 0,
-                                                transition: 'ease 0.2s',
-                                                fontSize: '1rem'
-                                            }} icon={faCopy} onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigator.clipboard.writeText(refAgentContactEmail.current.value);
-                                            }}/>
-                                        }
-
-                                        {
-                                            (selectedContact?.id || 0) > 0 &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-agent-contact-primary-email': true,
-                                                    'pushed': (agentContactEmailItems.length > 1)
-                                                })}>
-                                                {selectedContact?.primary_email || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            agentContactEmailItems.length > 1 &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showAgentContactEmails) {
-                                                                     setShowAgentContactEmails(false);
-                                                                 } else {
-                                                                     if (agentContactEmailItems.length > 1) {
-                                                                         await setAgentContactEmailItems(agentContactEmailItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                             return item;
-                                                                         }))
-
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowAgentContactEmails(true);
-
-                                                                             refAgentContactEmailPopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
-
-                                                                 refAgentContactEmail.current.focus();
-                                                             }}/>
-                                        }
-                                    </div>
-                                    {
-                                        agentContactEmailsTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-email"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refAgentContactEmailDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                agentContactEmailItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedContact({
-                                                                                    ...selectedContact,
-                                                                                    primary_email: item.type
-                                                                                });
-
-                                                                                // validateContactForSaving({ keyCode: 9 });
-                                                                                setShowAgentContactEmails(false);
-                                                                                refAgentContactEmail.current.focus();
-                                                                            }}
-                                                                            ref={ref => refAgentContactEmailPopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Email Work `
-                                                                                    : item.type === 'personal' ? `Email Personal `
-                                                                                        : item.type === 'other' ? `Email Other ` : ''
-                                                                            }
-
-                                                                            (<b>
+                                                                        (<b>
                                                                             {
                                                                                 item.type === 'work' ? item.email
                                                                                     : item.type === 'personal' ? item.email
@@ -2617,2745 +4767,1413 @@ const Agents = (props) => {
                                                                             }
                                                                         </b>)
 
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
+                                                                        {
+                                                                            item.selected &&
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight} />
+                                                                        }
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
                                                     </div>
                                                 </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledAgentContactFields + ' input-box-container grow'}>
-                                    <input tabIndex={18 + props.tabTimes} type="text" placeholder="Notes"
-                                           onKeyDown={(e) => {
-                                               let key = e.keyCode || e.which;
+                                            </div>
+                                        </animated.div>
+                                    ))
+                                }
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div className={disabledAgentContactFields + ' input-box-container grow'}>
+                                <input tabIndex={18 + props.tabTimes} type="text" placeholder="Notes"
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
 
-                                               if (key === 9) {
-                                                   saveContact(e);
-                                               }
-                                           }}
-                                           onChange={e => setSelectedContact({
-                                               ...selectedContact,
-                                               notes: e.target.value
-                                           })}
-                                           value={selectedContact.notes || ''}
-                                    />
-                                </div>
+                                        if (key === 9) {
+                                            saveContact(e);
+                                        }
+                                    }}
+                                    onChange={e => setSelectedContact({
+                                        ...selectedContact,
+                                        notes: e.target.value
+                                    })}
+                                    value={selectedContact.notes || ''}
+                                />
                             </div>
                         </div>
+                    </div>
 
-                        {/*CONTACT LIST*/}
-                        <div className="form-bordered-box" style={{height: 140}}>
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    {
-                                        showingContactList &&
-                                        <div className="mochi-button" onClick={() => setShowingContactList(false)}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Search</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
-                                    {
-                                        !showingContactList &&
-                                        <div className="mochi-button" onClick={() => setShowingContactList(true)}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Cancel</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
-
-                                    {
-                                        !showingContactList &&
-                                        <div className="mochi-button" onClick={() => {
-                                            handleContactSearch()
-                                        }}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Send</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
-                                </div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
-
-                            <div className="form-slider">
-                                <div className="form-slider-wrapper" style={{left: showingContactList ? 0 : '-100%'}}>
-                                    <div className="contact-list-box">
-                                        {
-                                            (selectedAgent?.contacts || []).length > 0 &&
-                                            <div className="contact-list-header">
-                                                <div className="contact-list-col tcol first-name">First Name</div>
-                                                <div className="contact-list-col tcol last-name">Last Name</div>
-                                                <div className="contact-list-col tcol phone-work">Phone</div>
-                                                <div className="contact-list-col tcol email-work">E-Mail</div>
-                                                <div className="contact-list-col tcol contact-selected"></div>
-                                                <div className="contact-list-col tcol pri"></div>
-                                            </div>
-                                        }
-
-                                        <div className="contact-list-wrapper">
-                                            {
-                                                (selectedAgent?.contacts || []).map((contact, index) => {
-                                                    return (
-                                                        <div className="contact-list-item" key={index}
-                                                             onDoubleClick={async () => {
-                                                                 let panel = {
-                                                                     panelName: `${props.panelName}-contacts`,
-                                                                     component: <Contacts
-                                                                         title='Contacts'
-                                                                         tabTimes={22000 + props.tabTimes}
-                                                                         panelName={`${props.panelName}-contacts`}
-                                                                         savingContactUrl='/saveContact'
-                                                                         deletingContactUrl='/deleteContact'
-                                                                         uploadAvatarUrl='/uploadAvatar'
-                                                                         removeAvatarUrl='/removeAvatar'
-                                                                         origin={props.origin}
-                                                                         owner='agent'
-                                                                         openPanel={props.openPanel}
-                                                                         closePanel={props.closePanel}
-                                                                         componentId={moment().format('x')}
-
-                                                                         contactSearchCustomer={{
-                                                                             ...selectedAgent,
-                                                                             selectedContact: contact
-                                                                         }}
-                                                                     />
-                                                                 }
-
-                                                                 props.openPanel(panel, props.origin);
-                                                             }} onClick={() => setSelectedContact(contact)}>
-                                                            <div
-                                                                className="contact-list-col tcol first-name" style={{
-                                                                    textTransform: 'capitalize'
-                                                                }}>{contact.first_name}</div>
-                                                            <div
-                                                                className="contact-list-col tcol last-name" style={{
-                                                                    textTransform: 'capitalize'
-                                                                }}>{contact.last_name}</div>
-                                                            <div className="contact-list-col tcol phone-work">{
-                                                                contact.primary_phone === 'work' ? contact.phone_work
-                                                                    : contact.primary_phone === 'fax' ? contact.phone_work_fax
-                                                                        : contact.primary_phone === 'mobile' ? contact.phone_mobile
-                                                                            : contact.primary_phone === 'direct' ? contact.phone_direct
-                                                                                : contact.primary_phone === 'other' ? contact.phone_other
-                                                                                    : ''
-                                                            }</div>
-                                                            <div className="contact-list-col tcol email-work">{
-                                                                contact.primary_email === 'work' ? contact.email_work
-                                                                    : contact.primary_email === 'personal' ? contact.email_personal
-                                                                        : contact.primary_email === 'other' ? contact.email_other
-                                                                            : ''
-                                                            }</div>
-                                                            {
-                                                                (contact.id === (selectedContact?.id || 0)) &&
-                                                                <div className="contact-list-col tcol contact-selected">
-                                                                    <FontAwesomeIcon icon={faPencilAlt}/>
-                                                                </div>
-                                                            }
-                                                            {
-                                                                (contact.is_primary === 1) &&
-                                                                <div className="contact-list-col tcol pri">
-                                                                    <FontAwesomeIcon icon={faCheck}/>
-                                                                </div>
-                                                            }
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-
+                    {/*CONTACT LIST*/}
+                    <div className="form-bordered-box">
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="form-buttons">
+                                {
+                                    showingContactList &&
+                                    <div className="mochi-button" onClick={() => setShowingContactList(false)}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Search</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
-                                    <div className="contact-search-box">
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="First Name" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                                       onChange={e => setContactSearch({
-                                                           ...contactSearch,
-                                                           first_name: e.target.value
-                                                       })} value={contactSearch.first_name || ''}/>
-                                            </div>
-                                            <div className="form-h-sep"></div>
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="Last Name" style={{
-                                        textTransform: 'capitalize'
-                                    }} onFocus={() => {
-                                                    setShowingContactList(false)
-                                                }} onChange={e => setContactSearch({
-                                                    ...contactSearch,
-                                                    last_name: e.target.value
-                                                })} value={contactSearch.last_name || ''}/>
-                                            </div>
+                                }
+                                {
+                                    !showingContactList &&
+                                    <div className="mochi-button" onClick={() => setShowingContactList(true)}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Cancel</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
+
+                                {
+                                    !showingContactList &&
+                                    <div className="mochi-button" onClick={() => {
+                                        handleContactSearch()
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Send</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
+                            </div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="form-slider">
+                            <div className="form-slider-wrapper" style={{ left: showingContactList ? 0 : '-100%' }}>
+                                <div className="contact-list-box">
+                                    {
+                                        (selectedAgent?.contacts || []).length > 0 &&
+                                        <div className="contact-list-header">
+                                            <div className="contact-list-col tcol first-name">First Name</div>
+                                            <div className="contact-list-col tcol last-name">Last Name</div>
+                                            <div className="contact-list-col tcol phone-work">Phone</div>
+                                            <div className="contact-list-col tcol email-work">E-Mail</div>
+                                            <div className="contact-list-col tcol contact-selected"></div>
+                                            <div className="contact-list-col tcol pri"></div>
                                         </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 1" style={{
-                                        textTransform: 'capitalize'
-                                    }} onFocus={() => {
-                                                    setShowingContactList(false)
-                                                }} onChange={e => setContactSearch({
+                                    }
+
+                                    <div className="contact-list-wrapper">
+                                        {
+                                            (selectedAgent?.contacts || []).map((contact, index) => {
+                                                return (
+                                                    <div className="contact-list-item" key={index}
+                                                        onDoubleClick={async () => {
+                                                            let panel = {
+                                                                panelName: `${props.panelName}-contacts`,
+                                                                component: <Contacts
+                                                                    title='Contacts'
+                                                                    tabTimes={22000 + props.tabTimes}
+                                                                    panelName={`${props.panelName}-contacts`}
+                                                                    savingContactUrl='/saveContact'
+                                                                    deletingContactUrl='/deleteContact'
+                                                                    uploadAvatarUrl='/uploadAvatar'
+                                                                    removeAvatarUrl='/removeAvatar'
+                                                                    origin={props.origin}
+                                                                    owner='agent'
+                                                                    openPanel={props.openPanel}
+                                                                    closePanel={props.closePanel}
+                                                                    componentId={moment().format('x')}
+
+                                                                    contactSearchCustomer={{
+                                                                        ...selectedAgent,
+                                                                        selectedContact: contact
+                                                                    }}
+                                                                />
+                                                            }
+
+                                                            props.openPanel(panel, props.origin);
+                                                        }} onClick={() => setSelectedContact(contact)}>
+                                                        <div
+                                                            className="contact-list-col tcol first-name" style={{
+                                                                textTransform: 'capitalize'
+                                                            }}>{contact.first_name}</div>
+                                                        <div
+                                                            className="contact-list-col tcol last-name" style={{
+                                                                textTransform: 'capitalize'
+                                                            }}>{contact.last_name}</div>
+                                                        <div className="contact-list-col tcol phone-work">{
+                                                            contact.primary_phone === 'work' ? contact.phone_work
+                                                                : contact.primary_phone === 'fax' ? contact.phone_work_fax
+                                                                    : contact.primary_phone === 'mobile' ? contact.phone_mobile
+                                                                        : contact.primary_phone === 'direct' ? contact.phone_direct
+                                                                            : contact.primary_phone === 'other' ? contact.phone_other
+                                                                                : ''
+                                                        }</div>
+                                                        <div className="contact-list-col tcol email-work">{
+                                                            contact.primary_email === 'work' ? contact.email_work
+                                                                : contact.primary_email === 'personal' ? contact.email_personal
+                                                                    : contact.primary_email === 'other' ? contact.email_other
+                                                                        : ''
+                                                        }</div>
+                                                        {
+                                                            (contact.id === (selectedContact?.id || 0)) &&
+                                                            <div className="contact-list-col tcol contact-selected">
+                                                                <FontAwesomeIcon icon={faPencilAlt} />
+                                                            </div>
+                                                        }
+                                                        {
+                                                            (contact.is_primary === 1) &&
+                                                            <div className="contact-list-col tcol pri">
+                                                                <FontAwesomeIcon icon={faCheck} />
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+
+                                </div>
+                                <div className="contact-search-box">
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input type="text" placeholder="First Name" style={{
+                                                textTransform: 'capitalize'
+                                            }}
+                                                onChange={e => setContactSearch({
                                                     ...contactSearch,
-                                                    address1: e.target.value
-                                                })} value={contactSearch.address1 || ''}/>
-                                            </div>
+                                                    first_name: e.target.value
+                                                })} value={contactSearch.first_name || ''} />
                                         </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 2" style={{
-                                        textTransform: 'capitalize'
-                                    }} onFocus={() => {
-                                                    setShowingContactList(false)
-                                                }} onChange={e => setContactSearch({
-                                                    ...contactSearch,
-                                                    address2: e.target.value
-                                                })} value={contactSearch.address2 || ''}/>
-                                            </div>
+                                        <div className="form-h-sep"></div>
+                                        <div className="input-box-container grow">
+                                            <input type="text" placeholder="Last Name" style={{
+                                                textTransform: 'capitalize'
+                                            }} onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                last_name: e.target.value
+                                            })} value={contactSearch.last_name || ''} />
                                         </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="City" style={{
-                                        textTransform: 'capitalize'
-                                    }} onFocus={() => {
-                                                    setShowingContactList(false)
-                                                }} onChange={e => setContactSearch({
-                                                    ...contactSearch,
-                                                    city: e.target.value
-                                                })} value={contactSearch.city || ''}/>
-                                            </div>
-                                            <div className="form-h-sep"></div>
-                                            <div className="input-box-container input-state">
-                                                <input type="text" placeholder="State" maxLength="2" onFocus={() => {
-                                                    setShowingContactList(false)
-                                                }} onChange={e => setContactSearch({
-                                                    ...contactSearch,
-                                                    state: e.target.value
-                                                })} value={contactSearch.state || ''}/>
-                                            </div>
-                                            <div className="form-h-sep"></div>
-                                            <div className="input-box-container grow">
-                                                <MaskedInput
-                                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                                    guide={true}
-                                                    type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
+                                    </div>
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input type="text" placeholder="Address 1" style={{
+                                                textTransform: 'capitalize'
+                                            }} onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                address1: e.target.value
+                                            })} value={contactSearch.address1 || ''} />
+                                        </div>
+                                    </div>
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input type="text" placeholder="Address 2" style={{
+                                                textTransform: 'capitalize'
+                                            }} onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                address2: e.target.value
+                                            })} value={contactSearch.address2 || ''} />
+                                        </div>
+                                    </div>
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input type="text" placeholder="City" style={{
+                                                textTransform: 'capitalize'
+                                            }} onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                city: e.target.value
+                                            })} value={contactSearch.city || ''} />
+                                        </div>
+                                        <div className="form-h-sep"></div>
+                                        <div className="input-box-container input-state">
+                                            <input type="text" placeholder="State" maxLength="2" onFocus={() => {
+                                                setShowingContactList(false)
+                                            }} onChange={e => setContactSearch({
+                                                ...contactSearch,
+                                                state: e.target.value
+                                            })} value={contactSearch.state || ''} />
+                                        </div>
+                                        <div className="form-h-sep"></div>
+                                        <div className="input-box-container grow">
+                                            <MaskedInput
+                                                mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                guide={true}
+                                                type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
                                                     setShowingContactList(false)
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
                                                     phone: e.target.value
-                                                })} value={contactSearch.phone || ''}/>
-                                            </div>
-                                        </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="E-Mail"
-                                                       style={{textTransform: 'lowercase'}}
-                                                       onKeyDown={(e) => {
-                                                           e.preventDefault();
-                                                           let key = e.keyCode || e.which;
-
-                                                           if (key === 9) {
-                                                               let elems = document.getElementsByTagName('input');
-
-                                                               for (var i = elems.length; i--;) {
-                                                                   if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                       elems[i].focus();
-                                                                       break;
-                                                                   }
-                                                               }
-                                                           }
-                                                       }}
-                                                       onFocus={() => {
-                                                           setShowingContactList(false)
-                                                       }}
-                                                       onChange={e => setContactSearch({
-                                                           ...contactSearch,
-                                                           email: e.target.value
-                                                       })}
-                                                       value={contactSearch.email || ''}/>
-                                            </div>
+                                                })} value={contactSearch.phone || ''} />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="fields-container-row grow">
-                        {/*NOTES LIST*/}
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Notes</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => {
-                                        if ((selectedAgent?.id || 0) === 0) {
-                                            window.alert('You must select a agent first!');
-                                            return;
-                                        }
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input type="text" placeholder="E-Mail"
+                                                style={{ textTransform: 'lowercase' }}
+                                                onKeyDown={(e) => {
+                                                    e.preventDefault();
+                                                    let key = e.keyCode || e.which;
 
-                                        setSelectedNote({id: 0, agent_id: selectedAgent.id})
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Add Note</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className="mochi-button" onClick={() => {
-                                        if (selectedAgent?.id === undefined || selectedAgent?.notes.length === 0) {
-                                            window.alert('There is nothing to print!');
-                                            return;
-                                        }
+                                                    if (key === 9) {
+                                                        let elems = document.getElementsByTagName('input');
 
-                                        let html = ``;
-
-                                        selectedAgent?.notes.map((note, index) => {
-                                            html += `<div><b>${note.user_code?.code} : ${moment(note.date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY : HHmm')}</b> : ${note.text}</div>`
-
-                                            return true;
-                                        })
-
-                                        printWindow(html);
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Print</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                </div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
-
-                            <div className="notes-list-container">
-                                <div className="notes-list-wrapper">
-                                    {
-                                        (selectedAgent?.notes || []).map((note, index) => {
-                                            return (
-                                                <div className="notes-list-item" key={index}
-                                                     onClick={() => setSelectedNote(note)}>
-                                                    <div className="notes-list-col tcol note-text">{note.text}</div>
-                                                    {
-                                                        (note.id === (selectedNote?.id || 0)) &&
-                                                        <div className="notes-list-col tcol notes-selected">
-                                                            <FontAwesomeIcon icon={faPencilAlt}/>
-                                                        </div>
+                                                        for (var i = elems.length; i--;) {
+                                                            if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
+                                                                elems[i].focus();
+                                                                break;
+                                                            }
+                                                        }
                                                     }
-                                                </div>
-                                            )
-                                        })
-                                    }
+                                                }}
+                                                onFocus={() => {
+                                                    setShowingContactList(false)
+                                                }}
+                                                onChange={e => setContactSearch({
+                                                    ...contactSearch,
+                                                    email: e.target.value
+                                                })}
+                                                value={contactSearch.email || ''} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {/* DRIVERS FORM */}
+                <div className="form-bordered-box">
+                    <div className="form-header">
+                        <div className="top-border top-border-left"></div>
+                        <div className="form-title">Driver Information</div>
+                        <div className="top-border top-border-middle"></div>
+                        <div className="form-buttons">
+                            <div className={
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.delete || 0) === 0)
+                                    ? 'mochi-button disabled' : 'mochi-button'
+                            } onClick={() => {
+                                if ((selectedAgent.id || 0) === 0) {
+                                    window.alert('You must select an agent first!');
+                                    return;
+                                }
 
-                <div className="fields-container-col">
-                    <div className="fields-container-row" style={{display: 'flex', flexDirection: 'row'}}>
-                        {/*MAILING ADDRESS FORM*/}
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Mailing Address</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    <div className="mochi-button" onClick={remitToAddressBtn}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Remit to address is the same</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className="mochi-button" onClick={mailingAddressClearBtn}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Clear</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                </div>
-                                <div className="top-border top-border-right"></div>
+                                if ((selectedDriver?.id || 0) === 0) {
+                                    window.alert('You must select a driver first!');
+                                    return;
+                                }
+
+                                if (window.confirm('Are you sure to delete this driver?')) {
+                                    axios.post(props.serverUrl + '/deleteAgentDriver', selectedDriver).then(res => {
+                                        if (res.data.result === 'OK') {
+                                            setSelectedAgent({ ...selectedAgent, drivers: res.data.drivers });
+                                            setSelectedDriver({});
+                                        }
+                                    }).catch(e => {
+                                        console.log('error deleting carrier driver', e);
+                                    });
+                                }
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Delete</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
 
-                            <div className="form-row">
-                                <div className={disabledAgentMailingAddressFields + ' input-box-container input-code'}>
-                                    <input tabIndex={19 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                           ref={refAgentMailingCode}
-                                           readOnly={true}
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       code: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       code: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.code || ''}/>
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Name" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       name: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       name: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.name || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 1" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       address1: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       address1: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.address1 || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={22 + props.tabTimes} type="text" placeholder="Address 2" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       address2: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       address2: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.address2 || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledAgentMailingAddressFields + ' input-box-container grow'}>
-                                    <input tabIndex={23 + props.tabTimes} type="text" placeholder="City" style={{
-                                        textTransform: 'capitalize'
-                                    }}
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       city: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       city: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.city || ''}/>
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className={disabledAgentMailingAddressFields + ' input-box-container input-state'}>
-                                    <input tabIndex={24 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       state: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       state: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.state || ''}/>
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div
-                                    className={disabledAgentMailingAddressFields + ' input-box-container input-zip-code'}>
-                                    <input tabIndex={25 + props.tabTimes} type="text" placeholder="Postal Code"
-                                           onKeyDown={saveMailingAddress}
-                                           onInput={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       zip: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent({
-                                                   ...selectedAgent,
-                                                   mailing_address: {
-                                                       ...selectedAgent?.mailing_address,
-                                                       zip: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.zip || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledAgentMailingAddressFields + ' select-box-container'}
-                                     style={{flexGrow: 1}}>
-                                    <div className="select-box-wrapper">
-                                        <input
-                                            tabIndex={26 + props.tabTimes}
-                                            type="text"
-                                            placeholder="Contact Name"
-                                            ref={refMailingContactName}
-                                            style={{
-                                                textTransform: 'capitalize'
-                                            }}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
-
-                                                switch (key) {
-                                                    case 37:
-                                                    case 38: // arrow left | arrow up
-                                                        e.preventDefault();
-                                                        if (showMailingContactNames) {
-                                                            let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (mailingContactNameItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (mailingContactNameItems.length > 1) {
-                                                                await setMailingContactNameItems((selectedAgent?.contacts || []).map((item, index) => {
-                                                                    item.selected = index === 0
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactNames(true);
-
-                                                                refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 39:
-                                                    case 40: // arrow right | arrow down
-                                                        e.preventDefault();
-                                                        if (showMailingContactNames) {
-                                                            let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    if (selectedIndex === (mailingContactNameItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (mailingContactNameItems.length > 1) {
-                                                                await setMailingContactNameItems((selectedAgent?.contacts || []).map((item, index) => {
-                                                                    item.selected = index === 0
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactNames(true);
-
-                                                                refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setShowMailingContactNames(false);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (showMailingContactNames && mailingContactNameItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedAgent({
-                                                                ...selectedAgent,
-                                                                mailing_address: {
-                                                                    ...selectedAgent?.mailing_address,
-                                                                    mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
-                                                                    mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                                    mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
-                                                                        ? 'work'
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
-                                                                            ? 'fax'
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
-                                                                                ? 'mobile'
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
-                                                                                    ? 'direct'
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
-                                                                                        ? 'other' :
-                                                                                        ''
-                                                                }
-                                                            });
-
-                                                            saveMailingAddress({keyCode: 9});
-                                                            setShowMailingContactNames(false);
-                                                            refMailingContactName.current.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (showMailingContactNames) {
-                                                            e.preventDefault();
-                                                            await setSelectedAgent({
-                                                                ...selectedAgent,
-                                                                mailing_address: {
-                                                                    ...selectedAgent?.mailing_address,
-                                                                    mailing_contact: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)],
-                                                                    mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                                    mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
-                                                                        ? 'work'
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
-                                                                            ? 'fax'
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
-                                                                                ? 'mobile'
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
-                                                                                    ? 'direct'
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
-                                                                                        ? 'other' :
-                                                                                        ''
-                                                                }
-                                                            });
-
-                                                            saveMailingAddress({keyCode: 9});
-                                                            setShowMailingContactNames(false);
-                                                            refMailingContactName.current.focus();
-                                                        } else {
-                                                            saveMailingAddress({keyCode: 9});
-                                                        }
-                                                        break;
-
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onInput={(e) => {
-                                                // setSelectedAgent({
-                                                //     ...selectedAgent,
-                                                //     mailing_contact_name: e.target.value
-                                                // })
-                                            }}
-                                            onChange={(e) => {
-                                                // setSelectedAgent({
-                                                //     ...selectedAgent,
-                                                //     mailing_contact_name: e.target.value
-                                                // })
-                                            }}
-                                            value={
-                                                (selectedAgent?.mailing_address?.mailing_contact?.first_name || '') +
-                                                ((selectedAgent?.mailing_address?.mailing_contact?.last_name || '') === ''
-                                                    ? ''
-                                                    : ' ' + selectedAgent?.mailing_address?.mailing_contact?.last_name)
-                                            }
-                                        />
-
-                                        {
-                                            ((selectedAgent?.contacts || []).length > 1 && (selectedAgent?.mailing_address?.code || '') !== '') &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showMailingContactNames) {
-                                                                     setShowMailingContactNames(false);
-                                                                 } else {
-                                                                     if ((selectedAgent?.contacts || []).length > 1) {
-                                                                         await setMailingContactNameItems((selectedAgent?.contacts || []).map((item, index) => {
-                                                                             item.selected = index === 0
-                                                                             return item;
-                                                                         }))
-
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowMailingContactNames(true);
-
-                                                                             refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
-
-                                                                 refMailingContactName.current.focus();
-                                                             }}/>
-                                        }
-                                    </div>
-                                    {
-                                        mailingContactNamesTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-names"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refMailingContactNameDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                mailingContactNameItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedAgent({
-                                                                                    ...selectedAgent,
-                                                                                    mailing_address: {
-                                                                                        ...selectedAgent?.mailing_address,
-                                                                                        mailing_contact: item,
-                                                                                        mailing_contact_id: item.id,
-                                                                                        mailing_contact_primary_phone: (item.phone_work || '') !== ''
-                                                                                            ? 'work'
-                                                                                            : (item.phone_work_fax || '') !== ''
-                                                                                                ? 'fax'
-                                                                                                : (item.phone_mobile || '') !== ''
-                                                                                                    ? 'mobile'
-                                                                                                    : (item.phone_direct || '') !== ''
-                                                                                                        ? 'direct'
-                                                                                                        : (item.phone_other || '') !== ''
-                                                                                                            ? 'other' :
-                                                                                                            ''
-                                                                                    }
-                                                                                });
-
-                                                                                saveMailingAddress({keyCode: 9});
-                                                                                setShowMailingContactNames(false);
-                                                                                refMailingContactName.current.focus();
-                                                                            }}
-                                                                            ref={ref => refMailingContactNamePopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.first_name + ((item.last_name || '') === '' ? '' : ' ' + item.last_name)
-                                                                            }
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-
-                                <div className="form-h-sep"></div>
-                                <div
-                                    className={disabledAgentMailingAddressFields + ' select-box-container input-phone'}>
-                                    <div className="select-box-wrapper">
-                                        <MaskedInput tabIndex={27 + props.tabTimes}
-                                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                                     guide={true}
-                                                     type="text"
-                                                     placeholder="Contact Phone"
-                                                     ref={refMailingContactPhone}
-                                                     onKeyDown={async (e) => {
-                                                         let key = e.keyCode || e.which;
-
-                                                         switch (key) {
-                                                             case 37:
-                                                             case 38: // arrow left | arrow up
-                                                                 e.preventDefault();
-                                                                 if (showMailingContactPhones) {
-                                                                     let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
-
-                                                                     if (selectedIndex === -1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === 0) {
-                                                                                 item.selected = index === (mailingContactPhoneItems.length - 1);
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex - 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
-
-                                                                     refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (mailingContactPhoneItems.length > 1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-
-                                                                         setShowMailingContactPhones(true);
-
-                                                                         refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
-
-                                                             case 39:
-                                                             case 40: // arrow right | arrow down
-                                                                 e.preventDefault();
-                                                                 if (showMailingContactPhones) {
-                                                                     let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
-
-                                                                     if (selectedIndex === -1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === (mailingContactPhoneItems.length - 1)) {
-                                                                                 item.selected = index === 0;
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex + 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
-
-                                                                     refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (mailingContactPhoneItems.length > 1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-
-                                                                         setShowMailingContactPhones(true);
-
-                                                                         refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
-
-                                                             case 27: // escape
-                                                                 setShowMailingContactPhones(false);
-                                                                 break;
-
-                                                             case 13: // enter
-                                                                 if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                                     await setSelectedAgent({
-                                                                         ...selectedAgent,
-                                                                         mailing_address: {
-                                                                             ...selectedAgent.mailing_address,
-                                                                             mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
-                                                                         }
-                                                                     });
-
-                                                                     saveMailingAddress({keyCode: 9});
-                                                                     setShowMailingContactPhones(false);
-                                                                     refMailingContactPhone.current.inputElement.focus();
-                                                                 }
-                                                                 break;
-
-                                                             case 9: // tab
-                                                                 if (showMailingContactPhones) {
-                                                                     e.preventDefault();
-                                                                     await setSelectedAgent({
-                                                                         ...selectedAgent,
-                                                                         mailing_address: {
-                                                                             ...selectedAgent.mailing_address,
-                                                                             mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
-                                                                         }
-                                                                     });
-
-                                                                     saveMailingAddress({keyCode: 9});
-                                                                     setShowMailingContactPhones(false);
-                                                                     refMailingContactPhone.current.inputElement.focus();
-                                                                 } else {
-                                                                     saveMailingAddress({keyCode: 9});
-                                                                 }
-                                                                 break;
-
-                                                             default:
-                                                                 break;
-                                                         }
-                                                     }}
-                                                     onInput={(e) => {
-                                                         // setSelectedAgent({
-                                                         //     ...selectedAgent,
-                                                         //     mailing_contact_phone: e.target.value
-                                                         // });
-                                                     }}
-                                                     onChange={(e) => {
-                                                         // setSelectedAgent({
-                                                         //     ...selectedAgent,
-                                                         //     mailing_contact_phone: e.target.value
-                                                         // });
-                                                     }}
-                                                     value={
-                                                         (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'work'
-                                                             ? (selectedAgent?.mailing_address?.mailing_contact?.phone_work || '')
-                                                             : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'fax'
-                                                                 ? (selectedAgent?.mailing_address?.mailing_contact?.phone_work_fax || '')
-                                                                 : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'mobile'
-                                                                     ? (selectedAgent?.mailing_address?.mailing_contact?.phone_mobile || '')
-                                                                     : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'direct'
-                                                                         ? (selectedAgent?.mailing_address?.mailing_contact?.phone_direct || '')
-                                                                         : (selectedAgent?.mailing_address?.mailing_contact_primary_phone || '') === 'other'
-                                                                             ? (selectedAgent?.mailing_address?.mailing_contact?.phone_other || '')
-                                                                             : ''
-                                                     }
-                                        />
-
-                                        {
-                                            ((selectedAgent?.id || 0) > 0 && (selectedAgent?.mailing_address?.code || '') !== '') &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-mailing-contact-primary-phone': true,
-                                                    'pushed': (mailingContactPhoneItems.length > 1)
-                                                })}>
-                                                {selectedAgent?.mailing_address?.mailing_contact_primary_phone || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            mailingContactPhoneItems.length > 1 &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showMailingContactPhones) {
-                                                                     setShowMailingContactPhones(false);
-                                                                 } else {
-                                                                     if (mailingContactPhoneItems.length > 1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowMailingContactPhones(true);
-
-                                                                             refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
-
-                                                                 refMailingContactPhone.current.inputElement.focus();
-                                                             }}/>
-                                        }
-                                    </div>
-                                    {
-                                        mailingContactPhonesTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-phone"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refMailingContactPhoneDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                mailingContactPhoneItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedAgent({
-                                                                                    ...selectedAgent,
-                                                                                    mailing_address: {
-                                                                                        ...selectedAgent?.mailing_address,
-                                                                                        mailing_contact_primary_phone: item.type
-                                                                                    }
-                                                                                });
-
-                                                                                saveMailingAddress({keyCode: 9});
-                                                                                setShowMailingContactPhones(false);
-                                                                                refMailingContactPhone.current.inputElement.focus();
-                                                                            }}
-                                                                            ref={ref => refMailingContactPhonePopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Phone Work `
-                                                                                    : item.type === 'fax' ? `Phone Work Fax `
-                                                                                        : item.type === 'mobile' ? `Phone Mobile `
-                                                                                            : item.type === 'direct' ? `Phone Direct `
-                                                                                                : item.type === 'other' ? `Phone Other ` : ''
-                                                                            }
-
-                                                                            (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-
-                                <div className="form-h-sep"></div>
-                                <div
-                                    className={disabledAgentMailingAddressFields + ' input-box-container input-phone-ext'}>
-                                    <input tabIndex={28 + props.tabTimes} type="text" placeholder="Ext"
-                                           onKeyDown={saveMailingAddress}
-                                           onChange={e => {
-                                               // setSelectedAgent({ ...selectedAgent, mailing_ext: e.target.value })
-                                           }}
-                                           value={selectedAgent?.mailing_address?.mailing_contact?.phone_ext || ''}/>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className={disabledAgentMailingAddressFields + ' select-box-container'}
-                                     style={{flexGrow: 1}}
-                                     onMouseEnter={() => {
-                                         if ((selectedAgent?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                             (selectedAgent?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                             (selectedAgent?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                             setShowMailingContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onFocus={() => {
-                                         if ((selectedAgent?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                             (selectedAgent?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                             (selectedAgent?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                             setShowMailingContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onBlur={() => {
-                                         window.setTimeout(() => {
-                                             setShowMailingContactEmailCopyBtn(false);
-                                         }, 1000);
-                                     }}
-                                     onMouseLeave={() => {
-                                         setShowMailingContactEmailCopyBtn(false);
-                                     }}>
-
-                                    <div className="select-box-wrapper">
-                                        <input tabIndex={29 + props.tabTimes} type="text" placeholder="E-Mail"
-                                               ref={refMailingContactEmail}
-                                               onKeyDown={async (e) => {
-                                                   let key = e.keyCode || e.which;
-
-                                                   switch (key) {
-                                                       case 37:
-                                                       case 38: // arrow left | arrow up
-                                                           e.preventDefault();
-                                                           if (showMailingContactEmails) {
-                                                               let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
-
-                                                               if (selectedIndex === -1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
-                                                               } else {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       if (selectedIndex === 0) {
-                                                                           item.selected = index === (mailingContactEmailItems.length - 1);
-                                                                       } else {
-                                                                           item.selected = index === (selectedIndex - 1)
-                                                                       }
-                                                                       return item;
-                                                                   }))
-                                                               }
-
-                                                               refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                   if (r && r.classList.contains('selected')) {
-                                                                       r.scrollIntoView({
-                                                                           behavior: 'auto',
-                                                                           block: 'center',
-                                                                           inline: 'nearest'
-                                                                       })
-                                                                   }
-                                                                   return true;
-                                                               });
-                                                           } else {
-                                                               if (mailingContactEmailItems.length > 1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
-
-                                                                   setShowMailingContactEmails(true);
-
-                                                                   refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                       if (r && r.classList.contains('selected')) {
-                                                                           r.scrollIntoView({
-                                                                               behavior: 'auto',
-                                                                               block: 'center',
-                                                                               inline: 'nearest'
-                                                                           })
-                                                                       }
-                                                                       return true;
-                                                                   });
-                                                               }
-                                                           }
-                                                           break;
-
-                                                       case 39:
-                                                       case 40: // arrow right | arrow down
-                                                           e.preventDefault();
-                                                           if (showMailingContactEmails) {
-                                                               let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
-
-                                                               if (selectedIndex === -1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
-                                                               } else {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       if (selectedIndex === (mailingContactEmailItems.length - 1)) {
-                                                                           item.selected = index === 0;
-                                                                       } else {
-                                                                           item.selected = index === (selectedIndex + 1)
-                                                                       }
-                                                                       return item;
-                                                                   }))
-                                                               }
-
-                                                               refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                   if (r && r.classList.contains('selected')) {
-                                                                       r.scrollIntoView({
-                                                                           behavior: 'auto',
-                                                                           block: 'center',
-                                                                           inline: 'nearest'
-                                                                       })
-                                                                   }
-                                                                   return true;
-                                                               });
-                                                           } else {
-                                                               if (mailingContactEmailItems.length > 1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
-
-                                                                   setShowMailingContactEmails(true);
-
-                                                                   refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                       if (r && r.classList.contains('selected')) {
-                                                                           r.scrollIntoView({
-                                                                               behavior: 'auto',
-                                                                               block: 'center',
-                                                                               inline: 'nearest'
-                                                                           })
-                                                                       }
-                                                                       return true;
-                                                                   });
-                                                               }
-                                                           }
-                                                           break;
-
-                                                       case 27: // escape
-                                                           setShowMailingContactEmails(false);
-                                                           break;
-
-                                                       case 13: // enter
-                                                           if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                               await setSelectedAgent({
-                                                                   ...selectedAgent,
-                                                                   mailing_address: {
-                                                                       ...selectedAgent?.mailing_address,
-                                                                       mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
-                                                                   }
-                                                               });
-
-                                                               saveMailingAddress({keyCode: 9});
-                                                               setShowMailingContactEmails(false);
-                                                               refMailingContactEmail.current.focus();
-                                                           }
-                                                           break;
-
-                                                       case 9: // tab
-                                                           if (showMailingContactEmails) {
-                                                               e.preventDefault();
-                                                               await setSelectedAgent({
-                                                                   ...selectedAgent,
-                                                                   mailing_address: {
-                                                                       ...selectedAgent?.mailing_address,
-                                                                       mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
-                                                                   }
-                                                               });
-
-                                                               saveMailingAddress({keyCode: 9});
-                                                               setShowMailingContactEmails(false);
-                                                               refMailingContactEmail.current.focus();
-                                                           } else {
-                                                               saveMailingAddress({keyCode: 9});
-                                                           }
-                                                           break;
-
-                                                       default:
-                                                           break;
-                                                   }
-                                               }}
-                                               onChange={e => {
-                                               }}
-                                               value={
-                                                   (selectedAgent?.mailing_address?.mailing_contact_primary_email || '') === 'work'
-                                                       ? (selectedAgent?.mailing_address?.mailing_contact?.email_work || '')
-                                                       : (selectedAgent?.mailing_address?.mailing_contact_primary_email || '') === 'personal'
-                                                           ? (selectedAgent?.mailing_address?.mailing_contact?.email_personal || '')
-                                                           : (selectedAgent?.mailing_address?.mailing_contact_primary_email || '') === 'other'
-                                                               ? (selectedAgent?.mailing_address?.mailing_contact?.email_other || '')
-                                                               : ''
-                                               }
-                                        />
-
-                                        {
-                                            ((selectedAgent?.id || 0) > 0 && (selectedAgent?.mailing_address?.code || '') !== '') &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-mailing-contact-primary-email': true,
-                                                    'pushed': (mailingContactEmailItems.length > 1)
-                                                })}>
-                                                {selectedAgent?.mailing_address?.mailing_contact_primary_email || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            showMailingContactEmailCopyBtn &&
-                                            <FontAwesomeIcon style={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                right: 30,
-                                                zIndex: 1,
-                                                cursor: 'pointer',
-                                                transform: 'translateY(-50%)',
-                                                color: '#2bc1ff',
-                                                margin: 0,
-                                                transition: 'ease 0.2s',
-                                                fontSize: '1rem'
-                                            }} icon={faCopy} onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigator.clipboard.writeText(refMailingContactEmail.current.value);
-                                            }}/>
-                                        }
-
-                                        {
-                                            mailingContactEmailItems.length > 1 &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showMailingContactEmails) {
-                                                                     setShowMailingContactEmails(false);
-                                                                 } else {
-                                                                     if (mailingContactEmailItems.length > 1) {
-                                                                         await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowMailingContactEmails(true);
-
-                                                                             refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
-
-                                                                 refMailingContactEmail.current.focus();
-                                                             }}/>
-                                        }
-                                    </div>
-                                    {
-                                        mailingContactEmailsTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-email"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refMailingContactEmailDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                mailingContactEmailItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedAgent({
-                                                                                    ...selectedAgent,
-                                                                                    mailing_address: {
-                                                                                        ...selectedAgent?.mailing_address,
-                                                                                        mailing_contact_primary_email: item.type
-                                                                                    }
-                                                                                });
-
-                                                                                saveMailingAddress({keyCode: 9});
-                                                                                setShowMailingContactEmails(false);
-                                                                                refMailingContactEmail.current.focus();
-                                                                            }}
-                                                                            ref={ref => refMailingContactEmailPopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Email Work `
-                                                                                    : item.type === 'personal' ? `Email Personal `
-                                                                                        : item.type === 'other' ? `Email Other ` : ''
-                                                                            }
-
-                                                                            (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
+                            <div className="mochi-button" onClick={() => {
+                                setSelectedDriver({});
+                                refDriverCode.current.focus();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Clear</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
+                        <div className="top-border top-border-right"></div>
+                    </div>
 
-                        {/*ADDED DATE*/}
-                        <div className="form-bordered-box"
-                             style={{width: '190px', flexGrow: 1, marginLeft: 10, justifyContent: 'space-between'}}>
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
+                    <div className="form-row">
+                        <div className="input-box-container input-code">
+                            <input tabIndex={30 + props.tabTimes} type="text" placeholder="Code"
+                                style={{
+                                    textTransform: 'uppercase'
+                                }}
+                                ref={refDriverCode}
+                                readOnly={(selectedDriver?.id || 0) > 0}
+                                onKeyDown={(e) => {
+                                    let key = e.keyCode || e.which;
 
-                            <div className="select-box-container">
-                                <div className="select-box-wrapper">
-                                    <MaskedInput tabIndex={30 + props.tabTimes}
-                                                 mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-                                                 guide={false}
-                                                 type="text" placeholder="Added Date"
-                                                 onKeyDown={async (e) => {
-                                                     let key = e.keyCode || e.which;
-
-                                                     if (key >= 37 && key <= 40) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.added_date || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedAddedDate(event_date);
-
-                                                         if (isAddedDateCalendarShown) {
-                                                             e.preventDefault();
-
-                                                             if (key === 37) { // left - minus 1
-                                                                 setPreSelectedAddedDate(preSelectedAddedDate.clone().subtract(1, 'day'));
-                                                             }
-
-                                                             if (key === 38) { // up - minus 7
-                                                                 setPreSelectedAddedDate(preSelectedAddedDate.clone().subtract(7, 'day'));
-                                                             }
-
-                                                             if (key === 39) { // right - plus 1
-                                                                 setPreSelectedAddedDate(preSelectedAddedDate.clone().add(1, 'day'));
-                                                             }
-
-                                                             if (key === 40) { // down - plus 7
-                                                                 setPreSelectedAddedDate(preSelectedAddedDate.clone().add(7, 'day'));
-                                                             }
-                                                         } else {
-                                                             await setIsAddedDateCalendarShown(true);
-                                                         }
-                                                     }
-
-                                                     if (key === 13) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.added_date || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedAddedDate(event_date);
-
-                                                         if (isAddedDateCalendarShown) {
-                                                             event_date = preSelectedAddedDate.clone().format('MM/DD/YYYY');
-
-                                                             await setSelectedAgent(selectedAgent => {
-                                                                 return {
-                                                                     ...selectedAgent,
-                                                                     added_date: event_date
-                                                                 }
-                                                             })
-
-                                                             // await saveAgent({keyCode: 9});
-
-                                                             await setIsAddedDateCalendarShown(false);
-                                                         }
-                                                     }
-
-                                                     if (key === 9) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.added_date || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedAddedDate(event_date);
-
-                                                         if (isAddedDateCalendarShown) {
-                                                             event_date = preSelectedAddedDate.clone().format('MM/DD/YYYY');
-
-                                                             await setSelectedAgent(selectedAgent => {
-                                                                 return {
-                                                                     ...selectedAgent,
-                                                                     added_date: event_date
-                                                                 }
-                                                             })
-
-                                                             // await saveAgent({keyCode: 9});
-
-                                                             await setIsAddedDateCalendarShown(false);
-                                                         } else {
-                                                             if (e.target.value.trim() === '') {
-                                                                 await setSelectedAgent(selectedAgent => {
-                                                                     return {
-                                                                         ...selectedAgent,
-                                                                         added_date: null
-                                                                     }
-                                                                 })
-
-                                                                 // await saveAgent({keyCode: 9});
-                                                             }
-                                                         }
-                                                     }
-                                                 }}
-                                                 onBlur={e => {
-                                                     setSelectedAgent(selectedAgent => {
-                                                         return {
-                                                             ...selectedAgent,
-                                                             added_date: getFormattedDates(selectedAgent?.added_date)
-                                                         }
-                                                     })
-                                                 }}
-                                                 onInput={e => {
-                                                     setSelectedAgent(selectedAgent => {
-                                                         return {
-                                                             ...selectedAgent,
-                                                             added_date: e.target.value
-                                                         }
-                                                     })
-                                                 }}
-                                                 onChange={e => {
-                                                     setSelectedAgent(selectedAgent => {
-                                                         return {
-                                                             ...selectedAgent,
-                                                             added_date: e.target.value
-                                                         }
-                                                     })
-                                                 }}
-                                                 value={selectedAgent?.added_date || ''}
-                                                 ref={refAddedDate}
-                                    />
-
-                                    <FontAwesomeIcon className="dropdown-button calendar added-date-calendar"
-                                                     icon={faCalendarAlt} onClick={(e) => {
-                                        if (isAddedDateCalendarShown) {
-                                            setIsAddedDateCalendarShown(false);
-                                        } else {
-                                            // e.stopPropagation();
+                                    if (key === 9) {
 
 
-                                            new Promise((resolve, reject) => {
-                                                if (moment((selectedAgent?.added_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.added_date || '').trim()) {
-                                                    setPreSelectedAddedDate(moment(selectedAgent?.added_date, 'MM/DD/YYYY'));
+                                        if (e.target.value.trim() !== '') {
+                                            axios.post(props.serverUrl + '/getAgentDriverByCode', { code: e.target.value.trim() }).then(res => {
+                                                if (res.data.result === 'OK') {
+                                                    setSelectedDriver({ ...res.data.driver });
+                                                    refDriverName.current.focus();
                                                 } else {
-                                                    setPreSelectedAddedDate(moment());
+                                                    e.preventDefault();
+                                                    refDriverCode.current.focus();
                                                 }
-
-                                                resolve('OK');
-                                            }).then(res => {
-                                                setIsAddedDateCalendarShown(true);
-                                                refAddedDate.current.inputElement.focus();
                                             }).catch(e => {
-
+                                                console.log(e);
                                             });
-
                                         }
-                                    }}/>
-                                </div>
-                                {
-                                    addedDateTransition((style, item) => item && (
-                                        <animated.div
-                                            className="mochi-contextual-container"
-                                            id="mochi-contextual-container-date-received"
-                                            style={{
-                                                ...style,
-                                                left: '-150px',
-                                                display: 'block'
-                                            }}
-                                            ref={refAddedDateCalendarDropDown}
-                                        >
-                                            <div className="mochi-contextual-popup vertical below left"
-                                                 style={{height: 275}}>
-                                                <div className="mochi-contextual-popup-content">
-                                                    <div className="mochi-contextual-popup-wrapper">
-                                                        <Calendar
-                                                            value={moment((selectedAgent?.added_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.added_date || '').trim()
-                                                                ? moment(selectedAgent?.added_date, 'MM/DD/YYYY')
-                                                                : moment()}
-                                                            onChange={(day) => {
-                                                                new Promise(async (resolve, reject) => {
-                                                                    await setSelectedAgent(selectedAgent => {
-                                                                        return {
-                                                                            ...selectedAgent,
-                                                                            added_date: day.format('MM/DD/YYYY')
-                                                                        }
-                                                                    })
-
-                                                                    resolve('OK')
-                                                                }).then(response => {
-                                                                    // saveAgent({keyCode: 9});
-                                                                })
-                                                            }}
-                                                            closeCalendar={() => {
-                                                                setIsAddedDateCalendarShown(false);
-                                                            }}
-                                                            preDay={preSelectedAddedDate}
-                                                            onChangePreDay={(preDay) => {
-                                                                setPreSelectedAddedDate(preDay);
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </animated.div>
-                                    ))
+                                    }
+                                }}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, code: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, code: e.target.value })
+                                }}
+                                value={selectedDriver?.code || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className="input-box-container grow">
+                            <input tabIndex={31 + props.tabTimes} type="text" placeholder="First Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
+                                ref={refDriverName}
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
                                 }
-                            </div>
-
-                            <div className="select-box-container">
-                                <div className="select-box-wrapper">
-                                    <MaskedInput tabIndex={31 + props.tabTimes}
-                                                 mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-                                                 guide={false}
-                                                 type="text" placeholder="Termination Date"
-                                                 onKeyDown={async (e) => {
-                                                     let key = e.keyCode || e.which;
-
-                                                     if (key >= 37 && key <= 40) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.termination_date || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedTerminationDate(event_date);
-
-                                                         if (isTerminationDateCalendarShown) {
-                                                             e.preventDefault();
-
-                                                             if (key === 37) { // left - minus 1
-                                                                 setPreSelectedTerminationDate(preSelectedTerminationDate.clone().subtract(1, 'day'));
-                                                             }
-
-                                                             if (key === 38) { // up - minus 7
-                                                                 setPreSelectedTerminationDate(preSelectedTerminationDate.clone().subtract(7, 'day'));
-                                                             }
-
-                                                             if (key === 39) { // right - plus 1
-                                                                 setPreSelectedTerminationDate(preSelectedTerminationDate.clone().add(1, 'day'));
-                                                             }
-
-                                                             if (key === 40) { // down - plus 7
-                                                                 setPreSelectedTerminationDate(preSelectedTerminationDate.clone().add(7, 'day'));
-                                                             }
-                                                         } else {
-                                                             await setIsTerminationDateCalendarShown(true);
-                                                         }
-                                                     }
-
-                                                     if (key === 13) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.termination_date || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedTerminationDate(event_date);
-
-                                                         if (isTerminationDateCalendarShown) {
-                                                             event_date = preSelectedTerminationDate.clone().format('MM/DD/YYYY');
-
-                                                             await setSelectedAgent(selectedAgent => {
-                                                                 return {
-                                                                     ...selectedAgent,
-                                                                     termination_date: event_date
-                                                                 }
-                                                             })
-
-                                                             // await saveAgent({keyCode: 9});
-
-                                                             await setIsTerminationDateCalendarShown(false);
-                                                         }
-                                                     }
-
-                                                     if (key === 9) {
-                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedAgent?.termination_date || ''), 'MM/DD/YYYY');
-                                                         await setPreSelectedTerminationDate(event_date);
-
-                                                         if (isTerminationDateCalendarShown) {
-                                                             event_date = preSelectedTerminationDate.clone().format('MM/DD/YYYY');
-
-                                                             await setSelectedAgent(selectedAgent => {
-                                                                 return {
-                                                                     ...selectedAgent,
-                                                                     termination_date: event_date
-                                                                 }
-                                                             })
-
-                                                             // await saveAgent({keyCode: 9});
-
-                                                             await setIsTerminationDateCalendarShown(false);
-                                                         } else {
-                                                             if (e.target.value.trim() === '') {
-                                                                 await setSelectedAgent(selectedAgent => {
-                                                                     return {
-                                                                         ...selectedAgent,
-                                                                         termination_date: null
-                                                                     }
-                                                                 })
-
-                                                                 // await saveAgent({keyCode: 9});
-                                                             }
-                                                         }
-                                                     }
-                                                 }}
-                                                 onBlur={e => {
-                                                     setSelectedAgent(selectedAgent => {
-                                                         return {
-                                                             ...selectedAgent,
-                                                             termination_date: getFormattedDates(selectedAgent?.termination_date)
-                                                         }
-                                                     })
-                                                 }}
-                                                 onInput={e => {
-                                                     setSelectedAgent(selectedAgent => {
-                                                         return {
-                                                             ...selectedAgent,
-                                                             termination_date: e.target.value
-                                                         }
-                                                     })
-                                                 }}
-                                                 onChange={e => {
-                                                     setSelectedAgent(selectedAgent => {
-                                                         return {
-                                                             ...selectedAgent,
-                                                             termination_date: e.target.value
-                                                         }
-                                                     })
-                                                 }}
-                                                 value={selectedAgent?.termination_date || ''}
-                                                 ref={refTerminationDate}
-                                    />
-
-                                    <FontAwesomeIcon className="dropdown-button calendar termination-date-calendar"
-                                                     icon={faCalendarAlt} onClick={(e) => {
-                                        if (isTerminationDateCalendarShown) {
-                                            setIsTerminationDateCalendarShown(false);
-                                        } else {
-                                            // e.stopPropagation();
-
-
-                                            new Promise((resolve, reject) => {
-                                                if (moment((selectedAgent?.termination_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.termination_date || '').trim()) {
-                                                    setPreSelectedTerminationDate(moment(selectedAgent?.termination_date, 'MM/DD/YYYY'));
-                                                } else {
-                                                    setPreSelectedTerminationDate(moment());
-                                                }
-
-                                                resolve('OK');
-                                            }).then(res => {
-                                                setIsTerminationDateCalendarShown(true);
-                                                refTerminationDate.current.inputElement.focus();
-                                            }).catch(e => {
-
-                                            });
-
-                                        }
-                                    }}/>
-                                </div>
-                                {
-                                    terminationDateTransition((style, item) => item && (
-                                        <animated.div
-                                            className="mochi-contextual-container"
-                                            id="mochi-contextual-container-date-received"
-                                            style={{
-                                                ...style,
-                                                left: '-150px',
-                                                display: 'block'
-                                            }}
-                                            ref={refTerminationDateCalendarDropDown}
-                                        >
-                                            <div className="mochi-contextual-popup vertical below left"
-                                                 style={{height: 275}}>
-                                                <div className="mochi-contextual-popup-content">
-                                                    <div className="mochi-contextual-popup-wrapper">
-                                                        <Calendar
-                                                            value={moment((selectedAgent?.termination_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedAgent?.termination_date || '').trim()
-                                                                ? moment(selectedAgent?.termination_date, 'MM/DD/YYYY')
-                                                                : moment()}
-                                                            onChange={(day) => {
-                                                                new Promise(async (resolve, reject) => {
-                                                                    await setSelectedAgent(selectedAgent => {
-                                                                        return {
-                                                                            ...selectedAgent,
-                                                                            termination_date: day.format('MM/DD/YYYY')
-                                                                        }
-                                                                    })
-
-                                                                    resolve('OK')
-                                                                }).then(response => {
-                                                                    // saveAgent({keyCode: 9});
-                                                                })
-                                                            }}
-                                                            closeCalendar={() => {
-                                                                setIsTerminationDateCalendarShown(false);
-                                                            }}
-                                                            preDay={preSelectedTerminationDate}
-                                                            onChangePreDay={(preDay) => {
-                                                                setPreSelectedTerminationDate(preDay);
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </animated.div>
-                                    ))
+                                onKeyDown={validateDriverForSaving}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, first_name: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, first_name: e.target.value })
+                                }}
+                                value={selectedDriver?.first_name || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className="input-box-container grow">
+                            <input tabIndex={32 + props.tabTimes} type="text" placeholder="Last Name"
+                                style={{
+                                    textTransform: 'capitalize'
+                                }}
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
                                 }
-                            </div>
+                                onKeyDown={validateDriverForSaving}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, last_name: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, last_name: e.target.value })
+                                }}
+                                value={selectedDriver?.last_name || ''} />
+                        </div>
+                    </div>
 
-                            <div className="input-box-container">
-                                <input tabIndex={32 + props.tabTimes} type="text" placeholder="Regional Manager"
-                                       onInput={(e) => {
-                                           setSelectedAgent(selectedAgent => {
-                                               return {
-                                                   ...selectedAgent,
-                                                   regional_manager: e.target.value
-                                               }
-                                           })
-                                       }}
-                                       onChange={e => {
-                                           setSelectedAgent(selectedAgent => {
-                                               return {
-                                                   ...selectedAgent,
-                                                   regional_manager: e.target.value
-                                               }
-                                           })
-                                       }}
-                                       value={selectedAgent?.regional_manager || ''}/>
-                            </div>
+                    <div className="form-v-sep"></div>
 
-                            <div className="select-box-container">
-                                <div className="select-box-wrapper">
-                                    <input
-                                        type="text"
-                                        readOnly={!props.isAdmin}
-                                        tabIndex={33 + props.tabTimes}
-                                        placeholder="Division"
-                                        ref={refDivision}
-                                        onKeyDown={async (e) => {
-                                            let key = e.keyCode || e.which;
+                    <div className="form-row">
+                        <div className="input-box-container" style={{ width: '40%' }}>
+                            <MaskedInput tabIndex={33 + props.tabTimes}
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
+                                }
+                                mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                guide={true}
+                                type="text" placeholder="Phone"
+                                onKeyDown={validateDriverForSaving}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, phone: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, phone: e.target.value })
+                                }}
+                                value={selectedDriver?.phone || ''} />
+                        </div>
 
-                                            if (!props.isAdmin) {
+                        <div className="form-h-sep"></div>
+
+                        <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
+                            onMouseEnter={() => {
+                                if ((selectedDriver?.email || '') !== '') {
+                                    setShowAgentDriverEmailCopyBtn(true);
+                                }
+                            }}
+                            onFocus={() => {
+                                if ((selectedDriver?.email || '') !== '') {
+                                    setShowAgentDriverEmailCopyBtn(true);
+                                }
+                            }}
+                            onBlur={() => {
+                                window.setTimeout(() => {
+                                    setShowAgentDriverEmailCopyBtn(false);
+                                }, 1000);
+                            }}
+                            onMouseLeave={() => {
+                                setShowAgentDriverEmailCopyBtn(false);
+                            }}>
+                            <input tabIndex={34 + props.tabTimes} type="text" placeholder="E-Mail"
+                                style={{ textTransform: 'lowercase' }}
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
+                                }
+                                ref={refAgentDriverEmail}
+                                onKeyDown={validateDriverForSaving}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, email: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, email: e.target.value })
+                                }}
+                                value={selectedDriver?.email || ''} />
+                            {
+                                showAgentDriverEmailCopyBtn &&
+                                <FontAwesomeIcon style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    right: 5,
+                                    zIndex: 1,
+                                    cursor: 'pointer',
+                                    transform: 'translateY(-50%)',
+                                    color: '#2bc1ff',
+                                    margin: 0,
+                                    transition: 'ease 0.2s',
+                                    fontSize: '1rem'
+                                }} icon={faCopy} onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(refAgentDriverEmail.current.value);
+                                }} />
+                            }
+                        </div>
+
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className="select-box-container" style={{ flexGrow: 1 }}>
+                            <div className="select-box-wrapper">
+                                <input type="text"
+                                    tabIndex={35 + props.tabTimes}
+                                    placeholder="Equipment"
+                                    readOnly={
+                                        (props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
+                                    }
+                                    ref={refEquipment}
+                                    onKeyDown={async (e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        switch (key) {
+                                            case 37:
+                                            case 38: // arrow left | arrow up
                                                 e.preventDefault();
-                                            } else {
-                                                switch (key) {
-                                                    case 37: case 38: // arrow left | arrow up
-                                                        e.preventDefault();
-                                                        if (divisionItems.length > 0) {
-                                                            let selectedIndex = divisionItems.findIndex((item) => item.selected);
+                                                if (driverEquipmentDropdownItems.length > 0) {
+                                                    let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
 
-                                                            if (selectedIndex === -1) {
-                                                                await setDivisionItems(
-                                                                    divisionItems.map((item, index) => {
-                                                                        item.selected = index === 0;
-                                                                        return item;
-                                                                    })
-                                                                );
+                                                    if (selectedIndex === -1) {
+                                                        await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                            if (selectedIndex === 0) {
+                                                                item.selected = index === (driverEquipmentDropdownItems.length - 1);
                                                             } else {
-                                                                await setDivisionItems(
-                                                                    divisionItems.map((item, index) => {
-                                                                        if (selectedIndex === 0) {
-                                                                            item.selected =
-                                                                                index === divisionItems.length - 1;
-                                                                        } else {
-                                                                            item.selected =
-                                                                                index === selectedIndex - 1;
-                                                                        }
-                                                                        return item;
-                                                                    })
-                                                                );
+                                                                item.selected = index === (selectedIndex - 1)
                                                             }
-
-                                                            refDivisionPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setDivisionItems(res.data.divisions.map((item, index) => {
-                                                                        item.selected =
-                                                                            (selectedAgent?.division?.id ||
-                                                                                0) === 0
-                                                                                ? index === 0
-                                                                                : item.id ===
-                                                                                selectedAgent.division.id;
-                                                                        return item;
-                                                                    }));
-
-                                                                    refDivisionPopupItems.current.map((r, i) => {
-                                                                        if (r && r.classList.contains("selected")) {
-                                                                            r.scrollIntoView({
-                                                                                behavior: "auto",
-                                                                                block: "center",
-                                                                                inline: "nearest",
-                                                                            });
-                                                                        }
-                                                                        return true;
-                                                                    });
-                                                                }
-                                                            }).catch(async (e) => {
-                                                                console.log("error getting divisions", e);
-                                                            });
-                                                        }
-                                                        break;
-
-                                                    case 39: case 40: // arrow right | arrow down
-                                                        e.preventDefault();
-                                                        if (divisionItems.length > 0) {
-                                                            let selectedIndex = divisionItems.findIndex((item) => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setDivisionItems(divisionItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }));
-                                                            } else {
-                                                                await setDivisionItems(divisionItems.map((item, index) => {
-                                                                    if (selectedIndex === divisionItems.length - 1) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === selectedIndex + 1;
-                                                                    }
-                                                                    return item;
-                                                                }));
-                                                            }
-
-                                                            refDivisionPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setDivisionItems(res.data.divisions.map(
-                                                                            (item, index) => {
-                                                                                item.selected =
-                                                                                    (selectedAgent?.division?.id ||
-                                                                                        0) === 0
-                                                                                        ? index === 0
-                                                                                        : item.id ===
-                                                                                        selectedAgent?.division.id;
-                                                                                return item;
-                                                                            }
-                                                                        )
-                                                                    );
-
-                                                                    refDivisionPopupItems.current.map((r, i) => {
-                                                                        if (r && r.classList.contains("selected")) {
-                                                                            r.scrollIntoView({
-                                                                                behavior: "auto",
-                                                                                block: "center",
-                                                                                inline: "nearest",
-                                                                            });
-                                                                        }
-                                                                        return true;
-                                                                    });
-                                                                }
-                                                            }).catch(async (e) => {
-                                                                console.log("error getting divisions", e);
-                                                            });
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setDivisionItems([]);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (divisionItems.length > 0 && divisionItems.findIndex((item) => item.selected) > -1) {
-                                                            await setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    division: divisionItems[divisionItems.findIndex((item) => item.selected)],
-                                                                    division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
-                                                                }
-                                                            })
-
-                                                            // saveAgent({ keyCode: 9 });
-                                                            setDivisionItems([]);
-                                                            refDivision.current.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (divisionItems.length > 0) {
-                                                            e.preventDefault();
-                                                            await setSelectedAgent(selectedAgent => {
-                                                                return {
-                                                                    ...selectedAgent,
-                                                                    division: divisionItems[divisionItems.findIndex((item) => item.selected)],
-                                                                    division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id
-                                                                }
-                                                            })
-
-                                                            // saveAgent({ keyCode: 9 });
-                                                            setDivisionItems([]);
-                                                            refDivision.current.focus();
-                                                        }
-                                                        break;
-
-                                                    default:
-                                                        break;
-                                                }
-                                            }
-                                        }}
-                                        onBlur={async () => {
-                                            if ((selectedAgent?.division?.id || 0) === 0) {
-                                                await setSelectedAgent(selectedAgent => {
-                                                    return {
-                                                        ...selectedAgent,
-                                                        division: {},
-                                                        division_id: null
+                                                            return item;
+                                                        }))
                                                     }
+
+                                                    refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getEquipments').then(async res => {
+                                                        if (res.data.result === 'OK') {
+                                                            await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedDriver?.equipment.id
+                                                                return item;
+                                                            }))
+
+                                                            refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(async e => {
+                                                        console.log('error getting driver equipments', e);
+                                                    })
+                                                }
+                                                break;
+
+                                            case 39:
+                                            case 40: // arrow right | arrow down
+                                                e.preventDefault();
+                                                if (driverEquipmentDropdownItems.length > 0) {
+                                                    let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
+
+                                                    if (selectedIndex === -1) {
+                                                        await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                            item.selected = index === 0;
+                                                            return item;
+                                                        }))
+                                                    } else {
+                                                        await setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                            if (selectedIndex === (driverEquipmentDropdownItems.length - 1)) {
+                                                                item.selected = index === 0;
+                                                            } else {
+                                                                item.selected = index === (selectedIndex + 1)
+                                                            }
+                                                            return item;
+                                                        }))
+                                                    }
+
+                                                    refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains('selected')) {
+                                                            r.scrollIntoView({
+                                                                behavior: 'auto',
+                                                                block: 'center',
+                                                                inline: 'nearest'
+                                                            })
+                                                        }
+                                                        return true;
+                                                    });
+                                                } else {
+                                                    axios.post(props.serverUrl + '/getEquipments').then(async res => {
+                                                        if (res.data.result === 'OK') {
+                                                            await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedDriver?.equipment.id
+                                                                return item;
+                                                            }))
+
+                                                            refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }).catch(async e => {
+                                                        console.log('error getting driver equipments', e);
+                                                    })
+                                                }
+                                                break;
+
+                                            case 27: // escape
+                                                setDriverEquipmentDropdownItems([]);
+                                                break;
+
+                                            case 13: // enter
+                                                if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex(item => item.selected) > -1) {
+                                                    await setSelectedDriver({
+                                                        ...selectedDriver,
+                                                        equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
+                                                        equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id
+                                                    });
+                                                    validateDriverForSaving({ keyCode: 9 });
+                                                    setDriverEquipmentDropdownItems([]);
+                                                    refEquipment.current.focus();
+                                                }
+                                                break;
+
+                                            case 9: // tab
+                                                if (driverEquipmentDropdownItems.length > 0) {
+                                                    e.preventDefault();
+                                                    await setSelectedDriver({
+                                                        ...selectedDriver,
+                                                        equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
+                                                        equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id
+                                                    });
+                                                    validateDriverForSaving({ keyCode: 9 });
+                                                    setDriverEquipmentDropdownItems([]);
+                                                    refEquipment.current.focus();
+                                                }
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }}
+                                    onBlur={async () => {
+                                        if ((selectedDriver?.equipment?.id || 0) === 0) {
+                                            await setSelectedDriver({ ...selectedDriver, equipment: {} });
+                                        }
+                                    }}
+                                    onInput={async (e) => {
+                                        let equipment = selectedDriver?.equipment || {};
+                                        equipment.id = 0;
+                                        equipment.name = e.target.value;
+                                        await setSelectedDriver({ ...selectedDriver, equipment: equipment });
+
+                                        if (e.target.value.trim() === '') {
+                                            setDriverEquipmentDropdownItems([]);
+                                        } else {
+                                            axios.post(props.serverUrl + '/getEquipments', {
+                                                name: e.target.value.trim()
+                                            }).then(async res => {
+                                                if (res.data.result === 'OK') {
+                                                    await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                        item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                            ? index === 0
+                                                            : item.id === selectedDriver?.equipment.id
+                                                        return item;
+                                                    }))
+                                                }
+                                            }).catch(async e => {
+                                                console.log('error getting driver equipments', e);
+                                            })
+                                        }
+                                    }}
+                                    onChange={async (e) => {
+                                        let equipment = selectedDriver?.equipment || {};
+                                        equipment.id = 0;
+                                        equipment.name = e.target.value;
+                                        await setSelectedDriver({ ...selectedDriver, equipment: equipment });
+                                    }}
+                                    value={selectedDriver?.equipment?.name || ''}
+                                />
+                                {
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0) &&
+                                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                                        if (driverEquipmentDropdownItems.length > 0) {
+                                            setDriverEquipmentDropdownItems([]);
+                                        } else {
+                                            if ((selectedDriver?.equipment?.id || 0) === 0 && (selectedDriver?.equipment?.name || '') !== '') {
+                                                axios.post(props.serverUrl + '/getEquipments', {
+                                                    name: selectedDriver?.equipment.name
+                                                }).then(async res => {
+                                                    if (res.data.result === 'OK') {
+                                                        await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === selectedDriver?.equipment.id
+                                                            return item;
+                                                        }))
+
+                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async e => {
+                                                    console.log('error getting driver equipments', e);
+                                                })
+                                            } else {
+                                                axios.post(props.serverUrl + '/getEquipments').then(async res => {
+                                                    if (res.data.result === 'OK') {
+                                                        await setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === selectedDriver?.equipment.id
+                                                            return item;
+                                                        }))
+
+                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async e => {
+                                                    console.log('error getting driver equipments', e);
                                                 })
                                             }
+                                        }
+
+                                        refEquipment.current.focus();
+                                    }} />
+                                }
+                            </div>
+                            {
+                                equipmentTransition((style, item) => item && (
+                                    <animated.div
+                                        className="mochi-contextual-container"
+                                        id="mochi-contextual-container-driver-equipment"
+                                        style={{
+                                            ...style,
+                                            left: '-50%',
+                                            display: 'block'
                                         }}
-                                        onInput={async (e) => {
-                                            let division = selectedAgent?.division || {};
-
-                                            division.id = 0;
-                                            division.name = e.target.value;
-
-                                            await setSelectedAgent(selectedAgent => {
-                                                return {
-                                                    ...selectedAgent,
-                                                    division: division,
-                                                    division_id: division.id
-                                                }
-                                            })
-
-                                            if (e.target.value.trim() === "") {
-                                                setDivisionItems([]);
-                                            } else {
-                                                axios.post(props.serverUrl + "/getDivisions", { name: e.target.value.trim() }).then(async (res) => {
-                                                    if (res.data.result === "OK") {
-                                                        await setDivisionItems(
-                                                            res.data.divisions.map((item, index) => {
-                                                                item.selected = (selectedAgent?.division?.id || 0) === 0
-                                                                    ? index === 0
-                                                                    : item.id ===
-                                                                    selectedAgent.division.id;
-                                                                return item;
-                                                            })
-                                                        );
-                                                    }
-                                                }).catch(async (e) => {
-                                                    console.log("error getting divisions", e);
-                                                });
-                                            }
-                                        }}
-                                        onChange={async (e) => {
-                                            let division = selectedAgent?.division || {};
-
-                                            division.id = 0;
-                                            division.name = e.target.value;
-
-                                            await setSelectedAgent(selectedAgent => {
-                                                return {
-                                                    ...selectedAgent,
-                                                    division: division,
-                                                    division_id: division.id
-                                                }
-                                            })
-                                        }}
-                                        value={selectedAgent?.division?.name || ""}
-                                    />
-                                    {
-                                        props.isAdmin &&
-                                        <FontAwesomeIcon
-                                            className="dropdown-button"
-                                            icon={faCaretDown}
-                                            style={{
-                                                pointerEvents: props.isAdmin ? 'all' : 'none'
-                                            }}
-                                            onClick={() => {
-                                                if (divisionItems.length > 0) {
-                                                    setDivisionItems([]);
-                                                } else {
-                                                    if ((selectedAgent?.division?.id || 0) === 0 && (selectedAgent?.division?.name || "") !== "") {
-                                                        axios.post(props.serverUrl + "/getDivisions", { name: selectedAgent.division.name }).then(async (res) => {
-                                                            if (res.data.result === "OK") {
-                                                                await setDivisionItems(res.data.divisions.map((item, index) => {
-                                                                    item.selected = (selectedAgent?.division?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedAgent.division.id;
-                                                                    return item;
-                                                                }));
-
-                                                                refDivisionPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains("selected")) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: "auto",
-                                                                            block: "center",
-                                                                            inline: "nearest",
-                                                                        });
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async (e) => {
-                                                            console.log("error getting divisions", e);
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
-                                                            if (res.data.result === "OK") {
-                                                                await setDivisionItems(res.data.divisions.map((item, index) => {
-                                                                    item.selected = (selectedAgent?.division?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedAgent.division.id;
-                                                                    return item;
-                                                                }));
-
-                                                                refDivisionPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains("selected")) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: "auto",
-                                                                            block: "center",
-                                                                            inline: "nearest",
-                                                                        });
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async (e) => {
-                                                            console.log("error getting divisions", e);
-                                                        });
-                                                    }
-                                                }
-
-                                                refDivision.current.focus();
-                                            }}
-                                        />
-                                    }
-                                </div>
-
-                                {
-                                    divisionTransition((style, item) => item && (
-                                        <animated.div
-                                            className="mochi-contextual-container"
-                                            id="mochi-contextual-container-division"
-                                            style={{
-                                                ...style,
-                                                left: "-50%",
-                                                display: "block",
-                                            }}
-                                            ref={refDivisionDropDown}>
-
-                                            <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
-                                                <div className="mochi-contextual-popup-content">
-                                                    <div className="mochi-contextual-popup-wrapper">
-                                                        {divisionItems.map((item, index) => {
+                                        ref={refDriverEquipmentDropDown}
+                                    >
+                                        <div className="mochi-contextual-popup vertical below left">
+                                            <div className="mochi-contextual-popup-content">
+                                                <div className="mochi-contextual-popup-wrapper">
+                                                    {
+                                                        driverEquipmentDropdownItems.map((item, index) => {
                                                             const mochiItemClasses = classnames({
-                                                                "mochi-item": true,
-                                                                selected: item.selected,
+                                                                'mochi-item': true,
+                                                                'selected': item.selected
                                                             });
 
-                                                            const searchValue = (selectedAgent?.division?.id || 0) === 0 && (selectedAgent?.division?.name || "") !== ""
-                                                                ? selectedAgent?.division?.name
-                                                                : undefined;
+                                                            const searchValue = (selectedDriver?.equipment?.id || 0) === 0 && (selectedDriver?.equipment?.name || '') !== ''
+                                                                ? selectedDriver?.equipment?.name : undefined;
 
                                                             return (
                                                                 <div
                                                                     key={index}
                                                                     className={mochiItemClasses}
                                                                     id={item.id}
-                                                                    onClick={() => {
-                                                                        setSelectedAgent(selectedAgent => {
-                                                                            return {
-                                                                                ...selectedAgent,
-                                                                                division: item,
-                                                                                division_id: item.id
-                                                                            }
-                                                                        })
-
-                                                                        window.setTimeout(() => {
-                                                                            // saveAgent({ keyCode: 9 });
-                                                                            setDivisionItems([]);
-                                                                            refDivision.current.focus();
-                                                                        }, 0);
+                                                                    onClick={async () => {
+                                                                        await setSelectedDriver({
+                                                                            ...selectedDriver,
+                                                                            equipment: item,
+                                                                            equipment_id: item.id
+                                                                        });
+                                                                        validateDriverForSaving({ keyCode: 9 });
+                                                                        setDriverEquipmentDropdownItems([]);
+                                                                        refEquipment.current.focus();
                                                                     }}
-                                                                    ref={(ref) => refDivisionPopupItems.current.push(ref)}
+                                                                    ref={ref => refDriverEquipmentPopupItems.current.push(ref)}
                                                                 >
-                                                                    {searchValue === undefined ? (item.name) : (
-                                                                        <Highlighter
-                                                                            highlightClassName="mochi-item-highlight-text"
-                                                                            searchWords={[searchValue]}
-                                                                            autoEscape={true}
-                                                                            textToHighlight={item.name}
-                                                                        />
-                                                                    )}
-                                                                    {item.selected && (
+                                                                    {
+                                                                        searchValue === undefined
+                                                                            ? item.name
+                                                                            : <Highlighter
+                                                                                highlightClassName="mochi-item-highlight-text"
+                                                                                searchWords={[searchValue]}
+                                                                                autoEscape={true}
+                                                                                textToHighlight={item.name}
+                                                                            />
+                                                                    }
+                                                                    {
+                                                                        item.selected &&
                                                                         <FontAwesomeIcon
                                                                             className="dropdown-selected"
-                                                                            icon={faCaretRight}
-                                                                        />
-                                                                    )}
+                                                                            icon={faCaretRight} />
+                                                                    }
                                                                 </div>
-                                                            );
-                                                        })}
-                                                    </div>
+                                                            )
+                                                        })
+                                                    }
                                                 </div>
                                             </div>
-                                        </animated.div>
-                                    ))
+                                        </div>
+                                    </animated.div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className="input-box-container grow">
+                            <input tabIndex={36 + props.tabTimes} type="text" placeholder="Truck"
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
                                 }
-                            </div>
+                                onKeyDown={validateDriverForSaving}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, truck: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, truck: e.target.value })
+                                }}
+                                value={selectedDriver?.truck || ''} />
+                        </div>
+                        <div className="form-h-sep"></div>
+                        <div className="input-box-container grow">
+                            <input tabIndex={37 + props.tabTimes} type="text" placeholder="Trailer"
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
+                                }
+                                onKeyDown={validateDriverForSaving}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, trailer: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, trailer: e.target.value })
+                                }}
+                                value={selectedDriver?.trailer || ''} />
+                        </div>
+                    </div>
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className="input-box-container grow">
+                            <input tabIndex={38 + props.tabTimes} type="text" placeholder="Notes"
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0
+                                }
+                                onKeyDown={(e) => {
+                                    let key = e.keyCode || e.which;
 
-                            <div className="input-box-container">
-                                <input tabIndex={34 + props.tabTimes} type="text" placeholder="FID"
-                                       onKeyDown={(e) => {
-                                           let key = e.keyCode ||e.which;
+                                    if (key === 9) {
+                                        if (selectedAgent?.id || 0 > 0) {
+                                            let driver = { ...selectedDriver, agent_id: selectedAgent.id };
 
-                                           if (key === 9){
-                                               saveAgent(e);
-                                           }
-                                       }}
-                                       onInput={(e) => {
-                                           setSelectedAgent(selectedAgent => {
-                                               return {
-                                                   ...selectedAgent,
-                                                   fid: e.target.value
-                                               }
-                                           })
-                                       }}
-                                       onChange={e => {
-                                           setSelectedAgent(selectedAgent => {
-                                               return {
-                                                   ...selectedAgent,
-                                                   fid: e.target.value
-                                               }
-                                           })
-                                       }}
-                                       value={selectedAgent?.fid || ''}/>
-                            </div>
+                                            if ((driver.first_name || '').trim() !== '') {
+                                                e.preventDefault();
+
+                                                axios.post(props.serverUrl + '/saveAgentDriver', driver).then(res => {
+                                                    if (res.data.result === 'OK') {
+                                                        setSelectedAgent(selectedAgent => {
+                                                            return {
+                                                                ...selectedAgent,
+                                                                drivers: res.data.drivers
+                                                            }
+                                                        });
+                                                        setSelectedDriver({});
+
+                                                        refDriverCode.current.focus();
+                                                    }
+
+                                                    setIsSavingDriver(false);
+                                                }).catch(e => {
+                                                    console.log('error on saving carrier driver', e);
+                                                    setIsSavingDriver(false);
+                                                });
+                                            } else {
+                                                e.preventDefault();
+                                                setIsSavingDriver(false);
+                                                refAgentCode.current.focus();
+                                            }
+                                        } else {
+                                            e.preventDefault();
+                                            setIsSavingDriver(false);
+                                            refAgentCode.current.focus();
+                                        }
+                                    }
+                                }}
+                                onInput={e => {
+                                    setSelectedDriver({ ...selectedDriver, notes: e.target.value })
+                                }}
+                                onChange={e => {
+                                    setSelectedDriver({ ...selectedDriver, notes: e.target.value })
+                                }}
+                                value={selectedDriver?.notes || ''} />
                         </div>
                     </div>
 
-                    <div className="fields-container-row grow">
-                        {/*PAST ORDERS LIST*/}
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Past Orders</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
-
-                            <div className="orders-list-container">
-                                <div className="orders-list-wrapper">
-                                    {
-                                        (selectedAgent?.orders || []).map((order, index) => {
-                                            return (
-                                                <div className="orders-list-item" key={index} onClick={() => {
-                                                    let panel = {
-                                                        panelName: `${props.panelName}-dispatch`,
-                                                        component: <Dispatch
-                                                            title='Dispatch'
-                                                            tabTimes={22000 + props.tabTimes}
-                                                            panelName={`${props.panelName}-dispatch`}
-                                                            origin={props.origin}
-                                                            isOnPanel={true}
-                                                            isAdmin={props.isAdmin}
-                                                            openPanel={props.openPanel}
-                                                            closePanel={props.closePanel}
-                                                            componentId={moment().format('x')}
-
-                                                            order_id={order.id}
-                                                        />
-                                                    }
-
-                                                    props.openPanel(panel, props.origin);
-                                                }}>
-                                                    <span style={{
-                                                        color: "#4682B4",
-                                                        fontWeight: 'bold',
-                                                        marginRight: 5
-                                                    }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
-                                                    ? order.routing[0].type === 'pickup'
-                                                        ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
-                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-
-                                                        : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
-                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-                                                    : ''}
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                </div>
-                            </div>
-
-                            {
-                                loadingAgentOrdersTransition((style, item) => item &&
-                                    <animated.div className='loading-container' style={style}>
-                                        <div className="loading-container-wrapper">
-                                            <Loader type="Circles" color="#009bdd" height={40} width={40}
-                                                    visible={item}/>
-                                        </div>
-                                    </animated.div>
-                                )
-                            }
-                        </div>
-
-                        <div className="fields-container-col" style={{marginTop: 0, marginLeft: 0}}>
-                            {/*CREDIT FORM*/}
-                            <div className="form-bordered-box" style={{
-                                width: '190px',
-                                flexGrow: 0,
-                                marginLeft: 10,
-                                display: 'grid',
-                                gridTemplateColumns: '1fr',
-                                gridGap: '10px'
-                            }}>
-                                <div className="form-header">
-                                    <div className="top-border top-border-left"></div>
-                                    {/*<div className="form-title">Credit</div>*/}
-                                    <div className="top-border top-border-middle"></div>
-                                    <div className="top-border top-border-right"></div>
-                                </div>
-
-                                <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <div className="input-box-container grow">
-                                        <input tabIndex={35 + props.tabTimes} type="number" placeholder="Agent Pay Brokerage" min={0}
-                                               onKeyDown={(e) => {
-                                                   let key = e.keyCode ||e.which;
-
-                                                   if (key === 9){
-                                                       saveAgent(e);
-                                                   }
-                                               }}
-                                               onInput={(e) => {
-                                                   setSelectedAgent(selectedAgent => {
-                                                       return {
-                                                           ...selectedAgent,
-                                                           agent_pay_brokerage: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               onChange={e => {
-                                                   setSelectedAgent(selectedAgent => {
-                                                       return {
-                                                           ...selectedAgent,
-                                                           agent_pay_brokerage: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               value={selectedAgent?.agent_pay_brokerage || ''}/>
-                                    </div>
-                                </div>
-
-                                <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <div className="input-box-container grow">
-                                        <input tabIndex={36 + props.tabTimes} type="number" placeholder="Agent Pay Company Trucks" min={0}
-                                               onKeyDown={(e) => {
-                                                   let key = e.keyCode ||e.which;
-
-                                                   if (key === 9){
-                                                       saveAgent(e);
-                                                   }
-                                               }}
-                                               onInput={(e) => {
-                                                   setSelectedAgent(selectedAgent => {
-                                                       return {
-                                                           ...selectedAgent,
-                                                           agent_pay_company_trucks: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               onChange={e => {
-                                                   setSelectedAgent(selectedAgent => {
-                                                       return {
-                                                           ...selectedAgent,
-                                                           agent_pay_company_trucks: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               value={selectedAgent?.agent_pay_company_trucks || ''}/>
-                                    </div>
-                                </div>
-
-                                <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <div className='input-box-container grow' style={{
-                                        backgroundColor: (selectedAgent?.agent_own_units || 0) === 0 ? 'rgba(0,0,0,0.05)' : 'white'
-                                    }}>
-                                        <input tabIndex={37 + props.tabTimes} type="number" placeholder="Agent Pay Own Trucks" min={3}
-                                               readOnly={(selectedAgent?.agent_own_units || 0) === 0}
-                                               onKeyDown={(e) => {
-                                                   let key = e.keyCode ||e.which;
-
-                                                   if (key === 9){
-                                                       saveAgent(e);
-                                                   }
-                                               }}
-                                               onInput={(e) => {
-                                                   setSelectedAgent(selectedAgent => {
-                                                       return {
-                                                           ...selectedAgent,
-                                                           agent_pay_own_trucks: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               onChange={e => {
-                                                   setSelectedAgent(selectedAgent => {
-                                                       return {
-                                                           ...selectedAgent,
-                                                           agent_pay_own_trucks: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               value={selectedAgent?.agent_pay_own_trucks || ''}/>
-                                    </div>
-                                </div>
-
-                                <div className="form-row" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <label htmlFor="" style={{fontSize: '0.7rem'}}>Does Agent Own Units?</label>
-
-                                    <div className="input-toggle-container" style={{minWidth: '3rem', maxWidth: '3rem'}}>
-                                        <input type="checkbox"
-                                               id={props.panelName + '-cbox-does-agent-own-units-primary-btn'}
-                                               onChange={(e) => {
-                                                   setSelectedAgent(selectedAgent =>{
-                                                       return {
-                                                           ...selectedAgent,
-                                                           agent_own_units: e.target.checked ? 1 : 0
-                                                       }
-                                                   });
-
-                                                   saveAgent({keyCode: 9});
-                                               }}
-                                               checked={(selectedAgent?.agent_own_units || 0) === 1}/>
-                                        <label htmlFor={props.panelName + '-cbox-does-agent-own-units-primary-btn'}>
-                                            <div className="label-text">{(selectedAgent?.agent_own_units || 0) === 1 ? 'Yes' : 'No'}</div>
-                                            <div className="input-toggle-btn"></div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            {/*HOURS FORM*/}
-                            <div className="form-bordered-box" style={{
-                                width: '190px',
-                                flexGrow: 0,
-                                marginLeft: 10,
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
-                                gridGap: '10px'
-                            }}>
-                                <div className="form-header">
-                                    <div className="top-border top-border-left"></div>
-                                    <div className="form-title">Hours</div>
-                                    <div className="top-border top-border-middle"></div>
-                                    <div className="top-border top-border-right"></div>
-                                </div>
-
-                                <div className="input-box-container ">
-                                    <input tabIndex={38 + props.tabTimes} type="text" placeholder="Open"
-                                           onBlur={(e) => {
-                                               saveHours(e, 'hours open')
-                                           }}
-                                           onChange={e => {
-                                              setSelectedAgent(selectedAgent => {
-                                                   return {
-                                                       ...selectedAgent,
-                                                       hours: {
-                                                            ...(selectedAgent?.hours || {}),
-                                                           hours_open: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           value={(selectedAgent?.hours?.hours_open || '')} />
-                                </div>
-
-                                <div className="input-box-container ">
-                                    <input tabIndex={39 + props.tabTimes} type="text" placeholder="Close"
-                                           onBlur={(e) => {
-                                               saveHours(e, 'hours close')
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent(selectedAgent => {
-                                                   return {
-                                                       ...selectedAgent,
-                                                       hours: {
-                                                           ...(selectedAgent?.hours || {}),
-                                                           hours_close: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           value={(selectedAgent?.hours?.hours_close || '')} />
-                                </div>
-
-                                <div className="input-box-container ">
-                                    <input tabIndex={40 + props.tabTimes} type="text" placeholder="Open"
-                                           onBlur={(e) => {
-                                               saveHours(e, 'hours open 2')
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent(selectedAgent => {
-                                                   return {
-                                                       ...selectedAgent,
-                                                       hours: {
-                                                           ...(selectedAgent?.hours || {}),
-                                                           hours_open2: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           value={(selectedAgent?.hours?.hours_open2 || '')} />
-                                </div>
-
-                                <div className="input-box-container ">
-                                    <input tabIndex={41 + props.tabTimes} type="text" placeholder="Close"
-                                           onKeyDown={(e) => {
-                                               let key = e.keyCode || e.which;
-
-                                               if (key === 9){
-                                                   e.preventDefault();
-
-                                                   saveAgent(e, true);
-                                               }
-                                           }}
-                                           onBlur={(e) => {
-                                               saveHours(e, 'hours close 2')
-                                           }}
-                                           onChange={e => {
-                                               setSelectedAgent(selectedAgent => {
-                                                   return {
-                                                       ...selectedAgent,
-                                                       hours: {
-                                                           ...(selectedAgent?.hours || {}),
-                                                           hours_close2: e.target.value
-                                                       }
-                                                   }
-                                               })
-                                           }}
-                                           value={(selectedAgent?.hours?.hours_close2 || '')} />
-                                </div>
-                            </div>
-
-
+                    <div className="form-row" style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'flex-end',
+                        flexGrow: 1,
+                        paddingBottom: 10
+                    }}>
+                        <div className={
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0)
+                                ? 'mochi-button disabled' : 'mochi-button'
+                        }>
+                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                            <div className="mochi-button-base">E-Mail Driver</div>
+                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                     </div>
                 </div>
 
-                <div className="fields-container-col" style={{alignItems: 'flex-end'}}>
-                    <div className="fields-container-row" style={{display: 'flex', flexDirection: 'column'}}>
-                        {/*BUTTONS SECTION*/}
-                        <div className="buttons-container">
-                            <div className="mochi-button wrap" onClick={revenueInformationBtnClick}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Revenue Information</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
+                <div className="fields-container-col" style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr',
+                    gridTemplateRows: 'auto auto',
+                    gridGap: '10px'
+                }}>
+                    {/*CREDIT FORM*/}
+                    <div className="form-bordered-box" style={{
+                        flexGrow: 0,
+                        display: 'grid',
+                        gridTemplateColumns: '1fr',
+                        gridGap: '5px'
+                    }}>
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            {/*<div className="form-title">Credit</div>*/}
+                            <div className="top-border top-border-middle"></div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
 
-                            <div className="mochi-button wrap" onClick={orderHistoryBtnClick}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Order History</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
+                        <div className="form-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{
+                                    fontSize: '0.7rem',
+                                    color: 'rgba(0,0,0,0.7)',
+                                    whiteSpace: 'nowrap'
+                                }}>Agent Pay Brokerage
+                                </div>
+                                <input tabIndex={44 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
 
-                            <div className="mochi-button wrap" onClick={documentsBtnClick}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Documents</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        if (key === 9) {
+                                            saveAgent(e);
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_brokerage: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    onChange={e => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_brokerage: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedAgent?.agent_pay_brokerage || ''} />
                             </div>
+                        </div>
 
-                            <div className="mochi-button wrap" onClick={() => {
+                        <div className="form-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{
+                                    fontSize: '0.7rem',
+                                    color: 'rgba(0,0,0,0.7)',
+                                    whiteSpace: 'nowrap'
+                                }}>Agent Pay Company Trucks
+                                </div>
+                                <input tabIndex={45 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9) {
+                                            saveAgent(e);
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_company_trucks: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    onChange={e => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_company_trucks: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedAgent?.agent_pay_company_trucks || ''} />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className='input-box-container grow' style={{
+                                backgroundColor: (selectedAgent?.agent_own_units || 0) === 0 ? 'rgba(0,0,0,0.05)' : 'white',
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                            }}>
+                                <div style={{
+                                    fontSize: '0.7rem',
+                                    color: 'rgba(0,0,0,0.7)',
+                                    whiteSpace: 'nowrap'
+                                }}>Agent Pay Own Trucks
+                                </div>
+                                <input tabIndex={46 + props.tabTimes} type="number" min={3} style={{ textAlign: 'right' }}
+                                    readOnly={(selectedAgent?.agent_own_units || 0) === 0}
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9) {
+                                            saveAgent(e);
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_own_trucks: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    onChange={e => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_own_trucks: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedAgent?.agent_pay_own_trucks || ''} />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                            <label htmlFor="" style={{ fontSize: '0.7rem' }}>Does Agent Own Units?</label>
+
+                            <div className="input-toggle-container" style={{ minWidth: '3rem', maxWidth: '3rem' }}>
+                                <input type="checkbox"
+                                    id={props.panelName + '-cbox-does-agent-own-units-primary-btn'}
+                                    onChange={(e) => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_own_units: e.target.checked ? 1 : 0
+                                            }
+                                        });
+
+                                        saveAgent({ keyCode: 9 });
+                                    }}
+                                    checked={(selectedAgent?.agent_own_units || 0) === 1} />
+                                <label htmlFor={props.panelName + '-cbox-does-agent-own-units-primary-btn'}>
+                                    <div className="label-text">{(selectedAgent?.agent_own_units || 0) === 1 ? 'Yes' : 'No'}</div>
+                                    <div className="input-toggle-btn"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/*HOURS FORM*/}
+                    <div className="form-bordered-box" style={{
+                        flexGrow: 0,
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gridGap: '5px'
+                    }}>
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Hours</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="input-box-container ">
+                            <input tabIndex={47 + props.tabTimes} type="text" placeholder="Open"
+                                onBlur={(e) => {
+                                    saveHours(e, 'hours open')
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            hours: {
+                                                ...(selectedAgent?.hours || {}),
+                                                hours_open: e.target.value
+                                            }
+                                        }
+                                    })
+                                }}
+                                value={(selectedAgent?.hours?.hours_open || '')} />
+                        </div>
+
+                        <div className="input-box-container ">
+                            <input tabIndex={48 + props.tabTimes} type="text" placeholder="Close"
+                                onBlur={(e) => {
+                                    saveHours(e, 'hours close')
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            hours: {
+                                                ...(selectedAgent?.hours || {}),
+                                                hours_close: e.target.value
+                                            }
+                                        }
+                                    })
+                                }}
+                                value={(selectedAgent?.hours?.hours_close || '')} />
+                        </div>
+
+                        <div className="input-box-container ">
+                            <input tabIndex={49 + props.tabTimes} type="text" placeholder="Open"
+                                onBlur={(e) => {
+                                    saveHours(e, 'hours open 2')
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            hours: {
+                                                ...(selectedAgent?.hours || {}),
+                                                hours_open2: e.target.value
+                                            }
+                                        }
+                                    })
+                                }}
+                                value={(selectedAgent?.hours?.hours_open2 || '')} />
+                        </div>
+
+                        <div className="input-box-container ">
+                            <input tabIndex={50 + props.tabTimes} type="text" placeholder="Close"
+                                onKeyDown={(e) => {
+                                    let key = e.keyCode || e.which;
+
+                                    if (key === 9) {
+                                        e.preventDefault();
+
+                                        saveAgent(e, true);
+                                    }
+                                }}
+                                onBlur={(e) => {
+                                    saveHours(e, 'hours close 2')
+                                }}
+                                onChange={e => {
+                                    setSelectedAgent(selectedAgent => {
+                                        return {
+                                            ...selectedAgent,
+                                            hours: {
+                                                ...(selectedAgent?.hours || {}),
+                                                hours_close2: e.target.value
+                                            }
+                                        }
+                                    })
+                                }}
+                                value={(selectedAgent?.hours?.hours_close2 || '')} />
+                        </div>
+                    </div>
+                </div>
+
+                <div></div>
+
+                {/*NOTES LIST*/}
+                <div className="form-bordered-box">
+                    <div className="form-header">
+                        <div className="top-border top-border-left"></div>
+                        <div className="form-title">Notes</div>
+                        <div className="top-border top-border-middle"></div>
+                        <div className="form-buttons">
+                            <div className="mochi-button" onClick={() => {
                                 if ((selectedAgent?.id || 0) === 0) {
+                                    window.alert('You must select a agent first!');
+                                    return;
+                                }
+
+                                setSelectedNote({ id: 0, agent_id: selectedAgent.id })
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Add Note</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className="mochi-button" onClick={() => {
+                                if (selectedAgent?.id === undefined || selectedAgent?.notes.length === 0) {
                                     window.alert('There is nothing to print!');
                                     return;
                                 }
 
-                                handledPrintAgentInformation();
+                                let html = ``;
+
+                                selectedAgent?.notes.map((note, index) => {
+                                    html += `<div><b>${note.user_code?.code} : ${moment(note.date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY : HHmm')}</b> : ${note.text}</div>`
+
+                                    return true;
+                                })
+
+                                printWindow(html);
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">Print Agent Information</div>
+                                <div className="mochi-button-base">Print</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
+                        <div className="top-border top-border-right"></div>
+                    </div>
+
+                    <div className="notes-list-container">
+                        <div className="notes-list-wrapper">
+                            {
+                                (selectedAgent?.notes || []).map((note, index) => {
+                                    return (
+                                        <div className="notes-list-item" key={index}
+                                            onClick={() => setSelectedNote(note)}>
+                                            <div className="notes-list-col tcol note-text">{note.text}</div>
+                                            {
+                                                (note.id === (selectedNote?.id || 0)) &&
+                                                <div className="notes-list-col tcol notes-selected">
+                                                    <FontAwesomeIcon icon={faPencilAlt} />
+                                                </div>
+                                            }
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
+
+                {/*DRIVERS LIST*/}
+                <div className="form-bordered-box">
+                    <div className="form-header">
+                        <div className="top-border top-border-left"></div>
+                        <div className="form-title">Drivers</div>
+                        <div className="top-border top-border-middle"></div>
+                        <div className="top-border top-border-right"></div>
+                    </div>
+
+                    <div className="drivers-list-container">
+                        {
+                            (selectedAgent.drivers || []).length > 0 &&
+                            <div className="drivers-list-header">
+                                <div className="driver-list-col tcol first-name">First Name</div>
+                                <div className="driver-list-col tcol last-name">Last Name</div>
+                                <div className="driver-list-col tcol phone">Phone</div>
+                                <div className="driver-list-col tcol email">E-Mail</div>
+                            </div>
+                        }
+
+                        <div className="drivers-list-wrapper">
+                            {
+                                (selectedAgent.drivers || []).map((driver, index) => {
+                                    return (
+                                        <div className="drivers-list-item" key={index} onClick={() => {
+                                            if ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 1)) {
+                                                setSelectedDriver({ ...driver });
+                                                refDriverName.current.focus();
+                                            }
+                                        }}>
+                                            <div
+                                                className="driver-list-col tcol first-name">{driver.first_name || ''}</div>
+                                            <div className="driver-list-col tcol last-name">{driver.last_name || ''}</div>
+                                            <div className="driver-list-col tcol phone">{driver.phone || ''}</div>
+                                            <div className="driver-list-col tcol email">{driver.email || ''}</div>
+                                            {
+                                                (driver.id === (selectedDriver?.id || 0)) &&
+                                                <div className="driver-list-col tcol driver-selected">
+                                                    <FontAwesomeIcon icon={faPencilAlt} />
+                                                </div>
+                                            }
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                {/*PAST ORDERS LIST*/}
+                <div className="form-bordered-box">
+                    <div className="form-header">
+                        <div className="top-border top-border-left"></div>
+                        <div className="form-title">Past Orders</div>
+                        <div className="top-border top-border-middle"></div>
+                        <div className="top-border top-border-right"></div>
+                    </div>
+
+                    <div className="orders-list-container">
+                        <div className="orders-list-wrapper">
+                            {
+                                (selectedAgent?.orders || []).map((order, index) => {
+                                    return (
+                                        <div className="orders-list-item" key={index} onClick={() => {
+                                            let panel = {
+                                                panelName: `${props.panelName}-dispatch`,
+                                                component: <Dispatch
+                                                    title='Dispatch'
+                                                    tabTimes={22000 + props.tabTimes}
+                                                    panelName={`${props.panelName}-dispatch`}
+                                                    origin={props.origin}
+                                                    isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
+                                                    openPanel={props.openPanel}
+                                                    closePanel={props.closePanel}
+                                                    componentId={moment().format('x')}
+
+                                                    order_id={order.id}
+                                                />
+                                            }
+
+                                            props.openPanel(panel, props.origin);
+                                        }}>
+                                            <span style={{
+                                                color: "#4682B4",
+                                                fontWeight: 'bold',
+                                                marginRight: 5
+                                            }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
+                                                ? order.routing[0].type === 'pickup'
+                                                    ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
+                                                        ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                            ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                            (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+
+                                                    : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
+                                                        ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                            ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                            (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+                                                : ''}
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                    </div>
+
+                    {
+                        loadingAgentOrdersTransition((style, item) => item &&
+                            <animated.div className='loading-container' style={style}>
+                                <div className="loading-container-wrapper">
+                                    <Loader type="Circles" color="#009bdd" height={40} width={40}
+                                        visible={item} />
+                                </div>
+                            </animated.div>
+                        )
+                    }
+                </div>
+
+                <div></div>
+
             </div>
 
             {
                 noteTransition((style, item) => item && (
-                    <animated.div style={{...style}}>
+                    <animated.div style={{ ...style }}>
                         <AgentModal
                             selectedData={selectedNote}
                             setSelectedData={setSelectedNote}
                             selectedParent={selectedAgent}
                             setSelectedParent={(data) => {
-                                setSelectedAgent({...selectedAgent, notes: data.notes});
+                                setSelectedAgent({ ...selectedAgent, notes: data.notes });
                             }}
                             savingDataUrl='/saveAgentNote'
                             deletingDataUrl='/deleteAgentNote'
@@ -5375,7 +6193,8 @@ const Agents = (props) => {
 const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
-        serverUrl: state.systemReducers.serverUrl
+        serverUrl: state.systemReducers.serverUrl,
+        user: state.systemReducers.user
     }
 }
 

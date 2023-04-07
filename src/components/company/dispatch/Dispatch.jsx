@@ -4143,9 +4143,9 @@ const Dispatch = (props) => {
     useEffect(() => {
         if (isSavingDeliveryId > -1) {
             if ((selectedOrder?.id || 0) > 0) {
-                let delivery = (selectedOrder?.deliveries || []).find(
-                    (d) => d.id === isSavingDeliveryId
-                );
+                let delivery = (selectedOrder?.deliveries || []).find((d) => d.id === isSavingDeliveryId);
+
+                console.log(isSavingDeliveryId, selectedOrder?.deliveries || []);
 
                 if (delivery !== undefined) {
                     if ((delivery.customer?.id || 0) > 0) {
@@ -4745,7 +4745,7 @@ const Dispatch = (props) => {
             await setShipperBolNumber("");
             refBolNumbers.current.focus();
 
-            setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
+            // setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
         }
     };
 
@@ -4782,7 +4782,7 @@ const Dispatch = (props) => {
             await setShipperPoNumber("");
             refPoNumbers.current.focus();
 
-            setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
+            // setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
         }
     };
 
@@ -4819,7 +4819,7 @@ const Dispatch = (props) => {
             await setShipperRefNumber("");
             refRefNumbers.current.focus();
 
-            setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
+            // setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
         }
     };
 
@@ -4856,7 +4856,7 @@ const Dispatch = (props) => {
             await setConsigneeBolNumber("");
             refDeliveryBolNumbers.current.focus();
 
-            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+            // setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
         }
     };
 
@@ -4893,7 +4893,7 @@ const Dispatch = (props) => {
             await setConsigneePoNumber("");
             refDeliveryPoNumbers.current.focus();
 
-            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+            // setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
         }
     };
 
@@ -4930,7 +4930,7 @@ const Dispatch = (props) => {
             await setConsigneeRefNumber("");
             refDeliveryRefNumbers.current.focus();
 
-            setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+            // setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
         }
     };
 
@@ -6625,8 +6625,11 @@ const Dispatch = (props) => {
                                         selected_order.id = 0;
                                         selected_order.order_number = 0;
                                         selected_order.trip_number = 0;
-                                        // selected_order.carrier_id = null;
-                                        // selected_order.carrier_driver_id = null;
+                                        selected_order.carrier = {};
+                                        selected_order.carrier_id = null;
+                                        selected_order.carrier_driver_id = null;
+                                        selected_order.equipment_id = null;
+                                        selected_order.equipment = {};
                                         selected_order.user_code_id = props.user.user_code.id;
                                         selected_order.customer_check_number = null;
                                         selected_order.customer_date_received = null;
@@ -6651,9 +6654,9 @@ const Dispatch = (props) => {
                                                     ...res.data.order,
                                                     component_id: props.componentId,
                                                 });
-                                                // await setSelectedCarrier({});
-                                                // await setSelectedCarrierContact({});
-                                                // await setSelectedCarrierDriver({});
+                                                await setSelectedCarrier({});
+                                                await setSelectedCarrierContact({});
+                                                await setSelectedCarrierDriver({});
 
                                                 new Promise((resolve, reject) => {
                                                     if ((selected_order?.internal_notes || []).length > 0) {
@@ -6916,7 +6919,7 @@ const Dispatch = (props) => {
                                                                                         console.log("error saving order miles", e);
                                                                                     }).then(() => {
                                                                                         setIsLoading(false);
-                                                                                        refDispatchEvents.current.focus();
+                                                                                        refCarrierCode.current.focus();
                                                                                     });
                                                                                 }
                                                                             }).catch((e) => {
@@ -14201,10 +14204,8 @@ const Dispatch = (props) => {
                                                                                                 (selectedShipperCustomer) => {
                                                                                                     return {
                                                                                                         ...selectedShipperCustomer,
-                                                                                                        pu_date1:
-                                                                                                            day.format("MM/DD/YYYY"),
-                                                                                                        pu_date2:
-                                                                                                            day.format("MM/DD/YYYY"),
+                                                                                                        pu_date1: day.format("MM/DD/YYYY"),
+                                                                                                        pu_date2: day.format("MM/DD/YYYY"),
                                                                                                     };
                                                                                                 }
                                                                                             );
@@ -14215,8 +14216,8 @@ const Dispatch = (props) => {
                                                                                                         ...selectedOrder,
                                                                                                         pickups: (selectedOrder?.pickups || []).map((pu, i) => {
                                                                                                             if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
-                                                                                                                pu.pu_date1 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
-                                                                                                                pu.pu_date2 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
+                                                                                                                pu.pu_date1 = day.format("MM/DD/YYYY");
+                                                                                                                pu.pu_date2 = day.format("MM/DD/YYYY");
                                                                                                                 // setIsSavingPickupId(-1);
                                                                                                                 // setIsSavingPickupId(pu.id);
                                                                                                             }
@@ -14558,7 +14559,7 @@ const Dispatch = (props) => {
                                                                                                     ...selectedOrder,
                                                                                                     pickups: (selectedOrder?.pickups || []).map((pu, i) => {
                                                                                                         if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
-                                                                                                            pu.pu_date2 = preSelectedPickupDate1.clone().format("MM/DD/YYYY");
+                                                                                                            pu.pu_date2 = day.format("MM/DD/YYYY");
                                                                                                             // setIsSavingPickupId(-1);
                                                                                                             // setIsSavingPickupId(pu.id);
                                                                                                         }
@@ -14889,10 +14890,7 @@ const Dispatch = (props) => {
                                                                                         }),
                                                                                     });
 
-                                                                                    setIsSavingPickupId(
-                                                                                        selectedShipperCustomer?.pickup_id ||
-                                                                                        0
-                                                                                    );
+                                                                                    setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
                                                                                 }}
                                                                             ></span>
                                                                         }
@@ -14954,18 +14952,12 @@ const Dispatch = (props) => {
                                                             onInput={(e) => {
                                                                 setSelectedOrder({
                                                                     ...selectedOrder,
-                                                                    pickups: (selectedOrder?.pickups || []).map(
-                                                                        (pu, i) => {
-                                                                            if (
-                                                                                pu.id ===
-                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                    0)
-                                                                            ) {
-                                                                                pu.seal_number = e.target.value;
-                                                                            }
-                                                                            return pu;
+                                                                    pickups: (selectedOrder?.pickups || []).map((pu, i) => {
+                                                                        if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                            pu.seal_number = e.target.value;
                                                                         }
-                                                                    ),
+                                                                        return pu;
+                                                                    }),
                                                                 });
 
                                                                 setSelectedShipperCustomer({
@@ -14978,11 +14970,7 @@ const Dispatch = (props) => {
                                                                     ...selectedOrder,
                                                                     pickups: (selectedOrder?.pickups || []).map(
                                                                         (pu, i) => {
-                                                                            if (
-                                                                                pu.id ===
-                                                                                (selectedShipperCustomer?.pickup_id ||
-                                                                                    0)
-                                                                            ) {
+                                                                            if (pu.id === (selectedShipperCustomer?.pickup_id || 0)) {
                                                                                 pu.seal_number = e.target.value;
                                                                             }
                                                                             return pu;
@@ -17790,25 +17778,9 @@ const Dispatch = (props) => {
                                                                         setIsPickupDate1CalendarShown(false);
                                                                         setIsPickupDate2CalendarShown(false);
 
-                                                                        if (
-                                                                            moment(
-                                                                                (
-                                                                                    selectedConsigneeCustomer?.delivery_date1 ||
-                                                                                    ""
-                                                                                ).trim(),
-                                                                                "MM/DD/YYYY"
-                                                                            ).format("MM/DD/YYYY") ===
-                                                                            (
-                                                                                selectedConsigneeCustomer?.delivery_date1 ||
-                                                                                ""
-                                                                            ).trim()
-                                                                        ) {
-                                                                            setPreSelectedDeliveryDate1(
-                                                                                moment(
-                                                                                    selectedConsigneeCustomer?.delivery_date1,
-                                                                                    "MM/DD/YYYY"
-                                                                                )
-                                                                            );
+                                                                        if (moment((selectedConsigneeCustomer?.delivery_date1 || "").trim(), "MM/DD/YYYY").format("MM/DD/YYYY") ===
+                                                                            (selectedConsigneeCustomer?.delivery_date1 || "").trim()) {
+                                                                            setPreSelectedDeliveryDate1(moment(selectedConsigneeCustomer?.delivery_date1, "MM/DD/YYYY"));
                                                                         } else {
                                                                             setPreSelectedDeliveryDate1(moment());
                                                                         }
@@ -17841,33 +17813,17 @@ const Dispatch = (props) => {
                                                                             <div className="mochi-contextual-popup-content">
                                                                                 <div className="mochi-contextual-popup-wrapper">
                                                                                     <Calendar
-                                                                                        value={
-                                                                                            moment(
-                                                                                                (
-                                                                                                    selectedConsigneeCustomer?.delivery_date1 ||
-                                                                                                    ""
-                                                                                                ).trim(),
-                                                                                                "MM/DD/YYYY"
-                                                                                            ).format("MM/DD/YYYY") ===
-                                                                                                (
-                                                                                                    selectedConsigneeCustomer?.delivery_date1 ||
-                                                                                                    ""
-                                                                                                ).trim()
-                                                                                                ? moment(
-                                                                                                    selectedConsigneeCustomer?.delivery_date1,
-                                                                                                    "MM/DD/YYYY"
-                                                                                                )
-                                                                                                : moment()
+                                                                                        value={moment((selectedConsigneeCustomer?.delivery_date1 || "").trim(), "MM/DD/YYYY").format("MM/DD/YYYY") === (selectedConsigneeCustomer?.delivery_date1 || "").trim()
+                                                                                            ? moment(selectedConsigneeCustomer?.delivery_date1, "MM/DD/YYYY")
+                                                                                            : moment()
                                                                                         }
                                                                                         onChange={(day) => {
                                                                                             setSelectedConsigneeCustomer(
                                                                                                 (selectedConsigneeCustomer) => {
                                                                                                     return {
                                                                                                         ...selectedConsigneeCustomer,
-                                                                                                        delivery_date1:
-                                                                                                            day.format("MM/DD/YYYY"),
-                                                                                                        delivery_date2:
-                                                                                                            day.format("MM/DD/YYYY"),
+                                                                                                        delivery_date1: day.format("MM/DD/YYYY"),
+                                                                                                        delivery_date2: day.format("MM/DD/YYYY"),
                                                                                                     };
                                                                                                 }
                                                                                             );
@@ -17876,33 +17832,12 @@ const Dispatch = (props) => {
                                                                                                 (selectedOrder) => {
                                                                                                     return {
                                                                                                         ...selectedOrder,
-                                                                                                        deliveries: (
-                                                                                                            selectedOrder?.deliveries ||
-                                                                                                            []
-                                                                                                        ).map((delivery, i) => {
-                                                                                                            if (
-                                                                                                                delivery.id ===
-                                                                                                                (selectedConsigneeCustomer?.delivery_id ||
-                                                                                                                    0)
-                                                                                                            ) {
-                                                                                                                delivery.delivery_date1 =
-                                                                                                                    preSelectedDeliveryDate1
-                                                                                                                        .clone()
-                                                                                                                        .format(
-                                                                                                                            "MM/DD/YYYY"
-                                                                                                                        );
-                                                                                                                delivery.delivery_date2 =
-                                                                                                                    preSelectedDeliveryDate1
-                                                                                                                        .clone()
-                                                                                                                        .format(
-                                                                                                                            "MM/DD/YYYY"
-                                                                                                                        );
-                                                                                                                setIsSavingDeliveryId(
-                                                                                                                    -1
-                                                                                                                );
-                                                                                                                setIsSavingDeliveryId(
-                                                                                                                    delivery.id
-                                                                                                                );
+                                                                                                        deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                                                            if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                                                delivery.delivery_date1 = day.format("MM/DD/YYYY");
+                                                                                                                delivery.delivery_date2 = day.format("MM/DD/YYYY");
+                                                                                                                // setIsSavingDeliveryId(-1);
+                                                                                                                // setIsSavingDeliveryId(delivery.id);
                                                                                                             }
                                                                                                             return delivery;
                                                                                                         }),
@@ -17910,31 +17845,19 @@ const Dispatch = (props) => {
                                                                                                 }
                                                                                             );
 
-                                                                                            setIsPickupDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsPickupDate2CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate1CalendarShown(
-                                                                                                false
-                                                                                            );
-                                                                                            setIsDeliveryDate2CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsPickupDate1CalendarShown(false);
+                                                                                            setIsPickupDate2CalendarShown(false);
+                                                                                            setIsDeliveryDate1CalendarShown(false);
+                                                                                            setIsDeliveryDate2CalendarShown(false);
 
                                                                                             refDeliveryTime1.current.focus();
                                                                                         }}
                                                                                         closeCalendar={() => {
-                                                                                            setIsDeliveryDate1CalendarShown(
-                                                                                                false
-                                                                                            );
+                                                                                            setIsDeliveryDate1CalendarShown(false);
                                                                                         }}
                                                                                         preDay={preSelectedDeliveryDate1}
                                                                                         onChangePreDay={(preDay) => {
-                                                                                            setPreSelectedDeliveryDate1(
-                                                                                                preDay
-                                                                                            );
+                                                                                            setPreSelectedDeliveryDate1(preDay);
                                                                                         }}
                                                                                     />
                                                                                 </div>
@@ -17971,14 +17894,8 @@ const Dispatch = (props) => {
                                                                             delivery_time1: formatted,
                                                                         });
 
-                                                                        let deliveries = (
-                                                                            selectedOrder?.deliveries || []
-                                                                        ).map((delivery, i) => {
-                                                                            if (
-                                                                                delivery.id ===
-                                                                                (selectedConsigneeCustomer?.delivery_id ||
-                                                                                    0)
-                                                                            ) {
+                                                                        let deliveries = (selectedOrder?.deliveries || []).map((delivery, i) => {
+                                                                            if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                                                                 delivery.delivery_time1 = formatted;
                                                                                 // setIsSavingDeliveryId(-1);
                                                                                 // setIsSavingDeliveryId(delivery.id);
@@ -18037,9 +17954,7 @@ const Dispatch = (props) => {
                                                                     }),
                                                                 });
                                                             }}
-                                                            value={
-                                                                selectedConsigneeCustomer?.delivery_time1 || ""
-                                                            }
+                                                            value={selectedConsigneeCustomer?.delivery_time1 || ""}
                                                         />
                                                     </div>
                                                     <div style={{
@@ -18265,7 +18180,7 @@ const Dispatch = (props) => {
                                                                                                     ...selectedOrder,
                                                                                                     deliveries: (selectedOrder?.deliveries || []).map((delivery, i) => {
                                                                                                         if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
-                                                                                                            delivery.delivery_date2 = preSelectedDeliveryDate1.clone().format("MM/DD/YYYY");
+                                                                                                            delivery.delivery_date2 = day.format("MM/DD/YYYY");
                                                                                                             // setIsSavingDeliveryId(-1);
                                                                                                             // setIsSavingDeliveryId(delivery.id);
                                                                                                         }
@@ -18636,7 +18551,7 @@ const Dispatch = (props) => {
                                                                     let key = e.keyCode || e.which;
 
                                                                     if (key === 9) {
-                                                                        setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
+                                                                        // setIsSavingDeliveryId(selectedConsigneeCustomer?.delivery_id || 0);
                                                                     }
                                                                 }
                                                             }}
@@ -21158,8 +21073,6 @@ const Dispatch = (props) => {
                                                 event_type_id: dispatchEvent.id,
                                             };
 
-                                            console.log(selectedOrderEvent);
-
                                             if (dispatchEvent.id === 1) {
                                                 event_parameters.arrived_customer_id = selectedOrderEvent.customer.id;
                                                 event_parameters.shipper_id = (selectedOrderEvent.customer.type || "") === "pickup"
@@ -21232,8 +21145,9 @@ const Dispatch = (props) => {
                                                         let recipient_bcc = [];
                                                         let emailUrl = '';
                                                         let customer_id = null;
+                                                        let event_location = null;
 
-                                                        if ((dispatchEvent?.id || 0) === 1) { // Arrived
+                                                        if ((event_parameters?.event_type_id || 0) === 1) { // Arrived
                                                             if ((selectedOrderEvent?.type || '') === 'pickup') {
                                                                 emailUrl = '/sendCarrierArrivedShipperEmail';
                                                                 customer_id = selectedOrderEvent.customer.id;
@@ -21281,7 +21195,7 @@ const Dispatch = (props) => {
                                                             }
                                                         }
 
-                                                        if ((dispatchEvent?.id || 0) === 9) { // Loaded at shipper
+                                                        if ((event_parameters?.event_type_id || 0) === 9) { // Loaded at shipper
                                                             emailUrl = '/sendCarrierLoadedShipperEmail';
                                                             customer_id = event_parameters.shipper_id;
 
@@ -21305,34 +21219,68 @@ const Dispatch = (props) => {
                                                             });
                                                         }
 
-                                                        if ((dispatchEvent?.id || 0) === 6) { // Delivered at consignee
-                                                            emailUrl = '/sendCarrierUnloadedConsigneeEmail';
-                                                            customer_id = event_parameters.consignee_id;
+                                                        if ((event_parameters?.event_type_id || 0) === 6) { // Delivered at consignee
+                                                            if ((res.data.order_events || []).filter(x => x.event_type_id === 6).length === (selectedOrder?.routing || []).filter(x => x.type === 'delivery').length) {
+                                                                emailUrl = '/sendCarrierUnloadedConsigneeEmail';
+                                                                customer_id = event_parameters.consignee_id;
 
-                                                            (selectedOrder?.bill_to_company?.automatic_emails || []).map(item => {
 
-                                                                if ((item?.empty || 0) === 1) {
-                                                                    if ((item?.type || '') === 'to') {
-                                                                        recipient_to.push(item.email);
+                                                                (selectedOrder?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                                    if ((item?.empty || 0) === 1) {
+                                                                        if ((item?.type || '') === 'to') {
+                                                                            recipient_to.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'cc') {
+                                                                            recipient_cc.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'bcc') {
+                                                                            recipient_bcc.push(item.email);
+                                                                        }
                                                                     }
 
-                                                                    if ((item?.type || '') === 'cc') {
-                                                                        recipient_cc.push(item.email);
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+
+                                                        if ((event_parameters?.event_type_id || 0) === 4) { // Check Calls
+                                                            emailUrl = '/sendCarrierCheckCallsEmail';
+
+                                                            let lastDelivery = (selectedOrder?.routing || []).findLast(x => x.type === 'delivery');
+
+                                                            if (lastDelivery) {
+                                                                customer_id = (selectedOrder?.deliveries || []).find(x => x.id === lastDelivery.delivery_id)?.customer_id;
+                                                                event_location = event_parameters?.event_location;
+
+                                                                (selectedOrder?.bill_to_company?.automatic_emails || []).map(item => {
+
+                                                                    if ((item?.check_calls || 0) === 1) {
+                                                                        if ((item?.type || '') === 'to') {
+                                                                            recipient_to.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'cc') {
+                                                                            recipient_cc.push(item.email);
+                                                                        }
+
+                                                                        if ((item?.type || '') === 'bcc') {
+                                                                            recipient_bcc.push(item.email);
+                                                                        }
                                                                     }
 
-                                                                    if ((item?.type || '') === 'bcc') {
-                                                                        recipient_bcc.push(item.email);
-                                                                    }
-                                                                }
-
-                                                                return true;
-                                                            });
+                                                                    return true;
+                                                                });
+                                                            }
                                                         }
 
                                                         if (recipient_to.length > 0) {
                                                             axios.post(props.serverUrl + emailUrl, {
                                                                 order_number: selectedOrder?.order_number,
                                                                 customer_id,
+                                                                event_location,
                                                                 user_first_name,
                                                                 user_last_name,
                                                                 recipient_to,

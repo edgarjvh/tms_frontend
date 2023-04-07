@@ -4259,12 +4259,12 @@ const Carriers = (props) => {
                                         ? 'mochi-button disabled' : 'mochi-button'
                                 } onClick={() => {
                                     if ((selectedCarrier.id || 0) === 0) {
-                                        window.alert('You must selecte a carrier first!');
+                                        window.alert('You must select a carrier first!');
                                         return;
                                     }
 
                                     if ((selectedDriver?.id || 0) === 0) {
-                                        window.alert('You must selecte a driver first!');
+                                        window.alert('You must select a driver first!');
                                         return;
                                     }
 
