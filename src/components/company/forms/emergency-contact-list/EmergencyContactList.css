@@ -1,0 +1,78 @@
+.emergency-contact-list .form-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper {
+  width: 200%;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  display: flex;
+  transition: ease 0.3s;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box {
+  width: 50%;
+  position: relative;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .contact-list-header {
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #000000;
+  min-height: 1rem;
+  max-height: 1rem;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.first-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.last-name {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.phone-work {
+  min-width: 5rem;
+  max-width: 5rem;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.email-work {
+  flex-grow: 1;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.pri {
+  text-align: center;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1rem);
+  bottom: 0;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper .contact-list-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 5px;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper .contact-list-item > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .contact-list-wrapper .contact-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-search-box {
+  width: 50%;
+}

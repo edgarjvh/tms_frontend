@@ -5059,6 +5059,17 @@ const Agents = (props) => {
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.delete || 0) === 0)
                                     ? 'mochi-button disabled' : 'mochi-button'
                             } onClick={() => {
+                                
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Add Driver</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                            <div className={
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.delete || 0) === 0)
+                                    ? 'mochi-button disabled' : 'mochi-button'
+                            } onClick={() => {
                                 if ((selectedAgent.id || 0) === 0) {
                                     window.alert('You must select an agent first!');
                                     return;
@@ -5110,7 +5121,6 @@ const Agents = (props) => {
 
                                     if (key === 9) {
 
-
                                         if (e.target.value.trim() !== '') {
                                             axios.post(props.serverUrl + '/getAgentDriverByCode', { code: e.target.value.trim() }).then(res => {
                                                 if (res.data.result === 'OK') {
@@ -5134,11 +5144,14 @@ const Agents = (props) => {
                                 }}
                                 value={selectedDriver?.code || ''} />
                         </div>
-                        <div className="form-h-sep"></div>
-                        <div className="input-box-container grow">
+                    </div>
+
+                    <div className="form-v-sep"></div>
+                    <div className="form-row">
+                        <div className="input-box-container" style={{width: '40%'}}>
                             <input tabIndex={31 + props.tabTimes} type="text" placeholder="First Name"
                                 style={{
-                                    textTransform: 'capitalize'
+                                    textTransform: 'capitalize'                                    
                                 }}
                                 ref={refDriverName}
                                 readOnly={
@@ -5176,9 +5189,7 @@ const Agents = (props) => {
                                 value={selectedDriver?.last_name || ''} />
                         </div>
                     </div>
-
                     <div className="form-v-sep"></div>
-
                     <div className="form-row">
                         <div className="input-box-container" style={{ width: '40%' }}>
                             <MaskedInput tabIndex={33 + props.tabTimes}
@@ -5603,7 +5614,7 @@ const Agents = (props) => {
                     </div>
                     <div className="form-v-sep"></div>
                     <div className="form-row">
-                        <div className="input-box-container grow">
+                        <div className="input-box-container" style={{width: '40%'}}>
                             <input tabIndex={36 + props.tabTimes} type="text" placeholder="Truck"
                                 readOnly={
                                     (props.user?.user_code?.is_admin || 0) === 0 &&
@@ -5698,11 +5709,22 @@ const Agents = (props) => {
 
                     <div className="form-row" style={{
                         display: 'flex',
-                        justifyContent: 'center',
+                        justifyContent: 'space-evenly',
                         alignItems: 'flex-end',
                         flexGrow: 1,
                         paddingBottom: 10
                     }}>
+                        <div className={
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0)
+                                ? 'mochi-button disabled' : 'mochi-button'
+                        }>
+                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                            <div className="mochi-button-base">More Info</div>
+                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                        </div>
+
                         <div className={
                             ((props.user?.user_code?.is_admin || 0) === 0 &&
                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0 &&
@@ -5719,7 +5741,7 @@ const Agents = (props) => {
                 <div className="fields-container-col" style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr',
-                    gridTemplateRows: 'auto auto',
+                    gridTemplateRows: 'auto',
                     gridGap: '10px'
                 }}>
                     {/*CREDIT FORM*/}
@@ -5778,6 +5800,78 @@ const Agents = (props) => {
                                     fontSize: '0.7rem',
                                     color: 'rgba(0,0,0,0.7)',
                                     whiteSpace: 'nowrap'
+                                }}>Agent Pay ET3
+                                </div>
+                                <input tabIndex={44 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9) {
+                                            saveAgent(e);
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_et3: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    onChange={e => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_et3: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedAgent?.agent_pay_et3 || ''} />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{
+                                    fontSize: '0.7rem',
+                                    color: 'rgba(0,0,0,0.7)',
+                                    whiteSpace: 'nowrap'
+                                }}>Agent Pay Outside Broker
+                                </div>
+                                <input tabIndex={44 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9) {
+                                            saveAgent(e);
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_outside_broker: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    onChange={e => {
+                                        setSelectedAgent(selectedAgent => {
+                                            return {
+                                                ...selectedAgent,
+                                                agent_pay_outside_broker: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedAgent?.agent_pay_outside_broker || ''} />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="input-box-container grow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{
+                                    fontSize: '0.7rem',
+                                    color: 'rgba(0,0,0,0.7)',
+                                    whiteSpace: 'nowrap'
                                 }}>Agent Pay Company Trucks
                                 </div>
                                 <input tabIndex={45 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
@@ -5826,6 +5920,8 @@ const Agents = (props) => {
 
                                         if (key === 9) {
                                             saveAgent(e);
+
+                                            refAgentName.current.focus();
                                         }
                                     }}
                                     onInput={(e) => {
@@ -5872,106 +5968,7 @@ const Agents = (props) => {
                             </div>
                         </div>
                     </div>
-
-                    {/*HOURS FORM*/}
-                    <div className="form-bordered-box" style={{
-                        flexGrow: 0,
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gridGap: '5px'
-                    }}>
-                        <div className="form-header">
-                            <div className="top-border top-border-left"></div>
-                            <div className="form-title">Hours</div>
-                            <div className="top-border top-border-middle"></div>
-                            <div className="top-border top-border-right"></div>
-                        </div>
-
-                        <div className="input-box-container ">
-                            <input tabIndex={47 + props.tabTimes} type="text" placeholder="Open"
-                                onBlur={(e) => {
-                                    saveHours(e, 'hours open')
-                                }}
-                                onChange={e => {
-                                    setSelectedAgent(selectedAgent => {
-                                        return {
-                                            ...selectedAgent,
-                                            hours: {
-                                                ...(selectedAgent?.hours || {}),
-                                                hours_open: e.target.value
-                                            }
-                                        }
-                                    })
-                                }}
-                                value={(selectedAgent?.hours?.hours_open || '')} />
-                        </div>
-
-                        <div className="input-box-container ">
-                            <input tabIndex={48 + props.tabTimes} type="text" placeholder="Close"
-                                onBlur={(e) => {
-                                    saveHours(e, 'hours close')
-                                }}
-                                onChange={e => {
-                                    setSelectedAgent(selectedAgent => {
-                                        return {
-                                            ...selectedAgent,
-                                            hours: {
-                                                ...(selectedAgent?.hours || {}),
-                                                hours_close: e.target.value
-                                            }
-                                        }
-                                    })
-                                }}
-                                value={(selectedAgent?.hours?.hours_close || '')} />
-                        </div>
-
-                        <div className="input-box-container ">
-                            <input tabIndex={49 + props.tabTimes} type="text" placeholder="Open"
-                                onBlur={(e) => {
-                                    saveHours(e, 'hours open 2')
-                                }}
-                                onChange={e => {
-                                    setSelectedAgent(selectedAgent => {
-                                        return {
-                                            ...selectedAgent,
-                                            hours: {
-                                                ...(selectedAgent?.hours || {}),
-                                                hours_open2: e.target.value
-                                            }
-                                        }
-                                    })
-                                }}
-                                value={(selectedAgent?.hours?.hours_open2 || '')} />
-                        </div>
-
-                        <div className="input-box-container ">
-                            <input tabIndex={50 + props.tabTimes} type="text" placeholder="Close"
-                                onKeyDown={(e) => {
-                                    let key = e.keyCode || e.which;
-
-                                    if (key === 9) {
-                                        e.preventDefault();
-
-                                        saveAgent(e, true);
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    saveHours(e, 'hours close 2')
-                                }}
-                                onChange={e => {
-                                    setSelectedAgent(selectedAgent => {
-                                        return {
-                                            ...selectedAgent,
-                                            hours: {
-                                                ...(selectedAgent?.hours || {}),
-                                                hours_close2: e.target.value
-                                            }
-                                        }
-                                    })
-                                }}
-                                value={(selectedAgent?.hours?.hours_close2 || '')} />
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <div></div>

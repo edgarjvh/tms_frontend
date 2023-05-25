@@ -15454,6 +15454,7 @@ const Dispatch = (props) => {
                                                         <input
                                                             tabIndex={37 + props.tabTimes}
                                                             type="text"
+                                                            style={{textTransform: 'capitalize'}}
                                                             placeholder="Address 1"
                                                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                             onInput={(e) => {
@@ -15600,6 +15601,7 @@ const Dispatch = (props) => {
                                                         <input
                                                             tabIndex={38 + props.tabTimes}
                                                             type="text"
+                                                            style={{textTransform: 'capitalize'}}
                                                             placeholder="Address 2"
                                                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                             onInput={(e) => {
@@ -15746,6 +15748,7 @@ const Dispatch = (props) => {
                                                         <input
                                                             tabIndex={39 + props.tabTimes}
                                                             type="text"
+                                                            style={{textTransform: 'capitalize'}}
                                                             placeholder="City"
                                                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                             onInput={(e) => {
@@ -16177,6 +16180,7 @@ const Dispatch = (props) => {
                                                                 tabIndex={42 + props.tabTimes}
                                                                 type="text"
                                                                 placeholder="Contact Name"
+                                                                style={{textTransform: 'capitalize'}}
                                                                 ref={refConsigneeContactName}
                                                                 readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                                 onKeyDown={async (e) => {
@@ -16934,7 +16938,7 @@ const Dispatch = (props) => {
                                                                 tabIndex={43 + props.tabTimes}
                                                                 mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/,]}
                                                                 guide={true}
-                                                                type="text"
+                                                                type="text"                                                                
                                                                 placeholder="Contact Phone"
                                                                 ref={refConsigneeContactPhone}
                                                                 readOnly={(selectedOrder?.is_cancelled || 0) === 1}

@@ -1,0 +1,48 @@
+.selected-parent-contact-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.selected-parent-contact-primary-phone.pushed {
+  right: 20px;
+}
+.selected-parent-contact-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.selected-parent-contact-primary-email.pushed {
+  right: 20px;
+}
+.selected-mailing-contact-primary-phone {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.selected-mailing-contact-primary-phone.pushed {
+  right: 20px;
+}
+.selected-mailing-contact-primary-email {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.selected-mailing-contact-primary-email.pushed {
+  right: 20px;
+}

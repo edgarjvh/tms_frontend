@@ -21,7 +21,8 @@ import {
     DriverSearch,
     Operators,
     OperatorSearch,
-    Divisions
+    Divisions,
+    CompanyDrivers
 } from './../panels';
 
 import {
@@ -1308,44 +1309,48 @@ function CompanySetup(props) {
                             value={selectedCompany?.ein || ''} />
                     </div>
                     <div className="input-box-container">
-                        <input tabIndex={48 + props.tabTimes} type="text" placeholder="Zulip Name"
-                            id="txt-company-zulip-name"
+                        <input tabIndex={48 + props.tabTimes} type="text" placeholder="MC Number"
+                            id="txt-company-mc-number"
                             onInput={e => {
                                 setSelectedCompany({
                                     ...selectedCompany,
-                                    zulip_name: e.target.value
+                                    mc_number: e.target.value
                                 })
                             }}
                             onChange={e => {
                                 setSelectedCompany({
                                     ...selectedCompany,
-                                    zulip_name: e.target.value
+                                    mc_number: e.target.value
                                 })
                             }}
-                            value={selectedCompany?.zulip_name || ''} />
+                            value={selectedCompany?.mc_number || ''} />
                     </div>
                     <div className="input-box-container">
-                        <input tabIndex={49 + props.tabTimes} type="text" placeholder="Jitsi Name"
-                            id="txt-company-jitsi-name"
+                        <input tabIndex={49 + props.tabTimes} type="text" placeholder="DOT Number"
+                            id="txt-company-dot-number"
                             onKeyDown={e => {
-                                e.preventDefault();
-                                validateCompanyForSaving(e);
+                                let key = e.keyCode || e.which;
 
-                                refCompanyCode.current.focus();
+                                if (key === 9){
+                                    e.preventDefault();
+                                    validateCompanyForSaving(e);
+                                    refCompanyCode.current.focus();
+                                }
+
                             }}
                             onInput={e => {
                                 setSelectedCompany({
                                     ...selectedCompany,
-                                    jitsi_name: e.target.value
+                                    dot_number: e.target.value
                                 })
                             }}
                             onChange={e => {
                                 setSelectedCompany({
                                     ...selectedCompany,
-                                    jitsi_name: e.target.value
+                                    dot_number: e.target.value
                                 })
                             }}
-                            value={selectedCompany?.jitsi_name || ''} />
+                            value={selectedCompany?.dot_number || ''} />
                     </div>
                 </div>
             </div>
@@ -4486,11 +4491,11 @@ function CompanySetup(props) {
                                     }
 
                                     let panel = {
-                                        panelName: `${props.panelName}-drivers`,
-                                        component: <Drivers
-                                            title='Driver'
+                                        panelName: `${props.panelName}-company-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Company Driver'
                                             tabTimes={322000 + props.tabTimes}
-                                            panelName={`${props.panelName}-drivers`}
+                                            panelName={`${props.panelName}-company-drivers`}
                                             savingDriverUrl='/saveDriver'
                                             deletingDriverUrl='/deleteDriver'
                                             uploadAvatarUrl='/uploadDriverAvatar'

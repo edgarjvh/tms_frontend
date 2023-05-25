@@ -829,11 +829,11 @@ const Drivers = (props) => {
                                             <div className="mochi-button-base">Chat</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                         </div>
-                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                        {/* <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Video</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>
@@ -928,14 +928,14 @@ const Drivers = (props) => {
                                         </div>
                                     </div>
 
-                                    <div className="username-video">
+                                    {/* <div className="username-video">
                                         <div className="driver-username">@username</div>
                                         <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Video</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="driver-buttons">

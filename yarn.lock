@@ -5631,6 +5631,11 @@ file-loader@6.1.1:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
+file-saver@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
+  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
+
 file-uri-to-path@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
@@ -12598,6 +12603,16 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
+
+vcard-creator@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/vcard-creator/-/vcard-creator-0.6.0.tgz#bfbc9c2b39509c16f087a3de25e013e1eaa9d556"
+  integrity sha512-X++vIvcdydbsf+5eLMzS/xRmDQ+cQmceqSJCTBdMNQUzZfYjiiksyuwraWxqJ4N94ZzQoCbqhZ20XN9wXYJ3jg==
+
+vcards-js@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/vcards-js/-/vcards-js-2.10.0.tgz#70871c3c6f1f154ae0b4925d761bfe7ac2c8502a"
+  integrity sha512-nah+xbVInVJaO6+C5PEUqaougmv8BN8aa7ZCtmVQcX6eWIZGRukckFtseXSI7KD7/nXtwkJe624y42T0r+L+AQ==
 
 vendors@^1.0.0:
   version "1.0.4"

@@ -2,6 +2,7 @@ export {default as Employees} from './employees/Employees';
 export {default as EmployeeSearch} from './employee-search/EmployeeSearch';
 export {default as Agents} from './agents/Agents';
 export {default as AgentSearch} from './agent-search/AgentSearch';
+export {default as CompanyDrivers} from './company-drivers/CompanyDrivers';
 export {default as Drivers} from './drivers/Drivers';
 export {default as DriverSearch} from './driver-search/DriverSearch';
 export {default as Operators} from './operators/Operators';

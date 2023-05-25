@@ -46,6 +46,13 @@ import {
 } from './../panels';
 
 import {
+    MainForm,
+    MailingAddressForm,
+    ContactForm,
+    ContactList as ContactListBox
+} from './../forms'
+
+import {
     Dispatch
 } from './../../company';
 
@@ -253,22 +260,6 @@ const Customers = (props) => {
         leave: { opacity: 0, top: "calc(100% + 7px)" },
         config: { duration: 100 },
         reverse: salesmanItems.length > 0
-    });
-
-    const customerContactPhonesTransition = useTransition(showCustomerContactPhones, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
-        reverse: showCustomerContactPhones
-    });
-
-    const customerContactEmailsTransition = useTransition(showCustomerContactEmails, {
-        from: { opacity: 0, top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, top: 'calc(100% + 7px)' },
-        config: { duration: 100 },
-        reverse: showCustomerContactEmails
     });
 
     const emailToTransition = useTransition(emailToDropdownItems.length > 0, {
@@ -1907,6 +1898,47 @@ const Customers = (props) => {
         return true;
     }
 
+    const contactListItemDoubleClick = (contact) => {
+        if (((props.user?.user_code?.is_admin || 0) === 0 &&
+            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)) {
+            return;
+        }
+
+        let panel = {
+            panelName: `${props.panelName}-contacts`,
+            component: <Contacts
+                title='Contacts'
+                tabTimes={22000 + props.tabTimes}
+                panelName={`${props.panelName}-contacts`}
+                savingContactUrl='/saveContact'
+                deletingContactUrl='/deleteContact'
+                uploadAvatarUrl='/uploadAvatar'
+                removeAvatarUrl='/removeAvatar'
+                permissionName='customer contacts'
+                origin={props.origin}
+                owner='customer'
+                openPanel={props.openPanel}
+                closePanel={props.closePanel}
+                componentId={moment().format('x')}
+
+                contactSearchCustomer={{
+                    ...selectedCustomer,
+                    selectedContact: {
+                        ...contact,
+                        company: (contact?.company || '') === '' ? props.selectedParent?.name || '' : contact.company,
+                        address1: (props.selectedParent?.address1 || '').toLowerCase() === (contact?.address1 || '').toLowerCase() ? (props.selectedParent?.address1 || '') : (contact?.address1 || ''),
+                        address2: (props.selectedParent?.address2 || '').toLowerCase() === (contact?.address2 || '').toLowerCase() ? (props.selectedParent?.address2 || '') : (contact?.address2 || ''),
+                        city: (props.selectedParent?.city || '').toLowerCase() === (contact?.city || '').toLowerCase() ? (props.selectedParent?.city || '') : (contact?.city || ''),
+                        state: (props.selectedParent?.state || '').toLowerCase() === (contact?.state || '').toLowerCase() ? (props.selectedParent?.state || '') : (contact?.state || ''),
+                        zip_code: (props.selectedParent?.zip || '').toLowerCase() === (contact?.zip_code || '').toLowerCase() ? (props.selectedParent?.zip || '') : (contact?.zip_code || ''),
+                    }
+                }}
+            />
+        }
+
+        props.openPanel(panel, props.origin);
+    }
+
     return (
         <div className="customers-main-container" style={{
             borderRadius: props.scale === 1 ? 0 : '20px',
@@ -1942,2040 +1974,100 @@ const Customers = (props) => {
             <div className="fields-container">
                 <div className="fields-container-row">
                     <div className="fields-container-col">
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Customer</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    {
-                                        ((props.user?.user_code?.is_admin || 0) === 1) &&
-                                        <div className="mochi-button" onClick={importCustomerBtnClick}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Import</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
-                                    <div className="mochi-button" onClick={searchCustomerBtnClick}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Search</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className="mochi-button" onClick={() => {
+                        <MainForm
+                            formTitle='Customer'
+                            formButtons={[
+                                {
+                                    title: 'Import',
+                                    onClick: () => {
+                                        importCustomerBtnClick();
+                                    },
+                                    isEnabled: true
+                                },
+                                {
+                                    title: 'Search',
+                                    onClick: () => {
+                                        searchCustomerBtnClick();
+                                    },
+                                    isEnabled: true
+                                },
+                                {
+                                    title: 'Clear',
+                                    onClick: () => {
                                         setInitialValues();
                                         refCustomerCode.current.focus();
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Clear</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                </div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
+                                    },
+                                    isEnabled: (props.user?.user_code?.is_admin || 0) === 1
+                                },
+                            ]}
+                            refs={{
+                                refCode: refCustomerCode,
+                                refName: refCustomerName,
+                                refEmail: refCustomerEmail
+                            }}
+                            tabTimesFrom={1}
+                            tabTimes={props.tabTimes}
+                            searchByCode={searchCustomerByCode}
+                            validateForSaving={validateCustomerForSaving}
+                            selectedParent={selectedCustomer}
+                            setSelectedParent={setSelectedCustomer}
+                            withEmail={1}
+                        />
 
-                            <div className="form-row">
-                                <div className="input-box-container input-code">
-                                    <input tabIndex={1 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                        id="txt-customer-code"
-                                        ref={refCustomerCode}
-                                        onKeyDown={searchCustomerByCode}
-                                        onInput={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                code: e.target.value,
-                                                code_number: 0
-                                            })
-                                        }}
-                                        onChange={e => {
-                                            setSelectedCustomer({
-                                                ...selectedCustomer,
-                                                code: e.target.value,
-                                                code_number: 0
-                                            })
-                                        }}
-                                        value={(selectedCustomer.code_number || 0) === 0 ? (selectedCustomer.code || '') : selectedCustomer.code + selectedCustomer.code_number} />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container grow">
-                                    <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name"
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
-                                        ref={refCustomerName}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onChange={e => setSelectedCustomer({
-                                            ...selectedCustomer,
-                                            name: e.target.value
-                                        })}
-                                        value={selectedCustomer?.name || ''} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onChange={e => setSelectedCustomer({
-                                            ...selectedCustomer,
-                                            address1: e.target.value
-                                        })}
-                                        value={selectedCustomer?.address1 || ''} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onChange={e => setSelectedCustomer({
-                                            ...selectedCustomer,
-                                            address2: e.target.value
-                                        })}
-                                        value={selectedCustomer?.address2 || ''} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={5 + props.tabTimes} type="text" placeholder="City"
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onChange={e => setSelectedCustomer({
-                                            ...selectedCustomer,
-                                            city: e.target.value
-                                        })}
-                                        value={selectedCustomer?.city || ''} />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container input-state">
-                                    <input tabIndex={6 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onChange={e => setSelectedCustomer({
-                                            ...selectedCustomer,
-                                            state: e.target.value
-                                        })}
-                                        value={selectedCustomer?.state || ''} />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container input-zip-code">
-                                    <input tabIndex={7 + props.tabTimes} type="text" placeholder="Postal Code"
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onKeyDown={validateCustomerForSaving}
-                                        onChange={e => setSelectedCustomer({
-                                            ...selectedCustomer,
-                                            zip: e.target.value
-                                        })}
-                                        value={selectedCustomer?.zip || ''} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact Name"
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onInput={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({
-                                                    ...selectedCustomer,
-                                                    contact_name: e.target.value
-                                                })
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({
-                                                    ...selectedCustomer,
-                                                    contact_name: e.target.value
-                                                })
-                                            }
-                                        }}
-                                        value={
-                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                                ? (((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.first_name || '') + ' ' +
-                                                    ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.last_name || '')).trim()
-                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
-                                                    ? (selectedCustomer?.contact_name || '')
-                                                    // ? ''
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).first_name + ' ' + selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).last_name
-
-                                        }
-                                    />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container input-phone" style={{ position: 'relative' }}>
-                                    <MaskedInput
-                                        tabIndex={9 + props.tabTimes}
-                                        mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text" placeholder="Contact Phone"
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onInput={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({
-                                                    ...selectedCustomer,
-                                                    contact_phone: e.target.value
-                                                })
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({
-                                                    ...selectedCustomer,
-                                                    contact_phone: e.target.value
-                                                })
-                                            }
-                                        }}
-                                        value={
-                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                                ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'work'
-                                                    ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_work
-                                                    : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'fax'
-                                                        ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_work_fax
-                                                        : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'mobile'
-                                                            ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_mobile
-                                                            : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'direct'
-                                                                ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_direct
-                                                                : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'other'
-                                                                    ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_other
-                                                                    : ''
-                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
-                                                    ? (selectedCustomer?.contact_phone || '')
-                                                    // ? ''
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'work'
-                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_work
-                                                        : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'fax'
-                                                            ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_work_fax
-                                                            : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'mobile'
-                                                                ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_mobile
-                                                                : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'direct'
-                                                                    ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_direct
-                                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'other'
-                                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_other
-                                                                        : ''
-
-                                        }
-                                    />
-
-                                    {
-                                        ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1) ||
-                                            ((selectedCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined)) &&
-                                        <div
-                                            className={classnames({
-                                                'selected-customer-contact-primary-phone': true,
-                                                'pushed': false
-                                            })}>
-                                            {
-                                                (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                                    ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone
-                                            }
-                                        </div>
-                                    }
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container input-phone-ext">
-                                    <input tabIndex={10 + props.tabTimes} type="text" placeholder="Ext"
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onInput={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({ ...selectedCustomer, ext: e.target.value })
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({ ...selectedCustomer, ext: e.target.value })
-                                            }
-                                        }}
-                                        value={
-                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                                ? ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone || 'work') === 'work'
-                                                    ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_ext
-                                                    : ''
-                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
-                                                    ? (selectedCustomer?.ext || '')
-                                                    // ? ''
-                                                    : (selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone || 'work') === 'work'
-                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_ext
-                                                        : ''
-
-                                        }
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container" style={{ position: 'relative', flexGrow: 1 }}
-                                    onMouseEnter={() => {
-                                        if ((selectedCustomer?.email || '') !== '') {
-                                            setShowCustomerEmailCopyBtn(true);
-                                        }
-                                    }}
-                                    onFocus={() => {
-                                        if ((selectedCustomer?.email || '') !== '') {
-                                            setShowCustomerEmailCopyBtn(true);
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        window.setTimeout(() => {
-                                            setShowCustomerEmailCopyBtn(false);
-                                        }, 1000);
-                                    }}
-                                    onMouseLeave={() => {
-                                        setShowCustomerEmailCopyBtn(false);
-                                    }}
-                                >
-                                    <input tabIndex={11 + props.tabTimes}
-                                        ref={refCustomerEmail}
-                                        type="text"
-                                        placeholder="E-Mail"
-                                        style={{ textTransform: 'lowercase' }}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer info')?.pivot?.edit || 0) === 0
-                                        }
-                                        onKeyDown={validateCustomerForSaving}
-                                        onInput={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({ ...selectedCustomer, email: e.target.value })
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            if ((selectedCustomer?.contacts || []).length === 0) {
-                                                setSelectedCustomer({ ...selectedCustomer, email: e.target.value })
-                                            }
-                                        }}
-                                        value={
-                                            (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                                ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email === 'work'
-                                                    ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).email_work
-                                                    : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email === 'personal'
-                                                        ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).email_personal
-                                                        : selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email === 'other'
-                                                            ? selectedCustomer?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).email_other
-                                                            : ''
-                                                : (selectedCustomer?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
-                                                    ? (selectedCustomer?.email || '')
-                                                    // ? ''
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email === 'work'
-                                                        ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).email_work
-                                                        : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email === 'personal'
-                                                            ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).email_personal
-                                                            : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email === 'other'
-                                                                ? selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).email_other
-                                                                : ''
-                                        }
-                                    />
-                                    {
-                                        ((selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1) ||
-                                            ((selectedCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined)) &&
-                                        <div
-                                            className={classnames({
-                                                'selected-customer-contact-primary-email': true,
-                                                'pushed': false
-                                            })}>
-                                            {
-                                                (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                                    ? (selectedCustomer?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_email
-                                                    : selectedCustomer?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_email
-                                            }
-                                        </div>
-                                    }
-
-                                    {
-                                        showCustomerEmailCopyBtn &&
-                                        <FontAwesomeIcon style={{
-                                            position: 'absolute',
-                                            top: '50%',
-                                            right: 30,
-                                            zIndex: 1,
-                                            cursor: 'pointer',
-                                            transform: 'translateY(-50%)',
-                                            color: '#2bc1ff',
-                                            margin: 0,
-                                            transition: 'ease 0.2s',
-                                            fontSize: '1rem'
-                                        }} icon={faCopy} onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigator.clipboard.writeText(refCustomerEmail.current.value);
-                                        }} />
-                                    }
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div className="fields-container-col" style={{ display: 'flex', flexDirection: 'row' }}>
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Mailing Address</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    <div className={
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.edit || 0) === 0)
-                                            ? 'mochi-button disabled' : 'mochi-button'
-                                    } onClick={mailingAddressBillToBtn}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Bill to</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className={
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0)
-                                            ? 'mochi-button disabled' : 'mochi-button'
-                                    } onClick={remitToAddressBtn}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base" style={{
-                                            color: (selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ? 'green' : 'black'
-                                        }}>Remit to address is the same</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className={
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0)
-                                            ? 'mochi-button disabled' : 'mochi-button'
-                                    } onClick={mailingAddressClearBtn}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Clear</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                </div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="input-box-container input-code" style={{
-                                    backgroundColor: (selectedCustomer?.mailing_customer_id || 0) > 0 ? 'lightgreen' : 'white'
-                                }}>
-                                    <input tabIndex={18 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                        ref={refCustomerMailingCode}
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.id || 0) === 0 ||
-                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
-                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
-                                        }
-                                        onKeyDown={(e) => {
-                                            let key = e.keyCode || e.which;
-
-                                            if (key === 9) {
-                                                if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 0 && (selectedCustomer?.mailing_customer_id || 0) === 0) {
-                                                    if (e.target.value.trim() !== '') {
-                                                        e.preventDefault();
-
-                                                        axios.post(props.serverUrl + '/getCustomerMailingAddressByCode', {
-                                                            code: e.target.value
-                                                        }).then(res => {
-                                                            if (res.data.result === 'OK') {
-                                                                if ((res.data.mailing_address || []).length > 0) {
-                                                                    let selectedCustomerCode = (selectedCustomer?.code || '') + ((selectedCustomer?.code_number || 0) === 0 ? '' : selectedCustomer.code_number);
-
-                                                                    let data = { ...res.data.mailing_address[0] };
-
-                                                                    if (data.type === 'customer') {
-                                                                        let dataCode = (data.code || '') + ((data.code_number || 0) === 0 ? '' : data.code_number);
-
-                                                                        if (selectedCustomerCode.toLowerCase() === dataCode.toLowerCase()) {
-                                                                            remitToAddressBtn();
-                                                                            refMailingContactName.current.focus();
-                                                                        } else {
-                                                                            let currentCustomer = { ...selectedCustomer };
-                                                                            currentCustomer.remit_to_address_is_the_same = 0;
-                                                                            currentCustomer.mailing_customer_id = data.id;
-                                                                            currentCustomer.mailing_address_id = null;
-
-                                                                            let mailing_address = { ...data };
-
-                                                                            if (mailing_address.contacts.findIndex(x => x.is_primary === 1) > -1) {
-                                                                                currentCustomer.mailing_customer_contact_id = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].id;
-
-                                                                                currentCustomer.mailing_customer_contact_primary_phone = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ''
-                                                                                    ? 'work'
-                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ''
-                                                                                        ? 'fax'
-                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ''
-                                                                                            ? 'mobile'
-                                                                                            : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ''
-                                                                                                ? 'direct'
-                                                                                                : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ''
-                                                                                                    ? 'other' : 'work';
-
-                                                                                currentCustomer.mailing_customer_contact_primary_email = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_work !== ''
-                                                                                    ? 'work'
-                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_personal !== ''
-                                                                                        ? 'personal'
-                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_other !== ''
-                                                                                            ? 'other' : 'work';
-
-                                                                                mailing_address.contact_name = (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.first_name || '') + ' ' +
-                                                                                    (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.last_name || '');
-
-                                                                                mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ''
-                                                                                    : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ''
-                                                                                        : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
-                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ''
-                                                                                            : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
-                                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ''
-                                                                                                : currentCustomer.mailing_customer_contact_primary_phone === 'other'
-                                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ''
-                                                                                                    : '';
-
-                                                                                mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || ''
-                                                                                    : '';
-
-                                                                                mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
-                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ''
-                                                                                    : currentCustomer.mailing_customer_contact_primary_email === 'personal'
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ''
-                                                                                        : currentCustomer.mailing_customer_contact_primary_email === 'other'
-                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ''
-                                                                                            : '';
-
-                                                                            } else if (mailing_address.contacts.length > 0) {
-                                                                                currentCustomer.mailing_customer_contact_id = mailing_address.contacts[0].id;
-
-                                                                                currentCustomer.mailing_customer_contact_primary_phone = mailing_address.contacts[0].phone_work !== ''
-                                                                                    ? 'work'
-                                                                                    : mailing_address.contacts[0].phone_work_fax !== ''
-                                                                                        ? 'fax'
-                                                                                        : mailing_address.contacts[0].phone_mobile !== ''
-                                                                                            ? 'mobile'
-                                                                                            : mailing_address.contacts[0].phone_direct !== ''
-                                                                                                ? 'direct'
-                                                                                                : mailing_address.contacts[0].phone_other !== ''
-                                                                                                    ? 'other' : 'work';
-
-                                                                                currentCustomer.mailing_customer_contact_primary_email = mailing_address.contacts[0].email_work !== ''
-                                                                                    ? 'work'
-                                                                                    : mailing_address.contacts[0].email_personal !== ''
-                                                                                        ? 'personal'
-                                                                                        : mailing_address.contacts[0].email_other !== ''
-                                                                                            ? 'other' : 'work';
-
-                                                                                mailing_address.contact_name = (mailing_address.contacts[0]?.first_name || '') + ' ' + (mailing_address.contacts[0]?.last_name || '');
-
-                                                                                mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                                    ? mailing_address.contacts[0]?.phone_work || ''
-                                                                                    : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
-                                                                                        ? mailing_address.contacts[0]?.phone_work_fax || ''
-                                                                                        : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
-                                                                                            ? mailing_address.contacts[0]?.phone_mobile || ''
-                                                                                            : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
-                                                                                                ? mailing_address.contacts[0]?.phone_direct || ''
-                                                                                                : currentCustomer.mailing_customer_contact_primary_phone === 'other'
-                                                                                                    ? mailing_address.contacts[0]?.phone_other || ''
-                                                                                                    : '';
-
-                                                                                mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                                    ? mailing_address.contacts[0]?.phone_ext || ''
-                                                                                    : '';
-
-                                                                                mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
-                                                                                    ? mailing_address.contacts[0]?.email_work || ''
-                                                                                    : currentCustomer.mailing_customer_contact_primary_email === 'personal'
-                                                                                        ? mailing_address.contacts[0]?.email_personal || ''
-                                                                                        : currentCustomer.mailing_customer_contact_primary_email === 'other'
-                                                                                            ? mailing_address.contacts[0]?.email_other || ''
-                                                                                            : '';
-                                                                            } else {
-                                                                                currentCustomer.mailing_customer_contact_id = null;
-                                                                                currentCustomer.mailing_customer_contact_primary_phone = 'work';
-                                                                                currentCustomer.mailing_customer_contact_primary_email = 'work';
-                                                                            }
-
-                                                                            setSelectedCustomer({ ...currentCustomer, mailing_address: mailing_address });
-                                                                            validateCustomerForSaving(e);
-                                                                            refCustomerMailingName.current.focus();
-                                                                        }
-                                                                    } else if (data.type === 'mailing') {
-                                                                        setSelectedCustomer(prev => {
-                                                                            return {
-                                                                                ...prev,
-                                                                                remit_to_address_is_the_same: 0,
-                                                                                mailing_customer_id: null,
-                                                                                mailing_address_id: data.id,
-                                                                                mailing_address: { ...data }
-                                                                            }
-                                                                        });
-
-                                                                        validateCustomerForSaving(e);
-                                                                        refCustomerMailingName.current.focus();
-                                                                    }
-                                                                }
-                                                            }
-                                                        }).catch(e => {
-                                                            console.log(e);
-                                                        })
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...prev?.mailing_address,
-                                                        code: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={(selectedCustomer?.mailing_address?.code || '') + ((selectedCustomer?.mailing_address?.code_number || 0) === 0 ? '' : selectedCustomer?.mailing_address?.code_number)} />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container grow">
-                                    <input tabIndex={19 + props.tabTimes} type="text" placeholder="Name"
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
-                                        ref={refCustomerMailingName}
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.id || 0) === 0 ||
-                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
-                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
-                                        }
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...prev?.mailing_address,
-                                                        name: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={(selectedCustomer?.mailing_address?.name || '')} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={20 + props.tabTimes} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.id || 0) === 0 ||
-                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
-                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
-                                        }
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...prev?.mailing_address,
-                                                        address1: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={(selectedCustomer?.mailing_address?.address1 || '')} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.id || 0) === 0 ||
-                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
-                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
-                                        }
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...prev?.mailing_address,
-                                                        address2: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={(selectedCustomer?.mailing_address?.address2 || '')} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={22 + props.tabTimes} type="text" placeholder="City"
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.id || 0) === 0 ||
-                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
-                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
-                                        }
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...prev?.mailing_address,
-                                                        city: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={(selectedCustomer?.mailing_address?.city || '')} />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container input-state">
-                                    <input tabIndex={23 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.id || 0) === 0 ||
-                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
-                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
-                                        }
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...prev?.mailing_address,
-                                                        state: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={(selectedCustomer?.mailing_address?.state || '')} />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container input-zip-code">
-                                    <input tabIndex={24 + props.tabTimes} type="text" placeholder="Postal Code"
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.id || 0) === 0 ||
-                                                (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 ||
-                                                (selectedCustomer?.mailing_customer_id || 0) > 0))
-                                        }
-                                        onKeyDown={(e) => {
-                                            let key = e.keyCode || e.which;
-
-                                            if (key === 9){
-                                                if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 0 &&
-                                                (selectedCustomer?.mailing_customer_id || 0) === 0 &&
-                                                (selectedCustomer?.id || 0) > 0){
-                                                    validateMailingAddressForSaving(e)
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...prev?.mailing_address,
-                                                        zip: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={(selectedCustomer?.mailing_address?.zip || '')} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="select-box-container" style={{ flexGrow: 1 }}>
-                                    <div className="select-box-wrapper">
-                                        <input
-                                            style={{
-                                                textTransform: 'capitalize'
-                                            }}
-                                            readOnly={
-                                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0 ||
-                                                (selectedCustomer?.mailing_address?.id || 0) === 0
-                                            }
-                                            tabIndex={25 + props.tabTimes}
-                                            type="text"
-                                            placeholder="Contact Name"
-                                            ref={refMailingContactName}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
-
-                                                switch (key) {
-                                                    case 37:
-                                                    case 38: // arrow left | arrow up
-                                                        // e.preventDefault();
-                                                        if (showMailingContactNames) {
-                                                            let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (mailingContactNameItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            let contacts = [];
-
-                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
-                                                                contacts = selectedCustomer?.contacts || [];
-                                                            }
-
-                                                            if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
-                                                                contacts = selectedCustomer?.mailing_address?.contacts || [];
-                                                            }
-
-                                                            if (contacts.length > 0) {
-                                                                await setMailingContactNameItems(contacts.map((item, index) => {
-                                                                    item.selected = index === 0
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactNames(true);
-
-                                                                refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 39:
-                                                    case 40: // arrow right | arrow down
-                                                        // e.preventDefault();
-                                                        if (showMailingContactNames) {
-                                                            let selectedIndex = mailingContactNameItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactNameItems(mailingContactNameItems.map((item, index) => {
-                                                                    if (selectedIndex === (mailingContactNameItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            let contacts = [];
-
-                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
-                                                                contacts = selectedCustomer?.contacts || [];
-                                                            }
-
-                                                            if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
-                                                                contacts = selectedCustomer?.mailing_address?.contacts || [];
-                                                            }
-
-                                                            if (contacts.length > 0) {
-                                                                await setMailingContactNameItems(contacts.map((item, index) => {
-                                                                    item.selected = index === 0
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactNames(true);
-
-                                                                refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setShowMailingContactNames(false);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (showMailingContactNames && mailingContactNameItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedCustomer(prev => {
-                                                                return {
-                                                                    ...prev,
-                                                                    mailing_customer_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                                    mailing_customer_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
-                                                                        ? 'work'
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
-                                                                            ? 'fax'
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
-                                                                                ? 'mobile'
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
-                                                                                    ? 'direct'
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
-                                                                                        ? 'other' :
-                                                                                        '',
-                                                                    mailing_address: {
-                                                                        ...(prev?.mailing_address || {}),
-                                                                        contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
-                                                                            + ' '
-                                                                            + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
-                                                                        contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
-                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
-                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
-                                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
-                                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
-                                                                                            : '',
-                                                                        ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
-                                                                        email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
-                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
-                                                                                    : ''
-
-                                                                    }
-                                                                }
-                                                            });
-
-                                                            // validateMailingAddressForSaving({keyCode: 9});
-                                                            setShowMailingContactNames(false);
-                                                            refMailingContactName.current.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (showMailingContactNames) {
-                                                            e.preventDefault();
-                                                            await setSelectedCustomer(prev => {
-                                                                return {
-                                                                    ...prev,
-                                                                    mailing_customer_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                                    mailing_customer_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
-                                                                        ? 'work'
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
-                                                                            ? 'fax'
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
-                                                                                ? 'mobile'
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
-                                                                                    ? 'direct'
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
-                                                                                        ? 'other' :
-                                                                                        '',
-                                                                    mailing_address: {
-                                                                        ...(prev?.mailing_address || {}),
-                                                                        contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || '')
-                                                                            + ' '
-                                                                            + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || '')).trim(),
-                                                                        contact_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'work'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'fax'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '')
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'mobile'
-                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || '')
-                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'direct'
-                                                                                        ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || '')
-                                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || '') === 'other'
-                                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || '')
-                                                                                            : '',
-                                                                        ext: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || ''),
-                                                                        email: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'work'
-                                                                            ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || '')
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'personal'
-                                                                                ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || '')
-                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || '') === 'other'
-                                                                                    ? (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || '')
-                                                                                    : ''
-
-                                                                    }
-                                                                }
-                                                            });
-
-                                                            // validateMailingAddressForSaving({keyCode: 9});
-                                                            setShowMailingContactNames(false);
-                                                            refMailingContactName.current.focus();
-                                                        } else {
-                                                            // validateMailingAddressForSaving({keyCode: 9});
-                                                        }
-                                                        break;
-
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onBlur={e => {
-                                                let contacts = [];
-
-                                                if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
-                                                    contacts = (selectedCustomer?.contacts || []);
-
-                                                    let contact = contacts.find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
-
-                                                    if (contact) {
-                                                        setSelectedCustomer(prev => {
-                                                            return {
-                                                                ...prev,
-                                                                mailing_customer_contact_id: contact.id,
-                                                                mailing_address: {
-                                                                    ...(prev?.mailing_address || {}),
-                                                                    contact_phone: (contact.primary_phone || '') === 'work'
-                                                                        ? (contact.phone_work || '')
-                                                                        : (contact.primary_phone || '') === 'fax'
-                                                                            ? (contact.phone_work_fax || '')
-                                                                            : (contact.primary_phone || '') === 'mobile'
-                                                                                ? (contact.phone_mobile || '')
-                                                                                : (contact.primary_phone || '') === 'direct'
-                                                                                    ? (contact.phone_direct || '')
-                                                                                    : (contact.primary_phone || '') === 'other'
-                                                                                        ? (contact.phone_other || '')
-                                                                                        : '',
-                                                                    ext: (contact.phone_ext || ''),
-                                                                    email: (contact.primary_email || '') === 'work'
-                                                                        ? (contact.email_work || '')
-                                                                        : (contact.primary_email || '') === 'personal'
-                                                                            ? (contact.email_personal || '')
-                                                                            : (contact.primary_email || '') === 'other'
-                                                                                ? (contact.email_other || '')
-                                                                                : ''
-                                                                }
-                                                            }
-                                                        })
-                                                    } else {
-                                                        setSelectedCustomer(prev => {
-                                                            return {
-                                                                ...prev,
-                                                                mailing_customer_contact_id: null
-                                                            }
-                                                        })
-                                                    }
-                                                } else if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
-                                                    contacts = (selectedCustomer?.mailing_address?.contacts || []);
-
-                                                    let contact = contacts.find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
-
-                                                    if (contact) {
-                                                        setSelectedCustomer(prev => {
-                                                            return {
-                                                                ...prev,
-                                                                mailing_customer_contact_id: contact.id,
-                                                                mailing_address: {
-                                                                    ...(prev?.mailing_address || {}),
-                                                                    contact_phone: (contact.primary_phone || '') === 'work'
-                                                                        ? (contact.phone_work || '')
-                                                                        : (contact.primary_phone || '') === 'fax'
-                                                                            ? (contact.phone_work_fax || '')
-                                                                            : (contact.primary_phone || '') === 'mobile'
-                                                                                ? (contact.phone_mobile || '')
-                                                                                : (contact.primary_phone || '') === 'direct'
-                                                                                    ? (contact.phone_direct || '')
-                                                                                    : (contact.primary_phone || '') === 'other'
-                                                                                        ? (contact.phone_other || '')
-                                                                                        : '',
-                                                                    ext: (contact.phone_ext || ''),
-                                                                    email: (contact.primary_email || '') === 'work'
-                                                                        ? (contact.email_work || '')
-                                                                        : (contact.primary_email || '') === 'personal'
-                                                                            ? (contact.email_personal || '')
-                                                                            : (contact.primary_email || '') === 'other'
-                                                                                ? (contact.email_other || '')
-                                                                                : ''
-                                                                }
-                                                            }
-                                                        })
-                                                    } else {
-                                                        setSelectedCustomer(prev => {
-                                                            return {
-                                                                ...prev,
-                                                                mailing_customer_contact_id: null
-                                                            }
-                                                        })
-                                                    }
-                                                }
-                                            }}
-                                            onChange={e => {
-                                                setSelectedCustomer(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        mailing_address: {
-                                                            ...(prev?.mailing_address || {}),
-                                                            contact_name: e.target.value
-                                                        }
-                                                    }
-                                                })
-                                            }}
-                                            value={(selectedCustomer?.mailing_address?.contact_name || '')}
-                                        />
-
-                                        {
-                                            (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 && (selectedCustomer?.contacts || []).length > 0) ||
-                                                ((selectedCustomer?.mailing_customer_id || 0) > 0 && (selectedCustomer?.mailing_address?.contacts || []).length > 0)) &&
-                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                onClick={async () => {
-                                                    if (showMailingContactNames) {
-                                                        setShowMailingContactNames(false);
-                                                    } else {
-                                                        let contacts = [];
-
-                                                        if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1) {
-                                                            contacts = selectedCustomer?.contacts || [];
-                                                        }
-
-                                                        if ((selectedCustomer?.mailing_customer_id || 0) > 0) {
-                                                            contacts = selectedCustomer?.mailing_address?.contacts || [];
-                                                        }
-
-
-
-                                                        if (contacts.length > 0) {
-                                                            await setMailingContactNameItems(contacts.map((item, index) => {
-                                                                item.selected = index === 0
-                                                                return item;
-                                                            }))
-
-                                                            window.setTimeout(() => {
-                                                                setShowMailingContactNames(true);
-
-                                                                refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }, 100);
-                                                        }
-                                                    }
-
-                                                    refMailingContactName.current.focus();
-                                                }} />
-                                        }
-                                    </div>
-                                    {
-                                        mailingContactNamesTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-names"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refMailingContactNameDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                mailingContactNameItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedCustomer(prev => {
-                                                                                    return {
-                                                                                        ...prev,
-                                                                                        mailing_customer_contact_id: item.id,
-                                                                                        mailing_customer_contact_primary_phone: (item.phone_work || '') !== ''
-                                                                                            ? 'work'
-                                                                                            : (item.phone_work_fax || '') !== ''
-                                                                                                ? 'fax'
-                                                                                                : (item.phone_mobile || '') !== ''
-                                                                                                    ? 'mobile'
-                                                                                                    : (item.phone_direct || '') !== ''
-                                                                                                        ? 'direct'
-                                                                                                        : (item.phone_other || '') !== ''
-                                                                                                            ? 'other' :
-                                                                                                            '',
-                                                                                        mailing_address: {
-                                                                                            ...(prev?.mailing_address || {}),
-                                                                                            contact_name: (item.first_name + ' ' + item.last_name).trim(),
-                                                                                            contact_phone: (item.primary_phone || '') === 'work'
-                                                                                                ? (item.phone_work || '')
-                                                                                                : (item.primary_phone || '') === 'fax'
-                                                                                                    ? (item.phone_work_fax || '')
-                                                                                                    : (item.primary_phone || '') === 'mobile'
-                                                                                                        ? (item.phone_mobile || '')
-                                                                                                        : (item.primary_phone || '') === 'direct'
-                                                                                                            ? (item.phone_direct || '')
-                                                                                                            : (item.primary_phone || '') === 'other'
-                                                                                                                ? (item.phone_other || '')
-                                                                                                                : '',
-                                                                                            ext: (item.phone_ext || ''),
-                                                                                            email: (item.primary_email || '') === 'work'
-                                                                                                ? (item.email_work || '')
-                                                                                                : (item.primary_email || '') === 'personal'
-                                                                                                    ? (item.email_personal || '')
-                                                                                                    : (item.primary_email || '') === 'other'
-                                                                                                        ? (item.email_other || '')
-                                                                                                        : ''
-                                                                                        }
-                                                                                    }
-                                                                                });
-
-                                                                                // validateMailingAddressForSaving({keyCode: 9});
-                                                                                setShowMailingContactNames(false);
-                                                                                refMailingContactName.current.focus();
-                                                                            }}
-                                                                            ref={ref => refMailingContactNamePopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.first_name + ((item.last_name || '') === '' ? '' : ' ' + item.last_name)
-                                                                            }
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight} />
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-
-                                <div className="form-h-sep"></div>
-                                <div className="select-box-container input-phone">
-                                    <div className="select-box-wrapper">
-                                        <MaskedInput tabIndex={26 + props.tabTimes}
-                                            readOnly={
-                                                ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.mailing_address?.id || 0) === 0
-                                            }
-                                            mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                            guide={true}
-                                            type="text"
-                                            placeholder="Contact Phone"
-                                            ref={refMailingContactPhone}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
-
-                                                switch (key) {
-                                                    case 37:
-                                                    case 38: // arrow left | arrow up
-                                                        if (showMailingContactPhones) {
-                                                            let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (mailingContactPhoneItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (mailingContactPhoneItems.length > 1) {
-                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactPhones(true);
-
-                                                                refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 39:
-                                                    case 40: // arrow right | arrow down
-                                                        if (showMailingContactPhones) {
-                                                            let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === (mailingContactPhoneItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (mailingContactPhoneItems.length > 1) {
-                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactPhones(true);
-
-                                                                refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setShowMailingContactPhones(false);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedCustomer(prev => {
-                                                                return {
-                                                                    ...prev,
-                                                                    mailing_customer_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
-                                                                    mailing_address: {
-                                                                        ...(prev?.mailing_address || {}),
-                                                                        contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
-                                                                        ext: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].ext
-                                                                    }
-                                                                }
-                                                            });
-
-                                                            // validateMailingAddressForSaving({keyCode: 9});
-                                                            setShowMailingContactPhones(false);
-                                                            refMailingContactPhone.current.inputElement.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (showMailingContactPhones) {
-                                                            e.preventDefault();
-                                                            await setSelectedCustomer(prev => {
-                                                                return {
-                                                                    ...prev,
-                                                                    mailing_customer_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
-                                                                    mailing_address: {
-                                                                        ...(prev?.mailing_address || {}),
-                                                                        contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
-                                                                        ext: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].ext
-                                                                    }
-                                                                }
-                                                            });
-
-                                                            // validateMailingAddressForSaving({keyCode: 9});
-                                                            setShowMailingContactPhones(false);
-                                                            refMailingContactPhone.current.inputElement.focus();
-                                                        } else {
-                                                            // validateMailingAddressForSaving({keyCode: 9});
-                                                        }
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onChange={(e) => {
-                                                setSelectedCustomer(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        mailing_address: {
-                                                            ...(prev?.mailing_address || {}),
-                                                            contact_phone: e.target.value
-                                                        }
-                                                    }
-                                                })
-                                            }}
-                                            value={selectedCustomer?.mailing_address?.contact_phone || ''}
-                                        />
-
-                                        {
-                                            (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) &&
-                                                (selectedCustomer?.mailing_customer_contact_id || 0) > 0) &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-mailing-contact-primary-phone': true,
-                                                    'pushed': (mailingContactPhoneItems.length > 1)
-                                                })}>
-                                                {selectedCustomer?.mailing_customer_contact_primary_phone || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            (mailingContactPhoneItems.length > 1 && ((selectedCustomer?.mailing_customer_contact_id || 0) > 0)) &&
-                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                onClick={async () => {
-                                                    if (showMailingContactPhones) {
-                                                        setShowMailingContactPhones(false);
-                                                    } else {
-                                                        if (mailingContactPhoneItems.length > 1) {
-                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-
-                                                            window.setTimeout(async () => {
-                                                                await setShowMailingContactPhones(true);
-
-                                                                refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }, 0)
-                                                        }
-                                                    }
-
-                                                    refMailingContactPhone.current.inputElement.focus();
-                                                }} />
-                                        }
-                                    </div>
-                                    {
-                                        mailingContactPhonesTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-phone"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refMailingContactPhoneDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                mailingContactPhoneItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedCustomer(prev => {
-                                                                                    return {
-                                                                                        ...prev,
-                                                                                        mailing_customer_contact_primary_phone: item.type,
-                                                                                        mailing_address: {
-                                                                                            ...(prev?.mailing_address || {}),
-                                                                                            contact_phone: item.phone,
-                                                                                            ext: item.ext
-                                                                                        }
-                                                                                    }
-                                                                                });
-
-                                                                                // validateMailingAddressForSaving({keyCode: 9});
-                                                                                setShowMailingContactPhones(false);
-                                                                                refMailingContactPhone.current.inputElement.focus();
-                                                                            }}
-                                                                            ref={ref => refMailingContactPhonePopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Phone Work `
-                                                                                    : item.type === 'fax' ? `Phone Work Fax `
-                                                                                        : item.type === 'mobile' ? `Phone Mobile `
-                                                                                            : item.type === 'direct' ? `Phone Direct `
-                                                                                                : item.type === 'other' ? `Phone Other ` : ''
-                                                                            }
-
-                                                                            (<b>
-                                                                                {
-                                                                                    item.type === 'work' ? item.phone
-                                                                                        : item.type === 'fax' ? item.phone
-                                                                                            : item.type === 'mobile' ? item.phone
-                                                                                                : item.type === 'direct' ? item.phone
-                                                                                                    : item.type === 'other' ? item.phone : ''
-                                                                                }
-                                                                            </b>)
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight} />
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container input-phone-ext">
-                                    <input tabIndex={27 + props.tabTimes} type="text" placeholder="Ext"
-                                        readOnly={
-                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                            (selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0
-                                        }
-                                        onChange={e => {
-                                            setSelectedCustomer(prev => {
-                                                return {
-                                                    ...prev,
-                                                    mailing_address: {
-                                                        ...(prev?.mailing_address || {}),
-                                                        ext: e.target.value
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={
-                                            (selectedCustomer?.mailing_customer_contact_id || 0) > 0
-                                                ? (selectedCustomer?.mailing_customer_contact_primary_phone || '') === 'work'
-                                                    ? selectedCustomer?.mailing_address?.ext || ''
-                                                    : ''
-                                                : selectedCustomer?.mailing_address?.ext || ''
-                                        } />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="select-box-container" style={{ flexGrow: 1 }}
-                                    onMouseEnter={() => {
-                                        if ((selectedCustomer?.mailing_address?.email || '') !== '') {
-                                            setShowMailingContactEmailCopyBtn(true);
-                                        }
-                                    }}
-                                    onFocus={() => {
-                                        if ((selectedCustomer?.mailing_address?.email || '') !== '') {
-                                            setShowMailingContactEmailCopyBtn(true);
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        window.setTimeout(() => {
-                                            setShowMailingContactEmailCopyBtn(false);
-                                        }, 1000);
-                                    }}
-                                    onMouseLeave={() => {
-                                        setShowMailingContactEmailCopyBtn(false);
-                                    }}>
-
-                                    <div className="select-box-wrapper">
-                                        <input tabIndex={28 + props.tabTimes} type="text" placeholder="E-Mail"
-                                            readOnly={
-                                                ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                                (selectedCustomer?.mailing_address?.id || 0) === 0
-                                            }
-                                            ref={refMailingContactEmail}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
-
-                                                switch (key) {
-                                                    case 37:
-                                                    case 38: // arrow left | arrow up
-                                                        e.preventDefault();
-                                                        if (showMailingContactEmails) {
-                                                            let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (mailingContactEmailItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (mailingContactEmailItems.length > 1) {
-                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactEmails(true);
-
-                                                                refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 39:
-                                                    case 40: // arrow right | arrow down
-                                                        e.preventDefault();
-                                                        if (showMailingContactEmails) {
-                                                            let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === (mailingContactEmailItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (mailingContactEmailItems.length > 1) {
-                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-
-                                                                setShowMailingContactEmails(true);
-
-                                                                refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setShowMailingContactEmails(false);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedCustomer(prev => {
-                                                                return {
-                                                                    ...prev,
-                                                                    mailing_customer_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
-                                                                    mailing_address: {
-                                                                        ...(prev?.mailing_address || {}),
-                                                                        email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email
-                                                                    }
-                                                                }
-                                                            });
-
-                                                            // validateMailingAddressForSaving({keyCode: 9});
-                                                            setShowMailingContactEmails(false);
-                                                            refMailingContactEmail.current.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (showMailingContactEmails) {
-                                                            e.preventDefault();
-                                                            await setSelectedCustomer(prev => {
-                                                                return {
-                                                                    ...prev,
-                                                                    mailing_customer_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
-                                                                    mailing_address: {
-                                                                        ...(prev?.mailing_address || {}),
-                                                                        email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email
-                                                                    }
-                                                                }
-                                                            });
-
-                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) {
-                                                                validateCustomerForSaving({ keyCode: 9 });
-                                                            } else if ((selectedCustomer?.id || 0) > 0) {
-                                                                validateMailingAddressForSaving({ keyCode: 9 });
-                                                            }
-
-                                                            setShowMailingContactEmails(false);
-                                                            refMailingContactEmail.current.focus();
-                                                        } else {
-                                                            if ((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) {
-                                                                validateCustomerForSaving({ keyCode: 9 });
-                                                            } else if ((selectedCustomer?.id || 0) > 0) {
-                                                                validateMailingAddressForSaving({ keyCode: 9 });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onChange={e => {
-                                                setSelectedCustomer(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        mailing_address: {
-                                                            ...(prev?.mailing_address || {}),
-                                                            email: e.target.value
-                                                        }
-                                                    }
-                                                })
-                                            }}
-                                            value={selectedCustomer?.mailing_address?.email || ''}
-                                        />
-
-                                        {
-                                            (((selectedCustomer?.remit_to_address_is_the_same || 0) === 1 || (selectedCustomer?.mailing_customer_id || 0) > 0) &&
-                                                (selectedCustomer?.mailing_customer_contact_id || 0) > 0) &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-mailing-contact-primary-email': true,
-                                                    'pushed': (mailingContactEmailItems.length > 1)
-                                                })}>
-                                                {selectedCustomer?.mailing_customer_contact_primary_email || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            showMailingContactEmailCopyBtn &&
-                                            <FontAwesomeIcon style={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                right: 30,
-                                                zIndex: 1,
-                                                cursor: 'pointer',
-                                                transform: 'translateY(-50%)',
-                                                color: '#2bc1ff',
-                                                margin: 0,
-                                                transition: 'ease 0.2s',
-                                                fontSize: '1rem'
-                                            }} icon={faCopy} onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigator.clipboard.writeText(refMailingContactEmail.current.value);
-                                            }} />
-                                        }
-
-                                        {
-                                            (mailingContactEmailItems.length > 1 && ((selectedCustomer?.mailing_customer_contact_id || 0) > 0)) &&
-                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                onClick={async () => {
-                                                    if (showMailingContactEmails) {
-                                                        setShowMailingContactEmails(false);
-                                                    } else {
-                                                        if (mailingContactEmailItems.length > 1) {
-                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            }))
-
-                                                            window.setTimeout(async () => {
-                                                                await setShowMailingContactEmails(true);
-
-                                                                refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }, 100)
-                                                        }
-                                                    }
-
-                                                    refMailingContactEmail.current.focus();
-                                                }} />
-                                        }
-                                    </div>
-                                    {
-                                        mailingContactEmailsTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-email"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refMailingContactEmailDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                mailingContactEmailItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedCustomer(prev => {
-                                                                                    return {
-                                                                                        ...prev,
-                                                                                        mailing_customer_contact_primary_email: item.type,
-                                                                                        mailing_address: {
-                                                                                            ...(prev?.mailing_address || {}),
-                                                                                            email: item.email
-                                                                                        }
-                                                                                    }
-                                                                                });
-
-                                                                                validateCustomerForSaving({ keyCode: 9 });
-                                                                                setShowMailingContactEmails(false);
-                                                                                refMailingContactEmail.current.focus();
-                                                                            }}
-                                                                            ref={ref => refMailingContactEmailPopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Email Work `
-                                                                                    : item.type === 'personal' ? `Email Personal `
-                                                                                        : item.type === 'other' ? `Email Other ` : ''
-                                                                            }
-
-                                                                            (<b>
-                                                                                {
-                                                                                    item.type === 'work' ? item.email
-                                                                                        : item.type === 'personal' ? item.email
-                                                                                            : item.type === 'other' ? item.email : ''
-                                                                                }
-                                                                            </b>)
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight} />
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                        <MailingAddressForm
+                            formTitle='Mailing Address'
+                            formButtons={[
+                                {
+                                    title: 'Bill to',
+                                    onClick: () => {
+                                        mailingAddressBillToBtn();
+                                    },
+                                    isEnabled: true
+                                },
+                                {
+                                    title: 'Remit to address is the same',
+                                    onClick: () => {
+                                        remitToAddressBtn();
+                                    },
+                                    isEnabled: true
+                                },
+                                {
+                                    title: 'Clear',
+                                    onClick: () => {
+                                        mailingAddressClearBtn();
+                                    },
+                                    isEnabled: true
+                                },
+                            ]}
+                            refs={{
+                                refCode: refCustomerMailingCode,
+                                refName: refCustomerMailingName,
+                                refContactName: refMailingContactName,
+                                refContactNameDropDown: refMailingContactNameDropDown,
+                                refContactNamePopupItems: refMailingContactNamePopupItems,
+                                refContactPhone: refMailingContactPhone,
+                                refContactPhonePopupItems: refMailingContactPhonePopupItems,
+                                refContactEmail: refMailingContactEmail,
+                                refContactEmailPopupItems: refMailingContactEmailPopupItems,
+                                refMailingName: refCustomerMailingName
+                            }}
+                            tabTimesFrom={18}
+                            tabTimes={props.tabTimes}
+                            searchByCode={searchCustomerByCode}
+                            validateForSaving={validateCustomerForSaving}
+                            validateMailingAddressForSaving={validateMailingAddressForSaving}
+                            selectedParent={selectedCustomer}
+                            setSelectedParent={setSelectedCustomer}
+                            billToBtn={mailingAddressBillToBtn}
+                            remitToAddressBtn={remitToAddressBtn}
+                            clearBtn={mailingAddressClearBtn}
+
+                            withCode={1}
+                            withName={1}
+                            withEmail={1}
+                        />
 
                         <div className="form-borderless-box" style={{ width: '170px', marginLeft: '10px', }}>
                             <div className="form-row">
@@ -5430,17 +3522,12 @@ const Customers = (props) => {
                 </div>
                 <div className="fields-container-row">
                     <div className="fields-container-col">
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="form-title">Contacts</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    <div className={
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)
-                                            ? 'mochi-button disabled' : 'mochi-button'
-                                    } onClick={async () => {
+                        <ContactForm
+                            formTitle='Contacts'
+                            formButtons={[
+                                {
+                                    title: 'More',
+                                    onClick: (async) => {
                                         if (selectedCustomer?.id === undefined) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -5484,17 +3571,13 @@ const Customers = (props) => {
                                         }
 
                                         props.openPanel(panel, props.origin);
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">More</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-
-                                    <div className={
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)
-                                            ? 'mochi-button disabled' : 'mochi-button'
-                                    } onClick={async () => {
+                                    },
+                                    isEnabled: ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 1)
+                                },
+                                {
+                                    title: 'Add Existing Contact',
+                                    onClick: (async) => {
                                         if (selectedCustomer?.id === undefined) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -5534,17 +3617,13 @@ const Customers = (props) => {
                                         }
 
                                         props.openPanel(panel, props.origin);
-
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Add Existing Contact</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className={
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0)
-                                            ? 'mochi-button disabled' : 'mochi-button'
-                                    } onClick={() => {
+                                    },
+                                    isEnabled: ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 1)
+                                },
+                                {
+                                    title: 'Add New Contact',
+                                    onClick: () => {
                                         if (selectedCustomer?.id === undefined) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -5585,949 +3664,34 @@ const Customers = (props) => {
                                         }
 
                                         props.openPanel(panel, props.origin);
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Add New Contact</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                    <div className="mochi-button" onClick={() => {
+                                    },
+                                    isEnabled: ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 1)
+                                },
+                                {
+                                    title: 'Clear',
+                                    onClick: () => {
                                         setSelectedContact({});
                                         refCustomerContactFirstName.current.focus();
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Clear</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                </div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
+                                    },
+                                    isEnabled: true
+                                }
+                            ]}
+                            refs={{
+                                refFirstName: refCustomerContactFirstName,
+                                refPhone: refCustomerContactPhone,
+                                refEmail: refCustomerContactEmail,
+                                refNotes: refCustomerContactNotes
+                            }}
+                            tabTimes={props.tabTimes}
 
-                            <div className="form-row">
-                                <div className="input-box-container grow">
-                                    <input tabIndex={12 + props.tabTimes} type="text" placeholder="First Name"
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
-                                        ref={refCustomerContactFirstName}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
-                                        }
-                                        onChange={e => {
-                                            setSelectedContact({ ...selectedContact, first_name: e.target.value })
-                                        }}
-                                        value={selectedContact.first_name || ''} />
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container grow">
-                                    <input tabIndex={13 + props.tabTimes} type="text" placeholder="Last Name"
-                                        style={{
-                                            textTransform: 'capitalize'
-                                        }}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
-                                        }
-                                        onChange={e => setSelectedContact({
-                                            ...selectedContact,
-                                            last_name: e.target.value
-                                        })}
-                                        value={selectedContact.last_name || ''} />
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="select-box-container" style={{ width: '50%' }}>
-                                    <div className="select-box-wrapper">
-                                        <MaskedInput tabIndex={14 + props.tabTimes}
-                                            readOnly={
-                                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
-                                            }
-                                            mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                            guide={true}
-                                            type="text"
-                                            placeholder="Phone"
-                                            ref={refCustomerContactPhone}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
+                            validateContactForSaving={validateContactForSaving}
+                            selectedParent={selectedCustomer}
+                            setSelectedParent={setSelectedCustomer}
+                            selectedContact={selectedContact}
+                            setSelectedContact={setSelectedContact}
 
-                                                switch (key) {
-                                                    case 37:
-                                                    case 38: // arrow left | arrow up
-                                                        e.preventDefault();
-                                                        if (showCustomerContactPhones) {
-                                                            let selectedIndex = customerContactPhoneItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setCustomerContactPhoneItems(customerContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setCustomerContactPhoneItems(customerContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (customerContactPhoneItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refCustomerContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (customerContactPhoneItems.length > 1) {
-                                                                await setCustomerContactPhoneItems(customerContactPhoneItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                    return item;
-                                                                }))
-
-                                                                setShowCustomerContactPhones(true);
-
-                                                                refCustomerContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 39:
-                                                    case 40: // arrow right | arrow down
-                                                        e.preventDefault();
-                                                        if (showCustomerContactPhones) {
-                                                            let selectedIndex = customerContactPhoneItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setCustomerContactPhoneItems(customerContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setCustomerContactPhoneItems(customerContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === (customerContactPhoneItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refCustomerContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (customerContactPhoneItems.length > 1) {
-                                                                await setCustomerContactPhoneItems(customerContactPhoneItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                    return item;
-                                                                }))
-
-                                                                setShowCustomerContactPhones(true);
-
-                                                                refCustomerContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setShowCustomerContactPhones(false);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (showCustomerContactPhones && customerContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedContact({
-                                                                ...selectedContact,
-                                                                primary_phone: customerContactPhoneItems[customerContactPhoneItems.findIndex(item => item.selected)].type
-                                                            });
-
-                                                            validateContactForSaving({ keyCode: 9 });
-                                                            setShowCustomerContactPhones(false);
-                                                            refCustomerContactPhone.current.inputElement.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (showCustomerContactPhones) {
-                                                            e.preventDefault();
-                                                            await setSelectedContact({
-                                                                ...selectedContact,
-                                                                primary_phone: customerContactPhoneItems[customerContactPhoneItems.findIndex(item => item.selected)].type
-                                                            });
-
-                                                            validateContactForSaving({ keyCode: 9 });
-                                                            setShowCustomerContactPhones(false);
-                                                            refCustomerContactPhone.current.inputElement.focus();
-                                                        } else {
-                                                            validateContactForSaving({ keyCode: 9 });
-                                                        }
-                                                        break;
-
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onInput={(e) => {
-                                                if ((selectedContact?.id || 0) === 0) {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    });
-                                                } else {
-                                                    if ((selectedContact?.primary_phone || '') === '') {
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        });
-                                                    } else {
-                                                        switch (selectedContact?.primary_phone) {
-                                                            case 'work':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_work: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'fax':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_work_fax: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'mobile':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_mobile: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'direct':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_direct: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'other':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_other: e.target.value
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                            onChange={(e) => {
-                                                if ((selectedContact?.id || 0) === 0) {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
-                                                    });
-                                                } else {
-                                                    if ((selectedContact?.primary_phone || '') === '') {
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        });
-                                                    } else {
-                                                        switch (selectedContact?.primary_phone) {
-                                                            case 'work':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_work: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'fax':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_work_fax: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'mobile':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_mobile: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'direct':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_direct: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'other':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    phone_other: e.target.value
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                            value={
-                                                (selectedContact?.primary_phone || '') === 'work'
-                                                    ? (selectedContact?.phone_work || '')
-                                                    : (selectedContact?.primary_phone || '') === 'fax'
-                                                        ? (selectedContact?.phone_work_fax || '')
-                                                        : (selectedContact?.primary_phone || '') === 'mobile'
-                                                            ? (selectedContact?.phone_mobile || '')
-                                                            : (selectedContact?.primary_phone || '') === 'direct'
-                                                                ? (selectedContact?.phone_direct || '')
-                                                                : (selectedContact?.primary_phone || '') === 'other'
-                                                                    ? (selectedContact?.phone_other || '')
-                                                                    : ''
-                                            }
-                                        />
-
-                                        {
-                                            (selectedContact?.id || 0) > 0 &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-customer-contact-primary-phone': true,
-                                                    'pushed': (customerContactPhoneItems.length > 1)
-                                                })}>
-                                                {selectedContact?.primary_phone || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            customerContactPhoneItems.length > 1 &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                onClick={async () => {
-                                                    if (showCustomerContactPhones) {
-                                                        setShowCustomerContactPhones(false);
-                                                    } else {
-                                                        if (customerContactPhoneItems.length > 1) {
-                                                            await setCustomerContactPhoneItems(customerContactPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                return item;
-                                                            }))
-
-                                                            window.setTimeout(async () => {
-                                                                await setShowCustomerContactPhones(true);
-
-                                                                refCustomerContactPhonePopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }, 0)
-                                                        }
-                                                    }
-
-                                                    refCustomerContactPhone.current.inputElement.focus();
-                                                }} />
-                                        }
-                                    </div>
-                                    {
-                                        customerContactPhonesTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-phone"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refCustomerContactPhoneDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                customerContactPhoneItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedContact({
-                                                                                    ...selectedContact,
-                                                                                    primary_phone: item.type
-                                                                                });
-
-                                                                                validateContactForSaving({ keyCode: 9 });
-                                                                                setShowCustomerContactPhones(false);
-                                                                                refCustomerContactPhone.current.inputElement.focus();
-                                                                            }}
-                                                                            ref={ref => refCustomerContactPhonePopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Phone Work `
-                                                                                    : item.type === 'fax' ? `Phone Work Fax `
-                                                                                        : item.type === 'mobile' ? `Phone Mobile `
-                                                                                            : item.type === 'direct' ? `Phone Direct `
-                                                                                                : item.type === 'other' ? `Phone Other ` : ''
-                                                                            }
-
-                                                                            (<b>
-                                                                                {
-                                                                                    item.type === 'work' ? item.phone
-                                                                                        : item.type === 'fax' ? item.phone
-                                                                                            : item.type === 'mobile' ? item.phone
-                                                                                                : item.type === 'direct' ? item.phone
-                                                                                                    : item.type === 'other' ? item.phone : ''
-                                                                                }
-                                                                            </b>)
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight} />
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
-                                    <div className="input-box-container input-phone-ext">
-                                        <input tabIndex={15 + props.tabTimes} type="text" placeholder="Ext"
-                                            readOnly={
-                                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
-                                            }
-                                            // onKeyDown={validateContactForSaving}
-                                            onChange={e => setSelectedContact({
-                                                ...selectedContact,
-                                                phone_ext: e.target.value
-                                            })}
-                                            value={(selectedContact?.primary_phone || '') === 'work' ? selectedContact.phone_ext || '' : ''} />
-                                    </div>
-                                    <div className="input-toggle-container">
-                                        <input type="checkbox"
-                                            disabled={
-                                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
-                                            }
-                                            id={props.panelName + '-cbox-customer-contacts-primary-btn'}
-                                            onChange={(e) => {
-                                                if (selectedContact.pivot) {
-                                                    setSelectedContact(prev => {
-                                                        return {
-                                                            ...prev,
-                                                            pivot: {
-                                                                ...selectedContact?.pivot || {},
-                                                                is_primary: e.target.checked ? 1 : 0
-                                                            }
-                                                        }
-                                                    })
-                                                } else {
-                                                    setSelectedContact(prev => {
-                                                        return {
-                                                            ...prev,
-                                                            is_primary: e.target.checked ? 1 : 0
-                                                        }
-                                                    })
-                                                }
-
-                                                validateContactForSaving({ keyCode: 9 });
-                                            }}
-                                            checked={selectedContact.pivot
-                                                ? (selectedContact?.pivot?.is_primary || 0) === 1
-                                                : (selectedContact?.is_primary || 0) === 1} />
-                                        <label htmlFor={props.panelName + '-cbox-customer-contacts-primary-btn'}>
-                                            <div className="label-text">Primary</div>
-                                            <div className="input-toggle-btn"></div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
-                                <div className="select-box-container" style={{ flexGrow: 1 }}
-                                    onMouseEnter={() => {
-                                        if ((selectedContact?.email_work || '') !== '' ||
-                                            (selectedContact?.email_personal || '') !== '' ||
-                                            (selectedContact?.email_other || '') !== '') {
-                                            setShowCustomerContactEmailCopyBtn(true);
-                                        }
-                                    }}
-                                    onFocus={() => {
-                                        if ((selectedContact?.email_work || '') !== '' ||
-                                            (selectedContact?.email_personal || '') !== '' ||
-                                            (selectedContact?.email_other || '') !== '') {
-                                            setShowCustomerContactEmailCopyBtn(true);
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        window.setTimeout(() => {
-                                            setShowCustomerContactEmailCopyBtn(false);
-                                        }, 1000);
-                                    }}
-                                    onMouseLeave={() => {
-                                        setShowCustomerContactEmailCopyBtn(false);
-                                    }}>
-                                    <div className="select-box-wrapper">
-                                        <input
-                                            style={{
-                                                width: 'calc(100% - 25px)',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap'
-                                            }}
-                                            readOnly={
-                                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
-                                            }
-                                            tabIndex={16 + props.tabTimes}
-                                            type="text"
-                                            placeholder="E-Mail"
-                                            ref={refCustomerContactEmail}
-                                            onKeyDown={async (e) => {
-                                                let key = e.keyCode || e.which;
-
-                                                switch (key) {
-                                                    case 37:
-                                                    case 38: // arrow left | arrow up
-                                                        e.preventDefault();
-                                                        if (showCustomerContactEmails) {
-                                                            let selectedIndex = customerContactEmailItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setCustomerContactEmailItems(customerContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setCustomerContactEmailItems(customerContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === (customerContactEmailItems.length - 1);
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex - 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refCustomerContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (customerContactEmailItems.length > 1) {
-                                                                await setCustomerContactEmailItems(customerContactEmailItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                    return item;
-                                                                }))
-
-                                                                setShowCustomerContactEmails(true);
-
-                                                                refCustomerContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 39:
-                                                    case 40: // arrow right | arrow down
-                                                        e.preventDefault();
-                                                        if (showCustomerContactEmails) {
-                                                            let selectedIndex = customerContactEmailItems.findIndex(item => item.selected);
-
-                                                            if (selectedIndex === -1) {
-                                                                await setCustomerContactEmailItems(customerContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                }))
-                                                            } else {
-                                                                await setCustomerContactEmailItems(customerContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === (customerContactEmailItems.length - 1)) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === (selectedIndex + 1)
-                                                                    }
-                                                                    return item;
-                                                                }))
-                                                            }
-
-                                                            refCustomerContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains('selected')) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: 'auto',
-                                                                        block: 'center',
-                                                                        inline: 'nearest'
-                                                                    })
-                                                                }
-                                                                return true;
-                                                            });
-                                                        } else {
-                                                            if (customerContactEmailItems.length > 1) {
-                                                                await setCustomerContactEmailItems(customerContactEmailItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                    return item;
-                                                                }))
-
-                                                                setShowCustomerContactEmails(true);
-
-                                                                refCustomerContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }
-                                                        break;
-
-                                                    case 27: // escape
-                                                        setShowCustomerContactEmails(false);
-                                                        break;
-
-                                                    case 13: // enter
-                                                        if (showCustomerContactEmails && customerContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                            await setSelectedContact({
-                                                                ...selectedContact,
-                                                                primary_email: customerContactEmailItems[customerContactEmailItems.findIndex(item => item.selected)].type
-                                                            });
-
-                                                            validateContactForSaving({ keyCode: 9 });
-                                                            setShowCustomerContactEmails(false);
-                                                            refCustomerContactEmail.current.focus();
-                                                        }
-                                                        break;
-
-                                                    case 9: // tab
-                                                        if (showCustomerContactEmails) {
-                                                            e.preventDefault();
-                                                            await setSelectedContact({
-                                                                ...selectedContact,
-                                                                primary_email: customerContactEmailItems[customerContactEmailItems.findIndex(item => item.selected)].type
-                                                            });
-
-                                                            validateContactForSaving({ keyCode: 9 });
-                                                            setShowCustomerContactEmails(false);
-                                                            refCustomerContactEmail.current.focus();
-                                                        } else {
-                                                            validateContactForSaving({ keyCode: 9 });
-                                                        }
-                                                        break;
-
-                                                    default:
-                                                        break;
-                                                }
-                                            }}
-                                            onInput={(e) => {
-                                                if ((selectedContact?.id || 0) === 0) {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    });
-                                                } else {
-                                                    if ((selectedContact?.primary_email || '') === '') {
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_work: e.target.value,
-                                                            primary_email: 'work'
-                                                        });
-                                                    } else {
-                                                        switch (selectedContact?.primary_email) {
-                                                            case 'work':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_work: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'personal':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_personal: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'other':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_other: e.target.value
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                            onChange={(e) => {
-                                                if ((selectedContact?.id || 0) === 0) {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value,
-                                                        primary_email: 'work'
-                                                    });
-                                                } else {
-                                                    if ((selectedContact?.primary_email || '') === '') {
-                                                        setSelectedContact({
-                                                            ...selectedContact,
-                                                            email_work: e.target.value,
-                                                            primary_email: 'work'
-                                                        });
-                                                    } else {
-                                                        switch (selectedContact?.primary_email) {
-                                                            case 'work':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_work: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'personal':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_personal: e.target.value
-                                                                });
-                                                                break;
-                                                            case 'other':
-                                                                setSelectedContact({
-                                                                    ...selectedContact,
-                                                                    email_other: e.target.value
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                            value={
-                                                (selectedContact?.primary_email || '') === 'work'
-                                                    ? (selectedContact?.email_work || '')
-                                                    : (selectedContact?.primary_email || '') === 'personal'
-                                                        ? (selectedContact?.email_personal || '')
-                                                        : (selectedContact?.primary_email || '') === 'other'
-                                                            ? (selectedContact?.email_other || '')
-                                                            : ''
-                                            }
-                                        />
-
-                                        {
-                                            showCustomerContactEmailCopyBtn &&
-                                            <FontAwesomeIcon style={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                right: 30,
-                                                zIndex: 1,
-                                                cursor: 'pointer',
-                                                transform: 'translateY(-50%)',
-                                                color: '#2bc1ff',
-                                                margin: 0,
-                                                transition: 'ease 0.2s',
-                                                fontSize: '1rem'
-                                            }} icon={faCopy} onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigator.clipboard.writeText(refCustomerContactEmail.current.value);
-                                            }} />
-                                        }
-
-                                        {
-                                            (selectedContact?.id || 0) > 0 &&
-                                            <div
-                                                className={classnames({
-                                                    'selected-customer-contact-primary-email': true,
-                                                    'pushed': (customerContactEmailItems.length > 1)
-                                                })}>
-                                                {selectedContact?.primary_email || ''}
-                                            </div>
-                                        }
-
-                                        {
-                                            customerContactEmailItems.length > 1 &&
-                                            <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                onClick={async () => {
-                                                    if (showCustomerContactEmails) {
-                                                        setShowCustomerContactEmails(false);
-                                                    } else {
-                                                        if (customerContactEmailItems.length > 1) {
-                                                            await setCustomerContactEmailItems(customerContactEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                return item;
-                                                            }))
-
-                                                            window.setTimeout(async () => {
-                                                                await setShowCustomerContactEmails(true);
-
-                                                                refCustomerContactEmailPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains('selected')) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: 'auto',
-                                                                            block: 'center',
-                                                                            inline: 'nearest'
-                                                                        })
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }, 0)
-                                                        }
-                                                    }
-
-                                                    refCustomerContactEmail.current.focus();
-                                                }} />
-                                        }
-                                    </div>
-                                    {
-                                        customerContactEmailsTransition((style, item) => item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-email"
-                                                style={{
-                                                    ...style,
-                                                    left: '0',
-                                                    display: 'block'
-                                                }}
-                                                ref={refCustomerContactEmailDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {
-                                                                customerContactEmailItems.map((item, index) => {
-                                                                    const mochiItemClasses = classnames({
-                                                                        'mochi-item': true,
-                                                                        'selected': item.selected
-                                                                    });
-
-                                                                    return (
-                                                                        <div
-                                                                            key={index}
-                                                                            className={mochiItemClasses}
-                                                                            id={item.id}
-                                                                            onClick={async () => {
-                                                                                await setSelectedContact({
-                                                                                    ...selectedContact,
-                                                                                    primary_email: item.type
-                                                                                });
-
-                                                                                validateContactForSaving({ keyCode: 9 });
-                                                                                setShowCustomerContactEmails(false);
-                                                                                refCustomerContactEmail.current.focus();
-                                                                            }}
-                                                                            ref={ref => refCustomerContactEmailPopupItems.current.push(ref)}
-                                                                        >
-                                                                            {
-                                                                                item.type === 'work' ? `Email Work `
-                                                                                    : item.type === 'personal' ? `Email Personal `
-                                                                                        : item.type === 'other' ? `Email Other ` : ''
-                                                                            }
-
-                                                                            (<b>
-                                                                                {
-                                                                                    item.type === 'work' ? item.email
-                                                                                        : item.type === 'personal' ? item.email
-                                                                                            : item.type === 'other' ? item.email : ''
-                                                                                }
-                                                                            </b>)
-
-                                                                            {
-                                                                                item.selected &&
-                                                                                <FontAwesomeIcon
-                                                                                    className="dropdown-selected"
-                                                                                    icon={faCaretRight} />
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        ))
-                                    }
-                                </div>
-                                <div className="form-h-sep"></div>
-                                <div className="input-box-container grow">
-                                    <input tabIndex={17 + props.tabTimes} type="text" placeholder="Notes"
-                                        ref={refCustomerContactNotes}
-                                        readOnly={
-                                            (props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0
-                                        }
-                                        onKeyDown={validateContactForSaving}
-                                        onChange={e => setSelectedContact({
-                                            ...selectedContact,
-                                            notes: e.target.value
-                                        })}
-                                        value={selectedContact.notes || ''}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        />
 
 
                     </div>
@@ -7862,273 +5026,135 @@ const Customers = (props) => {
 
                 <div className="fields-container-row grow" style={{ minHeight: '10.3rem', maxHeight: '10.3rem' }}>
                     <div className="fields-container-col">
-                        <div className="form-bordered-box">
-                            <div className="form-header">
-                                <div className="top-border top-border-left"></div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    {
-                                        showingContactList &&
-                                        <div className="mochi-button" onClick={() => {
-                                            setShowingContactList(false);
-                                            refCustomerContactSearchFirstName.current.focus();
-                                        }}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Search</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
-                                    {
-                                        !showingContactList &&
-                                        <div className="mochi-button" onClick={() => {
-                                            setShowingContactList(true);
-                                            refCustomerContactNotes.current.focus();
-                                        }}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Cancel</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
+                        <ContactListBox
+                            formTitle=''
+                            formButtons={[
+                                {
+                                    title: 'Search',
+                                    onClick: () => {
 
-                                    {
-                                        !showingContactList &&
-                                        <div className="mochi-button" onClick={searchContactBtnClick}>
-                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                            <div className="mochi-button-base">Send</div>
-                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                        </div>
-                                    }
-                                </div>
-                                <div className="top-border top-border-right"></div>
-                            </div>
-
-                            <div className="form-slider">
-                                <div className="form-slider-wrapper" style={{ left: showingContactList ? 0 : '-100%' }}>
-                                    <div className="contact-list-box">
-                                        {
-                                            (selectedCustomer?.contacts || []).length > 0 &&
-                                            <div className="contact-list-header">
-                                                <div className="contact-list-col tcol first-name">First Name</div>
-                                                <div className="contact-list-col tcol last-name">Last Name</div>
-                                                <div className="contact-list-col tcol phone-work">Phone</div>
-                                                <div className="contact-list-col tcol email-work">E-Mail</div>
-                                                <div className="contact-list-col tcol contact-selected"></div>
-                                                <div className="contact-list-col tcol pri"></div>
-                                            </div>
+                                    },
+                                    isEnabled: true
+                                },
+                                {
+                                    title: 'Add Existing Contact',
+                                    onClick: (async) => {
+                                        if (selectedCustomer?.id === undefined) {
+                                            window.alert('You must select a customer first!');
+                                            return;
                                         }
 
-                                        <div className="contact-list-wrapper">
-                                            {
-                                                (selectedCustomer?.contacts || []).map((contact, index) => {
-                                                    return (
-                                                        <div className="contact-list-item" key={index}
-                                                            onDoubleClick={async () => {
-                                                                if (((props.user?.user_code?.is_admin || 0) === 0 &&
-                                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 0)) {
-                                                                    return;
-                                                                }
-
-                                                                let panel = {
-                                                                    panelName: `${props.panelName}-contacts`,
-                                                                    component: <Contacts
-                                                                        title='Contacts'
-                                                                        tabTimes={22000 + props.tabTimes}
-                                                                        panelName={`${props.panelName}-contacts`}
-                                                                        savingContactUrl='/saveContact'
-                                                                        deletingContactUrl='/deleteContact'
-                                                                        uploadAvatarUrl='/uploadAvatar'
-                                                                        removeAvatarUrl='/removeAvatar'
-                                                                        permissionName='customer contacts'
-                                                                        origin={props.origin}
-                                                                        owner='customer'
-                                                                        openPanel={props.openPanel}
-                                                                        closePanel={props.closePanel}
-                                                                        componentId={moment().format('x')}
-
-                                                                        contactSearchCustomer={{
-                                                                            ...selectedCustomer,
-                                                                            selectedContact: {
-                                                                                ...contact,
-                                                                                company: (contact?.company || '') === '' ? selectedCustomer?.name || '' : contact.company,
-                                                                                address1: (selectedCustomer?.address1 || '').toLowerCase() === (contact?.address1 || '').toLowerCase() ? (selectedCustomer?.address1 || '') : (contact?.address1 || ''),
-                                                                                address2: (selectedCustomer?.address2 || '').toLowerCase() === (contact?.address2 || '').toLowerCase() ? (selectedCustomer?.address2 || '') : (contact?.address2 || ''),
-                                                                                city: (selectedCustomer?.city || '').toLowerCase() === (contact?.city || '').toLowerCase() ? (selectedCustomer?.city || '') : (contact?.city || ''),
-                                                                                state: (selectedCustomer?.state || '').toLowerCase() === (contact?.state || '').toLowerCase() ? (selectedCustomer?.state || '') : (contact?.state || ''),
-                                                                                zip_code: (selectedCustomer?.zip || '').toLowerCase() === (contact?.zip_code || '').toLowerCase() ? (selectedCustomer?.zip || '') : (contact?.zip_code || ''),
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                }
-
-                                                                props.openPanel(panel, props.origin);
-                                                            }} onClick={() => setSelectedContact(contact)}>
-                                                            <div className="contact-list-col tcol first-name" style={{ textTransform: 'capitalize' }}>{contact.first_name}</div>
-                                                            <div className="contact-list-col tcol last-name" style={{ textTransform: 'capitalize' }}>{contact.last_name}</div>
-                                                            <div className="contact-list-col tcol phone-work">{
-                                                                contact.primary_phone === 'work' ? contact.phone_work
-                                                                    : contact.primary_phone === 'fax' ? contact.phone_work_fax
-                                                                        : contact.primary_phone === 'mobile' ? contact.phone_mobile
-                                                                            : contact.primary_phone === 'direct' ? contact.phone_direct
-                                                                                : contact.primary_phone === 'other' ? contact.phone_other
-                                                                                    : ''
-                                                            }</div>
-                                                            <div className="contact-list-col tcol email-work" style={{ textTransform: 'lowercase' }}>{
-                                                                contact.primary_email === 'work' ? contact.email_work
-                                                                    : contact.primary_email === 'personal' ? contact.email_personal
-                                                                        : contact.primary_email === 'other' ? contact.email_other
-                                                                            : ''
-                                                            }</div>
-                                                            {
-                                                                (contact.id === (selectedContact?.id || 0)) &&
-                                                                <div className="contact-list-col tcol contact-selected">
-                                                                    <FontAwesomeIcon icon={faPencilAlt} />
-                                                                </div>
+                                        let panel = {
+                                            panelName: `${props.panelName}-contact-list`,
+                                            component: <ContactList
+                                                title='Contact List'
+                                                tabTimes={137000 + props.tabTimes}
+                                                panelName={`${props.panelName}-contact-list`}
+                                                origin={props.origin}
+                                                openPanel={props.openPanel}
+                                                closePanel={props.closePanel}
+                                                componentId={moment().format('x')}
+                                                selectedCustomerId={selectedCustomer?.id || 0}
+                                                setContacts={(contacts) => {
+                                                    console.log(contacts)
+                                                    new Promise((resolve, reject) => {
+                                                        setSelectedCustomer(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                contacts: contacts
                                                             }
-                                                            {
-                                                                (contact.pivot)
-                                                                    ? (contact?.pivot?.is_primary || 0) === 1 &&
-                                                                    <div className="contact-list-col tcol pri">
-                                                                        <FontAwesomeIcon icon={faCheck} />
-                                                                    </div>
-                                                                    : (contact?.is_primary || 0) === 1 &&
-                                                                    <div className="contact-list-col tcol pri">
-                                                                        <FontAwesomeIcon icon={faCheck} />
-                                                                    </div>
-                                                            }
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
+                                                        })
 
-                                    </div>
-                                    <div className="contact-search-box">
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="First Name"
-                                                    tabIndex={50 + props.tabTimes}
-                                                    ref={refCustomerContactSearchFirstName}
-                                                    onKeyDown={e => {
-                                                        let key = e.keyCode || e.which;
+                                                        resolve('OK');
+                                                    }).then((response) => {
+                                                        props.closePanel(`${props.panelName}-contact-list`, props.origin);
+                                                        refCustomerCode.current.focus();
+                                                    }).catch(e => {
+                                                        props.closePanel(`${props.panelName}-contact-list`, props.origin);
+                                                        refCustomerCode.current.focus();
+                                                    })
+                                                }}
+                                            />
+                                        }
 
-                                                        if (key === 9) {
-                                                            if (e.shiftKey) {
-                                                                e.preventDefault();
-                                                                setShowingContactList(true);
-                                                                refCustomerContactNotes.current.focus();
-                                                            }
-                                                        }
-                                                    }}
-                                                    onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        first_name: e.target.value
-                                                    })} value={contactSearch.first_name || ''} />
-                                            </div>
-                                            <div className="form-h-sep"></div>
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="Last Name"
-                                                    tabIndex={51 + props.tabTimes}
-                                                    onFocus={() => {
-                                                        setShowingContactList(false)
-                                                    }} onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        last_name: e.target.value
-                                                    })} value={contactSearch.last_name || ''} />
-                                            </div>
-                                        </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
-                                                    tabIndex={52 + props.tabTimes}
-                                                    onFocus={() => {
-                                                        setShowingContactList(false)
-                                                    }} onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        address1: e.target.value
-                                                    })} value={contactSearch.address1 || ''} />
-                                            </div>
-                                        </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
-                                                    tabIndex={53 + props.tabTimes}
-                                                    onFocus={() => {
-                                                        setShowingContactList(false)
-                                                    }} onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        address2: e.target.value
-                                                    })} value={contactSearch.address2 || ''} />
-                                            </div>
-                                        </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="City"
-                                                    tabIndex={54 + props.tabTimes}
-                                                    onFocus={() => {
-                                                        setShowingContactList(false)
-                                                    }} onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        city: e.target.value
-                                                    })} value={contactSearch.city || ''} />
-                                            </div>
-                                            <div className="form-h-sep"></div>
-                                            <div className="input-box-container input-state">
-                                                <input type="text" placeholder="State" maxLength="2"
-                                                    tabIndex={55 + props.tabTimes}
-                                                    onFocus={() => {
-                                                        setShowingContactList(false)
-                                                    }} onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        state: e.target.value
-                                                    })} value={contactSearch.state || ''} />
-                                            </div>
-                                            <div className="form-h-sep"></div>
-                                            <div className="input-box-container grow">
-                                                <MaskedInput
-                                                    tabIndex={56 + props.tabTimes}
-                                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                                    guide={true}
-                                                    type="text" placeholder="Phone (Work/Mobile/Fax)"
-                                                    onFocus={() => {
-                                                        setShowingContactList(false)
-                                                    }} onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        phone: e.target.value
-                                                    })} value={contactSearch.phone || ''} />
-                                            </div>
-                                        </div>
-                                        <div className="form-v-sep"></div>
-                                        <div className="form-row">
-                                            <div className="input-box-container grow">
-                                                <input type="text" placeholder="E-Mail"
-                                                    tabIndex={57 + props.tabTimes}
-                                                    style={{ textTransform: 'lowercase' }}
-                                                    onKeyDown={(e) => {
-                                                        let key = e.keyCode || e.which;
+                                        props.openPanel(panel, props.origin);
+                                    },
+                                    isEnabled: ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 1)
+                                },
+                                {
+                                    title: 'Add New Contact',
+                                    onClick: () => {
+                                        if (selectedCustomer?.id === undefined) {
+                                            window.alert('You must select a customer first!');
+                                            return;
+                                        }
 
-                                                        if (key === 9) {
-                                                            e.preventDefault();
-                                                            setShowingContactList(true)
-                                                            refCustomerMailingCode.current.focus();
-                                                        }
-                                                    }}
-                                                    onFocus={() => {
-                                                        setShowingContactList(false)
-                                                    }}
-                                                    onChange={e => setContactSearch({
-                                                        ...contactSearch,
-                                                        email: e.target.value
-                                                    })}
-                                                    value={contactSearch.email || ''} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                        let panel = {
+                                            panelName: `${props.panelName}-contacts`,
+                                            component: <Contacts
+                                                title='Contacts'
+                                                tabTimes={22000 + props.tabTimes}
+                                                panelName={`${props.panelName}-contacts`}
+                                                savingContactUrl='/saveContact'
+                                                deletingContactUrl='/deleteContact'
+                                                uploadAvatarUrl='/uploadAvatar'
+                                                removeAvatarUrl='/removeAvatar'
+                                                permissionName='customer contacts'
+                                                origin={props.origin}
+                                                owner='customer'
+                                                isEditingContact={true}
+                                                openPanel={props.openPanel}
+                                                closePanel={props.closePanel}
+                                                componentId={moment().format('x')}
+
+                                                contactSearchCustomer={{
+                                                    ...selectedCustomer,
+                                                    selectedContact: {
+                                                        id: 0,
+                                                        customer_id: selectedCustomer?.id,
+                                                        company: selectedCustomer?.name || '',
+                                                        address1: selectedCustomer?.address1 || '',
+                                                        address2: selectedCustomer?.address2 || '',
+                                                        city: selectedCustomer?.city || '',
+                                                        state: selectedCustomer?.state || '',
+                                                        zip_code: selectedCustomer?.zip || ''
+                                                    }
+                                                }}
+                                            />
+                                        }
+
+                                        props.openPanel(panel, props.origin);
+                                    },
+                                    isEnabled: ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer contacts')?.pivot?.edit || 0) === 1)
+                                },
+                                {
+                                    title: 'Clear',
+                                    onClick: () => {
+                                        setSelectedContact({});
+                                        refCustomerContactFirstName.current.focus();
+                                    },
+                                    isEnabled: true
+                                }
+                            ]}
+                            refs={{
+                                refContactSearchFirstName: refCustomerContactSearchFirstName,
+                                refContactNotes: refCustomerContactNotes,
+                                refParentMailingCode: refCustomerMailingCode
+                            }}
+                            tabTimes={props.tabTimes}
+
+                            validateContactForSaving={validateContactForSaving}
+                            selectedParent={selectedCustomer}
+                            selectedContact={selectedContact}
+                            setSelectedContact={setSelectedContact}
+                            showingContactList={showingContactList}
+                            setShowingContactList={setShowingContactList}
+                            searchContactBtnClick={searchContactBtnClick}
+                            contactListItemDoubleClick={contactListItemDoubleClick}
+
+                        />
 
                     </div>
 
@@ -8680,7 +5706,11 @@ const Customers = (props) => {
                         (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer crm')?.pivot?.edit || 0) === 0))
                         ? 'mochi-button disabled wrap' : 'mochi-button wrap'
                 } onClick={() => {
-                    window.open('https://crm.et3.dev/index.php?module=Users&action=Login', '_blank').focus();
+                    if (props.user.id === 1 || props.user.email_work === 'bdoss@et3logistics.com') {
+                        window.open('https://suitecrm.et3.dev/index.php?module=Users&action=Login', '_blank').focus();
+                    } else {
+                        window.open('https://crm.et3.dev/index.php?module=Users&action=Login', '_blank').focus();
+                    }
                 }}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">CRM</div>

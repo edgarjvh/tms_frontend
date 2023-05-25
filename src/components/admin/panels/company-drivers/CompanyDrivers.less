@@ -1,0 +1,32 @@
+.company-driver-container{
+    display: grid;
+    grid-template-columns: 500px 500px;
+    grid-template-rows: auto auto auto 1fr;
+    grid-gap: 10px;
+    padding: 10px 0;
+    flex-grow: 1;
+
+    .drivers-license-info{
+        display: flex;
+        flex-direction: row;
+
+        .form-col{
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+
+            &:last-child{
+                flex-grow: unset;
+                width: 160px;
+            }            
+        }
+
+        .input-box-container{
+
+            &.state{
+                width: 2.8rem;
+            }
+
+        }
+    }
+}

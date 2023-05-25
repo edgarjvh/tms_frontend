@@ -5517,8 +5517,8 @@ const Invoice = (props) => {
                                                     ((props.user?.user_code?.is_admin || 0) === 1 &&
                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1))) {
-                                                    
-                                                            const { rate, linehaul, total_charges } = rating;
+
+                                                    const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedBillToRating({
                                                         ...rating,
@@ -6653,9 +6653,9 @@ const Invoice = (props) => {
                                 placeholder='Description'
                                 ref={refCarrierDescription}
                                 onKeyDown={(e) => {
-                                    if ((selectedOrder?.is_cancelled || 0) === 0){
+                                    if ((selectedOrder?.is_cancelled || 0) === 0) {
                                         let key = e.keyCode || e.which;
-    
+
                                         if (key === 9) {
                                             if ((selectedCarrierRating?.rate_type?.id || 0) === 0 || (selectedCarrierRating?.rate_type?.name || '').toLowerCase() === 'comment') {
                                                 validateCarrierRatingForSaving(e);
@@ -9437,8 +9437,8 @@ const Invoice = (props) => {
                                                     ((props.user?.user_code?.is_admin || 0) === 1 &&
                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
-                                                    
-                                                            const { rate, linehaul, total_charges } = rating;
+
+                                                    const { rate, linehaul, total_charges } = rating;
 
                                                     setSelectedCarrierRating({
                                                         ...rating,
@@ -9746,9 +9746,9 @@ const Invoice = (props) => {
                             <div className="form-buttons">
                                 <div className={
                                     (selectedOrder?.is_cancelled || 0) === 1 ||
-                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                         ? 'mochi-button disabled' : 'mochi-button'
                                 } onClick={() => {
                                     if ((selectedOrder?.id || 0) === 0) {
@@ -9866,9 +9866,9 @@ const Invoice = (props) => {
                             <div className="form-buttons">
                                 <div className={
                                     (selectedOrder?.is_cancelled || 0) === 1 ||
-                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                         ? 'mochi-button disabled' : 'mochi-button'
                                 } onClick={() => {
                                     if ((selectedOrder?.id || 0) === 0) {
@@ -10346,36 +10346,36 @@ const Invoice = (props) => {
                             gridGap: 5
                         }}>
                             <div className='selected-pickup-number'>
-                                <span>BOL Numbers:</span> 
+                                <span>BOL Numbers:</span>
                                 {
                                     (selectedRoute?.bol_numbers || '').split('|').map((item, index) => {
-                                        if (item.trim() !== ''){
+                                        if (item.trim() !== '') {
                                             return (<span>{item}</span>)
-                                        }else{
+                                        } else {
                                             return ''
                                         }
                                     })
                                 }
                             </div>
                             <div className='selected-pickup-number'>
-                                <span>Ref Numbers:</span> 
+                                <span>Ref Numbers:</span>
                                 {
                                     (selectedRoute?.ref_numbers || '').split('|').map((item, index) => {
-                                        if (item.trim() !== ''){
+                                        if (item.trim() !== '') {
                                             return (<span>{item}</span>)
-                                        }else{
+                                        } else {
                                             return ''
                                         }
                                     })
                                 }
                             </div>
                             <div className='selected-pickup-number'>
-                                <span>PO Numbers:</span> 
+                                <span>PO Numbers:</span>
                                 {
                                     (selectedRoute?.po_numbers || '').split('|').map((item, index) => {
-                                        if (item.trim() !== ''){
+                                        if (item.trim() !== '') {
                                             return (<span>{item}</span>)
-                                        }else{
+                                        } else {
                                             return ''
                                         }
                                     })
@@ -10400,9 +10400,9 @@ const Invoice = (props) => {
                                 <div className='form-buttons'>
                                     <div className={
                                         (selectedOrder?.is_cancelled || 0) === 1 ||
-                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                             ? 'mochi-button disabled' : 'mochi-button'
                                     } onClick={() => {
                                         if ((selectedOrder?.id || 0) === 0) {
@@ -10442,7 +10442,7 @@ const Invoice = (props) => {
                                 <div className='form-buttons'>
                                     <div className={
                                         (selectedOrder?.is_cancelled || 0) === 1 ||
-                                        (selectedOrder?.invoice_customer_reviewed || 0) === 1 ||
+                                            (selectedOrder?.invoice_customer_reviewed || 0) === 1 ||
                                             ((props.user?.user_code?.is_admin || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -11523,7 +11523,7 @@ const Invoice = (props) => {
                     }}>
                         <div className={
                             (selectedOrder?.is_cancelled || 0) === 1 ||
-                            (selectedOrder?.order_invoiced || 0) === 0 ||
+                                (selectedOrder?.order_invoiced || 0) === 0 ||
                                 ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
@@ -11550,9 +11550,9 @@ const Invoice = (props) => {
                         </div>
                         <div className={
                             (selectedOrder?.is_cancelled || 0) === 1 ||
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                 ? 'mochi-button disabled' : 'mochi-button'
                         }
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -11562,9 +11562,9 @@ const Invoice = (props) => {
                         </div>
                         <div className={
                             (selectedOrder?.is_cancelled || 0) === 1 ||
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                 ? 'mochi-button disabled' : 'mochi-button'
                         }
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -11583,14 +11583,25 @@ const Invoice = (props) => {
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                     }
                                     onKeyDown={(e) => {
-                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
                                             let key = e.keyCode || e.which;
-    
+
                                             if (((props.user?.user_code?.is_admin || 0) === 1 ||
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                 if (key === 9) {
-                                                    validateOrderForSaving(e);
+                                                    // validateOrderForSaving(e);
+
+                                                    if ((selectedOrder?.id || 0) > 0) {
+                                                        axios.post(props.serverUrl + '/saveInvoiceCustomerCheckNumber', {
+                                                            id: selectedOrder.id,
+                                                            customer_check_number: e.target.value.trim()
+                                                        }).then(res => {
+
+                                                        }).catch(e => {
+                                                            console.log(e);
+                                                        });
+                                                    }
                                                 }
                                             }
                                         }
@@ -11628,31 +11639,31 @@ const Invoice = (props) => {
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                         }
                                         onKeyDown={async (e) => {
-                                            if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            if ((selectedOrder?.is_cancelled || 0) === 0) {
                                                 let key = e.keyCode || e.which;
-    
+
                                                 if (((props.user?.user_code?.is_admin || 0) === 1 ||
                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                     if (key >= 37 && key <= 40) {
                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
                                                         await setPreSelectedDateReceived(event_date);
-    
+
                                                         if (isDateReceivedCalendarShown) {
                                                             e.preventDefault();
-    
+
                                                             if (key === 37) { // left - minus 1
                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(1, 'day'));
                                                             }
-    
+
                                                             if (key === 38) { // up - minus 7
                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().subtract(7, 'day'));
                                                             }
-    
+
                                                             if (key === 39) { // right - plus 1
                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().add(1, 'day'));
                                                             }
-    
+
                                                             if (key === 40) { // down - plus 7
                                                                 setPreSelectedDateReceived(preSelectedDateReceived.clone().add(7, 'day'));
                                                             }
@@ -11660,44 +11671,62 @@ const Invoice = (props) => {
                                                             await setIsDateReceivedCalendarShown(true);
                                                         }
                                                     }
-    
+
                                                     if (key === 13) {
                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
                                                         await setPreSelectedDateReceived(event_date);
-    
+
                                                         if (isDateReceivedCalendarShown) {
                                                             event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
-    
+
                                                             await setSelectedOrder(selectedOrder => {
                                                                 return {
                                                                     ...selectedOrder,
                                                                     customer_date_received: event_date
                                                                 }
                                                             })
-    
-                                                            await validateOrderForSaving({ keyCode: 9 });
-    
-                                                            await setIsDateReceivedCalendarShown(false);
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceCustomerDateReceived', {
+                                                                    id: selectedOrder.id,
+                                                                    customer_date_received: event_date
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setIsDateReceivedCalendarShown(false);
+                                                                });
+                                                            }
                                                         }
                                                     }
-    
+
                                                     if (key === 9) {
                                                         let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.customer_date_received || ''), 'MM/DD/YYYY');
                                                         await setPreSelectedDateReceived(event_date);
-    
+
                                                         if (isDateReceivedCalendarShown) {
                                                             event_date = preSelectedDateReceived.clone().format('MM/DD/YYYY');
-    
+
                                                             await setSelectedOrder(selectedOrder => {
                                                                 return {
                                                                     ...selectedOrder,
                                                                     customer_date_received: event_date
                                                                 }
                                                             })
-    
-                                                            await validateOrderForSaving({ keyCode: 9 });
-    
-                                                            await setIsDateReceivedCalendarShown(false);
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceCustomerDateReceived', {
+                                                                    id: selectedOrder.id,
+                                                                    customer_date_received: event_date
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setIsDateReceivedCalendarShown(false);
+                                                                });
+                                                            }
                                                         } else {
                                                             if (e.target.value.trim() === '') {
                                                                 await setSelectedOrder(selectedOrder => {
@@ -11706,8 +11735,28 @@ const Invoice = (props) => {
                                                                         customer_date_received: null
                                                                     }
                                                                 })
-    
-                                                                await validateOrderForSaving({ keyCode: 9 });
+
+                                                                if ((selectedOrder?.id || 0) > 0) {
+                                                                    axios.post(props.serverUrl + '/saveInvoiceCustomerDateReceived', {
+                                                                        id: selectedOrder.id,
+                                                                        customer_date_received: null
+                                                                    }).then(res => {
+
+                                                                    }).catch(e => {
+                                                                        console.log(e);
+                                                                    });
+                                                                }
+                                                            } else {
+                                                                if ((selectedOrder?.id || 0) > 0) {
+                                                                    axios.post(props.serverUrl + '/saveInvoiceCustomerDateReceived', {
+                                                                        id: selectedOrder.id,
+                                                                        customer_date_received: event_date.clone().format('MM/DD/YYYY')
+                                                                    }).then(res => {
+
+                                                                    }).catch(e => {
+                                                                        console.log(e);
+                                                                    });
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -11715,7 +11764,7 @@ const Invoice = (props) => {
                                             }
                                         }}
                                         onBlur={e => {
-                                            if ((selectedOrder?.is_cancelled || 0) === 0){
+                                            if ((selectedOrder?.is_cancelled || 0) === 0) {
                                                 setSelectedOrder(selectedOrder => {
                                                     return {
                                                         ...selectedOrder,
@@ -11754,8 +11803,11 @@ const Invoice = (props) => {
                                                 if (isDateReceivedCalendarShown) {
                                                     setIsDateReceivedCalendarShown(false);
                                                 } else {
-                                                    // e.stopPropagation();
+                                                    e.stopPropagation();
 
+                                                    setIsInvoiceReceivedDateCalendarShown(false);
+                                                    setTermsItems([]);
+                                                    setIsDatePaidCalendarShown(false);
 
                                                     new Promise((resolve, reject) => {
                                                         if (moment((selectedOrder?.customer_date_received || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.customer_date_received || '').trim()) {
@@ -11769,7 +11821,7 @@ const Invoice = (props) => {
                                                         setIsDateReceivedCalendarShown(true);
                                                         refDateReceived.current.inputElement.focus();
                                                     }).catch(e => {
-
+                                                        console.log(e)
                                                     });
 
                                                 }
@@ -11807,9 +11859,22 @@ const Invoice = (props) => {
                                                                         }
                                                                     })
 
-                                                                    resolve('OK')
+                                                                    resolve(day.format('MM/DD/YYYY'))
                                                                 }).then(response => {
-                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                    // validateOrderForSaving({ keyCode: 9 });
+
+                                                                    if ((selectedOrder?.id || 0) > 0) {
+                                                                        axios.post(props.serverUrl + '/saveInvoiceCustomerDateReceived', {
+                                                                            id: selectedOrder.id,
+                                                                            customer_date_received: response
+                                                                        }).then(res => {
+
+                                                                        }).catch(e => {
+                                                                            console.log(e);
+                                                                        }).finally(() => {
+                                                                            setIsDateReceivedCalendarShown(false);
+                                                                        });
+                                                                    }
                                                                 })
                                                             }}
                                                             closeCalendar={() => {
@@ -11849,31 +11914,31 @@ const Invoice = (props) => {
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                     }
                                     onKeyDown={async (e) => {
-                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
                                             let key = e.keyCode || e.which;
-    
+
                                             if (((props.user?.user_code?.is_admin || 0) === 1 ||
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                 if (key >= 37 && key <= 40) {
                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
                                                     await setPreSelectedInvoiceReceivedDate(event_date);
-    
+
                                                     if (isInvoiceReceivedDateCalendarShown) {
                                                         e.preventDefault();
-    
+
                                                         if (key === 37) { // left - minus 1
                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(1, 'day'));
                                                         }
-    
+
                                                         if (key === 38) { // up - minus 7
                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().subtract(7, 'day'));
                                                         }
-    
+
                                                         if (key === 39) { // right - plus 1
                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(1, 'day'));
                                                         }
-    
+
                                                         if (key === 40) { // down - plus 7
                                                             setPreSelectedInvoiceReceivedDate(preSelectedInvoiceReceivedDate.clone().add(7, 'day'));
                                                         }
@@ -11881,44 +11946,62 @@ const Invoice = (props) => {
                                                         await setIsInvoiceReceivedDateCalendarShown(true);
                                                     }
                                                 }
-    
+
                                                 if (key === 13) {
                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
                                                     await setPreSelectedInvoiceReceivedDate(event_date);
-    
+
                                                     if (isInvoiceReceivedDateCalendarShown) {
                                                         event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
-    
+
                                                         await setSelectedOrder(selectedOrder => {
                                                             return {
                                                                 ...selectedOrder,
                                                                 invoice_received_date: event_date
                                                             }
                                                         })
-    
-                                                        await validateOrderForSaving({ keyCode: 9 });
-    
-                                                        await setIsInvoiceReceivedDateCalendarShown(false);
+
+                                                        if ((selectedOrder?.id || 0) > 0) {
+                                                            axios.post(props.serverUrl + '/saveInvoiceCarrierReceivedDate', {
+                                                                id: selectedOrder.id,
+                                                                invoice_received_date: event_date
+                                                            }).then(res => {
+
+                                                            }).catch(e => {
+                                                                console.log(e);
+                                                            }).finally(() => {
+                                                                setIsInvoiceReceivedDateCalendarShown(false);
+                                                            });
+                                                        }
                                                     }
                                                 }
-    
+
                                                 if (key === 9) {
                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_received_date || ''), 'MM/DD/YYYY');
                                                     await setPreSelectedInvoiceReceivedDate(event_date);
-    
+
                                                     if (isInvoiceReceivedDateCalendarShown) {
                                                         event_date = preSelectedInvoiceReceivedDate.clone().format('MM/DD/YYYY');
-    
+
                                                         await setSelectedOrder(selectedOrder => {
                                                             return {
                                                                 ...selectedOrder,
                                                                 invoice_received_date: event_date
                                                             }
                                                         })
-    
-                                                        await validateOrderForSaving({ keyCode: 9 });
-    
-                                                        await setIsInvoiceReceivedDateCalendarShown(false);
+
+                                                        if ((selectedOrder?.id || 0) > 0) {
+                                                            axios.post(props.serverUrl + '/saveInvoiceCarrierReceivedDate', {
+                                                                id: selectedOrder.id,
+                                                                invoice_received_date: event_date
+                                                            }).then(res => {
+
+                                                            }).catch(e => {
+                                                                console.log(e);
+                                                            }).finally(() => {
+                                                                setIsInvoiceReceivedDateCalendarShown(false);
+                                                            });
+                                                        }
                                                     } else {
                                                         if (e.target.value.trim() === '') {
                                                             await setSelectedOrder(selectedOrder => {
@@ -11927,8 +12010,28 @@ const Invoice = (props) => {
                                                                     invoice_received_date: null
                                                                 }
                                                             })
-    
-                                                            await validateOrderForSaving({ keyCode: 9 });
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceCarrierReceivedDate', {
+                                                                    id: selectedOrder.id,
+                                                                    invoice_received_date: null
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                });
+                                                            }
+                                                        } else {
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceCarrierReceivedDate', {
+                                                                    id: selectedOrder.id,
+                                                                    invoice_received_date: event_date.clone().format('MM/DD/YYYY')
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                });
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -11936,7 +12039,7 @@ const Invoice = (props) => {
                                         }
                                     }}
                                     onBlur={e => {
-                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
                                             setSelectedOrder(selectedOrder => {
                                                 return {
                                                     ...selectedOrder,
@@ -11975,6 +12078,12 @@ const Invoice = (props) => {
                                             if (isInvoiceReceivedDateCalendarShown) {
                                                 setIsInvoiceReceivedDateCalendarShown(false);
                                             } else {
+                                                e.stopPropagation();
+
+                                                setIsDateReceivedCalendarShown(false);
+                                                setTermsItems([]);
+                                                setIsDatePaidCalendarShown(false);
+
                                                 new Promise((resolve, reject) => {
                                                     if (moment((selectedOrder?.invoice_received_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_received_date || '').trim()) {
                                                         setPreSelectedInvoiceReceivedDate(moment(selectedOrder?.invoice_received_date, 'MM/DD/YYYY'));
@@ -12023,9 +12132,20 @@ const Invoice = (props) => {
                                                                     }
                                                                 })
 
-                                                                resolve('OK')
+                                                                resolve(day.format('MM/DD/YYYY'))
                                                             }).then(response => {
-                                                                validateOrderForSaving({ keyCode: 9 });
+                                                                if ((selectedOrder?.id || 0) > 0) {
+                                                                    axios.post(props.serverUrl + '/saveInvoiceCarrierReceivedDate', {
+                                                                        id: selectedOrder.id,
+                                                                        invoice_received_date: response
+                                                                    }).then(res => {
+
+                                                                    }).catch(e => {
+                                                                        console.log(e);
+                                                                    }).finally(() => {
+                                                                        setIsInvoiceReceivedDateCalendarShown(false);
+                                                                    });
+                                                                }
                                                             })
                                                         }}
                                                         closeCalendar={() => {
@@ -12053,14 +12173,23 @@ const Invoice = (props) => {
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                 }
                                 onKeyDown={(e) => {
-                                    if ((selectedOrder?.is_cancelled || 0) === 0){
+                                    if ((selectedOrder?.is_cancelled || 0) === 0) {
                                         let key = e.keyCode || e.which;
-    
+
                                         if (((props.user?.user_code?.is_admin || 0) === 1 ||
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                             if (key === 9) {
-                                                validateOrderForSaving(e);
+                                                if ((selectedOrder?.id || 0) > 0) {
+                                                    axios.post(props.serverUrl + '/saveInvoiceNumber', {
+                                                        id: selectedOrder.id,
+                                                        invoice_number: e.target.value.trim()
+                                                    }).then(res => {
+
+                                                    }).catch(e => {
+                                                        console.log(e);
+                                                    });
+                                                }
                                             }
                                         }
                                     }
@@ -12096,9 +12225,9 @@ const Invoice = (props) => {
                                     }
                                     ref={refTerms}
                                     onKeyDown={async (e) => {
-                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
                                             let key = e.keyCode || e.which;
-    
+
                                             if (((props.user?.user_code?.is_admin || 0) === 1 ||
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
@@ -12108,7 +12237,7 @@ const Invoice = (props) => {
                                                         e.preventDefault();
                                                         if (termsItems.length > 0) {
                                                             let selectedIndex = termsItems.findIndex(item => item.selected);
-    
+
                                                             if (selectedIndex === -1) {
                                                                 await setTermsItems(termsItems.map((item, index) => {
                                                                     item.selected = index === 0;
@@ -12124,7 +12253,7 @@ const Invoice = (props) => {
                                                                     return item;
                                                                 }))
                                                             }
-    
+
                                                             refTermsPopupItems.current.map((r, i) => {
                                                                 if (r && r.classList.contains('selected')) {
                                                                     r.scrollIntoView({
@@ -12144,7 +12273,7 @@ const Invoice = (props) => {
                                                                             : item.id === selectedOrder?.term?.id
                                                                         return item;
                                                                     }))
-    
+
                                                                     refTermsPopupItems.current.map((r, i) => {
                                                                         if (r && r.classList.contains('selected')) {
                                                                             r.scrollIntoView({
@@ -12161,13 +12290,13 @@ const Invoice = (props) => {
                                                             })
                                                         }
                                                         break;
-    
+
                                                     case 39:
                                                     case 40: // arrow right | arrow down
                                                         e.preventDefault();
                                                         if (termsItems.length > 0) {
                                                             let selectedIndex = termsItems.findIndex(item => item.selected);
-    
+
                                                             if (selectedIndex === -1) {
                                                                 await setTermsItems(termsItems.map((item, index) => {
                                                                     item.selected = index === 0;
@@ -12183,7 +12312,7 @@ const Invoice = (props) => {
                                                                     return item;
                                                                 }))
                                                             }
-    
+
                                                             refTermsPopupItems.current.map((r, i) => {
                                                                 if (r && r.classList.contains('selected')) {
                                                                     r.scrollIntoView({
@@ -12203,7 +12332,7 @@ const Invoice = (props) => {
                                                                             : item.id === selectedOrder?.term?.id
                                                                         return item;
                                                                     }))
-    
+
                                                                     refTermsPopupItems.current.map((r, i) => {
                                                                         if (r && r.classList.contains('selected')) {
                                                                             r.scrollIntoView({
@@ -12220,11 +12349,11 @@ const Invoice = (props) => {
                                                             })
                                                         }
                                                         break;
-    
+
                                                     case 27: // escape
                                                         setTermsItems([]);
                                                         break;
-    
+
                                                     case 13: // enter
                                                         if (termsItems.length > 0 && termsItems.findIndex(item => item.selected) > -1) {
                                                             setSelectedOrder(selectedOrder => {
@@ -12234,13 +12363,25 @@ const Invoice = (props) => {
                                                                     term_id: termsItems[termsItems.findIndex(item => item.selected)].id
                                                                 }
                                                             })
-    
-                                                            validateOrderForSaving({ keyCode: 9 });
-                                                            setTermsItems([]);
-                                                            refTerms.current.focus();
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceTerm', {
+                                                                    id: selectedOrder.id,
+                                                                    term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setTermsItems([]);
+                                                                    refTerms.current.focus();
+                                                                });
+                                                            }
+
+
                                                         }
                                                         break;
-    
+
                                                     case 9: // tab
                                                         if (termsItems.length > 0) {
                                                             e.preventDefault();
@@ -12251,13 +12392,23 @@ const Invoice = (props) => {
                                                                     term_id: termsItems[termsItems.findIndex(item => item.selected)].id
                                                                 }
                                                             })
-    
-                                                            validateOrderForSaving({ keyCode: 9 });
-                                                            setTermsItems([]);
-                                                            refTerms.current.focus();
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceTerm', {
+                                                                    id: selectedOrder.id,
+                                                                    term_id: termsItems[termsItems.findIndex(item => item.selected)].id
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setTermsItems([]);
+                                                                    refTerms.current.focus();
+                                                                });
+                                                            }
                                                         }
                                                         break;
-    
+
                                                     default:
                                                         break;
                                                 }
@@ -12265,7 +12416,7 @@ const Invoice = (props) => {
                                         }
                                     }}
                                     onBlur={async () => {
-                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
                                             if ((selectedOrder?.term?.id || 0) === 0) {
                                                 await setTerm({});
                                             }
@@ -12420,9 +12571,19 @@ const Invoice = (props) => {
                                                                             }
                                                                         })
 
-                                                                        validateOrderForSaving({ keyCode: 9 });
-                                                                        setTermsItems([]);
-                                                                        refTerms.current.focus();
+                                                                        if ((selectedOrder?.id || 0) > 0) {
+                                                                            axios.post(props.serverUrl + '/saveInvoiceTerm', {
+                                                                                id: selectedOrder.id,
+                                                                                term_id: item.id
+                                                                            }).then(res => {
+
+                                                                            }).catch(e => {
+                                                                                console.log(e);
+                                                                            }).finally(() => {
+                                                                                setTermsItems([]);
+                                                                                refTerms.current.focus();
+                                                                            });
+                                                                        }
                                                                     }}
                                                                     ref={ref => refTermsPopupItems.current.push(ref)}
                                                                 >
@@ -12477,31 +12638,31 @@ const Invoice = (props) => {
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                     }
                                     onKeyDown={async (e) => {
-                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
                                             let key = e.keyCode || e.which;
-    
+
                                             if (((props.user?.user_code?.is_admin || 0) === 1 ||
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                                 if (key >= 37 && key <= 40) {
                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
                                                     await setPreSelectedDatePaid(event_date);
-    
+
                                                     if (isDatePaidCalendarShown) {
                                                         e.preventDefault();
-    
+
                                                         if (key === 37) { // left - minus 1
                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(1, 'day'));
                                                         }
-    
+
                                                         if (key === 38) { // up - minus 7
                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().subtract(7, 'day'));
                                                         }
-    
+
                                                         if (key === 39) { // right - plus 1
                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().add(1, 'day'));
                                                         }
-    
+
                                                         if (key === 40) { // down - plus 7
                                                             setPreSelectedDatePaid(preSelectedDatePaid.clone().add(7, 'day'));
                                                         }
@@ -12509,44 +12670,62 @@ const Invoice = (props) => {
                                                         await setIsDatePaidCalendarShown(true);
                                                     }
                                                 }
-    
+
                                                 if (key === 13) {
                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
                                                     await setPreSelectedDatePaid(event_date);
-    
+
                                                     if (isDatePaidCalendarShown) {
                                                         event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
-    
+
                                                         await setSelectedOrder(selectedOrder => {
                                                             return {
                                                                 ...selectedOrder,
                                                                 invoice_date_paid: event_date
                                                             }
                                                         })
-    
-                                                        await validateOrderForSaving({ keyCode: 9 });
-    
-                                                        await setIsDatePaidCalendarShown(false);
+
+                                                        if ((selectedOrder?.id || 0) > 0) {
+                                                            axios.post(props.serverUrl + '/saveInvoiceDatePaid', {
+                                                                id: selectedOrder.id,
+                                                                invoice_date_paid: event_date
+                                                            }).then(res => {
+
+                                                            }).catch(e => {
+                                                                console.log(e);
+                                                            }).finally(() => {
+                                                                setIsDatePaidCalendarShown(false);
+                                                            });
+                                                        }
                                                     }
                                                 }
-    
+
                                                 if (key === 9) {
                                                     let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.invoice_date_paid || ''), 'MM/DD/YYYY');
                                                     await setPreSelectedDatePaid(event_date);
-    
+
                                                     if (isDatePaidCalendarShown) {
                                                         event_date = preSelectedDatePaid.clone().format('MM/DD/YYYY');
-    
+
                                                         await setSelectedOrder(selectedOrder => {
                                                             return {
                                                                 ...selectedOrder,
                                                                 invoice_date_paid: event_date
                                                             }
                                                         })
-    
-                                                        await validateOrderForSaving({ keyCode: 9 });
-    
-                                                        await setIsDatePaidCalendarShown(false);
+
+                                                        if ((selectedOrder?.id || 0) > 0) {
+                                                            axios.post(props.serverUrl + '/saveInvoiceDatePaid', {
+                                                                id: selectedOrder.id,
+                                                                invoice_date_paid: event_date
+                                                            }).then(res => {
+
+                                                            }).catch(e => {
+                                                                console.log(e);
+                                                            }).finally(() => {
+                                                                setIsDatePaidCalendarShown(false);
+                                                            });
+                                                        }
                                                     } else {
                                                         if (e.target.value.trim() === '') {
                                                             await setSelectedOrder(selectedOrder => {
@@ -12555,8 +12734,30 @@ const Invoice = (props) => {
                                                                     invoice_date_paid: null
                                                                 }
                                                             })
-    
-                                                            await validateOrderForSaving({ keyCode: 9 });
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceDatePaid', {
+                                                                    id: selectedOrder.id,
+                                                                    invoice_date_paid: null
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                });
+                                                            }
+                                                        } else {
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceDatePaid', {
+                                                                    id: selectedOrder.id,
+                                                                    invoice_date_paid: event_date.clone().format('MM/DD/YYYY')
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setIsDatePaidCalendarShown(false);
+                                                                });
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -12564,7 +12765,7 @@ const Invoice = (props) => {
                                         }
                                     }}
                                     onBlur={e => {
-                                        if ((selectedOrder?.is_cancelled || 0) === 0){
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
                                             setSelectedOrder(selectedOrder => {
                                                 return {
                                                     ...selectedOrder,
@@ -12602,6 +12803,12 @@ const Invoice = (props) => {
                                             if (isDatePaidCalendarShown) {
                                                 setIsDatePaidCalendarShown(false);
                                             } else {
+                                                e.stopPropagation();
+
+                                                setIsDateReceivedCalendarShown(false);
+                                                setIsInvoiceReceivedDateCalendarShown(false);
+                                                setTermsItems([]);
+
                                                 new Promise((resolve, reject) => {
                                                     if (moment((selectedOrder?.invoice_date_paid || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_date_paid || '').trim()) {
                                                         setPreSelectedDatePaid(moment(selectedOrder?.invoice_date_paid, 'MM/DD/YYYY'));
@@ -12648,7 +12855,18 @@ const Invoice = (props) => {
                                                                 }
                                                             });
 
-                                                            validateOrderForSaving({ keyCode: 9 });
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceDatePaid', {
+                                                                    id: selectedOrder.id,
+                                                                    invoice_date_paid: day.format('MM/DD/YYYY')
+                                                                }).then(res => {
+    
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setIsDatePaidCalendarShown(false);
+                                                                });
+                                                            }
                                                         }}
                                                         closeCalendar={() => {
                                                             setIsDatePaidCalendarShown(false);
@@ -12675,17 +12893,27 @@ const Invoice = (props) => {
                                         ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
                                 }
                                 onKeyDown={(e) => {
-                                    if ((selectedOrder?.is_cancelled || 0) === 0){
+                                    if ((selectedOrder?.is_cancelled || 0) === 0) {
                                         let key = e.keyCode || e.which;
-    
+
                                         if (((props.user?.user_code?.is_admin || 0) === 1 ||
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                             if (key === 9) {
                                                 e.preventDefault();
-                                                validateOrderForSaving(e);
-    
-                                                refOrderNumber.current.focus();
+                                                
+                                                if ((selectedOrder?.id || 0) > 0) {
+                                                    axios.post(props.serverUrl + '/saveInvoiceCarrierCheckNumber', {
+                                                        id: selectedOrder.id,
+                                                        carrier_check_number: e.target.value.trim()
+                                                    }).then(res => {
+
+                                                    }).catch(e => {
+                                                        console.log(e);
+                                                    }).finally(() => {
+                                                        refOrderNumber.current.focus();
+                                                    });
+                                                }                                                
                                             }
                                         }
                                     }

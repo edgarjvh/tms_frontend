@@ -1234,22 +1234,22 @@ const Carriers = (props) => {
 
                                     carrier.mailing_address = mailing_address;
 
-                                    setSelectedCarrier({
-                                        ...carrier,
-                                        credit_limit_total: carrier.credit_limit_total.toFixed(2)
-                                    });
+                                    // setSelectedCarrier({
+                                    //     ...carrier,
+                                    //     credit_limit_total: carrier.credit_limit_total.toFixed(2)
+                                    // });
                                     setSelectedContact((carrier.contacts || []).find(c => c.is_primary === 1) || {});
 
-                                    if ((props.selectedCarrier?.id || 0) === 0) {
-                                        props.setSelectedCarrier({
-                                            ...carrier,
-                                            component_id: props.componentId
-                                        });
-                                        props.setSelectedContact({
-                                            ...((carrier.contacts || []).find(c => c.is_primary === 1) || {}),
-                                            component_id: props.componentId
-                                        });
-                                    }
+                                    // if ((props.selectedCarrier?.id || 0) === 0) {
+                                    //     props.setSelectedCarrier({
+                                    //         ...carrier,
+                                    //         component_id: props.componentId
+                                    //     });
+                                    //     props.setSelectedContact({
+                                    //         ...((carrier.contacts || []).find(c => c.is_primary === 1) || {}),
+                                    //         component_id: props.componentId
+                                    //     });
+                                    // }
 
                                     setSelectedInsurance({});
                                     setSelectedDriver({});
@@ -8408,22 +8408,22 @@ const Carriers = (props) => {
 
                                             carrier.mailing_address = mailing_address;
 
-                                            setSelectedCarrier({
-                                                ...carrier,
-                                                credit_limit_total: carrier.credit_limit_total.toFixed(2)
-                                            });
+                                            // setSelectedCarrier({
+                                            //     ...carrier,
+                                            //     credit_limit_total: carrier.credit_limit_total.toFixed(2)
+                                            // });
                                             setSelectedContact((carrier.contacts || []).find(c => c.is_primary === 1) || {});
 
-                                            if ((props.selectedCarrier?.id || 0) === 0) {
-                                                props.setSelectedCarrier({
-                                                    ...carrier,
-                                                    component_id: props.componentId
-                                                });
-                                                props.setSelectedContact({
-                                                    ...((carrier.contacts || []).find(c => c.is_primary === 1) || {}),
-                                                    component_id: props.componentId
-                                                });
-                                            }
+                                            // if ((props.selectedCarrier?.id || 0) === 0) {
+                                            //     props.setSelectedCarrier({
+                                            //         ...carrier,
+                                            //         component_id: props.componentId
+                                            //     });
+                                            //     props.setSelectedContact({
+                                            //         ...((carrier.contacts || []).find(c => c.is_primary === 1) || {}),
+                                            //         component_id: props.componentId
+                                            //     });
+                                            // }
 
                                             setSelectedDriver({});
                                             setSelectedInsurance({});

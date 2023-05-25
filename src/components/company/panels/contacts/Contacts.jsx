@@ -7,6 +7,8 @@ import Draggable from 'react-draggable';
 import './Contacts.css';
 import MaskedInput from 'react-text-mask';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import VCard from 'vcard-creator';
+import FileSaver from 'file-saver';
 import {
     faCaretDown,
     faCaretRight,
@@ -38,6 +40,7 @@ import { animated, useTransition } from "react-spring";
 
 import { PassModal } from './../../../admin/panels/';
 
+var vCardsJS = require('vcards-js');
 
 const Contacts = (props) => {
     const refPrefix = useRef();
@@ -346,6 +349,50 @@ const Contacts = (props) => {
             });
         }
     }
+
+    const exportContact = () => {
+        let selectedPerson = {};
+
+        if (isEditingContact) {
+            selectedPerson = { ...tempSelectedContact };
+        } else {
+            selectedPerson = { ...contactSearchCustomer?.selectedContact }
+        }
+
+        let baseUrl = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PRO_SERVER_BASE_URL : process.env.REACT_APP_DEV_SERVER_BASE_URL;
+        let photo = (selectedPerson?.avatar || '') !== '' ? selectedPerson?.avatar : '';
+
+        const myVCard = new VCard();
+
+        myVCard
+        .addName((selectedPerson?.last_name || ''), (selectedPerson?.first_name || ''), (selectedPerson?.middle_name || ''),(selectedPerson?.prefix || ''), (selectedPerson?.suffix || ''))
+        .addCompany((selectedPerson?.company || ''), (selectedPerson?.department || ''))
+        .addJobtitle((selectedPerson?.tittle || ''))
+        .addEmail((selectedPerson?.email_work || ''), 'PREF;WORK')
+        .addEmail((selectedPerson?.email_personal || ''))
+        .addEmail((selectedPerson?.email_other || ''))
+        .addPhoneNumber((selectedPerson?.phone_work || ''), 'PREF;WORK')
+        .addPhoneNumber((selectedPerson?.phone_work_fax || ''), 'FAX')
+        .addPhoneNumber((selectedPerson?.phone_mobile || ''), 'CELL')
+        .addPhoneNumber((selectedPerson?.phone_direct || ''), 'HOME')
+        .addAddress(null,null,(selectedPerson?.address1 || ''),(selectedPerson?.city || ''),(selectedPerson?.state || ''),(selectedPerson?.zip_code || ''),(selectedPerson?.country || ''))
+        .addURL((selectedPerson?.website || ''))
+        .addNote((selectedPerson?.notes || ''))
+        .addPhotoURL(baseUrl + 'avatars/' + photo)
+        
+        let file = new Blob([
+            myVCard.toString()
+        ],
+            { type: "text/vcard;charset=utf-8" });
+
+        FileSaver.saveAs(
+            file,
+            `${selectedPerson?.first_name || ''}${selectedPerson?.last_name || ''}.vcf`,
+            true
+        );
+
+        
+    }    
 
     const contactAvatarChange = (e) => {
         let files = e.target.files;
@@ -891,6 +938,26 @@ const Contacts = (props) => {
 
                                     <div className={
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.export || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={exportContact} style={{
+                                        marginLeft: '0.2rem',
+                                        pointerEvents: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.export || 0) === 1))
+                                            ? 'all' : 'none',
+                                        cursor: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.export || 0) === 1))
+                                            ? 'pointer' : 'not-allowed'
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Export</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.delete || 0) === 0)
                                             ? 'mochi-button disabled' : 'mochi-button'
                                     } onClick={deleteContact} style={{
@@ -1134,7 +1201,7 @@ const Contacts = (props) => {
 
                                     <div className="field-container">
                                         <div className="field-title">E-mail Work</div>
-                                        <input type="text" readOnly={!isEditingContact} 
+                                        <input type="text" readOnly={!isEditingContact}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
