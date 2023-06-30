@@ -32,7 +32,9 @@ import {
     setSelectedCarrier,
     setSelectedCarrierContact,
     setSelectedFactoringCompany,
-    setSelectedFactoringCompanyContact
+    setSelectedFactoringCompanyContact,
+    setSelectedCompanyDriver as setSelectedDriver,
+    setSelectedDriverContact
 } from './../../../../actions';
 import { Documents } from "../index";
 import moment from "moment";
@@ -279,6 +281,11 @@ const Contacts = (props) => {
                     props.setSelectedOwnerOperatorContact(contact);
                 }
 
+                if (props.owner === 'driver'){
+                    props.setSelectedDriver({ ...props.selectedDriver, contacts: contacts});
+                    props.setSelectedDriverContact(contact);
+                }
+
                 setContactSearchCustomer(prev => {
                     return {
                         ...prev,
@@ -365,21 +372,21 @@ const Contacts = (props) => {
         const myVCard = new VCard();
 
         myVCard
-        .addName((selectedPerson?.last_name || ''), (selectedPerson?.first_name || ''), (selectedPerson?.middle_name || ''),(selectedPerson?.prefix || ''), (selectedPerson?.suffix || ''))
-        .addCompany((selectedPerson?.company || ''), (selectedPerson?.department || ''))
-        .addJobtitle((selectedPerson?.tittle || ''))
-        .addEmail((selectedPerson?.email_work || ''), 'PREF;WORK')
-        .addEmail((selectedPerson?.email_personal || ''))
-        .addEmail((selectedPerson?.email_other || ''))
-        .addPhoneNumber((selectedPerson?.phone_work || ''), 'PREF;WORK')
-        .addPhoneNumber((selectedPerson?.phone_work_fax || ''), 'FAX')
-        .addPhoneNumber((selectedPerson?.phone_mobile || ''), 'CELL')
-        .addPhoneNumber((selectedPerson?.phone_direct || ''), 'HOME')
-        .addAddress(null,null,(selectedPerson?.address1 || ''),(selectedPerson?.city || ''),(selectedPerson?.state || ''),(selectedPerson?.zip_code || ''),(selectedPerson?.country || ''))
-        .addURL((selectedPerson?.website || ''))
-        .addNote((selectedPerson?.notes || ''))
-        .addPhotoURL(baseUrl + 'avatars/' + photo)
-        
+            .addName((selectedPerson?.last_name || ''), (selectedPerson?.first_name || ''), (selectedPerson?.middle_name || ''), (selectedPerson?.prefix || ''), (selectedPerson?.suffix || ''))
+            .addCompany((selectedPerson?.company || ''), (selectedPerson?.department || ''))
+            .addJobtitle((selectedPerson?.tittle || ''))
+            .addEmail((selectedPerson?.email_work || ''), 'PREF;WORK')
+            .addEmail((selectedPerson?.email_personal || ''))
+            .addEmail((selectedPerson?.email_other || ''))
+            .addPhoneNumber((selectedPerson?.phone_work || ''), 'PREF;WORK')
+            .addPhoneNumber((selectedPerson?.phone_work_fax || ''), 'FAX')
+            .addPhoneNumber((selectedPerson?.phone_mobile || ''), 'CELL')
+            .addPhoneNumber((selectedPerson?.phone_direct || ''), 'HOME')
+            .addAddress(null, null, (selectedPerson?.address1 || ''), (selectedPerson?.city || ''), (selectedPerson?.state || ''), (selectedPerson?.zip_code || ''), (selectedPerson?.country || ''))
+            .addURL((selectedPerson?.website || ''))
+            .addNote((selectedPerson?.notes || ''))
+            .addPhotoURL(baseUrl + 'avatars/' + photo)
+
         let file = new Blob([
             myVCard.toString()
         ],
@@ -391,8 +398,8 @@ const Contacts = (props) => {
             true
         );
 
-        
-    }    
+
+    }
 
     const contactAvatarChange = (e) => {
         let files = e.target.files;
@@ -779,117 +786,147 @@ const Contacts = (props) => {
                                 {/*</div>*/}
                             </div>
                             <div className="contact-buttons">
-                                <div className="input-toggle-container">
-                                    <input type="checkbox" id="cbox-panel-customer-contacts-primary-btn"
-                                        onChange={e => {
-                                            if (tempSelectedContact.customer) {
-                                                setTempSelectedContact(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        pivot: {
-                                                            ...tempSelectedContact?.pivot || {},
-                                                            is_primary: e.target.checked ? 1 : 0
-                                                        }
-                                                    }
-                                                })
-                                            } else {
-                                                setTempSelectedContact(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        is_primary: e.target.checked ? 1 : 0
-                                                    }
-                                                })
-                                            }
-
+                                {
+                                    (props.owner || '') === 'driver' &&
+                                    <div className="input-box-container" style={{ width: '7rem', marginBottom: 10 }}>
+                                        <input type="number" placeholder='Priority' min={1} max={10} readOnly={!isEditingContact} style={{
+                                            textTransform: 'capitalize'
                                         }}
-                                        disabled={!isEditingContact}
-                                        checked={isEditingContact
-                                            ? tempSelectedContact?.pivot
-                                                ? (tempSelectedContact?.pivot.is_primary || 0) === 1
-                                                : (tempSelectedContact?.is_primary || 0) === 1
-                                            : contactSearchCustomer?.selectedContact?.pivot
-                                                ? (contactSearchCustomer?.selectedContact?.pivot?.is_primary || 0) === 1
-                                                : (contactSearchCustomer?.selectedContact?.is_primary || 0) === 1
+                                            onInput={(e) => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    priority: e.target.value
+                                                });
+                                            }}
+                                            onChange={e => {
+                                                setTempSelectedContact({
+                                                    ...tempSelectedContact,
+                                                    priority: e.target.value
+                                                });
+                                            }}
+                                            value={isEditingContact ? tempSelectedContact.priority || '' : contactSearchCustomer?.selectedContact?.priority || ''}
+                                        />
 
-                                        } />
-                                    <label htmlFor="cbox-panel-customer-contacts-primary-btn">
-                                        <div className="label-text">Primary</div>
-                                        <div className="input-toggle-btn"></div>
-                                    </label>
-                                </div>
-
-                                <div className="input-toggle-container">
-                                    <input type="checkbox" id="cbox-panel-customer-contacts-type-btn"
-                                        onChange={e => {
-                                            isEditingContact
-                                                ? (tempSelectedContact?.type || 'internal') === 'internal'
-                                                    ? setTempSelectedContact(prev => {
+                                    </div>
+                                }
+                                {
+                                    (props.owner || '') !== 'driver' &&
+                                    <div className="input-toggle-container">
+                                        <input type="checkbox" id="cbox-panel-customer-contacts-primary-btn"
+                                            onChange={e => {
+                                                if (tempSelectedContact.customer) {
+                                                    setTempSelectedContact(prev => {
                                                         return {
                                                             ...prev,
-                                                            type: 'external',
-                                                            prefix: '',
-                                                            first_name: '',
-                                                            middle_name: '',
-                                                            last_name: '',
-                                                            suffix: '',
-                                                            company: '',
-                                                            title: '',
-                                                            department: '',
-                                                            email_work: '',
-                                                            email_personal: '',
-                                                            email_other: '',
-                                                            primary_email: 'work',
-                                                            phone_work: '',
-                                                            phone_work_fax: '',
-                                                            phone_mobile: '',
-                                                            phone_direct: '',
-                                                            phone_other: '',
-                                                            phone_ext: '',
-                                                            primary_phone: 'work',
-                                                            country: '',
-                                                            address1: '',
-                                                            address2: '',
-                                                            city: '',
-                                                            state: '',
-                                                            zip_code: '',
-                                                            birthday: '',
-                                                            website: '',
-                                                            notes: '',
-                                                            is_primary: 0
+                                                            pivot: {
+                                                                ...tempSelectedContact?.pivot || {},
+                                                                is_primary: e.target.checked ? 1 : 0
+                                                            }
                                                         }
                                                     })
-                                                    : window.confirm('Are you sure you want to proceed?')
+                                                } else {
+                                                    setTempSelectedContact(prev => {
+                                                        return {
+                                                            ...prev,
+                                                            is_primary: e.target.checked ? 1 : 0
+                                                        }
+                                                    })
+                                                }
+
+                                            }}
+                                            disabled={!isEditingContact}
+                                            checked={isEditingContact
+                                                ? tempSelectedContact?.pivot
+                                                    ? (tempSelectedContact?.pivot.is_primary || 0) === 1
+                                                    : (tempSelectedContact?.is_primary || 0) === 1
+                                                : contactSearchCustomer?.selectedContact?.pivot
+                                                    ? (contactSearchCustomer?.selectedContact?.pivot?.is_primary || 0) === 1
+                                                    : (contactSearchCustomer?.selectedContact?.is_primary || 0) === 1
+
+                                            } />
+                                        <label htmlFor="cbox-panel-customer-contacts-primary-btn">
+                                            <div className="label-text">Primary</div>
+                                            <div className="input-toggle-btn"></div>
+                                        </label>
+                                    </div>
+                                }
+
+                                {
+                                    (props.owner || '') !== 'driver' &&
+                                    <div className="input-toggle-container">
+                                        <input type="checkbox" id="cbox-panel-customer-contacts-type-btn"
+                                            onChange={e => {
+                                                isEditingContact
+                                                    ? (tempSelectedContact?.type || 'internal') === 'internal'
                                                         ? setTempSelectedContact(prev => {
                                                             return {
                                                                 ...prev,
-                                                                company: contactSearchCustomer?.selectedContact?.company || '',
-                                                                address1: contactSearchCustomer?.selectedContact?.address1 || '',
-                                                                address2: contactSearchCustomer?.selectedContact?.address2 || '',
-                                                                city: contactSearchCustomer?.selectedContact?.city || '',
-                                                                state: contactSearchCustomer?.selectedContact?.state || '',
-                                                                zip_code: contactSearchCustomer?.selectedContact?.zip_code || '',
-                                                                type: 'internal'
+                                                                type: 'external',
+                                                                prefix: '',
+                                                                first_name: '',
+                                                                middle_name: '',
+                                                                last_name: '',
+                                                                suffix: '',
+                                                                company: '',
+                                                                title: '',
+                                                                department: '',
+                                                                email_work: '',
+                                                                email_personal: '',
+                                                                email_other: '',
+                                                                primary_email: 'work',
+                                                                phone_work: '',
+                                                                phone_work_fax: '',
+                                                                phone_mobile: '',
+                                                                phone_direct: '',
+                                                                phone_other: '',
+                                                                phone_ext: '',
+                                                                primary_phone: 'work',
+                                                                country: '',
+                                                                address1: '',
+                                                                address2: '',
+                                                                city: '',
+                                                                state: '',
+                                                                zip_code: '',
+                                                                birthday: '',
+                                                                website: '',
+                                                                notes: '',
+                                                                is_primary: 0
                                                             }
                                                         })
-                                                        : e.preventDefault()
-                                                : e.preventDefault()
-                                        }}
-                                        disabled={!isEditingContact}
-                                        checked={isEditingContact
-                                            ? tempSelectedContact?.type === 'internal'
-                                            : contactSearchCustomer?.selectedContact?.type === 'internal'
-                                        } />
-                                    <label htmlFor="cbox-panel-customer-contacts-type-btn" style={{
-                                        backgroundColor: isEditingContact
-                                            ? (tempSelectedContact?.type || 'internal') === 'internal' ? '#ffb80d' : '#0D96FF'
-                                            : (contactSearchCustomer?.selectedContact?.type || 'internal') === 'internal' ? '#ffb80d' : '#0D96FF'
-                                    }}>
-                                        <div className="label-text" style={{
-                                            textTransform: 'capitalize'
-                                        }}>{isEditingContact ? (tempSelectedContact?.type || 'internal') : (contactSearchCustomer?.selectedContact?.type || 'internal')}</div>
-                                        <div className="input-toggle-btn"></div>
-                                    </label>
-                                </div>
+                                                        : window.confirm('Are you sure you want to proceed?')
+                                                            ? setTempSelectedContact(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    company: contactSearchCustomer?.selectedContact?.company || '',
+                                                                    address1: contactSearchCustomer?.selectedContact?.address1 || '',
+                                                                    address2: contactSearchCustomer?.selectedContact?.address2 || '',
+                                                                    city: contactSearchCustomer?.selectedContact?.city || '',
+                                                                    state: contactSearchCustomer?.selectedContact?.state || '',
+                                                                    zip_code: contactSearchCustomer?.selectedContact?.zip_code || '',
+                                                                    type: 'internal'
+                                                                }
+                                                            })
+                                                            : e.preventDefault()
+                                                    : e.preventDefault()
+                                            }}
+                                            disabled={!isEditingContact}
+                                            checked={isEditingContact
+                                                ? tempSelectedContact?.type === 'internal'
+                                                : contactSearchCustomer?.selectedContact?.type === 'internal'
+                                            } />
+                                        <label htmlFor="cbox-panel-customer-contacts-type-btn" style={{
+                                            backgroundColor: isEditingContact
+                                                ? (tempSelectedContact?.type || 'internal') === 'internal' ? '#ffb80d' : '#0D96FF'
+                                                : (contactSearchCustomer?.selectedContact?.type || 'internal') === 'internal' ? '#ffb80d' : '#0D96FF'
+                                        }}>
+                                            <div className="label-text" style={{
+                                                textTransform: 'capitalize'
+                                            }}>{isEditingContact ? (tempSelectedContact?.type || 'internal') : (contactSearchCustomer?.selectedContact?.type || 'internal')}</div>
+                                            <div className="input-toggle-btn"></div>
+                                        </label>
+                                    </div>
+                                }
+
 
                                 <div className="right-buttons" style={{ display: 'flex' }}>
                                     {
@@ -1120,17 +1157,46 @@ const Contacts = (props) => {
                                         <div className={borderBottomClasses}></div>
                                     </div>
 
+                                    {
+                                        (props.owner || '') === 'driver' &&
+                                        <div className="field-container">
+                                            <div className="field-title">Relationship</div>
+                                            <input type="text" readOnly={!isEditingContact} style={{
+                                                textTransform: 'capitalize'
+                                            }}
+                                                onInput={(e) => {
+                                                    setTempSelectedContact({
+                                                        ...tempSelectedContact,
+                                                        relationship: e.target.value
+                                                    });
+                                                }}
+                                                onChange={e => {
+                                                    setTempSelectedContact({
+                                                        ...tempSelectedContact,
+                                                        relationship: e.target.value
+                                                    });
+                                                }}
+                                                value={isEditingContact ? tempSelectedContact.relationship || '' : contactSearchCustomer?.selectedContact?.relationship || ''}
+                                            />
+                                            <div className={borderBottomClasses}></div>
+                                        </div>
+                                    }
+
                                     <div className="field-container">
                                         <div className="field-title">Company</div>
-                                        <input type="text" readOnly={
-                                            isEditingContact
-                                                ? (tempSelectedContact?.type || 'internal') === 'internal'
-                                                    ? true
-                                                    : false
-                                                : true
-                                        } style={{
-                                            textTransform: 'capitalize'
-                                        }}
+                                        <input type="text"
+                                            readOnly={
+                                                props.owner !== 'driver'
+                                                    ? isEditingContact
+                                                        ? (tempSelectedContact?.type || 'internal') === 'internal'
+                                                            ? true
+                                                            : false
+                                                        : true
+                                                    : props.owner !== 'driver'
+                                            }
+                                            style={{
+                                                textTransform: 'capitalize'
+                                            }}
                                             onInput={(e) => {
                                                 setTempSelectedContact({
                                                     ...tempSelectedContact,
@@ -1860,6 +1926,8 @@ const mapStateToProps = (state) => {
         selectedCarrierContact: state.carrierReducers.selectedContact,
         selectedFactoringCompany: state.carrierReducers.selectedFactoringCompany,
         selectedFactoringCompanyContact: state.carrierReducers.selectedFactoringCompanyContact,
+        selectedDriver: state.companySetupReducers.selectedDriver,
+        selectedDriverContact: state.companySetupReducers.selectedDriverContact,
     }
 }
 
@@ -1877,5 +1945,7 @@ export default connect(mapStateToProps, {
     setSelectedCarrier,
     setSelectedCarrierContact,
     setSelectedFactoringCompany,
-    setSelectedFactoringCompanyContact
+    setSelectedFactoringCompanyContact,
+    setSelectedDriver,
+    setSelectedDriverContact
 })(Contacts)

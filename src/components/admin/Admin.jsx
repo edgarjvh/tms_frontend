@@ -29,6 +29,10 @@ import {
 } from '../../actions/adminActions';
 
 import {
+    setCompanySetupOpenedPanels
+} from './../../actions/companySetupActions';
+
+import {
     setSelectedPageIndex as setSelectedCompanyPageIndex,
     setMainCompanyScreenFocused
 } from '../../actions/companyActions';
@@ -346,8 +350,7 @@ function Admin(props) {
             }
         },
         update: panel => {
-            if (panel === undefined) {
-                // setCompanySetupPanels([]);
+            if (panel === undefined) {                
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (dispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
@@ -376,7 +379,6 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                // setCompanySetupPanels([]);
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (customerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
@@ -405,7 +407,7 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                // setCompanySetupPanels([]);
+                
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
@@ -434,7 +436,7 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                // setCompanySetupPanels([]);
+                
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (reportsPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
@@ -463,7 +465,7 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                // setCompanySetupPanels([]);
+                
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (invoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
@@ -492,7 +494,7 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                // setCompanySetupPanels([]);
+                
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (companySetupPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
@@ -932,7 +934,9 @@ function Admin(props) {
                                 isAdmin={true}
                                 origin='company'
                                 openPanel={openPanel}
-                                closePanel={closePanel}
+                                closePanel={(panelName, origin) => {                                    
+                                    closePanel(panelName, origin);
+                                }}
                             />
                         </div>
 
@@ -1260,6 +1264,9 @@ const mapStateToProps = state => {
         mainScreen: state.systemReducers.mainScreen,
         pages: state.adminReducers.pages,
         selectedPageIndex: state.adminReducers.selectedPageIndex,
+
+        companySetupOpenedPanels: state.companySetupReducers.companySetupOpenedPanels,
+
         mainAdminScreenFocused: state.adminReducers.mainAdminScreenFocused,
         dispatchScreenFocused: state.adminReducers.dispatchScreenFocused,
         customerScreenFocused: state.adminReducers.customerScreenFocused,
@@ -1322,6 +1329,9 @@ export default connect(mapStateToProps, {
     setPages,
     setSelectedPageIndex,
     setScale,
+
+    setCompanySetupOpenedPanels,
+
     setMainAdminScreenFocused,
     setDispatchScreenFocused,
     setCustomerScreenFocused,

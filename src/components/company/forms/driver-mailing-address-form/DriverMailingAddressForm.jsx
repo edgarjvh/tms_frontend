@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import './MailingAddressForm.css';
+import './DriverMailingAddressForm.css';
 import classnames from 'classnames';
 import moment from 'moment';
 import MaskedInput from 'react-text-mask';
@@ -10,17 +10,15 @@ import { useDetectClickOutside } from "react-detect-click-outside";
 import axios from 'axios';
 import { useTransition, animated } from 'react-spring';
 
-function MailingAddressForm(props) {
+function DriverMailingAddressForm(props) {
     const {
-        refCode,
-        refName,
+        refAddress1,
         refContactName,
         refContactNamePopupItems,
         refContactPhone,
         refContactPhonePopupItems,
         refContactEmail,
         refContactEmailPopupItems,
-        refMailingName,
     } = props.refs;
 
     const [showMailingContactNames, setShowMailingContactNames] = useState(false);
@@ -48,8 +46,6 @@ function MailingAddressForm(props) {
 
     const [showMailingContactEmailCopyBtn, setShowMailingContactEmailCopyBtn] = useState(false);
 
-
-
     const mailingContactNamesTransition = useTransition(showMailingContactNames, {
         from: { opacity: 0, top: 'calc(100% + 7px)' },
         enter: { opacity: 1, top: 'calc(100% + 12px)' },
@@ -75,11 +71,9 @@ function MailingAddressForm(props) {
     });
 
     useEffect(async () => {
-        if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 || (props.selectedParent?.mailing_customer_id || 0) > 0) {
-            if ((props.selectedParent?.mailing_customer_contact_id || 0) > 0) {
-                let contact = (props.selectedParent?.remit_to_address_is_the_same || 0) === 1
-                    ? (props.selectedParent?.contacts || []).find(x => x.id === props.selectedParent?.mailing_customer_contact_id)
-                    : (props.selectedParent?.mailing_address?.contacts || []).find(x => x.id === props.selectedParent?.mailing_customer_contact_id)
+        if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1) {
+            if ((props.selectedParent?.mailing_contact_id || 0) > 0) {
+                let contact = (props.selectedParent?.contacts || []).find(x => x.id === props.selectedParent?.mailing_contact_id);
 
                 if (contact) {
                     let phones = [];
@@ -137,7 +131,7 @@ function MailingAddressForm(props) {
                 }
             }
         }
-    }, [props.selectedParent?.mailing_customer_contact_id]);
+    }, [props.selectedParent?.mailing_contact_id]);
 
     return (
         <div className="form-bordered-box">
@@ -146,34 +140,14 @@ function MailingAddressForm(props) {
                 <div className="form-title">Mailing Address</div>
                 <div className="top-border top-border-middle"></div>
                 <div className="form-buttons">
-                    <div className={
-                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.save || 0) === 0 &&
-                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer bill to')?.pivot?.edit || 0) === 0)
-                            ? 'mochi-button disabled' : 'mochi-button'
-                    } onClick={props.billToBtn}>
-                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                        <div className="mochi-button-base">Bill to</div>
-                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                    </div>
-                    <div className={
-                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0)
-                            ? 'mochi-button disabled' : 'mochi-button'
-                    } onClick={props.remitToAddressBtn}>
+                    <div className='mochi-button' onClick={props.remitToAddressBtn}>
                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                         <div className="mochi-button-base" style={{
                             color: (props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ? 'green' : 'black'
                         }}>Remit to address is the same</div>
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                     </div>
-                    <div className={
-                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0)
-                            ? 'mochi-button disabled' : 'mochi-button'
-                    } onClick={props.clearBtn}>
+                    <div className='mochi-button' onClick={props.clearBtn}>
                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                         <div className="mochi-button-base">Clear</div>
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -182,247 +156,20 @@ function MailingAddressForm(props) {
                 <div className="top-border top-border-right"></div>
             </div>
 
-            <div className="form-row" style={{
-                display: props.withCode || props.withName ? 'flex' : 'none'
-            }}>
-                {
-                    props.withCode &&
-                    <div className="input-box-container input-code" style={{
-                        backgroundColor: (props.selectedParent?.mailing_customer_id || 0) > 0 ? 'lightgreen' : 'white',
-                        display: props.withCode ? 'flex' : 'none'
-                    }}>
-                        <input tabIndex={props.tabTimesFrom + props.tabTimes + 0} type="text" placeholder="Code" maxLength="8"
-                            ref={refCode}
-                            readOnly={
-                                ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                (props.selectedParent?.id || 0) === 0 ||
-                                (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ||
-                                    (props.selectedParent?.mailing_customer_id || 0) > 0))
-                            }
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
-
-                                if (key === 9) {
-                                    if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 0 && (props.selectedParent?.mailing_customer_id || 0) === 0) {
-                                        if (e.target.value.trim() !== '') {
-                                            e.preventDefault();
-
-                                            axios.post(props.serverUrl + '/getCustomerMailingAddressByCode', {
-                                                code: e.target.value
-                                            }).then(res => {
-                                                if (res.data.result === 'OK') {
-                                                    if ((res.data.mailing_address || []).length > 0) {
-                                                        let selectedCustomerCode = (props.selectedParent?.code || '') + ((props.selectedParent?.code_number || 0) === 0 ? '' : props.selectedParent.code_number);
-
-                                                        let data = { ...res.data.mailing_address[0] };
-
-                                                        if (data.type === 'customer') {
-                                                            let dataCode = (data.code || '') + ((data.code_number || 0) === 0 ? '' : data.code_number);
-
-                                                            if (selectedCustomerCode.toLowerCase() === dataCode.toLowerCase()) {
-                                                                props.remitToAddressBtn();
-                                                                refContactName.current.focus();
-                                                            } else {
-                                                                let currentCustomer = { ...props.selectedParent };
-                                                                currentCustomer.remit_to_address_is_the_same = 0;
-                                                                currentCustomer.mailing_customer_id = data.id;
-                                                                currentCustomer.mailing_address_id = null;
-
-                                                                let mailing_address = { ...data };
-
-                                                                if (mailing_address.contacts.findIndex(x => x.is_primary === 1) > -1) {
-                                                                    currentCustomer.mailing_customer_contact_id = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].id;
-
-                                                                    currentCustomer.mailing_customer_contact_primary_phone = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ''
-                                                                        ? 'work'
-                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ''
-                                                                            ? 'fax'
-                                                                            : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ''
-                                                                                ? 'mobile'
-                                                                                : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ''
-                                                                                    ? 'direct'
-                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ''
-                                                                                        ? 'other' : 'work';
-
-                                                                    currentCustomer.mailing_customer_contact_primary_email = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_work !== ''
-                                                                        ? 'work'
-                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_personal !== ''
-                                                                            ? 'personal'
-                                                                            : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_other !== ''
-                                                                                ? 'other' : 'work';
-
-                                                                    mailing_address.contact_name = (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.first_name || '') + ' ' +
-                                                                        (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.last_name || '');
-
-                                                                    mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ''
-                                                                        : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
-                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ''
-                                                                            : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
-                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ''
-                                                                                : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
-                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ''
-                                                                                    : currentCustomer.mailing_customer_contact_primary_phone === 'other'
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ''
-                                                                                        : '';
-
-                                                                    mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || ''
-                                                                        : '';
-
-                                                                    mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
-                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ''
-                                                                        : currentCustomer.mailing_customer_contact_primary_email === 'personal'
-                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ''
-                                                                            : currentCustomer.mailing_customer_contact_primary_email === 'other'
-                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ''
-                                                                                : '';
-
-                                                                } else if (mailing_address.contacts.length > 0) {
-                                                                    currentCustomer.mailing_customer_contact_id = mailing_address.contacts[0].id;
-
-                                                                    currentCustomer.mailing_customer_contact_primary_phone = mailing_address.contacts[0].phone_work !== ''
-                                                                        ? 'work'
-                                                                        : mailing_address.contacts[0].phone_work_fax !== ''
-                                                                            ? 'fax'
-                                                                            : mailing_address.contacts[0].phone_mobile !== ''
-                                                                                ? 'mobile'
-                                                                                : mailing_address.contacts[0].phone_direct !== ''
-                                                                                    ? 'direct'
-                                                                                    : mailing_address.contacts[0].phone_other !== ''
-                                                                                        ? 'other' : 'work';
-
-                                                                    currentCustomer.mailing_customer_contact_primary_email = mailing_address.contacts[0].email_work !== ''
-                                                                        ? 'work'
-                                                                        : mailing_address.contacts[0].email_personal !== ''
-                                                                            ? 'personal'
-                                                                            : mailing_address.contacts[0].email_other !== ''
-                                                                                ? 'other' : 'work';
-
-                                                                    mailing_address.contact_name = (mailing_address.contacts[0]?.first_name || '') + ' ' + (mailing_address.contacts[0]?.last_name || '');
-
-                                                                    mailing_address.contact_phone = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                        ? mailing_address.contacts[0]?.phone_work || ''
-                                                                        : currentCustomer.mailing_customer_contact_primary_phone === 'fax'
-                                                                            ? mailing_address.contacts[0]?.phone_work_fax || ''
-                                                                            : currentCustomer.mailing_customer_contact_primary_phone === 'mobile'
-                                                                                ? mailing_address.contacts[0]?.phone_mobile || ''
-                                                                                : currentCustomer.mailing_customer_contact_primary_phone === 'direct'
-                                                                                    ? mailing_address.contacts[0]?.phone_direct || ''
-                                                                                    : currentCustomer.mailing_customer_contact_primary_phone === 'other'
-                                                                                        ? mailing_address.contacts[0]?.phone_other || ''
-                                                                                        : '';
-
-                                                                    mailing_address.ext = currentCustomer.mailing_customer_contact_primary_phone === 'work'
-                                                                        ? mailing_address.contacts[0]?.phone_ext || ''
-                                                                        : '';
-
-                                                                    mailing_address.email = currentCustomer.mailing_customer_contact_primary_email === 'work'
-                                                                        ? mailing_address.contacts[0]?.email_work || ''
-                                                                        : currentCustomer.mailing_customer_contact_primary_email === 'personal'
-                                                                            ? mailing_address.contacts[0]?.email_personal || ''
-                                                                            : currentCustomer.mailing_customer_contact_primary_email === 'other'
-                                                                                ? mailing_address.contacts[0]?.email_other || ''
-                                                                                : '';
-                                                                } else {
-                                                                    currentCustomer.mailing_customer_contact_id = null;
-                                                                    currentCustomer.mailing_customer_contact_primary_phone = 'work';
-                                                                    currentCustomer.mailing_customer_contact_primary_email = 'work';
-                                                                }
-
-                                                                props.setSelectedParent({ ...currentCustomer, mailing_address: mailing_address });
-                                                                props.validateForSaving(e);
-                                                                refMailingName.current.focus();
-                                                            }
-                                                        } else if (data.type === 'mailing') {
-                                                            props.setSelectedParent(prev => {
-                                                                return {
-                                                                    ...prev,
-                                                                    remit_to_address_is_the_same: 0,
-                                                                    mailing_customer_id: null,
-                                                                    mailing_address_id: data.id,
-                                                                    mailing_address: { ...data }
-                                                                }
-                                                            });
-
-                                                            props.validateForSaving(e);
-                                                            refMailingName.current.focus();
-                                                        }
-                                                    }
-                                                }
-                                            }).catch(e => {
-                                                console.log(e);
-                                            })
-                                        }
-                                    }
-                                }
-                            }}
-                            onChange={e => {
-                                props.setSelectedParent(prev => {
-                                    return {
-                                        ...prev,
-                                        mailing_address: {
-                                            ...prev?.mailing_address,
-                                            code: e.target.value
-                                        }
-                                    }
-                                })
-                            }}
-                            value={(props.selectedParent?.mailing_address?.code || '') + ((props.selectedParent?.mailing_address?.code_number || 0) === 0 ? '' : props.selectedParent?.mailing_address?.code_number)} />
-                    </div>
-                }
-
-                <div className="form-h-sep"></div>
-                <div className="input-box-container grow" style={{
-                    display: props.withName ? 'flex' : 'none'
-                }}>
-                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 1} type="text" placeholder="Name"
-                        style={{
-                            textTransform: 'capitalize'
-                        }}
-                        ref={refName}
-                        readOnly={
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                            (props.selectedParent?.id || 0) === 0 ||
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ||
-                                (props.selectedParent?.mailing_customer_id || 0) > 0))
-                        }
-                        onChange={e => {
-                            props.setSelectedParent(prev => {
-                                return {
-                                    ...prev,
-                                    mailing_address: {
-                                        ...prev?.mailing_address,
-                                        name: e.target.value
-                                    }
-                                }
-                            })
-                        }}
-                        value={(props.selectedParent?.mailing_address?.name || '')} />
-                </div>
-            </div>
-            <div className="form-v-sep"></div>
             <div className="form-row">
+
+                {/* // ========================================================= ADDRESS 1 ==================================================== */}
+
                 <div className="input-box-container grow">
-                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 2} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
-                        readOnly={
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                            (props.selectedParent?.id || 0) === 0 ||
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ||
-                                (props.selectedParent?.mailing_customer_id || 0) > 0))
-                        }
+                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 1} type="text" placeholder="Address 1" style={{ textTransform: 'capitalize' }}
+                        ref={refAddress1}
+                        readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                         onChange={e => {
                             props.setSelectedParent(prev => {
                                 return {
                                     ...prev,
                                     mailing_address: {
-                                        ...prev?.mailing_address,
+                                        ...(prev?.mailing_address || {}),
                                         address1: e.target.value
                                     }
                                 }
@@ -433,22 +180,18 @@ function MailingAddressForm(props) {
             </div>
             <div className="form-v-sep"></div>
             <div className="form-row">
+
+                {/* // ========================================================= ADDRESS 2 ==================================================== */}
+
                 <div className="input-box-container grow">
-                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 3} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
-                        readOnly={
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                            (props.selectedParent?.id || 0) === 0 ||
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ||
-                                (props.selectedParent?.mailing_customer_id || 0) > 0))
-                        }
+                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 2} type="text" placeholder="Address 2" style={{ textTransform: 'capitalize' }}
+                        readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                         onChange={e => {
                             props.setSelectedParent(prev => {
                                 return {
                                     ...prev,
                                     mailing_address: {
-                                        ...prev?.mailing_address,
+                                        ...(prev?.mailing_address || {}),
                                         address2: e.target.value
                                     }
                                 }
@@ -459,25 +202,21 @@ function MailingAddressForm(props) {
             </div>
             <div className="form-v-sep"></div>
             <div className="form-row">
+
+                {/* // ========================================================= CITY ==================================================== */}
+
                 <div className="input-box-container grow">
-                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 4} type="text" placeholder="City"
+                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 3} type="text" placeholder="City"
+                        readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                         style={{
                             textTransform: 'capitalize'
                         }}
-                        readOnly={
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                            (props.selectedParent?.id || 0) === 0 ||
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ||
-                                (props.selectedParent?.mailing_customer_id || 0) > 0))
-                        }
                         onChange={e => {
                             props.setSelectedParent(prev => {
                                 return {
                                     ...prev,
                                     mailing_address: {
-                                        ...prev?.mailing_address,
+                                        ...(prev?.mailing_address || {}),
                                         city: e.target.value
                                     }
                                 }
@@ -486,22 +225,18 @@ function MailingAddressForm(props) {
                         value={(props.selectedParent?.mailing_address?.city || '')} />
                 </div>
                 <div className="form-h-sep"></div>
+
+                {/* // ========================================================= STATE ==================================================== */}
+
                 <div className="input-box-container input-state">
-                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 5} type="text" placeholder="State" maxLength="2"
-                        readOnly={
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                            (props.selectedParent?.id || 0) === 0 ||
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ||
-                                (props.selectedParent?.mailing_customer_id || 0) > 0))
-                        }
+                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 4} type="text" placeholder="State" maxLength="2"
+                        readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                         onChange={e => {
                             props.setSelectedParent(prev => {
                                 return {
                                     ...prev,
                                     mailing_address: {
-                                        ...prev?.mailing_address,
+                                        ...(prev?.mailing_address || {}),
                                         state: e.target.value
                                     }
                                 }
@@ -510,24 +245,22 @@ function MailingAddressForm(props) {
                         value={(props.selectedParent?.mailing_address?.state || '')} />
                 </div>
                 <div className="form-h-sep"></div>
+
+                {/* // ========================================================= ZIP ==================================================== */}
+
                 <div className="input-box-container input-zip-code">
-                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 6} type="text" placeholder="Postal Code"
-                        readOnly={
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                            (props.selectedParent?.id || 0) === 0 ||
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 ||
-                                (props.selectedParent?.mailing_customer_id || 0) > 0))
-                        }
+                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 5} type="text" placeholder="Postal Code"
+                        readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                         onKeyDown={(e) => {
                             let key = e.keyCode || e.which;
 
                             if (key === 9) {
-                                if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 0 &&
-                                    (props.selectedParent?.mailing_customer_id || 0) === 0 &&
-                                    (props.selectedParent?.id || 0) > 0) {
-                                    props.validateMailingAddressForSaving(e)
+                                if (props.triggerField === 'zip') {
+                                    if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 0 &&
+                                        (props.selectedParent?.id || 0) > 0) {
+
+                                        props.validateForSaving(e)
+                                    }
                                 }
                             }
                         }}
@@ -536,7 +269,7 @@ function MailingAddressForm(props) {
                                 return {
                                     ...prev,
                                     mailing_address: {
-                                        ...prev?.mailing_address,
+                                        ...(prev?.mailing_address || {}),
                                         zip: e.target.value
                                     }
                                 }
@@ -547,19 +280,17 @@ function MailingAddressForm(props) {
             </div>
             <div className="form-v-sep"></div>
             <div className="form-row">
+
+                {/* // ========================================================= CONTACT NAME ==================================================== */}
+
                 <div className="select-box-container" style={{ flexGrow: 1 }}>
                     <div className="select-box-wrapper">
                         <input
+                            // readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                             style={{
                                 textTransform: 'capitalize'
                             }}
-                            readOnly={
-                                (props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0 ||
-                                (props.selectedParent?.mailing_address?.id || 0) === 0
-                            }
-                            tabIndex={props.tabTimesFrom + props.tabTimes + 7}
+                            tabIndex={props.tabTimesFrom + props.tabTimes + 6}
                             type="text"
                             placeholder="Contact Name"
                             ref={refContactName}
@@ -604,10 +335,6 @@ function MailingAddressForm(props) {
 
                                             if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1) {
                                                 contacts = props.selectedParent?.contacts || [];
-                                            }
-
-                                            if ((props.selectedParent?.mailing_customer_id || 0) > 0) {
-                                                contacts = props.selectedParent?.mailing_address?.contacts || [];
                                             }
 
                                             if (contacts.length > 0) {
@@ -671,10 +398,6 @@ function MailingAddressForm(props) {
                                                 contacts = props.selectedParent?.contacts || [];
                                             }
 
-                                            if ((props.selectedParent?.mailing_customer_id || 0) > 0) {
-                                                contacts = props.selectedParent?.mailing_address?.contacts || [];
-                                            }
-
                                             if (contacts.length > 0) {
                                                 await setMailingContactNameItems(contacts.map((item, index) => {
                                                     item.selected = index === 0
@@ -706,8 +429,8 @@ function MailingAddressForm(props) {
                                             await props.setSelectedParent(prev => {
                                                 return {
                                                     ...prev,
-                                                    mailing_customer_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                    mailing_customer_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                    mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
+                                                    mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
                                                         ? 'work'
                                                         : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
                                                             ? 'fax'
@@ -759,8 +482,8 @@ function MailingAddressForm(props) {
                                             await props.setSelectedParent(prev => {
                                                 return {
                                                     ...prev,
-                                                    mailing_customer_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
-                                                    mailing_customer_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                    mailing_contact_id: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].id,
+                                                    mailing_contact_primary_phone: (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
                                                         ? 'work'
                                                         : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
                                                             ? 'fax'
@@ -824,7 +547,7 @@ function MailingAddressForm(props) {
                                         props.setSelectedParent(prev => {
                                             return {
                                                 ...prev,
-                                                mailing_customer_contact_id: contact.id,
+                                                mailing_contact_id: contact.id,
                                                 mailing_address: {
                                                     ...(prev?.mailing_address || {}),
                                                     contact_phone: (contact.primary_phone || '') === 'work'
@@ -853,49 +576,7 @@ function MailingAddressForm(props) {
                                         props.setSelectedParent(prev => {
                                             return {
                                                 ...prev,
-                                                mailing_customer_contact_id: null
-                                            }
-                                        })
-                                    }
-                                } else if ((props.selectedParent?.mailing_customer_id || 0) > 0) {
-                                    contacts = (props.selectedParent?.mailing_address?.contacts || []);
-
-                                    let contact = contacts.find(x => (x.first_name + ' ' + x.last_name).toLowerCase() === e.target.value.toLowerCase());
-
-                                    if (contact) {
-                                        props.setSelectedParent(prev => {
-                                            return {
-                                                ...prev,
-                                                mailing_customer_contact_id: contact.id,
-                                                mailing_address: {
-                                                    ...(prev?.mailing_address || {}),
-                                                    contact_phone: (contact.primary_phone || '') === 'work'
-                                                        ? (contact.phone_work || '')
-                                                        : (contact.primary_phone || '') === 'fax'
-                                                            ? (contact.phone_work_fax || '')
-                                                            : (contact.primary_phone || '') === 'mobile'
-                                                                ? (contact.phone_mobile || '')
-                                                                : (contact.primary_phone || '') === 'direct'
-                                                                    ? (contact.phone_direct || '')
-                                                                    : (contact.primary_phone || '') === 'other'
-                                                                        ? (contact.phone_other || '')
-                                                                        : '',
-                                                    ext: (contact.phone_ext || ''),
-                                                    email: (contact.primary_email || '') === 'work'
-                                                        ? (contact.email_work || '')
-                                                        : (contact.primary_email || '') === 'personal'
-                                                            ? (contact.email_personal || '')
-                                                            : (contact.primary_email || '') === 'other'
-                                                                ? (contact.email_other || '')
-                                                                : ''
-                                                }
-                                            }
-                                        })
-                                    } else {
-                                        props.setSelectedParent(prev => {
-                                            return {
-                                                ...prev,
-                                                mailing_customer_contact_id: null
+                                                mailing_contact_id: null
                                             }
                                         })
                                     }
@@ -914,13 +595,9 @@ function MailingAddressForm(props) {
                             }}
                             value={(props.selectedParent?.mailing_address?.contact_name || '')}
                         />
-
                         {
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 && (props.selectedParent?.contacts || []).length > 0) ||
-                                ((props.selectedParent?.mailing_customer_id || 0) > 0 && (props.selectedParent?.mailing_address?.contacts || []).length > 0)) &&
-                            ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
+                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 && (props.selectedParent?.contacts || []).length > 0)) &&
+                            ((props.user?.user_code?.is_admin || 0) === 1) &&
                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
                                 onClick={async () => {
                                     if (showMailingContactNames) {
@@ -931,12 +608,6 @@ function MailingAddressForm(props) {
                                         if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1) {
                                             contacts = props.selectedParent?.contacts || [];
                                         }
-
-                                        if ((props.selectedParent?.mailing_customer_id || 0) > 0) {
-                                            contacts = props.selectedParent?.mailing_address?.contacts || [];
-                                        }
-
-
 
                                         if (contacts.length > 0) {
                                             await setMailingContactNameItems(contacts.map((item, index) => {
@@ -997,8 +668,8 @@ function MailingAddressForm(props) {
                                                                 await props.setSelectedParent(prev => {
                                                                     return {
                                                                         ...prev,
-                                                                        mailing_customer_contact_id: item.id,
-                                                                        mailing_customer_contact_primary_phone: (item.phone_work || '') !== ''
+                                                                        mailing_contact_id: item.id,
+                                                                        mailing_contact_primary_phone: (item.phone_work || '') !== ''
                                                                             ? 'work'
                                                                             : (item.phone_work_fax || '') !== ''
                                                                                 ? 'fax'
@@ -1064,17 +735,15 @@ function MailingAddressForm(props) {
                 </div>
 
                 <div className="form-h-sep"></div>
+
+                {/* // ========================================================= CONTACT PHONE ==================================================== */}
+
                 <div className="select-box-container input-phone" style={{
                     width: '10.25rem'
                 }}>
                     <div className="select-box-wrapper">
-                        <MaskedInput tabIndex={props.tabTimesFrom + props.tabTimes + 8}
-                            readOnly={
-                                ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                (props.selectedParent?.mailing_address?.id || 0) === 0
-                            }
+                        <MaskedInput tabIndex={props.tabTimesFrom + props.tabTimes + 7}
+                            // readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                             guide={true}
                             type="text"
@@ -1201,7 +870,7 @@ function MailingAddressForm(props) {
                                             await props.setSelectedParent(prev => {
                                                 return {
                                                     ...prev,
-                                                    mailing_customer_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
+                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
                                                     mailing_address: {
                                                         ...(prev?.mailing_address || {}),
                                                         contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
@@ -1222,7 +891,7 @@ function MailingAddressForm(props) {
                                             await props.setSelectedParent(prev => {
                                                 return {
                                                     ...prev,
-                                                    mailing_customer_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
+                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type,
                                                     mailing_address: {
                                                         ...(prev?.mailing_address || {}),
                                                         contact_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].phone,
@@ -1255,24 +924,21 @@ function MailingAddressForm(props) {
                             }}
                             value={props.selectedParent?.mailing_address?.contact_phone || ''}
                         />
-
                         {
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 || (props.selectedParent?.mailing_customer_id || 0) > 0) &&
-                                (props.selectedParent?.mailing_customer_contact_id || 0) > 0) &&
+                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1) &&
+                                (props.selectedParent?.mailing_contact_id || 0) > 0) &&
                             <div
                                 className={classnames({
                                     'selected-mailing-contact-primary-phone': true,
                                     'pushed': (mailingContactPhoneItems.length > 1)
                                 })}>
-                                {props.selectedParent?.mailing_customer_contact_primary_phone || ''}
+                                {props.selectedParent?.mailing_contact_primary_phone || ''}
                             </div>
                         }
 
                         {
-                            (mailingContactPhoneItems.length > 1 && ((props.selectedParent?.mailing_customer_contact_id || 0) > 0)) &&
-                            ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
+                            (mailingContactPhoneItems.length > 1) &&
+                            ((props.user?.user_code?.is_admin || 0) === 1) &&
                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
                                 onClick={async () => {
                                     if (showMailingContactPhones) {
@@ -1337,7 +1003,7 @@ function MailingAddressForm(props) {
                                                                 await props.setSelectedParent(prev => {
                                                                     return {
                                                                         ...prev,
-                                                                        mailing_customer_contact_primary_phone: item.type,
+                                                                        mailing_contact_primary_phone: item.type,
                                                                         mailing_address: {
                                                                             ...(prev?.mailing_address || {}),
                                                                             contact_phone: item.phone,
@@ -1389,14 +1055,12 @@ function MailingAddressForm(props) {
                 </div>
 
                 <div className="form-h-sep"></div>
+
+                {/* // ========================================================= EXT ==================================================== */}
+
                 <div className="input-box-container input-phone-ext">
-                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 9} type="text" placeholder="Ext"
-                        readOnly={
-                            ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                            (props.selectedParent?.remit_to_address_is_the_same || 0) === 1 || (props.selectedParent?.mailing_customer_id || 0) > 0
-                        }
+                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 8} type="text" placeholder="Ext"
+                        // readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                         onChange={e => {
                             props.setSelectedParent(prev => {
                                 return {
@@ -1409,8 +1073,8 @@ function MailingAddressForm(props) {
                             })
                         }}
                         value={
-                            (props.selectedParent?.mailing_customer_contact_id || 0) > 0
-                                ? (props.selectedParent?.mailing_customer_contact_primary_phone || '') === 'work'
+                            (props.selectedParent?.mailing_contact_id || 0) > 0
+                                ? (props.selectedParent?.mailing_contact_primary_phone || '') === 'work'
                                     ? props.selectedParent?.mailing_address?.ext || ''
                                     : ''
                                 : props.selectedParent?.mailing_address?.ext || ''
@@ -1419,16 +1083,19 @@ function MailingAddressForm(props) {
             </div>
             <div className="form-v-sep"></div>
             <div className="form-row" style={{
-                display: props.withEmail ? 'flex' : 'none'
+                display: 'flex'
             }}>
+
+                {/* // ========================================================= EMAIL ==================================================== */}
+
                 <div className="select-box-container" style={{ flexGrow: 1 }}
                     onMouseEnter={() => {
-                        if ((props.selectedParent?.mailing_address?.email || '') !== '') {
+                        if ((props.selectedParent?.email || '') !== '') {
                             setShowMailingContactEmailCopyBtn(true);
                         }
                     }}
                     onFocus={() => {
-                        if ((props.selectedParent?.mailing_address?.email || '') !== '') {
+                        if ((props.selectedParent?.email || '') !== '') {
                             setShowMailingContactEmailCopyBtn(true);
                         }
                     }}
@@ -1442,14 +1109,9 @@ function MailingAddressForm(props) {
                     }}>
 
                     <div className="select-box-wrapper">
-                        <input tabIndex={props.tabTimesFrom + props.tabTimes + 10} type="text" placeholder="E-Mail"
-                            readOnly={
-                                ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 0 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 0) ||
-                                (props.selectedParent?.mailing_address?.id || 0) === 0
-                            }
+                        <input tabIndex={props.tabTimesFrom + props.tabTimes + 9} type="text" placeholder="E-Mail"
                             ref={refContactEmail}
+                            // readOnly={(props.selectedParent?.remit_to_address_is_the_same || 0) === 1}
                             onKeyDown={async (e) => {
                                 let key = e.keyCode || e.which;
 
@@ -1573,7 +1235,7 @@ function MailingAddressForm(props) {
                                             await props.setSelectedParent(prev => {
                                                 return {
                                                     ...prev,
-                                                    mailing_customer_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
+                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
                                                     mailing_address: {
                                                         ...(prev?.mailing_address || {}),
                                                         email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email
@@ -1593,7 +1255,7 @@ function MailingAddressForm(props) {
                                             await props.setSelectedParent(prev => {
                                                 return {
                                                     ...prev,
-                                                    mailing_customer_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
+                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type,
                                                     mailing_address: {
                                                         ...(prev?.mailing_address || {}),
                                                         email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].email
@@ -1601,7 +1263,7 @@ function MailingAddressForm(props) {
                                                 }
                                             });
 
-                                            if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 || (props.selectedParent?.mailing_customer_id || 0) > 0) {
+                                            if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1) {
                                                 props.validateForSaving({ keyCode: 9 });
                                             } else if ((props.selectedParent?.id || 0) > 0) {
                                                 props.validateMailingAddressForSaving({ keyCode: 9 });
@@ -1610,7 +1272,7 @@ function MailingAddressForm(props) {
                                             setShowMailingContactEmails(false);
                                             refContactEmail.current.focus();
                                         } else {
-                                            if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 || (props.selectedParent?.mailing_customer_id || 0) > 0) {
+                                            if ((props.selectedParent?.remit_to_address_is_the_same || 0) === 1) {
                                                 props.validateForSaving({ keyCode: 9 });
                                             } else if ((props.selectedParent?.id || 0) > 0) {
                                                 props.validateMailingAddressForSaving({ keyCode: 9 });
@@ -1637,14 +1299,14 @@ function MailingAddressForm(props) {
                         />
 
                         {
-                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1 || (props.selectedParent?.mailing_customer_id || 0) > 0) &&
-                                (props.selectedParent?.mailing_customer_contact_id || 0) > 0) &&
+                            (((props.selectedParent?.remit_to_address_is_the_same || 0) === 1) &&
+                                (props.selectedParent?.mailing_contact_id || 0) > 0) &&
                             <div
                                 className={classnames({
                                     'selected-mailing-contact-primary-email': true,
                                     'pushed': (mailingContactEmailItems.length > 1)
                                 })}>
-                                {props.selectedParent?.mailing_customer_contact_primary_email || ''}
+                                {props.selectedParent?.mailing_contact_primary_email || ''}
                             </div>
                         }
 
@@ -1668,10 +1330,8 @@ function MailingAddressForm(props) {
                         }
 
                         {
-                            (mailingContactEmailItems.length > 1 && ((props.selectedParent?.mailing_customer_contact_id || 0) > 0)) &&
-                            ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.save || 0) === 1 &&
-                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'customer mailing address')?.pivot?.edit || 0) === 1)) &&
+                            (mailingContactEmailItems.length > 1 && ((props.selectedParent?.mailing_contact_id || 0) > 0)) &&
+                            ((props.user?.user_code?.is_admin || 0) === 1) &&
                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
                                 onClick={async () => {
                                     if (showMailingContactEmails) {
@@ -1736,7 +1396,7 @@ function MailingAddressForm(props) {
                                                                 await props.setSelectedParent(prev => {
                                                                     return {
                                                                         ...prev,
-                                                                        mailing_customer_contact_primary_email: item.type,
+                                                                        mailing_contact_primary_email: item.type,
                                                                         mailing_address: {
                                                                             ...(prev?.mailing_address || {}),
                                                                             email: item.email
@@ -1794,4 +1454,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, null, null, { forwardRef: true })(MailingAddressForm)
+export default connect(mapStateToProps, null, null, { forwardRef: true })(DriverMailingAddressForm)

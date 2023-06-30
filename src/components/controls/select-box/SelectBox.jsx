@@ -1,51 +1,58 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {connect} from 'react-redux';
-// import { Transition, Spring, animated as animated2, config } from 'react-spring/renderprops';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect, useRef } from "react";
+import { connect } from "react-redux";
+import { useTransition, animated } from "react-spring";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import classnames from "classnames";
 import { useDetectClickOutside } from "react-detect-click-outside";
 
 function SelectBox(props) {
     const { refInput, refItems, refPopupItems, refDropdown } = props.refs;
 
+
+
+    const popupTransition = useTransition((props.items || []).length > 0, {
+        from: { opacity: 0, top: props.transitionFromTop || "calc(100% + 7px)" },
+        enter: { opacity: 1, top: props.transitionEnterTop || "calc(100% + 12px)" },
+        leave: { opacity: 0, top: props.transitionLeaveTop || "calc(100% + 7px)" },
+        config: { duration: 100 },
+        reverse: (props.items || []).length > 0,
+    });
+
     return (
-        <div className="select-box-container grow">
+        <div className="select-box-container" style={{ ...(props.boxStyle || {}) }}>
             <div className="select-box-wrapper">
                 <input
-                    style={{
-                        textTransform: props.textTransform
-                    }}
                     type="text"
                     tabIndex={props.tabIndex || 0}
+                    style={{ ...(props.inputStyle || {}) }}
                     placeholder={props.placeholder}
                     ref={refInput}
                     readOnly={props.readOnly}
-                    onKeyDown={async (e) => {
+                    onKeyDown={async e => {
                         let key = e.keyCode || e.which;
 
                         switch (key) {
                             case 37:
                             case 38: // arrow left | arrow up
                                 e.preventDefault();
-                                if (props.items.length > 0) {
-                                    let selectedIndex = props.items.findIndex((item) => item.selected);
+                                if ((props.items || []).length > 0) {
+                                    let selectedIndex = (props.items || []).findIndex(item => item.selected);
 
                                     if (selectedIndex === -1) {
                                         await props.setItems(
-                                            props.items.map((item, index) => {
+                                            (props.items || []).map((item, index) => {
                                                 item.selected = index === 0;
                                                 return item;
                                             })
                                         );
                                     } else {
                                         await props.setItems(
-                                            props.items.map((item, index) => {
+                                            (props.items || []).map((item, index) => {
                                                 if (selectedIndex === 0) {
-                                                    item.selected =
-                                                        index === props.items.length - 1;
+                                                    item.selected = index === (props.items || []).length - 1;
                                                 } else {
-                                                    item.selected =
-                                                        index === selectedIndex - 1;
+                                                    item.selected = index === selectedIndex - 1;
                                                 }
                                                 return item;
                                             })
@@ -70,23 +77,27 @@ function SelectBox(props) {
                             case 39:
                             case 40: // arrow right | arrow down
                                 e.preventDefault();
-                                if (props.items.length > 0) {
-                                    let selectedIndex = props.items.findIndex((item) => item.selected);
+                                if ((props.items || []).length > 0) {
+                                    let selectedIndex = (props.items || []).findIndex(item => item.selected);
 
                                     if (selectedIndex === -1) {
-                                        await props.setItems(props.items.map((item, index) => {
-                                            item.selected = index === 0;
-                                            return item;
-                                        }));
-                                    } else {
-                                        await props.setItems(props.items.map((item, index) => {
-                                            if (selectedIndex === props.items.length - 1) {
+                                        await props.setItems(
+                                            (props.items || []).map((item, index) => {
                                                 item.selected = index === 0;
-                                            } else {
-                                                item.selected = index === selectedIndex + 1;
-                                            }
-                                            return item;
-                                        }));
+                                                return item;
+                                            })
+                                        );
+                                    } else {
+                                        await props.setItems(
+                                            (props.items || []).map((item, index) => {
+                                                if (selectedIndex === (props.items || []).length - 1) {
+                                                    item.selected = index === 0;
+                                                } else {
+                                                    item.selected = index === selectedIndex + 1;
+                                                }
+                                                return item;
+                                            })
+                                        );
                                     }
 
                                     refPopupItems.current.map((r, i) => {
@@ -113,9 +124,13 @@ function SelectBox(props) {
                                 break;
 
                             case 9: // tab
-                                if (props.items.length > 0) {
+                                if ((props.items || []).length > 0) {
                                     e.preventDefault();
-                                    props.onTab();
+                                    props.onTab(e);
+                                }else{
+                                    if (props.triggerField === 1){
+                                        props.validateToSave(e);
+                                    }
                                 }
                                 break;
 
@@ -123,105 +138,89 @@ function SelectBox(props) {
                                 break;
                         }
                     }}
-                    onBlur={(e) => props.onBlur(e)}
-                    onInput={(e) => props.onInput(e)}
-                    onChange={(e) => props.onChange(e)}
+                    onBlur={e => {
+                        props.onBlur(e);
+                    }}
+                    onInput={e => {
+                        props.onInput(e);
+                    }}
+                    onChange={e => {
+                        props.onChange(e);
+                    }}
                     value={props.value}
                 />
-                {
-                    (props.isAdmin === 1) &&
+                {props.isDropdownEnabled && (
                     <FontAwesomeIcon
                         className="dropdown-button"
                         icon={faCaretDown}
-                        style={{
-                            pointerEvents: (props.isAdmin === 1) ? 'all' : 'none'
+                        onClick={() => {
+                            if ((props.items || []).length > 0) {
+                                props.setItems([]);
+                            } else {
+                                props.onDropdownClick();
+                            }
+                            refInput.current.focus();
                         }}
-                        onClick={() => props.onDropdownClick()}
                     />
-                }
+                )}
             </div>
+            {popupTransition(
+                (style, item) =>
+                    item && (
+                        <animated.div
+                            className="mochi-contextual-container"
+                            id={`mochi-contextual-container-${props.popupId || "id"}`}
+                            style={{
+                                ...style,
+                                left: "-50%",
+                                display: "block",
+                                ...(props.popupStyle || {}),
+                            }}
+                            ref={refDropdown}
+                        >
+                            <div
+                                className={`mochi-contextual-popup ${props.popupPosition || ""}`}
+                                style={{
+                                    height: props.popupStyle?.height || 150,
+                                }}
+                            >
+                                <div className="mochi-contextual-popup-content">
+                                    <div className="mochi-contextual-popup-wrapper">
+                                        {(props.items || []).map((item, index) => {
+                                            const mochiItemClasses = classnames({
+                                                "mochi-item": true,
+                                                selected: item.selected,
+                                            });
 
-            {/* {
-                divisionTransition((style, item) => item && (
-                    <animated.div
-                        className="mochi-contextual-container"
-                        id="mochi-contextual-container-division"
-                        style={{
-                            ...style,
-                            left: "-50%",
-                            display: "block",
-                        }}
-                        ref={refDivisionDropDown}>
-
-                        <div className="mochi-contextual-popup vertical below"
-                            style={{ height: 150 }}>
-                            <div className="mochi-contextual-popup-content">
-                                <div className="mochi-contextual-popup-wrapper">
-                                    {props.items.map((item, index) => {
-                                        const mochiItemClasses = classnames({
-                                            "mochi-item": true,
-                                            selected: item.selected,
-                                        });
-
-                                        const searchValue = (selectedCustomer?.division?.id || 0) === 0 && (selectedCustomer?.division?.name || "") !== ""
-                                            ? selectedCustomer?.division?.name
-                                            : undefined;
-
-                                        return (
-                                            <div
-                                                key={index}
-                                                className={mochiItemClasses}
-                                                id={item.id}
-                                                onClick={() => {
-                                                    setSelectedCustomer(selectedCustomer => {
-                                                        return {
-                                                            ...selectedCustomer,
-                                                            division: item,
-                                                            division_id: item.id
-                                                        }
-                                                    })
-
-                                                    window.setTimeout(() => {
-                                                        // validateCustomerForSaving({keyCode: 9});
-                                                        props.setItems([]);
-                                                        refInput.current.focus();
-                                                    }, 0);
-                                                }}
-                                                ref={(ref) => refPopupItems.current.push(ref)}
-                                            >
-                                                {searchValue === undefined ? (item.name) : (
-                                                    <Highlighter
-                                                        highlightClassName="mochi-item-highlight-text"
-                                                        searchWords={[searchValue]}
-                                                        autoEscape={true}
-                                                        textToHighlight={item.name}
-                                                    />
-                                                )}
-                                                {item.selected && (
-                                                    <FontAwesomeIcon
-                                                        className="dropdown-selected"
-                                                        icon={faCaretRight}
-                                                    />
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className={mochiItemClasses}
+                                                    id={item.id || ""}
+                                                    onClick={() => { props.onPopupClick(item) }}
+                                                    ref={(element) => refPopupItems.current.push(element)}
+                                                >
+                                                    {item.name}
+                                                    {item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </animated.div>
-                ))
-            } */}
-        </div>
-    )
+                        </animated.div>
+                    )
+            )}
+        </div>        
+    );
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
-        user: state.systemReducers.user
-    }
-}
+        user: state.systemReducers.user,
+    };
+};
 
-export default connect(mapStateToProps, null, null, { forwardRef: true })(SelectBox)
+export default connect(mapStateToProps, null, null, { forwardRef: true })(SelectBox);

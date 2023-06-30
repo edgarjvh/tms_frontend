@@ -16,7 +16,6 @@ function EmergencyContactList(props) {
     } = props.refs;
 
     const [contactSearch, setContactSearch] = useState({});
-
     
 
     return (
@@ -53,10 +52,11 @@ function EmergencyContactList(props) {
                         {
                             (props.selectedParent?.contacts || []).length > 0 &&
                             <div className="contact-list-header">
-                                <div className="contact-list-col tcol first-name">First Name</div>
-                                <div className="contact-list-col tcol last-name">Last Name</div>
-                                <div className="contact-list-col tcol phone-work">Phone</div>
-                                <div className="contact-list-col tcol email-work">E-Mail</div>
+                                <div className="contact-list-col tcol name">Name</div>
+                                {/* <div className="contact-list-col tcol last-name">Last Name</div> */}
+                                <div className="contact-list-col tcol phone">Phone</div>
+                                <div className="contact-list-col tcol email">E-Mail</div>
+                                <div className="contact-list-col tcol priority">Priority</div>
                                 <div className="contact-list-col tcol contact-selected"></div>
                                 <div className="contact-list-col tcol pri"></div>
                             </div>
@@ -70,9 +70,9 @@ function EmergencyContactList(props) {
                                             onDoubleClick={async () => {
                                                 props.contactListItemDoubleClick(contact)
                                             }} onClick={() => props.setSelectedContact(contact)}>
-                                            <div className="contact-list-col tcol first-name" style={{ textTransform: 'capitalize' }}>{contact.first_name}</div>
-                                            <div className="contact-list-col tcol last-name" style={{ textTransform: 'capitalize' }}>{contact.last_name}</div>
-                                            <div className="contact-list-col tcol phone-work">{
+                                            <div className="contact-list-col tcol name" style={{ textTransform: 'capitalize' }}>{contact.first_name} {contact.last_name}</div>
+                                            {/* <div className="contact-list-col tcol last-name" style={{ textTransform: 'capitalize' }}>{contact.last_name}</div> */}
+                                            <div className="contact-list-col tcol phone">{
                                                 contact.primary_phone === 'work' ? contact.phone_work
                                                     : contact.primary_phone === 'fax' ? contact.phone_work_fax
                                                         : contact.primary_phone === 'mobile' ? contact.phone_mobile
@@ -80,12 +80,13 @@ function EmergencyContactList(props) {
                                                                 : contact.primary_phone === 'other' ? contact.phone_other
                                                                     : ''
                                             }</div>
-                                            <div className="contact-list-col tcol email-work" style={{ textTransform: 'lowercase' }}>{
+                                            <div className="contact-list-col tcol email" style={{ textTransform: 'lowercase' }}>{
                                                 contact.primary_email === 'work' ? contact.email_work
                                                     : contact.primary_email === 'personal' ? contact.email_personal
                                                         : contact.primary_email === 'other' ? contact.email_other
                                                             : ''
                                             }</div>
+                                            <div className="contact-list-col tcol priority" style={{ textTransform: 'lowercase' }}>{contact.priority}</div>
                                             {
                                                 (contact.id === (props.selectedContact?.id || 0)) &&
                                                 <div className="contact-list-col tcol contact-selected">
@@ -111,7 +112,7 @@ function EmergencyContactList(props) {
 
                     </div>
                     <div className="contact-search-box">
-                        <div className="form-row">
+                        {/* <div className="form-row">
                             <div className="input-box-container grow">
                                 <input type="text" placeholder="First Name"
                                     tabIndex={50 + props.tabTimes}
@@ -228,7 +229,7 @@ function EmergencyContactList(props) {
                                     })}
                                     value={contactSearch.email || ''} />
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

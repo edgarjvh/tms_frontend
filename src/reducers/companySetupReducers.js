@@ -6,10 +6,12 @@ export const companySetupReducers = (state = {
     selectedEmployee: {},
     selectedAgent: {},
     selectedDriver: {},
+    selectedDriverContact: {},
     selectedOperator: {}
 }, action) => {
     switch (action.type) {
         case companySetupConstants.SET_COMPANY_SETUP_OPENED_PANELS:
+            console.log(action.payload);
             state = {
                 ...state,
                 companySetupOpenedPanels: action.payload
@@ -41,6 +43,13 @@ export const companySetupReducers = (state = {
             state = {
                 ...state,
                 selectedDriver: action.payload
+            }
+        break;
+
+        case companySetupConstants.SET_SELECTED_DRIVER_CONTACT:
+            state = {
+                ...state,
+                selectedDriverContact: action.payload
             }
         break;
 

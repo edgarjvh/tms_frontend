@@ -691,10 +691,10 @@ const Divisions = (props) => {
                             });
                         }
                     }).then(response => {
-                        props.closePanel(`${props.panelName}-division-search`, props.origin);
+                        props.closePanel(`${props.panelName}-division-search`, props.origin);                        
                         refDivisionName.current.focus();
                     }).catch(e => {
-                        props.closePanel(`${props.panelName}-division-search`, props.origin);
+                        // props.closePanel(`${props.panelName}-division-search`, props.origin);
                         refDivisionCode.current.focus();
                     })
 
@@ -4320,7 +4320,8 @@ const Divisions = (props) => {
 const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
-        serverUrl: state.systemReducers.serverUrl
+        serverUrl: state.systemReducers.serverUrl,
+        companySetupOpenedPanels: state.companySetupReducers.companySetupOpenedPanels
     }
 }
 

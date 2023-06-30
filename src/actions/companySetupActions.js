@@ -35,6 +35,13 @@ export const setSelectedCompanyDriver = driver => {
     }
 }
 
+export const setSelectedDriverContact = contact => {
+    return {
+        type: companySetupConstants.SET_SELECTED_DRIVER_CONTACT,
+        payload: contact
+    }
+}
+
 export const setSelectedOwnerOperator = ownerOperator => {
     return {
         type: companySetupConstants.SET_SELECTED_OWNER_OPERATOR,

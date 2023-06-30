@@ -114,6 +114,18 @@ const Documents = (props) => {
             case 'division':
                 getDocumentsUrl = '/getDocumentsByDivision';
                 break;
+            case 'company-driver-license':
+                getDocumentsUrl = '/getDocumentsByCompanyDriverLicense';
+                break;
+            case 'company-driver-medical-card':
+                getDocumentsUrl = '/getDocumentsByCompanyDriverMedicalCard';
+                break;
+            case 'company-driver-tractor':
+                getDocumentsUrl = '/getDocumentsByCompanyDriverTractor';
+                break;
+            case 'company-driver-trailer':
+                getDocumentsUrl = '/getDocumentsByCompanyDriverTrailer';
+                break;
             default:
                 break;
         }
@@ -129,6 +141,10 @@ const Documents = (props) => {
             order_id: props.selectedOwner.id,
             order_billing_id: props.selectedOwner.id,
             division_id: props.selectedOwner.id,
+            company_driver_license_id: props.selectedOwner.id,
+            company_driver_medical_card_id: props.selectedOwner.id,
+            company_driver_tractor_id: props.selectedOwner.id,
+            company_driver_trailer_id: props.selectedOwner.id,
         }).then(res => {
             if (res.data.result === 'OK') {
                 setSelectedOwner({
@@ -232,6 +248,10 @@ const Documents = (props) => {
         formData.append("invoice_id", selectedOwner.id);
         formData.append("order_id", selectedOwner.id);
         formData.append("division_id", selectedOwner.id);
+        formData.append("company_driver_license_id", selectedOwner.id);
+        formData.append("company_driver_medical_card_id", selectedOwner.id);
+        formData.append("company_driver_tractor_id", selectedOwner.id);
+        formData.append("company_driver_trailer_id", selectedOwner.id);
         formData.append("user_code_id", props.user.user_code.id);
         formData.append("date_entered", selectedOwnerDocument.date_entered);
         formData.append("title", selectedOwnerDocument.title);
@@ -258,6 +278,42 @@ const Documents = (props) => {
             axios.post(props.serverUrl + savingDocumentUrl, formData, options)
                 .then(res => {
                     if (res.data.result === "OK") {
+                        if (props.suborigin === 'company-driver-license'){
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+                        }
+
+                        if (props.suborigin === 'company-driver-medical-card'){
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+                        }
+
+                        if (props.suborigin === 'company-driver-tractor'){
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+                        }
+
+                        if (props.suborigin === 'company-driver-trailer'){
+                            setSelectedOwner(selectedOwner => {
+                                return {
+                                    ...selectedOwner,
+                                    documents: res.data.documents
+                                }
+                            })
+                        }
+
                         if (props.suborigin === 'company-employee') {
                             setSelectedOwner(selectedOwner => {
                                 return {
@@ -945,9 +1001,9 @@ const Documents = (props) => {
                 <div className="documents-right-side">
                     <div className={
                         (selectedOwner?.is_cancelled || 0) === 1 ||
-                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                            (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
                             ? 'mochi-button disabled' : 'mochi-button'
                     } style={{
                         fontSize: '1.5rem'
@@ -958,9 +1014,9 @@ const Documents = (props) => {
                     </div>
                     <div className={
                         (selectedOwner?.is_cancelled || 0) === 1 ||
-                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                            (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
                             ? 'mochi-button disabled' : 'mochi-button'
                     } style={{
                         fontSize: '1.5rem'
@@ -971,9 +1027,9 @@ const Documents = (props) => {
                     </div>
                     <div className={
                         (selectedOwner?.is_cancelled || 0) === 1 ||
-                        ((props.user?.user_code?.is_admin || 0) === 0 &&
-                            (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
                             ? 'mochi-button disabled' : 'mochi-button'
                     } style={{
                         fontSize: '1.5rem',
@@ -1033,9 +1089,9 @@ const Documents = (props) => {
 
                                     return (
                                         <div className={itemClasses} key={index} onClick={() => {
-                                            if ((selectedOwner?.is_cancelled || 0) === 0){
+                                            if ((selectedOwner?.is_cancelled || 0) === 0) {
                                                 let getDocumentNotesUrl = '';
-    
+
                                                 switch (props.suborigin) {
                                                     case 'company-employee':
                                                         getDocumentNotesUrl = '/getNotesByEmployeeDocument';
@@ -1067,17 +1123,34 @@ const Documents = (props) => {
                                                     case 'division':
                                                         getDocumentNotesUrl = '/getNotesByDivisionDocument';
                                                         break;
+                                                        
+                                                    case 'company-driver-license':
+                                                        getDocumentNotesUrl = '/getNotesByCompanyDriverLicenseDocument';
+                                                        break;
+                                                        
+                                                    case 'company-driver-medical-card':
+                                                        getDocumentNotesUrl = '/getNotesByCompanyDriverMedicalCardDocument';
+                                                        break;
+                                                        
+                                                    case 'company-driver-tractor':
+                                                        getDocumentNotesUrl = '/getNotesByCompanyDriverTractorDocument';
+                                                        break;
+                                                        
+                                                    case 'company-driver-trailer':
+                                                        getDocumentNotesUrl = '/getNotesByCompanyDriverTrailerDocument';
+                                                        break;
+                                                        
                                                     default:
                                                         break;
                                                 }
-    
+
                                                 axios.post(props.serverUrl + getDocumentNotesUrl, {
                                                     doc_id: document.id,
                                                 }).then(res => {
                                                     if (res.data.result === 'OK') {
                                                         document.notes = [...res.data.documentNotes]
                                                     }
-    
+
                                                     setSelectedOwnerDocument(document);
                                                 });
                                             }
@@ -1088,7 +1161,7 @@ const Documents = (props) => {
                                                 <span>{document.date_entered}</span>
                                                 <span>{document.title}</span>
                                                 <span>{document.subject}</span>
-                                                <span style={{color: '#1b73cb', flexGrow: 1, textOverflow: 'ellipsis'}} title={document.doc_name}>({document.doc_name})</span>
+                                                <span style={{ color: '#1b73cb', flexGrow: 1, textOverflow: 'ellipsis' }} title={document.doc_name}>({document.doc_name})</span>
                                             </div>
 
                                             <div className="documents-list-col tcol documents-selected">
@@ -1116,8 +1189,35 @@ const Documents = (props) => {
                                                             customer_id: selectedOwner.id,
                                                             carrier_id: selectedOwner.id,
                                                             factoring_company_id: selectedOwner.id,
+                                                            company_driver_license_id: selectedOwner.id,
+                                                            company_driver_medical_card_id: selectedOwner.id,
+                                                            company_driver_tractor_id: selectedOwner.id,
+                                                            company_driver_trailer_id: selectedOwner.id,
                                                         }).then(res => {
                                                             if (res.data.result === 'OK') {
+                                                                if (props.suborigin === 'company-driver-license') {
+                                                                    setSelectedOwner(selectedOwner => {
+                                                                        return { ...selectedOwner, documents: res.data.documents }
+                                                                    })
+                                                                }
+
+                                                                if (props.suborigin === 'company-driver-medical-card') {
+                                                                    setSelectedOwner(selectedOwner => {
+                                                                        return { ...selectedOwner, documents: res.data.documents }
+                                                                    })
+                                                                }
+
+                                                                if (props.suborigin === 'company-driver-tractor') {
+                                                                    setSelectedOwner(selectedOwner => {
+                                                                        return { ...selectedOwner, documents: res.data.documents }
+                                                                    })
+                                                                }
+
+                                                                if (props.suborigin === 'company-driver-trailer') {
+                                                                    setSelectedOwner(selectedOwner => {
+                                                                        return { ...selectedOwner, documents: res.data.documents }
+                                                                    })
+                                                                }
 
                                                                 if (props.suborigin === 'company-employee') {
                                                                     setSelectedOwner(selectedOwner => {
@@ -1277,9 +1377,9 @@ const Documents = (props) => {
                         <div className="form-buttons">
                             <div className={
                                 (selectedOwner?.is_cancelled || 0) === 1 ||
-                                ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                    (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
-                                        ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
+                                    ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                        (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0))
                                     ? 'mochi-button disabled' : 'mochi-button'
                             } onClick={() => {
                                 if ((selectedOwnerDocument.id || 0) > 0) {
@@ -1360,7 +1460,7 @@ const Documents = (props) => {
                         ((selectedOwnerDocument.id || 0) > 0 &&
                             (['pdf', 'txt', 'htm', 'html', 'tmf', 'log'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <iframe id="frame-preview"
-                            src={(props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={((props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1369,7 +1469,7 @@ const Documents = (props) => {
                             (['webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p', 'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
 
                         <iframe id="frame-preview"
-                            src={(props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={((props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1377,7 +1477,7 @@ const Documents = (props) => {
                         ((selectedOwnerDocument.id || 0) > 0 &&
                             (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <iframe id="frame-preview"
-                            src={('https://view.officeapps.live.com/op/embed.aspx?src=' + props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={('https://view.officeapps.live.com/op/embed.aspx?src=' + (props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1386,7 +1486,7 @@ const Documents = (props) => {
                             (['jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi', 'png', 'gif', 'webp', 'tiff', 'tif', 'bmp', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2', 'svg', 'svgz'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         // <div className="img-wrapper"><img src={props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id} alt="" /></div>
                         <iframe id="frame-preview"
-                            src={(props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={((props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1395,7 +1495,7 @@ const Documents = (props) => {
                             (!['jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi', 'png', 'gif', 'webp', 'tiff', 'tif', 'bmp', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2', 'svg', 'svgz', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'htm', 'html', 'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p', 'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', '7z', 'arc', 'arj', 'bz2', 'daa', 'gz', 'rar', 'tar', 'zim', 'zip', 'pdf', 'txt', 'tmf', 'log'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <div className="preview-not-available">
                             <span>No preview available for this file</span> <a
-                                href={props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id}
+                                href={(props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id}
                                 download={true}>Download</a>
                         </div>
                     }
@@ -1408,7 +1508,7 @@ const Documents = (props) => {
                     <Modal
                         selectedData={selectedOwnerDocumentNote}
                         setSelectedData={setSelectedOwnerDocumentNote}
-                        selectedParent={{...selectedOwnerDocument, is_cancelled: selectedOwner?.is_cancelled || 0}}
+                        selectedParent={{ ...selectedOwnerDocument, is_cancelled: selectedOwner?.is_cancelled || 0 }}
 
                         setSelectedParent={(data) => {
                             setSelectedOwnerDocument({

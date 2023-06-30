@@ -25,19 +25,23 @@
   min-height: 1rem;
   max-height: 1rem;
 }
-.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.first-name {
-  min-width: 5rem;
-  max-width: 5rem;
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.name {
+  min-width: 10rem;
+  max-width: 10rem;
 }
 .emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.last-name {
   min-width: 5rem;
   max-width: 5rem;
 }
-.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.phone-work {
-  min-width: 5rem;
-  max-width: 5rem;
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.phone {
+  min-width: 6rem;
+  max-width: 6rem;
 }
-.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.email-work {
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.email {
+  min-width: 10rem;
+  max-width: 10rem;
+}
+.emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.priority {
   flex-grow: 1;
 }
 .emergency-contact-list .form-slider .form-slider-wrapper .contact-list-box .tcol.pri {

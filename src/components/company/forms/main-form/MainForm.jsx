@@ -49,7 +49,13 @@ function MainForm(props) {
                     <input tabIndex={props.tabTimesFrom + props.tabTimes + 0} type="text" placeholder="Code" maxLength="8"
                         id="txt-parent-code"
                         ref={refCode}
-                        onKeyDown={props.searchByCode}
+                        onKeyDown={(e) => {
+                            let key = e.keyCode || e.which;
+
+                            if (key === 9){
+                                props.searchByCode(e);
+                            }                            
+                        }}
                         onInput={e => {
                             props.setSelectedParent({
                                 ...props.selectedParent,
@@ -157,7 +163,15 @@ function MainForm(props) {
                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.parentInfoPermission)?.pivot?.save || 0) === 0 &&
                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.parentInfoPermission)?.pivot?.edit || 0) === 0
                         }
-                        onKeyDown={props.validateForSaving}
+                        onKeyDown={(e) => {
+                            let key = e.keyCode || e.which;
+
+                            if (key === 9){
+                                if (props.triggerField === 'zip'){
+                                    props.validateForSaving(e);
+                                }
+                            }
+                        }}
                         onChange={e => props.setSelectedParent({
                             ...props.selectedParent,
                             zip: e.target.value
@@ -235,29 +249,29 @@ function MainForm(props) {
                         }}
                         value={
                             (props.selectedParent?.contacts || []).find(x => ((x?.pivot || {})?.is_primary || 0) === 1)
-                                ? props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'work'
+                                ? (props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.prary_phone || 'work') === 'work'
                                     ? props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_work
-                                    : props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'fax'
+                                    : (props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.primary_phone || 'work') === 'fax'
                                         ? props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_work_fax
-                                        : props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'mobile'
+                                        : (props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.primary_phone || 'work') === 'mobile'
                                             ? props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_mobile
-                                            : props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'direct'
+                                            : (props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.primary_phone || 'work') === 'direct'
                                                 ? props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_direct
-                                                : props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).primary_phone === 'other'
+                                                : (props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1)?.primary_phone || 'work') === 'other'
                                                     ? props.selectedParent?.contacts.find(x => ((x?.pivot || {})?.is_primary || 0) === 1).phone_other
                                                     : ''
                                 : (props.selectedParent?.contacts || []).find(c => c.is_primary === 1 && c.pivot === undefined) === undefined
                                     ? (props.selectedParent?.contact_phone || '')
                                     // ? ''
-                                    : props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'work'
+                                    : (props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone || 'work') === 'work'
                                         ? props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_work
-                                        : props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'fax'
+                                        : (props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone || 'work') === 'fax'
                                             ? props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_work_fax
-                                            : props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'mobile'
+                                            : (props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone || 'work') === 'mobile'
                                                 ? props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_mobile
-                                                : props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'direct'
+                                                : (props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone || 'work') === 'direct'
                                                     ? props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_direct
-                                                    : props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone === 'other'
+                                                    : (props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).primary_phone || 'work') === 'other'
                                                         ? props.selectedParent?.contacts.find(c => c.is_primary === 1 && c.pivot === undefined).phone_other
                                                         : ''
 
@@ -288,6 +302,15 @@ function MainForm(props) {
                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.parentInfoPermission)?.pivot?.save || 0) === 0 &&
                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.parentInfoPermission)?.pivot?.edit || 0) === 0
                         }
+                        onKeyDown={(e) => {
+                            let key = e.keyCode || e.which;
+
+                            if (key === 9){
+                                if (props.triggerField === 'ext'){
+                                    props.validateForSaving(e);
+                                }
+                            }
+                        }}
                         onInput={(e) => {
                             if ((props.selectedParent?.contacts || []).length === 0) {
                                 props.setSelectedParent({ ...props.selectedParent, ext: e.target.value })
@@ -382,7 +405,15 @@ function MainForm(props) {
                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.parentInfoPermission)?.pivot?.save || 0) === 0 &&
                             ((props.user?.user_code?.permissions || []).find(x => x.name === props.parentInfoPermission)?.pivot?.edit || 0) === 0
                         }
-                        onKeyDown={props.validateForSaving}
+                        onKeyDown={(e) => {
+                            let key = e.keyCode || e.which;
+
+                            if (key === 9){
+                                if (props.triggerField === 'email'){
+                                    props.validateForSaving(e);
+                                }
+                            }
+                        }}
                         onInput={(e) => {
                             if ((props.selectedParent?.contacts || []).length === 0) {
                                 props.setSelectedParent({ ...props.selectedParent, email: e.target.value })

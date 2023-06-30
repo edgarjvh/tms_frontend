@@ -220,7 +220,24 @@ export default class ToPrint extends Component {
                                             {
                                                 (this.props.selectedOrder?.pickups || []).map((item, index) => {
                                                     return (
-                                                        <span key={index} style={{ fontWeight: 'normal' }}>{item.po_numbers}</span>
+                                                        <div>
+                                                            {
+                                                                (item.po_numbers || '').split('|').map((_item, _index) => {
+                                                                    return (
+                                                                        <span
+                                                                            key={_index}
+                                                                            style={{
+                                                                                fontWeight: _index % 2 === 0 ? 'bold' : 'normal',
+                                                                                marginLeft: _index === 0 ? 0 : 5
+                                                                            }}
+                                                                        >
+                                                                            {_item}
+                                                                        </span>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>
+
                                                     )
                                                 })
                                             }

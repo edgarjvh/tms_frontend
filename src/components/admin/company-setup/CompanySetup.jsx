@@ -286,6 +286,8 @@ function CompanySetup(props) {
     }, [props.selectedAgent])
 
     useEffect(() => {
+        console.log(props.selectedDriver, props.componentId, selectedDriver)
+
         if ((props.selectedDriver?.component_id || '') !== props.componentId) {
             if (((selectedDriver?.id || 0) > 0 && (props.selectedDriver?.id || 0) > 0) && selectedDriver.id === props.selectedDriver.id) {
                 setSelectedDriver(selectedDriver => {
@@ -1331,7 +1333,7 @@ function CompanySetup(props) {
                             onKeyDown={e => {
                                 let key = e.keyCode || e.which;
 
-                                if (key === 9){
+                                if (key === 9) {
                                     e.preventDefault();
                                     validateCompanyForSaving(e);
                                     refCompanyCode.current.focus();
@@ -1379,7 +1381,9 @@ function CompanySetup(props) {
                                             owner='company'
                                             isEditingDriver={true}
                                             openPanel={props.openPanel}
-                                            closePanel={props.closePanel}
+                                            closePanel={(panelName, origin) => {
+                                                props.closePanel(panelName, origin);
+                                            }}
                                             componentId={moment().format('x')}
                                             selectedCompany={selectedCompany}
                                             isAdmin={props.isAdmin}
@@ -4456,24 +4460,26 @@ function CompanySetup(props) {
                                     }
 
                                     let panel = {
-                                        panelName: `${props.panelName}-drivers`,
-                                        component: <Drivers
-                                            title='Driver'
+                                        panelName: `${props.panelName}-company-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Company Driver'
                                             tabTimes={322000 + props.tabTimes}
-                                            panelName={`${props.panelName}-drivers`}
+                                            panelName={`${props.panelName}-company-drivers`}
                                             savingDriverUrl='/saveDriver'
                                             deletingDriverUrl='/deleteDriver'
                                             uploadAvatarUrl='/uploadDriverAvatar'
                                             removeAvatarUrl='/removeDriverAvatar'
                                             origin={props.origin}
                                             owner='company'
+                                            isEditingDriver={true}
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
                                             componentId={moment().format('x')}
+                                            selectedDriverId={selectedDriver.id}
 
                                             driverSearchCompany={{
                                                 ...selectedCompany,
-                                                selectedDriver: selectedDriver
+                                                selectedDriver: { id: 0, company_id: selectedCompany?.id }
                                             }}
                                         />
                                     }
@@ -5501,42 +5507,35 @@ function CompanySetup(props) {
                                                     <div className="driver-list-item" key={index}
                                                         onDoubleClick={async () => {
                                                             let panel = {
-                                                                panelName: `${props.panelName}-drivers`,
-                                                                component: <Drivers
-                                                                    title='Driver'
+                                                                panelName: `${props.panelName}-company-drivers`,
+                                                                component: <CompanyDrivers
+                                                                    title='Company Driver'
                                                                     tabTimes={322000 + props.tabTimes}
-                                                                    panelName={`${props.panelName}-drivers`}
+                                                                    panelName={`${props.panelName}-company-drivers`}
                                                                     savingDriverUrl='/saveDriver'
                                                                     deletingDriverUrl='/deleteDriver'
                                                                     uploadAvatarUrl='/uploadDriverAvatar'
                                                                     removeAvatarUrl='/removeDriverAvatar'
                                                                     origin={props.origin}
                                                                     owner='company'
+                                                                    isEditingDriver={true}
                                                                     openPanel={props.openPanel}
                                                                     closePanel={props.closePanel}
                                                                     componentId={moment().format('x')}
+                                                                    selectedDriverId={driver.id}
 
                                                                     driverSearchCompany={{
                                                                         ...selectedCompany,
-                                                                        selectedDriver: driver
+                                                                        selectedDriver: { id: 0, company_id: selectedCompany?.id }
                                                                     }}
                                                                 />
                                                             }
 
                                                             props.openPanel(panel, props.origin);
                                                         }} onClick={() => setSelectedDriver(driver)}>
-                                                        <div
-                                                            className="driver-list-col tcol first-name">{driver.first_name}</div>
-                                                        <div
-                                                            className="driver-list-col tcol last-name">{driver.last_name}</div>
-                                                        <div className="driver-list-col tcol phone-work">{
-                                                            driver.primary_phone === 'work' ? driver.phone_work
-                                                                : driver.primary_phone === 'fax' ? driver.phone_work_fax
-                                                                    : driver.primary_phone === 'mobile' ? driver.phone_mobile
-                                                                        : driver.primary_phone === 'direct' ? driver.phone_direct
-                                                                            : driver.primary_phone === 'other' ? driver.phone_other
-                                                                                : ''
-                                                        }</div>
+                                                        <div className="driver-list-col tcol first-name">{driver?.first_name || ''}</div>
+                                                        <div className="driver-list-col tcol last-name">{driver?.last_name || ''}</div>
+                                                        <div className="driver-list-col tcol phone-work">{driver?.contact_phone || ''}</div>
                                                         <div className="driver-list-col tcol email-work">{
                                                             driver.primary_email === 'work' ? driver.email_work
                                                                 : driver.primary_email === 'personal' ? driver.email_personal
