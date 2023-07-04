@@ -30,7 +30,7 @@ import {
     setSelectedEmployee,
     setSelectedAgent,
     setSelectedCompanyDriver as setSelectedDriver,
-    setSelectedOwnerOperator as setSelectedOperator
+    setSelectedCompanyOperator as setSelectedOperator
 } from './../../../actions';
 
 function CompanySetup(props) {
@@ -1011,35 +1011,31 @@ function CompanySetup(props) {
             },
             {
                 field: 'First Name',
-                data: (driverSearch.first_name || '').toLowerCase()
+                data: (driverSearch?.first_name || '').toLowerCase()
             },
             {
                 field: 'Last Name',
-                data: (driverSearch.last_name || '').toLowerCase()
+                data: (driverSearch?.last_name || '').toLowerCase()
             },
             {
                 field: 'Address 1',
-                data: (driverSearch.address1 || '').toLowerCase()
+                data: (driverSearch?.address1 || '').toLowerCase()
             },
             {
                 field: 'Address 2',
-                data: (driverSearch.address2 || '').toLowerCase()
+                data: (driverSearch?.address2 || '').toLowerCase()
             },
             {
                 field: 'City',
-                data: (driverSearch.city || '').toLowerCase()
+                data: (driverSearch?.city || '').toLowerCase()
             },
             {
                 field: 'State',
-                data: (driverSearch.state || '').toLowerCase()
+                data: (driverSearch?.state || '').toLowerCase()
             },
             {
-                field: 'Phone',
-                data: driverSearch.phone || ''
-            },
-            {
-                field: 'E-Mail',
-                data: (driverSearch.email || '').toLowerCase()
+                field: 'Zip',
+                data: driverSearch?.phone || ''
             }
         ]
 
@@ -1060,7 +1056,7 @@ function CompanySetup(props) {
                 callback={(driver) => {
                     new Promise((resolve, reject) => {
                         if (driver) {
-                            setSelectedCompany(driver.company);
+                            // setSelectedCompany(driver?.company || {});
                             setSelectedDriver(driver);
                             setShowingDriverList(true);
                             setDriverSearch({});
@@ -1096,35 +1092,31 @@ function CompanySetup(props) {
             },
             {
                 field: 'First Name',
-                data: (operatorSearch.first_name || '').toLowerCase()
+                data: (operatorSearch?.first_name || '').toLowerCase()
             },
             {
                 field: 'Last Name',
-                data: (operatorSearch.last_name || '').toLowerCase()
+                data: (operatorSearch?.last_name || '').toLowerCase()
             },
             {
                 field: 'Address 1',
-                data: (operatorSearch.address1 || '').toLowerCase()
+                data: (operatorSearch?.address1 || '').toLowerCase()
             },
             {
                 field: 'Address 2',
-                data: (operatorSearch.address2 || '').toLowerCase()
+                data: (operatorSearch?.address2 || '').toLowerCase()
             },
             {
                 field: 'City',
-                data: (operatorSearch.city || '').toLowerCase()
+                data: (operatorSearch?.city || '').toLowerCase()
             },
             {
                 field: 'State',
-                data: (operatorSearch.state || '').toLowerCase()
+                data: (operatorSearch?.state || '').toLowerCase()
             },
             {
-                field: 'Phone',
-                data: operatorSearch.phone || ''
-            },
-            {
-                field: 'E-Mail',
-                data: (operatorSearch.email || '').toLowerCase()
+                field: 'Zip',
+                data: operatorSearch?.Zip || ''
             }
         ]
 
@@ -1145,7 +1137,7 @@ function CompanySetup(props) {
                 callback={(operator) => {
                     new Promise((resolve, reject) => {
                         if (operator) {
-                            setSelectedCompany(operator.company);
+                            // setSelectedCompany(operator.company);
                             setSelectedOperator(operator);
                             setShowingOperatorList(true);
                             setOperatorSearch({});
@@ -4449,12 +4441,12 @@ function CompanySetup(props) {
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
                                 <div className="mochi-button" onClick={async () => {
-                                    if (selectedCompany?.id === undefined) {
+                                    if ((selectedCompany?.id || 0) === 0) {
                                         window.alert('You must select a company first!');
                                         return;
                                     }
 
-                                    if (selectedDriver.id === undefined) {
+                                    if ((selectedDriver?.id || 0) === 0) {
                                         window.alert('You must select a driver first!');
                                         return;
                                     }
@@ -4470,6 +4462,7 @@ function CompanySetup(props) {
                                             uploadAvatarUrl='/uploadDriverAvatar'
                                             removeAvatarUrl='/removeDriverAvatar'
                                             origin={props.origin}
+                                            subOrigin='driver'
                                             owner='company'
                                             isEditingDriver={true}
                                             openPanel={props.openPanel}
@@ -4491,7 +4484,7 @@ function CompanySetup(props) {
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                                 <div className="mochi-button" onClick={async () => {
-                                    if (selectedCompany?.id === undefined) {
+                                    if ((selectedCompany?.id || 0) === 0) {
                                         window.alert('You must select a company first!');
                                         return;
                                     }
@@ -4507,6 +4500,7 @@ function CompanySetup(props) {
                                             uploadAvatarUrl='/uploadDriverAvatar'
                                             removeAvatarUrl='/removeDriverAvatar'
                                             origin={props.origin}
+                                            subOrigin='driver'
                                             owner='company'
                                             isEditingDriver={true}
                                             openPanel={props.openPanel}
@@ -4758,63 +4752,9 @@ function CompanySetup(props) {
                                                 setSelectedDriver(selectedDriver => {
                                                     return {
                                                         ...selectedDriver,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
+                                                        contact_phone: e.target.value
                                                     }
                                                 });
-                                            } else {
-                                                if ((selectedDriver?.primary_phone || '') === '') {
-                                                    setSelectedDriver(selectedDriver => {
-                                                        return {
-                                                            ...selectedDriver,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedDriver?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
                                             }
                                         }}
                                         onChange={e => {
@@ -4822,78 +4762,27 @@ function CompanySetup(props) {
                                                 setSelectedDriver(selectedDriver => {
                                                     return {
                                                         ...selectedDriver,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
+                                                        contact_phone: e.target.value
                                                     }
                                                 });
-                                            } else {
-                                                if ((selectedDriver?.primary_phone || '') === '') {
-                                                    setSelectedDriver(selectedDriver => {
-                                                        return {
-                                                            ...selectedDriver,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedDriver?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedDriver(selectedDriver => {
-                                                                return {
-                                                                    ...selectedDriver,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
                                             }
                                         }}
                                         value={
-                                            (selectedDriver?.primary_phone || '') === 'work'
-                                                ? (selectedDriver?.phone_work || '')
-                                                : (selectedDriver?.primary_phone || '') === 'fax'
-                                                    ? (selectedDriver?.phone_work_fax || '')
-                                                    : (selectedDriver?.primary_phone || '') === 'mobile'
-                                                        ? (selectedDriver?.phone_mobile || '')
-                                                        : (selectedDriver?.primary_phone || '') === 'direct'
-                                                            ? (selectedDriver?.phone_direct || '')
-                                                            : (selectedDriver?.primary_phone || '') === 'other'
-                                                                ? (selectedDriver?.phone_other || '')
-                                                                : ''
-                                        } />
+                                            (selectedDriver?.contacts || []).length > 0
+                                                ? (selectedDriver.contacts[0]?.primary_phone || 'work') === 'work'
+                                                    ? selectedDriver.contacts[0]?.phone_work || ''
+                                                    : (selectedDriver.contacts[0]?.primary_phone || 'work') === 'fax'
+                                                        ? selectedDriver.contacts[0]?.phone_work_fax || ''
+                                                        : (selectedDriver.contacts[0]?.primary_phone || 'work') === 'mobile'
+                                                            ? selectedDriver.contacts[0]?.phone_mobile || ''
+                                                            : (selectedDriver.contacts[0]?.primary_phone || 'work') === 'direct'
+                                                                ? selectedDriver.contacts[0]?.phone_direct || ''
+                                                                : (selectedDriver.contacts[0]?.primary_phone || 'work') === 'other'
+                                                                    ? selectedDriver.contacts[0]?.phone_other || ''
+                                                                    : ''
+                                                : (selectedDriver?.contact_phone || '')
+                                        }
+                                    />
                                     {
                                         (selectedDriver?.id || 0) > 0 &&
                                         <div
@@ -4901,7 +4790,11 @@ function CompanySetup(props) {
                                                 'selected-company-driver-primary-phone': true,
                                                 'pushed': (driverPhoneItems.length > 1)
                                             })}>
-                                            {selectedDriver?.primary_phone || ''}
+                                            {
+                                                (selectedDriver?.contacts || []).length > 0
+                                                    ? selectedDriver.contacts[0]?.primary_phone || ''
+                                                    : ''
+                                            }
                                         </div>
                                     }
 
@@ -5024,7 +4917,7 @@ function CompanySetup(props) {
                                             setSelectedDriver(selectedDriver => {
                                                 return {
                                                     ...selectedDriver,
-                                                    phone_ext: e.target.value
+                                                    ext: e.target.value
                                                 }
                                             })
                                         }}
@@ -5032,11 +4925,17 @@ function CompanySetup(props) {
                                             setSelectedDriver(selectedDriver => {
                                                 return {
                                                     ...selectedDriver,
-                                                    phone_ext: e.target.value
+                                                    ext: e.target.value
                                                 }
                                             })
                                         }}
-                                        value={selectedDriver?.phone_ext || ''} />
+                                        value={
+                                            (selectedDriver?.contacts || []).length > 0
+                                                ? (selectedDriver.contacts[0]?.primary_phone || '') === 'work'
+                                                    ? selectedDriver.contacts[0]?.phone_ext || ''
+                                                    : ''
+                                                : selectedDriver?.ext || ''
+                                        } />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
@@ -5046,11 +4945,7 @@ function CompanySetup(props) {
                                         }}
                                         onChange={e => {
                                         }}
-                                        value={
-                                            (selectedDriver?.id || 0) > 0
-                                                ? 'DV' + selectedDriver.id.toString().padStart(4, '0')
-                                                : ''
-                                        } />
+                                        value={(selectedDriver?.code || '')} />
                                 </div>
                             </div>
                         </div>
@@ -5300,13 +5195,15 @@ function CompanySetup(props) {
                                             }
                                         }}
                                         value={
-                                            (selectedDriver?.primary_email || '') === 'work'
-                                                ? (selectedDriver?.email_work || '')
-                                                : (selectedDriver?.primary_email || '') === 'personal'
-                                                    ? (selectedDriver?.email_personal || '')
-                                                    : (selectedDriver?.primary_email || '') === 'other'
-                                                        ? (selectedDriver?.email_other || '')
-                                                        : ''
+                                            (selectedDriver?.contacts || []).length > 0
+                                                ? (selectedDriver.contacts[0]?.primary_email || 'work') === 'work'
+                                                    ? selectedDriver.contacts[0]?.email_work || ''
+                                                    : (selectedDriver.contacts[0]?.primary_email || 'work') === 'personal'
+                                                        ? selectedDriver.contacts[0]?.email_personal || ''
+                                                        : (selectedDriver.contacts[0]?.primary_email || 'work') === 'other'
+                                                            ? selectedDriver.contacts[0]?.email_other || ''
+                                                            : ''
+                                                : ''
                                         } />
 
                                     {
@@ -5316,7 +5213,11 @@ function CompanySetup(props) {
                                                 'selected-company-driver-primary-email': true,
                                                 'pushed': (driverEmailItems.length > 1)
                                             })}>
-                                            {selectedDriver?.primary_email || ''}
+                                            {
+                                                (selectedDriver?.contacts || []).length > 0
+                                                    ? selectedDriver.contacts[0]?.primary_email || ''
+                                                    : ''
+                                            }
                                         </div>
                                     }
 
@@ -5517,6 +5418,7 @@ function CompanySetup(props) {
                                                                     uploadAvatarUrl='/uploadDriverAvatar'
                                                                     removeAvatarUrl='/removeDriverAvatar'
                                                                     origin={props.origin}
+                                                                    subOrigin='driver'
                                                                     owner='company'
                                                                     isEditingDriver={true}
                                                                     openPanel={props.openPanel}
@@ -5535,12 +5437,31 @@ function CompanySetup(props) {
                                                         }} onClick={() => setSelectedDriver(driver)}>
                                                         <div className="driver-list-col tcol first-name">{driver?.first_name || ''}</div>
                                                         <div className="driver-list-col tcol last-name">{driver?.last_name || ''}</div>
-                                                        <div className="driver-list-col tcol phone-work">{driver?.contact_phone || ''}</div>
+                                                        <div className="driver-list-col tcol phone-work">{
+                                                            (driver?.contacts || []).length > 0
+                                                                ? (driver.contacts[0]?.primary_phone || 'work') === 'work'
+                                                                    ? driver.contacts[0]?.phone_work || ''
+                                                                    : (driver.contacts[0]?.primary_phone || 'work') === 'fax'
+                                                                        ? driver.contacts[0]?.phone_work_fax || ''
+                                                                        : (driver.contacts[0]?.primary_phone || 'work') === 'mobile'
+                                                                            ? driver.contacts[0]?.phone_mobile || ''
+                                                                            : (driver.contacts[0]?.primary_phone || 'work') === 'direct'
+                                                                                ? driver.contacts[0]?.phone_direct || ''
+                                                                                : (driver.contacts[0]?.primary_phone || 'work') === 'other'
+                                                                                    ? driver.contacts[0]?.phone_other || ''
+                                                                                    : ''
+                                                                : driver?.contact_phone || ''
+                                                        }</div>
                                                         <div className="driver-list-col tcol email-work">{
-                                                            driver.primary_email === 'work' ? driver.email_work
-                                                                : driver.primary_email === 'personal' ? driver.email_personal
-                                                                    : driver.primary_email === 'other' ? driver.email_other
-                                                                        : ''
+                                                            (driver?.contacts || []).length > 0
+                                                                ? (driver.contacts[0]?.primary_email || 'work') === 'work'
+                                                                    ? driver.contacts[0]?.email_work || ''
+                                                                    : (driver.contacts[0]?.primary_email || 'work') === 'personal'
+                                                                        ? driver.contacts[0]?.email_personal || ''
+                                                                        : (driver.contacts[0]?.primary_email || 'work') === 'other'
+                                                                            ? driver.contacts[0]?.email_other || ''
+                                                                            : ''
+                                                                : ''
                                                         }</div>
                                                         {
                                                             (driver.id === (selectedDriver?.id || 0)) &&
@@ -5672,35 +5593,38 @@ function CompanySetup(props) {
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
                                 <div className="mochi-button" onClick={async () => {
-                                    if (selectedCompany?.id === undefined) {
+                                    if ((selectedCompany?.id || 0) === 0) {
                                         window.alert('You must select a company first!');
                                         return;
                                     }
 
-                                    if (selectedOperator.id === undefined) {
+                                    if ((selectedOperator?.id || 0) === 0) {
                                         window.alert('You must select an operator first!');
                                         return;
                                     }
 
                                     let panel = {
-                                        panelName: `${props.panelName}-operators`,
-                                        component: <Operators
-                                            title='Operator'
-                                            tabTimes={422000 + props.tabTimes}
-                                            panelName={`${props.panelName}-operators`}
-                                            savingOperatorUrl='/saveOperator'
-                                            deletingOperatorUrl='/deleteOperator'
+                                        panelName: `${props.panelName}-company-operators`,
+                                        component: <CompanyDrivers
+                                            title='Company Operator'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-company-operators`}
+                                            savingDriverUrl='/saveOperator'
+                                            deletingDriverUrl='/deleteOperator'
                                             uploadAvatarUrl='/uploadOperatorAvatar'
                                             removeAvatarUrl='/removeOperatorAvatar'
                                             origin={props.origin}
+                                            subOrigin='operator'
                                             owner='company'
+                                            isEditingDriver={true}
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
                                             componentId={moment().format('x')}
+                                            selectedDriverId={selectedOperator.id}
 
-                                            operatorSearchCompany={{
+                                            driverSearchCompany={{
                                                 ...selectedCompany,
-                                                selectedOperator: selectedOperator
+                                                selectedDriver: { id: 0, company_id: selectedCompany?.id }
                                             }}
                                         />
                                     }
@@ -5712,31 +5636,32 @@ function CompanySetup(props) {
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                                 <div className="mochi-button" onClick={async () => {
-                                    if (selectedCompany?.id === undefined) {
+                                    if ((selectedCompany?.id || 0) === 0) {
                                         window.alert('You must select a company first!');
                                         return;
                                     }
 
                                     let panel = {
-                                        panelName: `${props.panelName}-operators`,
-                                        component: <Operators
-                                            title='Operator'
-                                            tabTimes={422000 + props.tabTimes}
-                                            panelName={`${props.panelName}-operators`}
-                                            savingOperatorUrl='/saveOperator'
-                                            deletingOperatorUrl='/deleteOperator'
+                                        panelName: `${props.panelName}-company-operators`,
+                                        component: <CompanyDrivers
+                                            title='Company Operator'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-company-operators`}
+                                            savingDriverUrl='/saveOperator'
+                                            deletingDriverUrl='/deleteOperator'
                                             uploadAvatarUrl='/uploadOperatorAvatar'
                                             removeAvatarUrl='/removeOperatorAvatar'
                                             origin={props.origin}
+                                            subOrigin='operator'
                                             owner='company'
-                                            isEditingOperator={true}
+                                            isEditingDriver={true}
                                             openPanel={props.openPanel}
                                             closePanel={props.closePanel}
                                             componentId={moment().format('x')}
 
-                                            operatorSearchCompany={{
+                                            driverSearchCompany={{
                                                 ...selectedCompany,
-                                                selectedOperator: { id: 0, company_id: selectedCompany?.id }
+                                                selectedDriver: { id: 0, company_id: selectedCompany?.id }
                                             }}
                                         />
                                     }
@@ -5979,63 +5904,9 @@ function CompanySetup(props) {
                                                 setSelectedOperator(selectedOperator => {
                                                     return {
                                                         ...selectedOperator,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
+                                                        contact_phone: e.target.value
                                                     }
                                                 });
-                                            } else {
-                                                if ((selectedOperator?.primary_phone || '') === '') {
-                                                    setSelectedOperator(selectedOperator => {
-                                                        return {
-                                                            ...selectedOperator,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedOperator?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
                                             }
                                         }}
                                         onChange={e => {
@@ -6043,78 +5914,27 @@ function CompanySetup(props) {
                                                 setSelectedOperator(selectedOperator => {
                                                     return {
                                                         ...selectedOperator,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: 'work'
+                                                        contact_phone: e.target.value
                                                     }
                                                 });
-                                            } else {
-                                                if ((selectedOperator?.primary_phone || '') === '') {
-                                                    setSelectedOperator(selectedOperator => {
-                                                        return {
-                                                            ...selectedOperator,
-                                                            phone_work: e.target.value,
-                                                            primary_phone: 'work'
-                                                        }
-                                                    });
-                                                } else {
-                                                    switch (selectedOperator?.primary_phone) {
-                                                        case 'work':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'fax':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_work_fax: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'mobile':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_mobile: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'direct':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_direct: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                        case 'other':
-                                                            setSelectedOperator(selectedOperator => {
-                                                                return {
-                                                                    ...selectedOperator,
-                                                                    phone_other: e.target.value
-                                                                }
-                                                            });
-                                                            break;
-                                                    }
-                                                }
                                             }
                                         }}
                                         value={
-                                            (selectedOperator?.primary_phone || '') === 'work'
-                                                ? (selectedOperator?.phone_work || '')
-                                                : (selectedOperator?.primary_phone || '') === 'fax'
-                                                    ? (selectedOperator?.phone_work_fax || '')
-                                                    : (selectedOperator?.primary_phone || '') === 'mobile'
-                                                        ? (selectedOperator?.phone_mobile || '')
-                                                        : (selectedOperator?.primary_phone || '') === 'direct'
-                                                            ? (selectedOperator?.phone_direct || '')
-                                                            : (selectedOperator?.primary_phone || '') === 'other'
-                                                                ? (selectedOperator?.phone_other || '')
-                                                                : ''
-                                        } />
+                                            (selectedOperator?.contacts || []).length > 0
+                                                ? (selectedOperator.contacts[0]?.primary_phone || 'work') === 'work'
+                                                    ? selectedOperator.contacts[0]?.phone_work || ''
+                                                    : (selectedOperator.contacts[0]?.primary_phone || 'work') === 'fax'
+                                                        ? selectedOperator.contacts[0]?.phone_work_fax || ''
+                                                        : (selectedOperator.contacts[0]?.primary_phone || 'work') === 'mobile'
+                                                            ? selectedOperator.contacts[0]?.phone_mobile || ''
+                                                            : (selectedOperator.contacts[0]?.primary_phone || 'work') === 'direct'
+                                                                ? selectedOperator.contacts[0]?.phone_direct || ''
+                                                                : (selectedOperator.contacts[0]?.primary_phone || 'work') === 'other'
+                                                                    ? selectedOperator.contacts[0]?.phone_other || ''
+                                                                    : ''
+                                                : (selectedOperator?.contact_phone || '')
+                                        }
+                                    />
                                     {
                                         (selectedOperator?.id || 0) > 0 &&
                                         <div
@@ -6122,7 +5942,11 @@ function CompanySetup(props) {
                                                 'selected-company-operator-primary-phone': true,
                                                 'pushed': (operatorPhoneItems.length > 1)
                                             })}>
-                                            {selectedOperator?.primary_phone || ''}
+                                            {
+                                                (selectedOperator?.contacts || []).length > 0
+                                                    ? selectedOperator.contacts[0]?.primary_phone || ''
+                                                    : ''
+                                            }
                                         </div>
                                     }
 
@@ -6245,7 +6069,7 @@ function CompanySetup(props) {
                                             setSelectedOperator(selectedOperator => {
                                                 return {
                                                     ...selectedOperator,
-                                                    phone_ext: e.target.value
+                                                    ext: e.target.value
                                                 }
                                             })
                                         }}
@@ -6253,11 +6077,17 @@ function CompanySetup(props) {
                                             setSelectedOperator(selectedOperator => {
                                                 return {
                                                     ...selectedOperator,
-                                                    phone_ext: e.target.value
+                                                    ext: e.target.value
                                                 }
                                             })
                                         }}
-                                        value={selectedOperator?.phone_ext || ''} />
+                                        value={
+                                            (selectedOperator?.contacts || []).length > 0
+                                                ? (selectedOperator.contacts[0]?.primary_phone || '') === 'work'
+                                                    ? selectedOperator.contacts[0]?.phone_ext || ''
+                                                    : ''
+                                                : selectedOperator?.ext || ''
+                                        } />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className="input-box-container grow">
@@ -6267,11 +6097,7 @@ function CompanySetup(props) {
                                         }}
                                         onChange={e => {
                                         }}
-                                        value={
-                                            (selectedOperator?.id || 0) > 0
-                                                ? 'OO' + selectedOperator.id.toString().padStart(4, '0')
-                                                : ''
-                                        } />
+                                        value={(selectedOperator?.code || '')} />
                                 </div>
                             </div>
                         </div>
@@ -6521,13 +6347,15 @@ function CompanySetup(props) {
                                             }
                                         }}
                                         value={
-                                            (selectedOperator?.primary_email || '') === 'work'
-                                                ? (selectedOperator?.email_work || '')
-                                                : (selectedOperator?.primary_email || '') === 'personal'
-                                                    ? (selectedOperator?.email_personal || '')
-                                                    : (selectedOperator?.primary_email || '') === 'other'
-                                                        ? (selectedOperator?.email_other || '')
-                                                        : ''
+                                            (selectedOperator?.contacts || []).length > 0
+                                                ? (selectedOperator.contacts[0]?.primary_email || 'work') === 'work'
+                                                    ? selectedOperator.contacts[0]?.email_work || ''
+                                                    : (selectedOperator.contacts[0]?.primary_email || 'work') === 'personal'
+                                                        ? selectedOperator.contacts[0]?.email_personal || ''
+                                                        : (selectedDriver.contacts[0]?.primary_email || 'work') === 'other'
+                                                            ? selectedOperator.contacts[0]?.email_other || ''
+                                                            : ''
+                                                : ''
                                         } />
 
                                     {
@@ -6537,7 +6365,10 @@ function CompanySetup(props) {
                                                 'selected-company-operator-primary-email': true,
                                                 'pushed': (operatorEmailItems.length > 1)
                                             })}>
-                                            {selectedOperator?.primary_email || ''}
+                                            {
+                                                (selectedOperator?.contacts || []).length > 0
+                                                    ? selectedOperator.contacts[0]?.primary_email || ''
+                                                    : ''}
                                         </div>
                                     }
 
@@ -6728,24 +6559,27 @@ function CompanySetup(props) {
                                                     <div className="operator-list-item" key={index}
                                                         onDoubleClick={async () => {
                                                             let panel = {
-                                                                panelName: `${props.panelName}-operators`,
-                                                                component: <Operators
-                                                                    title='Operator'
-                                                                    tabTimes={422000 + props.tabTimes}
-                                                                    panelName={`${props.panelName}-operators`}
-                                                                    savingOperatorUrl='/saveOperator'
-                                                                    deletingOperatorUrl='/deleteOperator'
+                                                                panelName: `${props.panelName}-company-operators`,
+                                                                component: <CompanyDrivers
+                                                                    title='Company Operator'
+                                                                    tabTimes={322000 + props.tabTimes}
+                                                                    panelName={`${props.panelName}-company-operators`}
+                                                                    savingDriverUrl='/saveOperator'
+                                                                    deletingDriverUrl='/deleteOperator'
                                                                     uploadAvatarUrl='/uploadOperatorAvatar'
                                                                     removeAvatarUrl='/removeOperatorAvatar'
                                                                     origin={props.origin}
+                                                                    subOrigin='operator'
                                                                     owner='company'
+                                                                    isEditingDriver={true}
                                                                     openPanel={props.openPanel}
                                                                     closePanel={props.closePanel}
                                                                     componentId={moment().format('x')}
+                                                                    selectedDriverId={operator.id}
 
-                                                                    operatorSearchCompany={{
+                                                                    driverSearchCompany={{
                                                                         ...selectedCompany,
-                                                                        selectedOperator: operator
+                                                                        selectedDriver: { id: 0, company_id: selectedCompany?.id }
                                                                     }}
                                                                 />
                                                             }
@@ -6757,18 +6591,30 @@ function CompanySetup(props) {
                                                         <div
                                                             className="operator-list-col tcol last-name">{operator.last_name}</div>
                                                         <div className="operator-list-col tcol phone-work">{
-                                                            operator.primary_phone === 'work' ? operator.phone_work
-                                                                : operator.primary_phone === 'fax' ? operator.phone_work_fax
-                                                                    : operator.primary_phone === 'mobile' ? operator.phone_mobile
-                                                                        : operator.primary_phone === 'direct' ? operator.phone_direct
-                                                                            : operator.primary_phone === 'other' ? operator.phone_other
+                                                            (operator?.contacts || []).length > 0
+                                                            ? (operator.contacts[0]?.primary_phone || 'work') === 'work'
+                                                                ? operator.contacts[0]?.phone_work || ''
+                                                                : (operator.contacts[0]?.primary_phone || 'work') === 'fax'
+                                                                    ? operator.contacts[0]?.phone_work_fax || ''
+                                                                    : (operator.contacts[0]?.primary_phone || 'work') === 'mobile'
+                                                                        ? operator.contacts[0]?.phone_mobile || ''
+                                                                        : (operator.contacts[0]?.primary_phone || 'work') === 'direct'
+                                                                            ? operator.contacts[0]?.phone_direct || ''
+                                                                            : (operator.contacts[0]?.primary_phone || 'work') === 'other'
+                                                                                ? operator.contacts[0]?.phone_other || ''
                                                                                 : ''
+                                                            : operator?.contact_phone || ''
                                                         }</div>
                                                         <div className="operator-list-col tcol email-work">{
-                                                            operator.primary_email === 'work' ? operator.email_work
-                                                                : operator.primary_email === 'personal' ? operator.email_personal
-                                                                    : operator.primary_email === 'other' ? operator.email_other
+                                                            (operator?.contacts || []).length > 0
+                                                            ? (operator.contacts[0]?.primary_email || 'work') === 'work'
+                                                                ? operator.contacts[0]?.email_work || ''
+                                                                : (operator.contacts[0]?.primary_email || 'work') === 'personal'
+                                                                    ? operator.contacts[0]?.email_personal || ''
+                                                                    : (operator.contacts[0]?.primary_email || 'work') === 'other'
+                                                                        ? operator.contacts[0]?.email_other || ''
                                                                         : ''
+                                                            : ''
                                                         }</div>
                                                         {
                                                             (operator.id === (selectedOperator?.id || 0)) &&

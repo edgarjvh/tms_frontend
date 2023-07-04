@@ -34,7 +34,9 @@ import {
     setSelectedFactoringCompany,
     setSelectedFactoringCompanyContact,
     setSelectedCompanyDriver as setSelectedDriver,
-    setSelectedDriverContact
+    setSelectedDriverContact,
+    setSelectedCompanyOperator as setSelectedOperator,
+    setSelectedOperatorContact
 } from './../../../../actions';
 import { Documents } from "../index";
 import moment from "moment";
@@ -276,13 +278,13 @@ const Contacts = (props) => {
                     props.setSelectedAgentContact(contact);
                 }
 
-                if (props.owner === 'owner-operator') {
-                    props.setSelectedOwnerOperator({ ...props.selectedOwnerOperator, contacts: contacts });
-                    props.setSelectedOwnerOperatorContact(contact);
+                if (props.owner === 'operator') {
+                    props.setSelectedOperator({ ...props.selectedOperator, contacts: contacts });
+                    props.setSelectedOperatorContact(contact);
                 }
 
-                if (props.owner === 'driver'){
-                    props.setSelectedDriver({ ...props.selectedDriver, contacts: contacts});
+                if (props.owner === 'driver') {
+                    props.setSelectedDriver({ ...props.selectedDriver, contacts: contacts });
                     props.setSelectedDriverContact(contact);
                 }
 
@@ -339,9 +341,14 @@ const Contacts = (props) => {
                         props.setSelectedAgentContact({ id: contact.id, deleted: true });
                     }
 
-                    if (props.owner === 'owner-operator') {
-                        props.setSelectedOwnerOperator({ ...props.selectedOwnerOperator, contacts: res.data.contacts });
-                        props.setSelectedOwnerOperatorContact({ id: contact.id, deleted: true });
+                    if (props.owner === 'operator') {
+                        props.setSelectedOperator({ ...props.selectedOperator, contacts: res.data.contacts });
+                        props.setSelectedOperatorContact({ id: contact.id, deleted: true });
+                    }
+
+                    if (props.owner === 'driver') {
+                        props.setSelectedDriver({ ...props.selectedDriver, contacts: res.data.contacts });
+                        props.setSelectedDriverContact({ id: contact.id, deleted: true });
                     }
 
                     setContactSearchCustomer({
@@ -457,9 +464,16 @@ const Contacts = (props) => {
                             props.setSelectedAgent({ ...props.selectedAgent, contacts: res.data.contacts });
                         }
 
-                        if (props.owner === 'owner-operator') {
-                            props.setSelectedOwnerOperator({
-                                ...props.selectedOwnerOperator,
+                        if (props.owner === 'operator') {
+                            props.setSelectedOperator({
+                                ...props.selectedOperator,
+                                contacts: res.data.contacts
+                            });
+                        }
+
+                        if (props.owner === 'driver') {
+                            props.setSelectedDriver({
+                                ...props.selectedDriver,
                                 contacts: res.data.contacts
                             });
                         }
@@ -510,8 +524,12 @@ const Contacts = (props) => {
                     props.setSelectedAgent({ ...props.selectedAgent, contacts: res.data.contacts });
                 }
 
-                if (props.owner === 'owner-operator') {
-                    props.setSelectedOwnerOperator({ ...props.selectedOwnerOperator, contacts: res.data.contacts });
+                if (props.owner === 'operator') {
+                    props.setSelectedOperator({ ...props.selectedOperator, contacts: res.data.contacts });
+                }
+
+                if (props.owner === 'driver') {
+                    props.setSelectedDriver({ ...props.selectedDriver, contacts: res.data.contacts });
                 }
 
                 await setContactSearchCustomer({
@@ -787,7 +805,7 @@ const Contacts = (props) => {
                             </div>
                             <div className="contact-buttons">
                                 {
-                                    (props.owner || '') === 'driver' &&
+                                    ((props.owner || '') === 'driver' || (props.owner || '') === 'operator') &&
                                     <div className="input-box-container" style={{ width: '7rem', marginBottom: 10 }}>
                                         <input type="number" placeholder='Priority' min={1} max={10} readOnly={!isEditingContact} style={{
                                             textTransform: 'capitalize'
@@ -810,7 +828,7 @@ const Contacts = (props) => {
                                     </div>
                                 }
                                 {
-                                    (props.owner || '') !== 'driver' &&
+                                    ((props.owner || '') !== 'driver' && (props.owner || '') !== 'operator') &&
                                     <div className="input-toggle-container">
                                         <input type="checkbox" id="cbox-panel-customer-contacts-primary-btn"
                                             onChange={e => {
@@ -852,7 +870,7 @@ const Contacts = (props) => {
                                 }
 
                                 {
-                                    (props.owner || '') !== 'driver' &&
+                                    ((props.owner || '') !== 'driver' && (props.owner || '') !== 'operator') &&
                                     <div className="input-toggle-container">
                                         <input type="checkbox" id="cbox-panel-customer-contacts-type-btn"
                                             onChange={e => {
@@ -1158,7 +1176,7 @@ const Contacts = (props) => {
                                     </div>
 
                                     {
-                                        (props.owner || '') === 'driver' &&
+                                        ((props.owner || '') === 'driver' || (props.owner || '') === 'operator') &&
                                         <div className="field-container">
                                             <div className="field-title">Relationship</div>
                                             <input type="text" readOnly={!isEditingContact} style={{
@@ -1186,13 +1204,13 @@ const Contacts = (props) => {
                                         <div className="field-title">Company</div>
                                         <input type="text"
                                             readOnly={
-                                                props.owner !== 'driver'
+                                                (props.owner !== 'driver' || props.owner !== 'operator')
                                                     ? isEditingContact
                                                         ? (tempSelectedContact?.type || 'internal') === 'internal'
                                                             ? true
                                                             : false
                                                         : true
-                                                    : props.owner !== 'driver'
+                                                    : (props.owner !== 'driver' || props.owner !== 'operator')
                                             }
                                             style={{
                                                 textTransform: 'capitalize'
@@ -1833,17 +1851,36 @@ const Contacts = (props) => {
                                         zip_code: contactSearchCustomer?.zip || ''
                                     });
                                     break;
-                                case 'owner-operator':
+                                case 'driver':
                                     setContactSearchCustomer({
                                         ...contactSearchCustomer,
                                         selectedContact: {
                                             id: 0,
-                                            owner_operator_id: contactSearchCustomer.id
+                                            driver_id: contactSearchCustomer.id
                                         }
                                     });
                                     setTempSelectedContact({
                                         id: 0,
-                                        owner_operator_id: contactSearchCustomer.id,
+                                        driver_id: contactSearchCustomer.id,
+                                        company: contactSearchCustomer?.name || '',
+                                        address1: contactSearchCustomer?.address1 || '',
+                                        address2: contactSearchCustomer?.address2 || '',
+                                        city: contactSearchCustomer?.city || '',
+                                        state: contactSearchCustomer?.state || '',
+                                        zip_code: contactSearchCustomer?.zip || ''
+                                    });
+                                    break;
+                                case 'operator':
+                                    setContactSearchCustomer({
+                                        ...contactSearchCustomer,
+                                        selectedContact: {
+                                            id: 0,
+                                            operator_id: contactSearchCustomer.id
+                                        }
+                                    });
+                                    setTempSelectedContact({
+                                        id: 0,
+                                        operator_id: contactSearchCustomer.id,
                                         company: contactSearchCustomer?.name || '',
                                         address1: contactSearchCustomer?.address1 || '',
                                         address2: contactSearchCustomer?.address2 || '',
@@ -1928,6 +1965,8 @@ const mapStateToProps = (state) => {
         selectedFactoringCompanyContact: state.carrierReducers.selectedFactoringCompanyContact,
         selectedDriver: state.companySetupReducers.selectedDriver,
         selectedDriverContact: state.companySetupReducers.selectedDriverContact,
+        selectedOperator: state.companySetupReducers.selectedOperator,
+        selectedOperatorContact: state.companySetupReducers.selectedOperatorContact,
     }
 }
 
@@ -1947,5 +1986,7 @@ export default connect(mapStateToProps, {
     setSelectedFactoringCompany,
     setSelectedFactoringCompanyContact,
     setSelectedDriver,
-    setSelectedDriverContact
+    setSelectedDriverContact,
+    setSelectedOperator,
+    setSelectedOperatorContact
 })(Contacts)

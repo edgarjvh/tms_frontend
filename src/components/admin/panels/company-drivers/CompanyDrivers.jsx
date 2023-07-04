@@ -27,7 +27,9 @@ import { Documents, Contacts } from './../../../company/panels';
 import {
     setSelectedCompany,
     setSelectedCompanyDriver as setSelectedDriver,
-    setSelectedDriverContact
+    setSelectedDriverContact,
+    setSelectedCompanyOperator as setSelectedOperator,
+    setSelectedOperatorContact
 } from './../../../../actions';
 
 const CompanyDrivers = props => {
@@ -151,10 +153,11 @@ const CompanyDrivers = props => {
     });
 
     useEffect(() => {
+        
         if ((selectedDriver?.id || 0) === 0) {
             if ((props.selectedDriverId || 0) > 0) {
                 setIsLoading(true);
-                axios.post(props.serverUrl + '/getDriverById', { id: props.selectedDriverId }).then(res => {
+                axios.post(props.serverUrl + `/get${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}ById`, { id: props.selectedDriverId }).then(res => {
                     if (res.data.result === 'OK') {
                         setSelectedDriver({ ...res.data.driver });
                         setSelectedMailingAddress({ ...res.data.driver?.mailing_address });
@@ -190,11 +193,11 @@ const CompanyDrivers = props => {
 
     const searchDriverInfoByCode = () => {
         if ((selectedDriver?.code || '') !== '') {
-            axios.post(props.serverUrl + '/getDriverByCode', {
+            axios.post(props.serverUrl + `/get${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}ByCode`, {
                 code: selectedDriver.code
             }).then(res => {
                 if (res.data.result === 'OK') {
-                    
+
 
                     let mailing = { ...res.data.driver?.mailing_address };
                     let mailingContact = (res.data.driver?.contacts || []).find(x => x.id === res.data.driver?.mailing_contact_id);
@@ -274,7 +277,7 @@ const CompanyDrivers = props => {
                 driver.first_name = first_name;
                 driver.last_name = last_name;
 
-                axios.post(props.serverUrl + '/saveDriver', driver).then(res => {
+                axios.post(props.serverUrl + `/save${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}`, driver).then(res => {
                     if (res.data.result === 'OK') {
                         if (res.data.driver) {
                             setSelectedDriver(prev => {
@@ -292,12 +295,24 @@ const CompanyDrivers = props => {
                                 component_id: props.componentId
                             })
 
-                            props.setSelectedDriver({
-                                ...selectedDriver,
-                                id: res.data.driver.id,
-                                code: res.data.driver.code,
-                                component_id: props.componentId
-                            })
+                            if ((props.subOrigin || 'driver') === 'operator') {
+                                props.setSelectedOperator({
+                                    ...selectedDriver,
+                                    id: res.data.driver.id,
+                                    code: res.data.driver.code,
+                                    component_id: props.componentId
+                                })
+                            }
+
+                            if ((props.subOrigin || 'driver') === 'driver') {
+                                props.setSelectedDriver({
+                                    ...selectedDriver,
+                                    id: res.data.driver.id,
+                                    code: res.data.driver.code,
+                                    component_id: props.componentId
+                                })
+                            }
+
                         }
                         setIsSavingDriver(false);
                     } else {
@@ -332,7 +347,7 @@ const CompanyDrivers = props => {
                     (mailing?.state || '') !== '' &&
                     (mailing?.zip || '') !== '' &&
                     (mailing?.remit_to_address_is_the_same || 0) !== 0) {
-                    axios.post(props.serverUrl + '/saveCompanyDriverMailingAddress', mailing).then(res => {
+                    axios.post(props.serverUrl + `/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MailingAddress`, mailing).then(res => {
                         if (res.data.result === 'OK') {
                             setSelectedDriver(prev => {
                                 return {
@@ -416,7 +431,7 @@ const CompanyDrivers = props => {
 
             setSelectedMailingAddress(mailing);
 
-            axios.post(props.serverUrl + '/saveCompanyDriverMailingAddress',
+            axios.post(props.serverUrl + `/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MailingAddress`,
                 {
                     ...mailing,
                     mailing_contact_id: contact?.id,
@@ -446,7 +461,7 @@ const CompanyDrivers = props => {
         refMailingAddress1.current.focus();
 
         if ((selectedDriver?.id || 0) > 0) {
-            axios.post(props.serverUrl + '/deleteCompanyDriverMailingAddress', {
+            axios.post(props.serverUrl + `/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MailingAddress`, {
                 company_driver_id: selectedDriver.id
             }).then(res => {
                 if (res.data.result === 'OK') {
@@ -503,7 +518,7 @@ const CompanyDrivers = props => {
                     contact.first_name = first;
                     contact.last_name = last;
 
-                    axios.post(props.serverUrl + '/saveCompanyDriverEmergencyContact', contact).then(res => {
+                    axios.post(props.serverUrl + `/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContact`, contact).then(res => {
                         if (res.data.result === 'OK') {
 
                             if (res.data.contact) {
@@ -545,13 +560,13 @@ const CompanyDrivers = props => {
                 title='Contacts'
                 tabTimes={2258000 + props.tabTimes}
                 panelName={`${props.panelName}-contacts`}
-                savingContactUrl='/saveCompanyDriverEmergencyContact'
-                deletingContactUrl='/deleteCompanyDriverEmergencyContact'
-                uploadAvatarUrl='/uploadCompanyDriverEmergencyContactAvatar'
-                removeAvatarUrl='/removeCompanyDriverEmergencyContactAvatar'
+                savingContactUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContact`}
+                deletingContactUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContact`}
+                uploadAvatarUrl={`/uploadCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContactAvatar`}
+                removeAvatarUrl={`/removeCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContactAvatar`}
                 permissionName='customer contacts'
                 origin={props.origin}
-                owner='driver'
+                owner={props.subOrigin}
                 // isEditingContact={true}
                 openPanel={props.openPanel}
                 closePanel={props.closePanel}
@@ -587,7 +602,7 @@ const CompanyDrivers = props => {
                     (selectedLicense?.expiration_date || '') !== '' &&
                     (selectedLicense?.restriction_id || 0) > 0) {
 
-                    axios.post(props.serverUrl + '/saveCompanyDriverLicense', license).then(res => {
+                    axios.post(props.serverUrl + `/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}License`, license).then(res => {
                         if (res.data.result === 'OK') {
                             setSelectedLicense(prev => {
                                 return {
@@ -631,7 +646,7 @@ const CompanyDrivers = props => {
         formData.append("expiration_date", selectedLicense?.expiration_date);
         formData.append("restriction_id", selectedLicense?.restriction_id);
 
-        axios.post(props.serverUrl + '/uploadDriverLicenseImage', formData, {})
+        axios.post(props.serverUrl + `/upload${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}LicenseImage`, formData, {})
             .then(async res => {
                 if (res.data.result === "OK") {
                     setSelectedLicense(prev => {
@@ -676,7 +691,7 @@ const CompanyDrivers = props => {
                 if ((card?.issue_date || '') !== '' &&
                     (card?.expiration_date || '') !== '') {
 
-                    axios.post(props.serverUrl + '/saveCompanyDriverMedicalCard', card).then(res => {
+                    axios.post(props.serverUrl + `/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCard`, card).then(res => {
                         if (res.data.result === 'OK') {
                             setSelectedMedicalCard(prev => {
                                 return {
@@ -715,7 +730,7 @@ const CompanyDrivers = props => {
         formData.append("issue_date", selectedMedicalCard?.issue_date);
         formData.append("expiration_date", selectedMedicalCard?.expiration_date);
 
-        axios.post(props.serverUrl + '/uploadDriverMedicalCardImage', formData, {})
+        axios.post(props.serverUrl + `/upload${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCardImage`, formData, {})
             .then(async res => {
                 if (res.data.result === "OK") {
                     setSelectedMedicalCard(prev => {
@@ -762,7 +777,7 @@ const CompanyDrivers = props => {
                     (tractor?.color || '') !== '' &&
                     (tractor?.type_id || 0) > 0) {
 
-                    axios.post(props.serverUrl + '/saveCompanyDriverTractor', tractor).then(res => {
+                    axios.post(props.serverUrl + `/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}Tractor`, tractor).then(res => {
                         if (res.data.result === 'OK') {
                             setSelectedTractor(prev => {
                                 return {
@@ -813,7 +828,7 @@ const CompanyDrivers = props => {
                     (trailer?.height || '') !== '' &&
                     (trailer?.type_id || 0) > 0) {
 
-                    axios.post(props.serverUrl + '/saveCompanyDriverTrailer', trailer).then(res => {
+                    axios.post(props.serverUrl + `/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}Trailer`, trailer).then(res => {
                         if (res.data.result === 'OK') {
                             setSelectedTrailer(prev => {
                                 return {
@@ -844,41 +859,73 @@ const CompanyDrivers = props => {
     }, [isSavingTrailer])
 
     useEffect(() => {
-        if ((props.selectedDriver?.component_id || "") !== props.componentId) {
-            if ((selectedContact?.id || 0) > 0 && (props.selectedDriver?.id || 0) > 0 && selectedContact.id === props.selectedDriver.id) {
-                setSelectedDriver(prev => {
-                    return {
-                        ...prev,
-                        ...props.selectedDriver,
-                    };
-                });
+        if ((props.subOrigin || 'driver') === 'driver') {
+            if ((props.selectedDriver?.component_id || "") !== props.componentId) {
+                if ((selectedDriver?.id || 0) > 0 && (props.selectedDriver?.id || 0) > 0 && selectedDriver.id === props.selectedDriver.id) {
+                    setSelectedDriver(prev => {
+                        return {
+                            ...prev,
+                            ...props.selectedDriver,
+                        };
+                    });
+                }
             }
         }
-    }, [props.selectedDriver])
+
+        if ((props.subOrigin || 'driver') === 'operator') {
+            if ((props.selectedOperator?.component_id || "") !== props.componentId) {
+                if ((selectedDriver?.id || 0) > 0 && (props.selectedOperator?.id || 0) > 0 && selectedDriver.id === props.selectedOperator.id) {
+                    setSelectedDriver(prev => {
+                        return {
+                            ...prev,
+                            ...props.selectedOperator,
+                        };
+                    });
+                }
+            }
+        }
+
+    }, [props.selectedDriver, props.selectedOperator])
 
     useEffect(() => {
-        if ((props.selectedDriverContact?.component_id || "") !== props.componentId) {
-            if ((selectedContact?.id || 0) > 0 && (props.selectedDriverContact?.id || 0) > 0 && selectedContact.id === props.selectedDriverContact.id) {
-                setSelectedContact(prev => {
-                    return {
-                        ...prev,
-                        ...props.selectedDriverContact,
-                    };
-                });
+        if ((props.subOrigin || 'driver') === 'driver') {
+            if ((props.selectedDriverContact?.component_id || "") !== props.componentId) {
+                if ((selectedContact?.id || 0) > 0 && (props.selectedDriverContact?.id || 0) > 0 && selectedContact.id === props.selectedDriverContact.id) {
+                    setSelectedContact(prev => {
+                        return {
+                            ...prev,
+                            ...props.selectedDriverContact,
+                        };
+                    });
+                }
             }
         }
-    }, [props.selectedDriverContact])
+
+        if ((props.subOrigin || 'driver') === 'operator') {
+            if ((props.selectedOperatorContact?.component_id || "") !== props.componentId) {
+                if ((selectedContact?.id || 0) > 0 && (props.selectedOperatorContact?.id || 0) > 0 && selectedContact.id === props.selectedOperatorContact.id) {
+                    setSelectedContact(prev => {
+                        return {
+                            ...prev,
+                            ...props.selectedOperatorContact,
+                        };
+                    });
+                }
+            }
+        }
+
+    }, [props.selectedDriverContact, props.selectedOperatorContact])
 
     const licenseAddDocumentBtnClick = (e) => {
         let panel = {
-            panelName: `${props.panelName}-documents-company-driver-license`,
+            panelName: `${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license`,
             component: (
                 <Documents
                     title="Documents"
                     tabTimes={310236 + props.tabTimes}
-                    panelName={`${props.panelName}-documents-company-driver-license`}
+                    panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license`}
                     origin={props.origin}
-                    suborigin={"company-driver-license"}
+                    suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license`}
                     openPanel={props.openPanel}
                     closePanel={props.closePanel}
                     componentId={moment().format("x")}
@@ -888,12 +935,12 @@ const CompanyDrivers = props => {
                         user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                         date_entered: moment().format("MM/DD/YYYY"),
                     }}
-                    savingDocumentUrl="/saveCompanyDriverLicenseDocument"
-                    deletingDocumentUrl="/deleteCompanyDriverLicenseDocument"
-                    savingDocumentNoteUrl="/saveCompanyDriverLicenseDocumentNote"
-                    deletingDocumentNoteUrl="/deleteCompanyDriverLicenseDocumentNote"
-                    serverDocumentsFolder="/company-driver-license-documents/"
-                    permissionName="company driver documents"
+                    savingDocumentUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}LicenseDocument`}
+                    deletingDocumentUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}LicenseDocument`}
+                    savingDocumentNoteUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}LicenseDocumentNote`}
+                    deletingDocumentNoteUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}LicenseDocumentNote`}
+                    serverDocumentsFolder={`/company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license-documents/`}
+                    permissionName={`company ${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'} documents`}
                 />
             ),
         };
@@ -903,14 +950,14 @@ const CompanyDrivers = props => {
 
     const medicalCardAddDocumentBtnClick = (e) => {
         let panel = {
-            panelName: `${props.panelName}-documents-company-driver-medical-card`,
+            panelName: `${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card`,
             component: (
                 <Documents
                     title="Documents"
                     tabTimes={310236 + props.tabTimes}
-                    panelName={`${props.panelName}-documents-company-driver-medical-card`}
+                    panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card`}
                     origin={props.origin}
-                    suborigin={"company-driver-medical-card"}
+                    suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card`}
                     openPanel={props.openPanel}
                     closePanel={props.closePanel}
                     componentId={moment().format("x")}
@@ -920,12 +967,12 @@ const CompanyDrivers = props => {
                         user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                         date_entered: moment().format("MM/DD/YYYY"),
                     }}
-                    savingDocumentUrl="/saveCompanyDriverMedicalCardDocument"
-                    deletingDocumentUrl="/deleteCompanyDriverMedicalCardDocument"
-                    savingDocumentNoteUrl="/saveCompanyDriverMedicalCardDocumentNote"
-                    deletingDocumentNoteUrl="/deleteCompanyDriverMedicalCardDocumentNote"
-                    serverDocumentsFolder="/company-driver-medical-card-documents/"
-                    permissionName="company driver documents"
+                    savingDocumentUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCardDocument`}
+                    deletingDocumentUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCardDocument`}
+                    savingDocumentNoteUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCardDocumentNote`}
+                    deletingDocumentNoteUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCardDocumentNote`}
+                    serverDocumentsFolder={`/company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card-documents/`}
+                    permissionName={`company ${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'} documents`}
                 />
             ),
         };
@@ -935,14 +982,14 @@ const CompanyDrivers = props => {
 
     const tractorAddDocumentBtnClick = (e) => {
         let panel = {
-            panelName: `${props.panelName}-documents-company-driver-tractor`,
+            panelName: `${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor`,
             component: (
                 <Documents
                     title="Documents"
                     tabTimes={310236 + props.tabTimes}
-                    panelName={`${props.panelName}-documents-company-driver-tractor`}
+                    panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor`}
                     origin={props.origin}
-                    suborigin={"company-driver-tractor"}
+                    suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor`}
                     openPanel={props.openPanel}
                     closePanel={props.closePanel}
                     componentId={moment().format("x")}
@@ -952,12 +999,12 @@ const CompanyDrivers = props => {
                         user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                         date_entered: moment().format("MM/DD/YYYY"),
                     }}
-                    savingDocumentUrl="/saveCompanyDriverTractorDocument"
-                    deletingDocumentUrl="/deleteCompanyDriverTractorDocument"
-                    savingDocumentNoteUrl="/saveCompanyDriverTractorDocumentNote"
-                    deletingDocumentNoteUrl="/deleteCompanyDriverTractorDocumentNote"
-                    serverDocumentsFolder="/company-driver-tractor-documents/"
-                    permissionName="company driver documents"
+                    savingDocumentUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TractorDocument`}
+                    deletingDocumentUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TractorDocument`}
+                    savingDocumentNoteUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TractorDocumentNote`}
+                    deletingDocumentNoteUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TractorDocumentNote`}
+                    serverDocumentsFolder={`/company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor-documents/`}
+                    permissionName={`company ${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'} documents`}
                 />
             ),
         };
@@ -967,14 +1014,14 @@ const CompanyDrivers = props => {
 
     const trailerAddDocumentBtnClick = (e) => {
         let panel = {
-            panelName: `${props.panelName}-documents-company-driver-trailer`,
+            panelName: `${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer`,
             component: (
                 <Documents
                     title="Documents"
                     tabTimes={310236 + props.tabTimes}
-                    panelName={`${props.panelName}-documents-company-driver-trailer`}
+                    panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer`}
                     origin={props.origin}
-                    suborigin={"company-driver-trailer"}
+                    suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer`}
                     openPanel={props.openPanel}
                     closePanel={props.closePanel}
                     componentId={moment().format("x")}
@@ -984,12 +1031,12 @@ const CompanyDrivers = props => {
                         user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                         date_entered: moment().format("MM/DD/YYYY"),
                     }}
-                    savingDocumentUrl="/saveCompanyDriverTrailerDocument"
-                    deletingDocumentUrl="/deleteCompanyDriverTrailerDocument"
-                    savingDocumentNoteUrl="/saveCompanyDriverTrailerDocumentNote"
-                    deletingDocumentNoteUrl="/deleteCompanyDriverTrailerDocumentNote"
-                    serverDocumentsFolder="/company-driver-trailer-documents/"
-                    permissionName="company driver documents"
+                    savingDocumentUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TrailerDocument`}
+                    deletingDocumentUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TrailerDocument`}
+                    savingDocumentNoteUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TrailerDocumentNote`}
+                    deletingDocumentNoteUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}TrailerDocumentNote`}
+                    serverDocumentsFolder={`/company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer-documents/`}
+                    permissionName={`company ${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'} documents`}
                 />
             ),
         };
@@ -1040,7 +1087,7 @@ const CompanyDrivers = props => {
 
             <div className="company-driver-container">
                 <MainForm
-                    formTitle="Driver info"
+                    formTitle={`${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'} info`}
                     formButtons={[
                         {
                             title: "Search",
@@ -1074,7 +1121,7 @@ const CompanyDrivers = props => {
                 <div className="form-bordered-box drivers-license-info">
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
-                        <div className="form-title">Driver's License Info</div>
+                        <div className="form-title">{(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}'s License Info</div>
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
                             <div className={licenseAddDocumentBtnClasses} onClick={(e) => { licenseAddDocumentBtnClick(e) }}>
@@ -1087,7 +1134,7 @@ const CompanyDrivers = props => {
                                 refDriverLicenseNumber.current.focus();
 
                                 if ((selectedLicense?.id || 0) > 0) {
-                                    axios.post(props.serverUrl + '/deleteCompanyDriverLicense', {
+                                    axios.post(props.serverUrl + `/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}License`, {
                                         id: selectedLicense.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
@@ -1862,7 +1909,7 @@ const CompanyDrivers = props => {
 
                             <div className={`mochi-button${(selectedLicense?.image || '') === '' ? ' disabled' : ''}`} onClick={() => {
                                 if (window.confirm('Are you sure you want to proceed?')) {
-                                    axios.post(props.serverUrl + '/removeDriverLicenseImage', {
+                                    axios.post(props.serverUrl + `/remove${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}LicenseImage`, {
                                         id: selectedLicense.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
@@ -1953,7 +2000,7 @@ const CompanyDrivers = props => {
                                 refMedicalCardIssueDate.current.inputElement.focus();
 
                                 if ((selectedMedicalCard?.id || 0) > 0) {
-                                    axios.post(props.serverUrl + '/deleteCompanyDriverMedicalCard', {
+                                    axios.post(props.serverUrl + `/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCard`, {
                                         id: selectedMedicalCard.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
@@ -2131,7 +2178,7 @@ const CompanyDrivers = props => {
 
                             <div className={`mochi-button${(selectedMedicalCard?.image || '') === '' ? ' disabled' : ''}`} onClick={() => {
                                 if (window.confirm('Are you sure you want to proceed?')) {
-                                    axios.post(props.serverUrl + '/removeDriverMedicalCardImage', {
+                                    axios.post(props.serverUrl + `/remove${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}MedicalCardImage`, {
                                         id: selectedMedicalCard.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
@@ -2191,13 +2238,13 @@ const CompanyDrivers = props => {
                                         title='Contacts'
                                         tabTimes={2258000 + props.tabTimes}
                                         panelName={`${props.panelName}-contacts`}
-                                        savingContactUrl='/saveCompanyDriverEmergencyContact'
-                                        deletingContactUrl='/deleteCompanyDriverEmergencyContact'
-                                        uploadAvatarUrl='/uploadCompanyDriverEmergencyContactAvatar'
-                                        removeAvatarUrl='/removeCompanyDriverEmergencyContactAvatar'
+                                        savingContactUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContact`}
+                                        deletingContactUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContact`}
+                                        uploadAvatarUrl={`/uploadCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContactAvatar`}
+                                        removeAvatarUrl={`/removeCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContactAvatar`}
                                         permissionName='customer contacts'
                                         origin={props.origin}
-                                        owner='driver'
+                                        owner={props.subOrigin}
                                         // isEditingContact={true}
                                         openPanel={props.openPanel}
                                         closePanel={props.closePanel}
@@ -2228,13 +2275,13 @@ const CompanyDrivers = props => {
                                         title='Contacts'
                                         tabTimes={2258000 + props.tabTimes}
                                         panelName={`${props.panelName}-contacts`}
-                                        savingContactUrl='/saveCompanyDriverEmergencyContact'
-                                        deletingContactUrl='/deleteCompanyDriverEmergencyContact'
-                                        uploadAvatarUrl='/uploadCompanyDriverEmergencyContactAvatar'
-                                        removeAvatarUrl='/removeCompanyDriverEmergencyContactAvatar'
+                                        savingContactUrl={`/saveCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContact`}
+                                        deletingContactUrl={`/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContact`}
+                                        uploadAvatarUrl={`/uploadCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContactAvatar`}
+                                        removeAvatarUrl={`/removeCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}EmergencyContactAvatar`}
                                         permissionName='customer contacts'
                                         origin={props.origin}
-                                        owner='driver'
+                                        owner={props.subOrigin}
                                         isEditingContact={true}
                                         openPanel={props.openPanel}
                                         closePanel={props.closePanel}
@@ -2293,7 +2340,7 @@ const CompanyDrivers = props => {
                                 refDriverTractorNumber.current.focus();
 
                                 if ((selectedTractor?.id || 0) > 0) {
-                                    axios.post(props.serverUrl + '/deleteCompanyDriverTractor', {
+                                    axios.post(props.serverUrl + `/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}Tractor`, {
                                         id: selectedTractor.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
@@ -2796,7 +2843,7 @@ const CompanyDrivers = props => {
                                 refDriverTrailerNumber.current.focus();
 
                                 if ((selectedTrailer?.id || 0) > 0) {
-                                    axios.post(props.serverUrl + '/deleteCompanyDriverTrailer', {
+                                    axios.post(props.serverUrl + `/deleteCompany${(props.subOrigin || 'driver') === 'operator' ? 'Operator' : 'Driver'}Trailer`, {
                                         id: selectedTrailer.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
@@ -3313,11 +3360,15 @@ const mapStateToProps = state => {
         selectedCompany: state.companySetupReducers.selectedCompany,
         selectedDriver: state.companySetupReducers.selectedDriver,
         selectedDriverContact: state.companySetupReducers.selectedDriverContact,
+        selectedOperator: state.companySetupReducers.selectedOperator,
+        selectedOperatorContact: state.companySetupReducers.selectedOperatorContact,
     };
 };
 
 export default connect(mapStateToProps, {
     setSelectedDriver,
     setSelectedCompany,
-    setSelectedDriverContact
+    setSelectedDriverContact,
+    setSelectedOperator,
+    setSelectedOperatorContact
 })(CompanyDrivers);

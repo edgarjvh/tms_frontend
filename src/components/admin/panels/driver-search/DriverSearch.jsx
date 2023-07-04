@@ -140,8 +140,7 @@ const DriverSearch = (props) => {
                         <div className="tcol address2">Address 2</div>
                         <div className="tcol city">City</div>
                         <div className="tcol state">State</div>
-                        <div className="tcol phone-work">Phone Work</div>
-                        <div className="tcol email-work">E-mail Work</div>
+                        <div className="tcol phone-work">Zip Code</div>
                     </div>
                 </div>
                 <div className="tbody">
@@ -157,8 +156,7 @@ const DriverSearch = (props) => {
                                             <div className="tcol address2">{c.address2}</div>
                                             <div className="tcol city">{c.city}</div>
                                             <div className="tcol state">{c.state}</div>
-                                            <div className="tcol phone-work">{c.phone_work}</div>
-                                            <div className="tcol email-work">{c.email_work}</div>
+                                            <div className="tcol phone-work">{c.zip}</div>
                                         </div>
                                     )
                                 })

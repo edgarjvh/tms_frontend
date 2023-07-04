@@ -7,7 +7,8 @@ export const companySetupReducers = (state = {
     selectedAgent: {},
     selectedDriver: {},
     selectedDriverContact: {},
-    selectedOperator: {}
+    selectedOperator: {},
+    selectedOperatorContact: {},
 }, action) => {
     switch (action.type) {
         case companySetupConstants.SET_COMPANY_SETUP_OPENED_PANELS:
@@ -53,10 +54,17 @@ export const companySetupReducers = (state = {
             }
         break;
 
-        case companySetupConstants.SET_SELECTED_OWNER_OPERATOR:
+        case companySetupConstants.SET_SELECTED_COMPANY_OPERATOR:
             state = {
                 ...state,
                 selectedOperator: action.payload
+            }
+        break;
+
+        case companySetupConstants.SET_SELECTED_OPERATOR_CONTACT:
+            state = {
+                ...state,
+                selectedOperatorContact: action.payload
             }
         break;
     }
