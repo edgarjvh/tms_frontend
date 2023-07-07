@@ -13,22 +13,37 @@
   margin-bottom: 5px;
   align-items: center;
 }
-.documents-fields .documents-left-side .documents-fields-row:nth-child(1) .input-box-container {
-  width: 7rem;
-  margin-right: 3px;
+.documents-fields .documents-left-side .documents-fields-row:nth-child(1) .documents-owner-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0 2px;
+  margin-right: 5px;
+}
+.documents-fields .documents-left-side .documents-fields-row:nth-child(1) .documents-owner-name {
+  font-size: 0.9rem;
+  text-transform: capitalize;
 }
 .documents-fields .documents-left-side .documents-fields-row:nth-child(2) {
   display: flex;
   margin-bottom: 5px;
+  align-items: center;
 }
 .documents-fields .documents-left-side .documents-fields-row:nth-child(2) .input-box-container {
+  width: 7rem;
+  margin-right: 3px;
+}
+.documents-fields .documents-left-side .documents-fields-row:nth-child(3) {
+  display: flex;
+  margin-bottom: 5px;
+}
+.documents-fields .documents-left-side .documents-fields-row:nth-child(3) .input-box-container {
   width: 16rem;
   margin-right: 3px;
 }
-.documents-fields .documents-left-side .documents-fields-row:nth-child(2) .input-box-container.tags {
+.documents-fields .documents-left-side .documents-fields-row:nth-child(3) .input-box-container.tags {
   text-transform: lowercase;
 }
-.documents-fields .documents-left-side .documents-fields-row:nth-child(2) .input-box-container.tags :placeholder-shown {
+.documents-fields .documents-left-side .documents-fields-row:nth-child(3) .input-box-container.tags :placeholder-shown {
   text-transform: none;
 }
 .documents-fields .documents-right-side .mochi-button {

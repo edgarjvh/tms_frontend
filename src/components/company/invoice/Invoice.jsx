@@ -806,13 +806,13 @@ const Invoice = (props) => {
         reverse: termsItems.length > 0
     });
 
-    const getOrderByOrderNumber = (e) => {
+    const getOrderByOrderNumber = (e, action = null) => {
         let key = e.keyCode || e.which;
 
         if (key === 9) {
             if ((selectedOrder.order_number || '') !== '') {
                 setIsLoading(true);
-                axios.post(props.serverUrl + '/getOrderByOrderNumber', { order_number: selectedOrder.order_number }).then(res => {
+                axios.post(props.serverUrl + '/getOrderByOrderNumber', { order_number: selectedOrder.order_number, action: action }).then(res => {
                     if (res.data.result === 'OK') {
                         if (res.data.order) {
                             setSelectedOrder({ ...res.data.order });
@@ -9654,29 +9654,58 @@ const Invoice = (props) => {
                     marginTop: -10,
                     justifyContent: 'center'
                 }}>
-
-                    <div className="mochi-button" style={{ justifyContent: 'center' }} onClick={() => {
-                        setSelectedOrder({});
-                        setOrderNumber('');
-                        setTripNumber('');
-                        setSelectedBillToCustomer({});
-                        setSelectedBillToCustomerContact({});
-                        setSelectedCarrier({});
-                        setSelectedCarrierContact({});
-                        setSelectedCarrierDriver({});
-                        setSelectedRoute({});
-
-                        refOrderNumber.current.focus({
-                            preventScroll: true
-                        });
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}>
-                        <div className="mochi-button-decorator mochi-button-decorator-left"
-                            style={{ fontSize: '0.9rem' }}>(
+                        <span className="fas fa-chevron-left" style={{
+                            fontSize: '0.8rem',
+                            marginRight: 7,
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                            color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.3)'
+                        }} onClick={() => {
+                            getOrderByOrderNumber({ keyCode: 9 }, 'previous');
+                        }}></span>
+
+                        <div className="mochi-button" style={{ justifyContent: 'center' }} onClick={() => {
+                            setSelectedOrder({});
+                            setOrderNumber('');
+                            setTripNumber('');
+                            setSelectedBillToCustomer({});
+                            setSelectedBillToCustomerContact({});
+                            setSelectedCarrier({});
+                            setSelectedCarrierContact({});
+                            setSelectedCarrierDriver({});
+                            setSelectedRoute({});
+
+                            refOrderNumber.current.focus({
+                                preventScroll: true
+                            });
+                        }}>
+                            <div className="mochi-button-decorator mochi-button-decorator-left"
+                                style={{ fontSize: '0.9rem' }}>(
+                            </div>
+                            <div className="mochi-button-base" style={{ fontSize: '0.9rem' }}>Clear</div>
+                            <div className="mochi-button-decorator mochi-button-decorator-right"
+                                style={{ fontSize: '0.9rem' }}>)
+                            </div>
                         </div>
-                        <div className="mochi-button-base" style={{ fontSize: '0.9rem' }}>Clear</div>
-                        <div className="mochi-button-decorator mochi-button-decorator-right"
-                            style={{ fontSize: '0.9rem' }}>)
-                        </div>
+
+                        <span className="fas fa-chevron-right" style={{
+                            fontSize: '0.8rem',
+                            marginLeft: 7,
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                            color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.3)'
+                        }} onClick={() => {
+                            getOrderByOrderNumber({ keyCode: 9 }, 'next');
+                        }}></span>
                     </div>
 
                     <div className="input-box-container" style={{ width: '10rem', marginTop: -4 }}>
@@ -12860,7 +12889,7 @@ const Invoice = (props) => {
                                                                     id: selectedOrder.id,
                                                                     invoice_date_paid: day.format('MM/DD/YYYY')
                                                                 }).then(res => {
-    
+
                                                                 }).catch(e => {
                                                                     console.log(e);
                                                                 }).finally(() => {
@@ -12901,7 +12930,7 @@ const Invoice = (props) => {
                                             ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
                                             if (key === 9) {
                                                 e.preventDefault();
-                                                
+
                                                 if ((selectedOrder?.id || 0) > 0) {
                                                     axios.post(props.serverUrl + '/saveInvoiceCarrierCheckNumber', {
                                                         id: selectedOrder.id,
@@ -12913,7 +12942,7 @@ const Invoice = (props) => {
                                                     }).finally(() => {
                                                         refOrderNumber.current.focus();
                                                     });
-                                                }                                                
+                                                }
                                             }
                                         }
                                     }

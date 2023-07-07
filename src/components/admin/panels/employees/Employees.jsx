@@ -82,8 +82,8 @@ const Employees = (props) => {
                 props.setSelectedCompany({
                     ...props.selectedCompany,
                     employees: (props.selectedCompany.employees || []).map(employee => {
-                        if (employee.id === employeeSearchCompany.selectedEmployee.id){
-                            employee = {...props.selectedEmployee}
+                        if (employee.id === employeeSearchCompany.selectedEmployee.id) {
+                            employee = { ...props.selectedEmployee }
                         }
 
                         return employee;
@@ -360,18 +360,24 @@ const Employees = (props) => {
 
                                 <div className="employee-data">
                                     <div className="employee-name" style={{
-                                            textTransform: 'capitalize'
-                                        }}>
+                                        textTransform: 'capitalize'
+                                    }}>
                                         {(employeeSearchCompany?.selectedEmployee?.prefix || '') + " " + (employeeSearchCompany?.selectedEmployee?.first_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.middle_name || '') + " " + (employeeSearchCompany?.selectedEmployee?.last_name || '')}
                                     </div>
                                     <div className="online-status">
                                         <div className={(isEditingEmployee ? tempSelectedEmployee.is_online : employeeSearchCompany?.selectedEmployee?.is_online) === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
-                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                        <div className="mochi-button" onClick={(e) => {
+                                            e.stopPropagation();
+                                            window.open('https://mm.et3.dev', '_blank').focus();
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Chat</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                         </div>
-                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                        <div className="mochi-button" onClick={(e) => { 
+                                            e.stopPropagation();
+                                            window.open('https://meet.et3.dev/', '_blank').focus();
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Video</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -470,8 +476,10 @@ const Employees = (props) => {
 
                                 <div className="employee-username-info">
                                     <div className="username-chat">
-                                        <div className="employee-username">@username</div>
-                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                        <div className="mochi-button" onClick={(e) => { 
+                                            e.stopPropagation();
+                                            window.open('https://mm.et3.dev', '_blank').focus();
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Chat</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -479,8 +487,10 @@ const Employees = (props) => {
                                     </div>
 
                                     <div className="username-video">
-                                        <div className="employee-username">@username</div>
-                                        <div className="mochi-button" onClick={(e) => { e.stopPropagation() }}>
+                                        <div className="mochi-button" onClick={(e) => { 
+                                            e.stopPropagation();
+                                            window.open('https://meet.et3.dev/', '_blank').focus();
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Video</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>

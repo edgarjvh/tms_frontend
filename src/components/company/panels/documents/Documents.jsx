@@ -278,7 +278,7 @@ const Documents = (props) => {
             axios.post(props.serverUrl + savingDocumentUrl, formData, options)
                 .then(res => {
                     if (res.data.result === "OK") {
-                        if (props.suborigin === 'company-driver-license'){
+                        if (props.suborigin === 'company-driver-license') {
                             setSelectedOwner(selectedOwner => {
                                 return {
                                     ...selectedOwner,
@@ -287,7 +287,7 @@ const Documents = (props) => {
                             })
                         }
 
-                        if (props.suborigin === 'company-driver-medical-card'){
+                        if (props.suborigin === 'company-driver-medical-card') {
                             setSelectedOwner(selectedOwner => {
                                 return {
                                     ...selectedOwner,
@@ -296,7 +296,7 @@ const Documents = (props) => {
                             })
                         }
 
-                        if (props.suborigin === 'company-driver-tractor'){
+                        if (props.suborigin === 'company-driver-tractor') {
                             setSelectedOwner(selectedOwner => {
                                 return {
                                     ...selectedOwner,
@@ -305,7 +305,7 @@ const Documents = (props) => {
                             })
                         }
 
-                        if (props.suborigin === 'company-driver-trailer'){
+                        if (props.suborigin === 'company-driver-trailer') {
                             setSelectedOwner(selectedOwner => {
                                 return {
                                     ...selectedOwner,
@@ -550,6 +550,84 @@ const Documents = (props) => {
 
             <div className="documents-fields">
                 <div className="documents-left-side">
+                    <div className="documents-fields-row">
+                        <div className="documents-owner-title">{
+                            (props.suborigin === 'company-driver-license' ||
+                                props.suborigin === 'company-driver-medical-card' ||
+                                props.suborigin === 'company-driver-tractor' ||
+                                props.suborigin === 'company-driver-trailer' ||
+                                props.suborigin === 'company-driver')
+                                ? 'Driver Name:'
+                                : props.suborigin === 'company-employee'
+                                    ? 'Employee Name:'
+                                    : props.suborigin === 'company-agent'
+                                        ? 'Agent Name:'
+                                        : props.suborigin === 'company-operator'
+                                            ? 'Operator Name:'
+                                            : props.suborigin === 'customer'
+                                                ? 'Customer Name:'
+                                                : props.suborigin === 'division'
+                                                    ? 'Division Name:'
+                                                    : props.suborigin === 'carrier'
+                                                        ? 'Carrier Name:'
+                                                        : props.suborigin === 'factoring-company'
+                                                            ? 'Factoring Company Name:'
+                                                            : (props.suborigin === 'order' || props.suborigin === 'order-billing')
+                                                                ? 'Order Number:'
+                                                                : ''
+                        }</div>
+
+                        <div className="documents-owner-name">{
+                            (props.suborigin === 'company-driver-license' ||
+                                props.suborigin === 'company-driver-medical-card' ||
+                                props.suborigin === 'company-driver-tractor' ||
+                                props.suborigin === 'company-driver-trailer')
+                                ? ((selectedOwner?.company_driver?.first_name || '') + ' ' + (selectedOwner?.company_driver?.last_name || '')).trim()
+                                : props.suborigin === 'company-employee'
+                                    ? ((selectedOwner?.first_name || '') + ' ' + (selectedOwner?.last_name || '')).trim()
+                                    : props.suborigin === 'company-agent'
+                                        ? (selectedOwner?.name || '')
+                                        : (props.suborigin === 'company-operator-license' ||
+                                            props.suborigin === 'company-operator-medical-card' ||
+                                            props.suborigin === 'company-operator-tractor' ||
+                                            props.suborigin === 'company-operator-trailer')
+                                            ? ((selectedOwner?.company_operator?.first_name || '') + ' ' + (selectedOwner?.company_operator?.last_name || '')).trim()
+                                            : props.suborigin === 'customer'
+                                                ? (selectedOwner?.name || '')
+                                                : props.suborigin === 'division'
+                                                    ? (selectedOwner?.name || '')
+                                                    : props.suborigin === 'carrier'
+                                                        ? (selectedOwner?.name || '')
+                                                        : props.suborigin === 'factoring-company'
+                                                            ? (selectedOwner?.name || '')
+                                                            : (props.suborigin === 'order' || props.suborigin === 'order-billing')
+                                                                ? (selectedOwner?.order_number || '')
+                                                                : ''
+                        }</div>
+
+                        <div className="documents-owner-title" style={{ marginLeft: 10 }}>{
+                            (props.suborigin === 'company-driver-license' || props.suborigin === 'company-operator-license')
+                                ? 'License Number:'
+                                : (props.suborigin === 'company-driver-medical-card' || props.suborigin === 'company-operator-medical-card')
+                                    ? 'Medical Card'
+                                    : (props.suborigin === 'company-driver-tractor' || props.suborigin === 'company-operator-tractor')
+                                        ? 'Tractor Number:'
+                                        : (props.suborigin === 'company-driver-trailer' || props.suborigin === 'company-operator-trailer')
+                                            ? 'Trailer Number:'
+                                            : ''
+                        }</div>
+                        <div className="documents-owner-name">{
+                            (props.suborigin === 'company-driver-license' || props.suborigin === 'company-operator-license')
+                                ? (selectedOwner?.license_number || '').toUpperCase()
+                                : (props.suborigin === 'company-driver-medical-card' || props.suborigin === 'company-operator-medical-card')
+                                    ? ''
+                                    : (props.suborigin === 'company-driver-tractor' || props.suborigin === 'company-operator-tractor')
+                                        ? (selectedOwner?.number || '').toUpperCase()
+                                        : (props.suborigin === 'company-driver-trailer' || props.suborigin === 'company-operator-trailer')
+                                            ? (selectedOwner?.number || '').toUpperCase()
+                                            : ''
+                        }</div>
+                    </div>
                     <div className="documents-fields-row">
                         <div className="input-box-container">
                             <input type="text" placeholder="Id" readOnly={true} value={
@@ -1123,23 +1201,23 @@ const Documents = (props) => {
                                                     case 'division':
                                                         getDocumentNotesUrl = '/getNotesByDivisionDocument';
                                                         break;
-                                                        
+
                                                     case 'company-driver-license':
                                                         getDocumentNotesUrl = '/getNotesByCompanyDriverLicenseDocument';
                                                         break;
-                                                        
+
                                                     case 'company-driver-medical-card':
                                                         getDocumentNotesUrl = '/getNotesByCompanyDriverMedicalCardDocument';
                                                         break;
-                                                        
+
                                                     case 'company-driver-tractor':
                                                         getDocumentNotesUrl = '/getNotesByCompanyDriverTractorDocument';
                                                         break;
-                                                        
+
                                                     case 'company-driver-trailer':
                                                         getDocumentNotesUrl = '/getNotesByCompanyDriverTrailerDocument';
                                                         break;
-                                                        
+
                                                     default:
                                                         break;
                                                 }
@@ -1460,7 +1538,7 @@ const Documents = (props) => {
                         ((selectedOwnerDocument.id || 0) > 0 &&
                             (['pdf', 'txt', 'htm', 'html', 'tmf', 'log'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <iframe id="frame-preview"
-                            src={((props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={((props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1469,7 +1547,7 @@ const Documents = (props) => {
                             (['webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p', 'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
 
                         <iframe id="frame-preview"
-                            src={((props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={((props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1477,7 +1555,7 @@ const Documents = (props) => {
                         ((selectedOwnerDocument.id || 0) > 0 &&
                             (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <iframe id="frame-preview"
-                            src={('https://view.officeapps.live.com/op/embed.aspx?src=' + (props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={('https://view.officeapps.live.com/op/embed.aspx?src=' + (props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1486,7 +1564,7 @@ const Documents = (props) => {
                             (['jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi', 'png', 'gif', 'webp', 'tiff', 'tif', 'bmp', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2', 'svg', 'svgz'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         // <div className="img-wrapper"><img src={props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id} alt="" /></div>
                         <iframe id="frame-preview"
-                            src={((props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
+                            src={((props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
 
@@ -1495,7 +1573,7 @@ const Documents = (props) => {
                             (!['jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi', 'png', 'gif', 'webp', 'tiff', 'tif', 'bmp', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2', 'svg', 'svgz', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'htm', 'html', 'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p', 'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', '7z', 'arc', 'arj', 'bz2', 'daa', 'gz', 'rar', 'tar', 'zim', 'zip', 'pdf', 'txt', 'tmf', 'log'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <div className="preview-not-available">
                             <span>No preview available for this file</span> <a
-                                href={(props.serverUrl.replace('/api','')) + serverDocumentsFolder + selectedOwnerDocument.doc_id}
+                                href={(props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id}
                                 download={true}>Download</a>
                         </div>
                     }

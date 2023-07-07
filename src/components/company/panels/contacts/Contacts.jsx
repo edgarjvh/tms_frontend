@@ -679,17 +679,34 @@ const Contacts = (props) => {
                                                         <div className="online-status">
                                                             <div
                                                                 className={contact.is_online === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
-                                                            {/*<div className="mochi-button" onClick={(e) => {*/}
-                                                            {/*    e.stopPropagation()*/}
-                                                            {/*}}>*/}
-                                                            {/*    <div*/}
-                                                            {/*        className="mochi-button-decorator mochi-button-decorator-left">(*/}
-                                                            {/*    </div>*/}
-                                                            {/*    <div className="mochi-button-base">Chat</div>*/}
-                                                            {/*    <div*/}
-                                                            {/*        className="mochi-button-decorator mochi-button-decorator-right">)*/}
-                                                            {/*    </div>*/}
-                                                            {/*</div>*/}
+                                                            {
+                                                                props.owner === 'agent' &&
+                                                                <div className="contact-username-info">
+                                                                    <div className="contact-username-info-wrapper">
+                                                                        <div className="username-chat">
+                                                                            <div className="mochi-button" onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                window.open('https://mm.et3.dev', '_blank').focus();
+                                                                            }}>
+                                                                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                                                <div className="mochi-button-base">Chat</div>
+                                                                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="username-video">
+                                                                            <div className="mochi-button" onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                window.open('https://meet.et3.dev/', '_blank').focus();
+                                                                            }}>
+                                                                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                                                <div className="mochi-button-base">Video</div>
+                                                                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            }
                                                         </div>
                                                     </div>
                                                 </div>
@@ -716,17 +733,34 @@ const Contacts = (props) => {
                                                     <div className="online-status">
                                                         <div
                                                             className={contact.is_online === 1 ? 'is-online is-online-on' : 'is-online is-online-off'}></div>
-                                                        {/*<div className="mochi-button" onClick={(e) => {*/}
-                                                        {/*    e.stopPropagation()*/}
-                                                        {/*}}>*/}
-                                                        {/*    <div*/}
-                                                        {/*        className="mochi-button-decorator mochi-button-decorator-left">(*/}
-                                                        {/*    </div>*/}
-                                                        {/*    <div className="mochi-button-base">Chat</div>*/}
-                                                        {/*    <div*/}
-                                                        {/*        className="mochi-button-decorator mochi-button-decorator-right">)*/}
-                                                        {/*    </div>*/}
-                                                        {/*</div>*/}
+                                                        {
+                                                            props.owner === 'agent' &&
+                                                            <div className="contact-username-info">
+                                                                <div className="contact-username-info-wrapper">
+                                                                    <div className="username-chat">
+                                                                        <div className="mochi-button" onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            window.open('https://mm.et3.dev', '_blank').focus();
+                                                                        }}>
+                                                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                                            <div className="mochi-button-base">Chat</div>
+                                                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="username-video">
+                                                                        <div className="mochi-button" onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            window.open('https://meet.et3.dev/', '_blank').focus();
+                                                                        }}>
+                                                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                                            <div className="mochi-button-base">Video</div>
+                                                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
@@ -792,16 +826,35 @@ const Contacts = (props) => {
                                         {(contactSearchCustomer?.selectedContact?.department || '')}
                                     </span>
                                 </div>
-                                {/*<div className="contact-username-info">*/}
-                                {/*    <div className="contact-username">@username</div>*/}
-                                {/*    <div className="mochi-button" onClick={(e) => {*/}
-                                {/*        e.stopPropagation()*/}
-                                {/*    }}>*/}
-                                {/*        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>*/}
-                                {/*        <div className="mochi-button-base">Chat</div>*/}
-                                {/*        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
+
+                                {
+                                    props.owner === 'agent' &&
+                                    <div className="contact-username-info">
+                                        <div className="contact-username-info-wrapper">
+                                            <div className="username-chat">
+                                                <div className="mochi-button" onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    window.open('https://mm.et3.dev', '_blank').focus();
+                                                }}>
+                                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                    <div className="mochi-button-base">Chat</div>
+                                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="username-video">
+                                                <div className="mochi-button" onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    window.open('https://meet.et3.dev/', '_blank').focus();
+                                                }}>
+                                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                    <div className="mochi-button-base">Video</div>
+                                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                             <div className="contact-buttons">
                                 {

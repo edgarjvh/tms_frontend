@@ -4,6 +4,12 @@
   overflow: hidden;
   display: flex;
 }
+.contact-container .contact-username-info-wrapper {
+  display: flex;
+}
+.contact-container .contact-username-info-wrapper .username-chat {
+  margin-right: 10px;
+}
 .contact-container .contact-list-container {
   width: 300px;
   position: relative;
@@ -242,6 +248,12 @@
   flex-direction: column;
   justify-content: flex-end;
   padding-bottom: 15px;
+}
+.contact-container .contact-form-bg .contact-form .contact-form-header .contact-info .contact-username-info .contact-username-info-wrapper {
+  display: flex;
+}
+.contact-container .contact-form-bg .contact-form .contact-form-header .contact-info .contact-username-info .contact-username-info-wrapper .username-chat {
+  margin-right: 10px;
 }
 .contact-container .contact-form-bg .contact-form .contact-form-header .contact-info .contact-username-info .contact-username {
   font-size: 1.2rem;

@@ -4428,7 +4428,7 @@ const Dispatch = (props) => {
         }
     }, [isSavingDeliveryId]);
 
-    const getOrderByOrderNumber = (e) => {
+    const getOrderByOrderNumber = (e, action = null) => {
         let key = e.keyCode || e.which;
 
         if (key === 9) {
@@ -4436,7 +4436,8 @@ const Dispatch = (props) => {
                 setIsLoading(true);
                 axios.post(props.serverUrl + "/getOrderByOrderNumber", {
                     order_number: selectedOrder.order_number,
-                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : '',
+                    action: action
                 }).then((res) => {
                     if (res.data.result === "OK") {
                         let order = JSON.parse(JSON.stringify(res.data.order));
@@ -5046,13 +5047,10 @@ const Dispatch = (props) => {
                     >
                         <div style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
                             <div className="form-borderless-box">
-                                <div
-                                    className="form-row"
-                                    style={{ display: "flex", justifyContent: "space-between" }}
-                                >
+                                <div className="form-row" style={{ display: "flex", justifyContent: "space-between" }}>
                                     <div className="input-box-container"
                                         style={{
-                                            width: "9rem",
+                                            // width: "9rem",
                                             display: "flex",
                                             justifyContent: "space-between",
                                             alignItems: "center",
@@ -5075,11 +5073,12 @@ const Dispatch = (props) => {
                                             value={selectedOrder?.user_code?.code || ''}
                                         />
                                     </div>
-
+                                    <div className="form-h-sep"></div>
+                                    
                                     <div
                                         className="input-box-container"
                                         style={{
-                                            width: "9rem",
+                                            // width: "9rem",
                                             display: "flex",
                                             justifyContent: "space-between",
                                             alignItems: "center",
@@ -5109,11 +5108,12 @@ const Dispatch = (props) => {
                                             value={selectedOrder?.order_number || ""}
                                         />
                                     </div>
-
+                                    
+                                    <div className="form-h-sep"></div>
                                     <div
                                         className="input-box-container"
                                         style={{
-                                            width: "9rem",
+                                            // width: "9rem",
                                             display: "flex",
                                             justifyContent: "space-between",
                                             alignItems: "center",
@@ -5148,6 +5148,18 @@ const Dispatch = (props) => {
                                             }
                                         />
                                     </div>
+                                    <div className="form-h-sep"></div>
+                                    <span className="fas fa-chevron-left" style={{
+                                        fontSize: '1rem',
+                                        margin: '0px 7px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                                        color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.3)'
+                                    }} onClick={() => {
+                                        getOrderByOrderNumber({keyCode: 9}, 'previous');
+                                    }}></span>
                                     <div className="mochi-button" onClick={dispatchClearBtnClick}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">
                                             (
@@ -5157,17 +5169,24 @@ const Dispatch = (props) => {
                                             )
                                         </div>
                                     </div>
+                                    <span className="fas fa-chevron-right" style={{
+                                        fontSize: '1rem',
+                                        margin: '0px 0px 0px 7px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                                        color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.3)'
+                                    }} onClick={() => {
+                                        getOrderByOrderNumber({keyCode: 9}, 'next');
+                                    }}></span>
                                 </div>
                             </div>
                         </div>
                         <div style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
                             <div className="form-borderless-box">
-                                <div
-                                    className="form-row"
-                                    style={{ display: "flex", justifyContent: "space-between" }}
-                                >
-                                    <div className="select-box-container" style={{ width: "9rem" }}>
-
+                                <div className="form-row" style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <div className="select-box-container" style={{flexGrow: 1}}>
                                         <div className="select-box-wrapper">
                                             <input
                                                 type="text"
@@ -5634,11 +5653,8 @@ const Dispatch = (props) => {
                                                 )
                                         )}
                                     </div>
-
-                                    <div
-                                        className="select-box-container"
-                                        style={{ width: "9rem" }}
-                                    >
+                                    <div className="form-h-sep"></div>
+                                    <div className="select-box-container" style={{ flexGrow: 1 }}>
                                         <div className="select-box-wrapper">
                                             <input
                                                 type="text"
@@ -6119,11 +6135,8 @@ const Dispatch = (props) => {
                                                 )
                                         )}
                                     </div>
-
-                                    <div
-                                        className="select-box-container"
-                                        style={{ width: "9rem" }}
-                                    >
+                                    <div className="form-h-sep"></div>
+                                    <div className="select-box-container" style={{ flexGrow: 1 }}>
                                         <div className="select-box-wrapper">
                                             <input
                                                 type="text"
