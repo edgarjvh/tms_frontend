@@ -14,15 +14,23 @@ import { useDetectClickOutside } from "react-detect-click-outside";
 import { useTransition, animated } from 'react-spring';
 import { DragDropContext, Droppable, Draggable as DraggableDnd } from 'react-beautiful-dnd'
 import {
-    setCompanyOpenedPanels,
-    setAdminOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
+    setAdminHomePanels,
+setCompanyHomePanels,
+setAdminCarrierPanels,
+setCompanyCarrierPanels,
+setAdminCompanySetupPanels,
+setCompanyCompanySetupPanels,
+setAdminCustomerPanels,
+setCompanyCustomerPanels,
+setAdminDispatchPanels,
+setCompanyDispatchPanels,
+setAdminInvoicePanels,
+setCompanyInvoicePanels,
+setAdminLoadBoardPanels,
+setCompanyLoadBoardPanels,
+setAdminReportPanels,
+setCompanyReportPanels,
+
     setSelectedOrder
 } from './../../../../actions';
 

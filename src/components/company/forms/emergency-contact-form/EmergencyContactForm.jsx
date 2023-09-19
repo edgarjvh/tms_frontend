@@ -8,13 +8,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faCheck, faPencilAlt, faTrashAlt, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { useDetectClickOutside } from "react-detect-click-outside";
 import { useTransition, animated } from 'react-spring';
+import { SelectBox } from './../../../controls';
+import axios from 'axios';
 
 function EmergencyContactForm(props) {
     const [showParentEmailCopyBtn, setShowParentEmailCopyBtn] = useState(false);
-    const { refName, refPhone, refEmail } = props.refs;
+    const { refName, refPhone, refEmail, refRelationship } = props.refs;
+
+    const [relationshipItems, setRelationshipItems] = useState([]);
+    const refRelationshipPopupItems = useRef([]);
+    const refRelationshipDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setRelationshipItems([])
+        }
+    });
 
     const refPhonePopupItems = useRef([]);
     const refEmailPopupItems = useRef([]);
+
+
 
     const [showContactPhones, setShowContactPhones] = useState(false);
     const [contactPhoneItems, setContactPhoneItems] = useState([]);
@@ -167,7 +179,7 @@ function EmergencyContactForm(props) {
 
                 {/* ======================================================= RELATIONSHIP ======================================================= */}
 
-                <div className="input-box-container" style={{ width: '8.5rem' }}>
+                {/* <div className="input-box-container" style={{ width: '8.5rem' }}>
                     <input tabIndex={props.tabTimesFrom + props.tabTimes + 2} type="text" placeholder="Relationship"
                         style={{
                             textTransform: 'capitalize'
@@ -180,13 +192,316 @@ function EmergencyContactForm(props) {
                         }}
                         value={props.selectedParent?.relationship || ''} />
                 </div>
-                <div className="form-h-sep"></div>
+                <div className="form-h-sep"></div> */}
 
+                <SelectBox
+                    placeholder="Relationship"
+                    popupId="relationship"
+                    tabIndex={props.tabTimesFrom + props.tabTimes + 2}
+                    boxStyle={{
+                        width: '8.5rem',
+                    }}
+                    inputStyle={{
+                        textTransform: 'capitalize'
+                    }}
+                    refs={{
+                        refInput: refRelationship,
+                        refPopupItems: refRelationshipPopupItems,
+                        refDropdown: refRelationshipDropDown,
+                    }}
+                    readOnly={false}
+                    isDropdownEnabled={true}
+                    popupPosition="vertical below"
+                    onEnter={async e => {
+                        if (relationshipItems.length > 0 && relationshipItems.findIndex(item => item.selected) > -1) {
+                            let item = relationshipItems[relationshipItems.findIndex(item => item.selected)];
+
+                            await props.setSelectedParent({
+                                ...props.selectedParent,
+                                relationship: item,
+                                relationship_id: item.id
+                            })
+
+                            // validateDriverLicenseToSave({ keyCode: 9 });
+                            setRelationshipItems([]);
+                            refRelationship.current.focus();
+                        }
+                    }}
+                    onTab={async e => {
+                        let item = relationshipItems[relationshipItems.findIndex(item => item.selected)];
+
+                        await props.setSelectedParent({
+                            ...props.selectedParent,
+                            relationship: item,
+                            relationship_id: item.id
+                        })
+
+                        // validateDriverLicenseToSave({ keyCode: 9 });
+                        setRelationshipItems([]);
+                        refRelationship.current.focus();
+                    }}
+                    onBlur={e => {
+                        if ((props.selectedParent?.relationship?.id || 0) === 0) {
+                            props.setSelectedParent({
+                                ...props.selectedParent,
+                                relationship: {},
+                                relationship_id: null
+                            })
+                        }
+                    }}
+                    onInput={e => {
+                        let _relationship = props.selectedParent?.relationship || {};
+                        _relationship.id = 0;
+                        _relationship.name = e.target.value;
+
+                        props.setSelectedParent({
+                            ...props.selectedParent,
+                            relationship: _relationship
+                        })
+
+                        if (e.target.value.trim() === "") {
+                            setRelationshipItems([]);
+                        } else {
+                            axios.post(props.serverUrl + "/getRelationships", {
+                                name: e.target.value.trim()
+                            }).then(res => {
+                                if (res.data.result === "OK") {
+                                    setRelationshipItems(res.data.relationships.map((item, index) => {
+                                        item.selected = (props.selectedParent?.relationship?.id || 0) === 0
+                                            ? index === 0
+                                            : item.id === props.selectedParent?.relationship.id
+                                        return item;
+                                    }));
+                                }
+                            }).catch(e => {
+                                console.log("error getting relationships", e);
+                            })
+                        }
+                    }}
+                    onChange={e => {
+                        let _relationship = props.selectedParent?.relationship || {};
+                        _relationship.id = 0;
+                        _relationship.name = e.target.value;
+
+                        props.setSelectedParent({
+                            ...props.selectedParent,
+                            relationship: _relationship
+                        })
+                    }}
+                    value={props.selectedParent?.relationship?.name || ""}
+                    items={relationshipItems}
+                    getItems={() => {
+                        axios.post(props.serverUrl + "/getRelationships").then(async res => {
+                            if (res.data.result === "OK") {
+                                await setRelationshipItems(res.data.relationships.map((item, index) => {
+                                    item.selected = (props.selectedParent?.relationship?.id || 0) === 0
+                                        ? index === 0
+                                        : item.id === props.selectedParent?.relationship.id
+                                    return item;
+                                }));
+
+                                refRelationshipPopupItems.current.map((r, i) => {
+                                    if (r && r.classList.contains("selected")) {
+                                        r.scrollIntoView({
+                                            behavior: "auto",
+                                            block: "center",
+                                            inline: "nearest",
+                                        });
+                                    }
+                                    return true;
+                                });
+                            }
+                        }).catch(async e => {
+                            console.log("error getting relationships", e);
+                        });
+                    }}
+                    setItems={setRelationshipItems}
+                    onDropdownClick={e => {
+                        if ((props.selectedParent?.relationship?.id || 0) === 0 && (props.selectedParent?.relationship?.name || "") !== "") {
+                            axios.post(props.serverUrl + "/getRelationships", {
+                                name: props.selectedParent?.relationship?.name
+                            }).then(async res => {
+                                if (res.data.result === "OK") {
+                                    await setRelationshipItems(res.data.relationships.map((item, index) => {
+                                        item.selected = (props.selectedParent?.relationship?.id || 0) === 0
+                                            ? index === 0
+                                            : item.id === props.selectedParent?.relationship.id
+                                        return item;
+                                    }));
+
+                                    refRelationshipPopupItems.current.map((r, i) => {
+                                        if (r && r.classList.contains("selected")) {
+                                            r.scrollIntoView({
+                                                behavior: "auto",
+                                                block: "center",
+                                                inline: "nearest",
+                                            });
+                                        }
+                                        return true;
+                                    });
+                                }
+                            }).catch(async e => {
+                                console.log("error getting relationships", e);
+                            });
+                        } else {
+                            axios.post(props.serverUrl + "/getRelationships").then(async res => {
+                                if (res.data.result === "OK") {
+                                    await setRelationshipItems(res.data.relationships.map((item, index) => {
+                                        item.selected = (props.selectedParent?.relationship?.id || 0) === 0
+                                            ? index === 0
+                                            : item.id === props.selectedParent?.relationship.id
+                                        return item;
+                                    }));
+
+                                    refRelationshipPopupItems.current.map((r, i) => {
+                                        if (r && r.classList.contains("selected")) {
+                                            r.scrollIntoView({
+                                                behavior: "auto",
+                                                block: "center",
+                                                inline: "nearest",
+                                            });
+                                        }
+                                        return true;
+                                    });
+                                }
+                            }).catch(async e => {
+                                console.log("error getting relationships", e);
+                            });
+                        }
+                    }}
+                    onPopupClick={item => {
+                        props.setSelectedParent({
+                            ...props.selectedParent,
+                            relationship: item,
+                            relationship_id: item.id
+                        })
+
+                        // validateDriverLicenseToSave({ keyCode: 9 });
+
+                        setRelationshipItems([]);
+                        refRelationship.current.focus();
+                    }}
+                />
                 {/* ======================================================= PRIORITY ======================================================= */}
 
 
-                <div className="input-box-container" style={{ width: '4.5rem' }}>
+                {/* <div className="input-box-container" style={{ width: '4.5rem' }}>
                     <input tabIndex={props.tabTimesFrom + props.tabTimes + 3} type='number' placeholder="Priority" min={1} max={10} maxLength={2}
+                        onChange={e => {
+                            props.setSelectedParent({
+                                ...props.selectedParent,
+                                priority: e.target.value
+                            })
+                        }}
+                        value={props.selectedParent?.priority || ''} />
+                </div> */}
+
+                <div className="input-box-container" style={{ width: '4.5rem' }}>
+                    <input tabIndex={props.tabTimesFrom + props.tabTimes + 3} type='text' placeholder="Priority"
+                        onKeyDown={(e) => {
+                            let key = e.keyCode || e.which;
+
+                            let value = e.target.value;
+
+                            let maxValue = 50;
+
+                            if (key === 49 || key === 97) { // Number 1
+                                value = Number(value + "1");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 50 || key === 98) { // Number 2
+                                value = Number(value + "2");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 51 || key === 99) { // Number 3
+                                value = Number(value + "3");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 52 || key === 100) { // Number 4
+                                value = Number(value + "4");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 53 || key === 101) { // Number 5
+                                value = Number(value + "5");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 54 || key === 102) { // Number 6
+                                value = Number(value + "6");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 55 || key === 103) { // Number 7
+                                value = Number(value + "7");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 56 || key === 104) { // Number 8
+                                value = Number(value + "8");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 57 || key === 105) { // Number 9
+                                value = Number(value + "9");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 48 || key === 96) { // Number 0
+                                value = Number(value + "0");
+
+                                if (value > maxValue) {
+                                    e.preventDefault();
+                                }
+                            } else if (key === 38) { // Arrow Up
+                                e.preventDefault();
+                                value = Number(value);
+
+                                if ((value + 1) <= maxValue){
+                                    props.setSelectedParent({
+                                        ...props.selectedParent,
+                                        priority: (value + 1)
+                                    })
+                                }
+                            } else if (key === 40) { // Arrow Down
+                                e.preventDefault();
+
+                                if (value === ''){
+                                    props.setSelectedParent({
+                                        ...props.selectedParent,
+                                        priority: maxValue
+                                    })
+                                }else{
+                                    value = Number(value);
+
+                                    if ((value - 1) >= 1){
+                                        props.setSelectedParent({
+                                            ...props.selectedParent,
+                                            priority: (value - 1)
+                                        })
+                                    }
+                                }
+                                
+                            } else if (key === 8 || key === 9 || key === 46 || key === 37 || key === 39) { // Backspace  / Tab / Delete / Arrow Left / Arrow Right
+
+                            }
+
+                            else {
+                                e.preventDefault();
+                            }
+                        }}
                         onChange={e => {
                             props.setSelectedParent({
                                 ...props.selectedParent,
@@ -296,6 +611,7 @@ function EmergencyContactForm(props) {
                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                             guide={true}
                             type="text" placeholder="Contact Phone"
+                            ref={refPhone}
                             onKeyDown={async (e) => {
                                 let key = e.keyCode || e.which;
 
@@ -421,7 +737,9 @@ function EmergencyContactForm(props) {
                                                 primary_phone: contactPhoneItems[contactPhoneItems.findIndex(item => item.selected)].type
                                             });
 
-                                            props.validateForSaving({ keyCode: 9 });
+                                            if (props.triggerField === 'phone'){
+                                                props.validateForSaving({ keyCode: 9 });
+                                            }
                                             setShowContactPhones(false);
                                             refPhone.current.inputElement.focus();
                                         }
@@ -435,11 +753,15 @@ function EmergencyContactForm(props) {
                                                 primary_phone: contactPhoneItems[contactPhoneItems.findIndex(item => item.selected)].type
                                             });
 
-                                            props.validateForSaving({ keyCode: 9 });
+                                            if (props.triggerField === 'phone'){
+                                                props.validateForSaving({ keyCode: 9 });
+                                            }
                                             setShowContactPhones(false);
                                             refPhone.current.inputElement.focus();
                                         } else {
-                                            props.validateForSaving({ keyCode: 9 });
+                                            if (props.triggerField === 'phone'){
+                                                props.validateForSaving({ keyCode: 9 });
+                                            }
                                         }
                                         break;
 

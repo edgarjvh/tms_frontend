@@ -104,6 +104,9 @@ export const dispatchReducers = (state = {
     customerNewCarrier: {},
     customerIsSavingOrder: false,
 
+    adminDispatchPanels: [],
+    companyDispatchPanels: []
+
 }, action) => {
     switch (action.type) {
         case dispatchConstants.SET_SELECTED_ORDER:
@@ -663,6 +666,18 @@ export const dispatchReducers = (state = {
             state = {
                 ...state,
                 customerIsSavingOrder: action.payload
+            }
+            break;
+        case dispatchConstants.SET_ADMIN_DISPATCH_PANELS:
+            state = {
+                ...state,
+                adminDispatchPanels: action.payload
+            }
+            break;
+        case dispatchConstants.SET_COMPANY_DISPATCH_PANELS:
+            state = {
+                ...state,
+                companyDispatchPanels: action.payload
             }
             break;
         default:

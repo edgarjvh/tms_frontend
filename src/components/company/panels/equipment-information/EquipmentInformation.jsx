@@ -1,23 +1,31 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {connect} from "react-redux";
+import React, { useState, useRef, useEffect } from 'react';
+import { connect } from "react-redux";
 import './EquipmentInformation.css';
 import classnames from 'classnames';
-import {useTransition, animated} from 'react-spring';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCaretDown, faCaretRight, faPencilAlt, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
-import {useDetectClickOutside} from "react-detect-click-outside";
+import { useTransition, animated } from 'react-spring';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretRight, faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { useDetectClickOutside } from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
 
 import {
-    setCompanyOpenedPanels,
-    setAdminOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+
     setSelectedCarrier,
 } from './../../../../actions';
 import axios from 'axios';
@@ -108,41 +116,41 @@ const EquipmentInformation = (props) => {
     const [isSavingEquipmentInformation, setIsSavingEquipmentInformation] = useState(false);
 
     const equipmentTransition = useTransition(equipmentDropdownItems.length > 0, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: equipmentDropdownItems.length > 0
     });
 
     const lengthTransition = useTransition(showLengthDropdownItems, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showLengthDropdownItems
     });
 
     const widthTransition = useTransition(showWidthDropdownItems, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showWidthDropdownItems
     });
 
     const heightTransition = useTransition(showHeightDropdownItems, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showHeightDropdownItems
     });
 
     useEffect(() => {
         if ((props.carrier?.id || 0) > 0) {
-            axios.post(props.serverUrl + '/getCarrierEquipments', {carrier_id: props.carrier.id}).then(res => {
-                if (res.data.result === 'OK'){
+            axios.post(props.serverUrl + '/getCarrierEquipments', { carrier_id: props.carrier.id }).then(res => {
+                if (res.data.result === 'OK') {
                     setEquipmentInformation(equipmentInformation => {
                         return {
                             ...equipmentInformation,
@@ -178,11 +186,11 @@ const EquipmentInformation = (props) => {
         if (isSavingEquipmentInformation) {
             if ((props.user?.user_code?.is_admin || 0) === 0 &&
                 ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
-                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0){
+                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0) {
                 return;
             }
 
-            let newEquipmentInformation = {...equipmentInformation};
+            let newEquipmentInformation = { ...equipmentInformation };
             let carrier = newEquipmentInformation?.carrier || {};
             let equipment = newEquipmentInformation?.equipment || {};
 
@@ -312,6 +320,150 @@ const EquipmentInformation = (props) => {
         }
     }
 
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+    }
+
     return (
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
@@ -320,7 +472,7 @@ const EquipmentInformation = (props) => {
                 <div>{props.title}</div>
             </div>
 
-            <div className='form-bordered-box' style={{margin: '20px 0 10px 0', flexGrow: 'initial'}}>
+            <div className='form-bordered-box' style={{ margin: '20px 0 10px 0', flexGrow: 'initial' }}>
                 <div className='form-header'>
                     <div className='top-border top-border-left'></div>
                     <div className='top-border top-border-middle'></div>
@@ -353,266 +505,266 @@ const EquipmentInformation = (props) => {
                 <div className="form-row">
                     <div className="input-box-container input-code">
                         <input tabIndex={1 + props.tabTimes} type="text" maxLength="8" placeholder="Code"
-                               readOnly={
-                                   (props.user?.user_code?.is_admin || 0) === 0 &&
-                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
-                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
-                               }
-                               ref={refEquipmentCarrierCode}
-                               onKeyDown={searchCarrierByCode}
-                               onInput={e => {
-                                   setEquipmentInformation({
-                                       ...equipmentInformation, carrier: {
-                                           ...equipmentInformation.carrier,
-                                           code: e.target.value
-                                       }
-                                   })
-                               }}
-                               onChange={e => {
-                                   setEquipmentInformation({
-                                       ...equipmentInformation, carrier: {
-                                           ...equipmentInformation.carrier,
-                                           code: e.target.value
-                                       }
-                                   })
-                               }}
-                               value={(equipmentInformation?.carrier?.code_number || 0) === 0 ? (equipmentInformation?.carrier?.code || '') : equipmentInformation?.carrier?.code + equipmentInformation?.carrier?.code_number}
+                            readOnly={
+                                (props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
+                            }
+                            ref={refEquipmentCarrierCode}
+                            onKeyDown={searchCarrierByCode}
+                            onInput={e => {
+                                setEquipmentInformation({
+                                    ...equipmentInformation, carrier: {
+                                        ...equipmentInformation.carrier,
+                                        code: e.target.value
+                                    }
+                                })
+                            }}
+                            onChange={e => {
+                                setEquipmentInformation({
+                                    ...equipmentInformation, carrier: {
+                                        ...equipmentInformation.carrier,
+                                        code: e.target.value
+                                    }
+                                })
+                            }}
+                            value={(equipmentInformation?.carrier?.code_number || 0) === 0 ? (equipmentInformation?.carrier?.code || '') : equipmentInformation?.carrier?.code + equipmentInformation?.carrier?.code_number}
                         />
                     </div>
                     <div className="form-h-sep"></div>
                     <div className="input-box-container grow">
                         <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name"
-                               readOnly={true}
-                               onInput={e => {
-                                   setEquipmentInformation({
-                                       ...equipmentInformation, carrier: {
-                                           ...equipmentInformation.carrier,
-                                           name: e.target.value
-                                       }
-                                   })
-                               }}
-                               onChange={e => {
-                                   setEquipmentInformation({
-                                       ...equipmentInformation, carrier: {
-                                           ...equipmentInformation.carrier,
-                                           name: e.target.value
-                                       }
-                                   })
-                               }}
-                               value={equipmentInformation?.carrier?.name || ''}
+                            readOnly={true}
+                            onInput={e => {
+                                setEquipmentInformation({
+                                    ...equipmentInformation, carrier: {
+                                        ...equipmentInformation.carrier,
+                                        name: e.target.value
+                                    }
+                                })
+                            }}
+                            onChange={e => {
+                                setEquipmentInformation({
+                                    ...equipmentInformation, carrier: {
+                                        ...equipmentInformation.carrier,
+                                        name: e.target.value
+                                    }
+                                })
+                            }}
+                            value={equipmentInformation?.carrier?.name || ''}
                         />
                     </div>
                 </div>
                 <div className="form-v-sep"></div>
                 <div className="form-row">
-                    <div className="select-box-container" style={{flexGrow: 1}}>
+                    <div className="select-box-container" style={{ flexGrow: 1 }}>
                         <div className="select-box-wrapper">
                             <input tabIndex={3 + props.tabTimes} type="text" placeholder="Equipment"
-                                   readOnly={
-                                       (props.user?.user_code?.is_admin || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
-                                   }
-                                   ref={refEquipment}
-                                   onKeyDown={async (e) => {
-                                       let key = e.keyCode || e.which;
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
+                                }
+                                ref={refEquipment}
+                                onKeyDown={async (e) => {
+                                    let key = e.keyCode || e.which;
 
-                                       switch (key) {
-                                           case 37:
-                                           case 38: // arrow left | arrow up
-                                               e.preventDefault();
-                                               if (equipmentDropdownItems.length > 0) {
-                                                   let selectedIndex = equipmentDropdownItems.findIndex(item => item.selected);
+                                    switch (key) {
+                                        case 37:
+                                        case 38: // arrow left | arrow up
+                                            e.preventDefault();
+                                            if (equipmentDropdownItems.length > 0) {
+                                                let selectedIndex = equipmentDropdownItems.findIndex(item => item.selected);
 
-                                                   if (selectedIndex === -1) {
-                                                       await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
-                                                           item.selected = index === 0;
-                                                           return item;
-                                                       }))
-                                                   } else {
-                                                       await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
-                                                           if (selectedIndex === 0) {
-                                                               item.selected = index === (equipmentDropdownItems.length - 1);
-                                                           } else {
-                                                               item.selected = index === (selectedIndex - 1)
-                                                           }
-                                                           return item;
-                                                       }))
-                                                   }
+                                                if (selectedIndex === -1) {
+                                                    await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
+                                                        item.selected = index === 0;
+                                                        return item;
+                                                    }))
+                                                } else {
+                                                    await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
+                                                        if (selectedIndex === 0) {
+                                                            item.selected = index === (equipmentDropdownItems.length - 1);
+                                                        } else {
+                                                            item.selected = index === (selectedIndex - 1)
+                                                        }
+                                                        return item;
+                                                    }))
+                                                }
 
-                                                   refEquipmentPopupItems.current.map((r, i) => {
-                                                       if (r && r.classList.contains('selected')) {
-                                                           r.scrollIntoView({
-                                                               behavior: 'auto',
-                                                               block: 'center',
-                                                               inline: 'nearest'
-                                                           })
-                                                       }
-                                                       return true;
-                                                   });
-                                               } else {
-                                                   axios.post(props.serverUrl + '/getEquipments').then(res => {
-                                                       if (res.data.result === 'OK') {
-                                                           setEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                               item.selected = (equipmentInformation?.equipment?.id || 0) === 0
-                                                                   ? index === 0
-                                                                   : item.id === equipmentInformation.equipment.id
-                                                               return item;
-                                                           }))
+                                                refEquipmentPopupItems.current.map((r, i) => {
+                                                    if (r && r.classList.contains('selected')) {
+                                                        r.scrollIntoView({
+                                                            behavior: 'auto',
+                                                            block: 'center',
+                                                            inline: 'nearest'
+                                                        })
+                                                    }
+                                                    return true;
+                                                });
+                                            } else {
+                                                axios.post(props.serverUrl + '/getEquipments').then(res => {
+                                                    if (res.data.result === 'OK') {
+                                                        setEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                            item.selected = (equipmentInformation?.equipment?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === equipmentInformation.equipment.id
+                                                            return item;
+                                                        }))
 
-                                                           refEquipmentPopupItems.current.map((r, i) => {
-                                                               if (r && r.classList.contains('selected')) {
-                                                                   r.scrollIntoView({
-                                                                       behavior: 'auto',
-                                                                       block: 'center',
-                                                                       inline: 'nearest'
-                                                                   })
-                                                               }
-                                                               return true;
-                                                           });
-                                                       }
-                                                   }).catch(async e => {
-                                                       console.log('error getting driver equipments', e);
-                                                   })
-                                               }
-                                               break;
+                                                        refEquipmentPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async e => {
+                                                    console.log('error getting driver equipments', e);
+                                                })
+                                            }
+                                            break;
 
-                                           case 39:
-                                           case 40: // arrow right | arrow down
-                                               e.preventDefault();
-                                               if (equipmentDropdownItems.length > 0) {
-                                                   let selectedIndex = equipmentDropdownItems.findIndex(item => item.selected);
+                                        case 39:
+                                        case 40: // arrow right | arrow down
+                                            e.preventDefault();
+                                            if (equipmentDropdownItems.length > 0) {
+                                                let selectedIndex = equipmentDropdownItems.findIndex(item => item.selected);
 
-                                                   if (selectedIndex === -1) {
-                                                       await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
-                                                           item.selected = index === 0;
-                                                           return item;
-                                                       }))
-                                                   } else {
-                                                       await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
-                                                           if (selectedIndex === (equipmentDropdownItems.length - 1)) {
-                                                               item.selected = index === 0;
-                                                           } else {
-                                                               item.selected = index === (selectedIndex + 1)
-                                                           }
-                                                           return item;
-                                                       }))
-                                                   }
+                                                if (selectedIndex === -1) {
+                                                    await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
+                                                        item.selected = index === 0;
+                                                        return item;
+                                                    }))
+                                                } else {
+                                                    await setEquipmentDropdownItems(equipmentDropdownItems.map((item, index) => {
+                                                        if (selectedIndex === (equipmentDropdownItems.length - 1)) {
+                                                            item.selected = index === 0;
+                                                        } else {
+                                                            item.selected = index === (selectedIndex + 1)
+                                                        }
+                                                        return item;
+                                                    }))
+                                                }
 
-                                                   refEquipmentPopupItems.current.map((r, i) => {
-                                                       if (r && r.classList.contains('selected')) {
-                                                           r.scrollIntoView({
-                                                               behavior: 'auto',
-                                                               block: 'center',
-                                                               inline: 'nearest'
-                                                           })
-                                                       }
-                                                       return true;
-                                                   });
-                                               } else {
-                                                   axios.post(props.serverUrl + '/getEquipments').then(res => {
-                                                       if (res.data.result === 'OK') {
-                                                           setEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                               item.selected = (equipmentInformation?.equipment?.id || 0) === 0
-                                                                   ? index === 0
-                                                                   : item.id === equipmentInformation.equipment.id
-                                                               return item;
-                                                           }))
+                                                refEquipmentPopupItems.current.map((r, i) => {
+                                                    if (r && r.classList.contains('selected')) {
+                                                        r.scrollIntoView({
+                                                            behavior: 'auto',
+                                                            block: 'center',
+                                                            inline: 'nearest'
+                                                        })
+                                                    }
+                                                    return true;
+                                                });
+                                            } else {
+                                                axios.post(props.serverUrl + '/getEquipments').then(res => {
+                                                    if (res.data.result === 'OK') {
+                                                        setEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                            item.selected = (equipmentInformation?.equipment?.id || 0) === 0
+                                                                ? index === 0
+                                                                : item.id === equipmentInformation.equipment.id
+                                                            return item;
+                                                        }))
 
-                                                           refEquipmentPopupItems.current.map((r, i) => {
-                                                               if (r && r.classList.contains('selected')) {
-                                                                   r.scrollIntoView({
-                                                                       behavior: 'auto',
-                                                                       block: 'center',
-                                                                       inline: 'nearest'
-                                                                   })
-                                                               }
-                                                               return true;
-                                                           });
-                                                       }
-                                                   }).catch(async e => {
-                                                       console.log('error getting driver equipments', e);
-                                                   })
-                                               }
-                                               break;
+                                                        refEquipmentPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains('selected')) {
+                                                                r.scrollIntoView({
+                                                                    behavior: 'auto',
+                                                                    block: 'center',
+                                                                    inline: 'nearest'
+                                                                })
+                                                            }
+                                                            return true;
+                                                        });
+                                                    }
+                                                }).catch(async e => {
+                                                    console.log('error getting driver equipments', e);
+                                                })
+                                            }
+                                            break;
 
-                                           case 27: // escape
-                                               setEquipmentDropdownItems([]);
-                                               break;
+                                        case 27: // escape
+                                            setEquipmentDropdownItems([]);
+                                            break;
 
-                                           case 13: // enter
-                                               if (equipmentDropdownItems.length > 0 && equipmentDropdownItems.findIndex(item => item.selected) > -1) {
-                                                   await setEquipmentInformation({
-                                                       ...equipmentInformation,
-                                                       equipment: equipmentDropdownItems[equipmentDropdownItems.findIndex(item => item.selected)]
-                                                   });
-                                                   setEquipmentDropdownItems([]);
-                                                   refEquipment.current.focus();
-                                               }
-                                               break;
+                                        case 13: // enter
+                                            if (equipmentDropdownItems.length > 0 && equipmentDropdownItems.findIndex(item => item.selected) > -1) {
+                                                await setEquipmentInformation({
+                                                    ...equipmentInformation,
+                                                    equipment: equipmentDropdownItems[equipmentDropdownItems.findIndex(item => item.selected)]
+                                                });
+                                                setEquipmentDropdownItems([]);
+                                                refEquipment.current.focus();
+                                            }
+                                            break;
 
-                                           case 9: // tab
-                                               if (equipmentDropdownItems.length > 0) {
-                                                   e.preventDefault();
-                                                   await setEquipmentInformation({
-                                                       ...equipmentInformation,
-                                                       equipment: equipmentDropdownItems[equipmentDropdownItems.findIndex(item => item.selected)]
-                                                   });
-                                                   setEquipmentDropdownItems([]);
-                                                   refEquipment.current.focus();
-                                               }
-                                               break;
+                                        case 9: // tab
+                                            if (equipmentDropdownItems.length > 0) {
+                                                e.preventDefault();
+                                                await setEquipmentInformation({
+                                                    ...equipmentInformation,
+                                                    equipment: equipmentDropdownItems[equipmentDropdownItems.findIndex(item => item.selected)]
+                                                });
+                                                setEquipmentDropdownItems([]);
+                                                refEquipment.current.focus();
+                                            }
+                                            break;
 
-                                           default:
-                                               break;
-                                       }
-                                   }}
-                                   onBlur={async () => {
-                                       if ((equipmentInformation?.equipment?.id || 0) === 0) {
-                                           await setEquipmentInformation({...equipmentInformation, equipment: {}});
-                                       }
-                                   }}
-                                   onInput={(e) => {
-                                       let equipment = equipmentInformation?.equipment || {};
-                                       equipment.id = 0;
-                                       equipment.name = e.target.value;
-                                       setEquipmentInformation(equipmentInformation => {
-                                           return {...equipmentInformation, equipment: equipment}
-                                       });
+                                        default:
+                                            break;
+                                    }
+                                }}
+                                onBlur={async () => {
+                                    if ((equipmentInformation?.equipment?.id || 0) === 0) {
+                                        await setEquipmentInformation({ ...equipmentInformation, equipment: {} });
+                                    }
+                                }}
+                                onInput={(e) => {
+                                    let equipment = equipmentInformation?.equipment || {};
+                                    equipment.id = 0;
+                                    equipment.name = e.target.value;
+                                    setEquipmentInformation(equipmentInformation => {
+                                        return { ...equipmentInformation, equipment: equipment }
+                                    });
 
-                                       if (e.target.value.trim() === '') {
-                                           setEquipmentDropdownItems([]);
-                                       } else {
-                                           axios.post(props.serverUrl + '/getEquipments', {
-                                               name: e.target.value.trim()
-                                           }).then(res => {
-                                               if (res.data.result === 'OK') {
-                                                   setEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                       item.selected = (equipmentInformation?.equipment?.id || 0) === 0
-                                                           ? index === 0
-                                                           : item.id === equipmentInformation.equipment.id
-                                                       return item;
-                                                   }))
-                                               }
-                                           }).catch(async e => {
-                                               console.log('error getting equipments', e);
-                                           })
-                                       }
-                                   }}
-                                   onChange={(e) => {
-                                       let equipment = equipmentInformation?.equipment || {};
-                                       equipment.id = 0;
-                                       equipment.name = e.target.value;
-                                       setEquipmentInformation(equipmentInformation => {
-                                           return {...equipmentInformation, equipment: equipment}
-                                       });
-                                   }}
-                                   value={equipmentInformation?.equipment?.name || ''}
+                                    if (e.target.value.trim() === '') {
+                                        setEquipmentDropdownItems([]);
+                                    } else {
+                                        axios.post(props.serverUrl + '/getEquipments', {
+                                            name: e.target.value.trim()
+                                        }).then(res => {
+                                            if (res.data.result === 'OK') {
+                                                setEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                    item.selected = (equipmentInformation?.equipment?.id || 0) === 0
+                                                        ? index === 0
+                                                        : item.id === equipmentInformation.equipment.id
+                                                    return item;
+                                                }))
+                                            }
+                                        }).catch(async e => {
+                                            console.log('error getting equipments', e);
+                                        })
+                                    }
+                                }}
+                                onChange={(e) => {
+                                    let equipment = equipmentInformation?.equipment || {};
+                                    equipment.id = 0;
+                                    equipment.name = e.target.value;
+                                    setEquipmentInformation(equipmentInformation => {
+                                        return { ...equipmentInformation, equipment: equipment }
+                                    });
+                                }}
+                                value={equipmentInformation?.equipment?.name || ''}
                             />
                             {
                                 ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 1 &&
-                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 1)) &&
+                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 1 &&
+                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 1)) &&
                                 <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
                                     if (equipmentDropdownItems.length > 0) {
                                         setEquipmentDropdownItems([]);
@@ -671,7 +823,7 @@ const EquipmentInformation = (props) => {
                                     }
 
                                     refEquipment.current.focus();
-                                }}/>
+                                }} />
                             }
 
                         </div>
@@ -728,7 +880,7 @@ const EquipmentInformation = (props) => {
                                                                 {
                                                                     item.selected &&
                                                                     <FontAwesomeIcon className="dropdown-selected"
-                                                                                     icon={faCaretRight}/>
+                                                                        icon={faCaretRight} />
                                                                 }
                                                             </div>
                                                         )
@@ -749,188 +901,188 @@ const EquipmentInformation = (props) => {
                         justifyContent: 'space-between',
                         alignItems: 'center'
                     }}>
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Number of
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Number of
                             Units
                         </div>
-                        <input tabIndex={4 + props.tabTimes} style={{textAlign: 'right', fontWeight: 'bold'}}
-                               readOnly={
-                                   (props.user?.user_code?.is_admin || 0) === 0 &&
-                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
-                                   ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
-                               }
-                               type="text"
-                               onInput={(e) => {
-                                   setEquipmentInformation({...equipmentInformation, units: e.target.value})
-                               }}
-                               onChange={(e) => {
-                                   setEquipmentInformation({...equipmentInformation, units: e.target.value})
-                               }}
-                               value={equipmentInformation.units || ''}
+                        <input tabIndex={4 + props.tabTimes} style={{ textAlign: 'right', fontWeight: 'bold' }}
+                            readOnly={
+                                (props.user?.user_code?.is_admin || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
+                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
+                            }
+                            type="text"
+                            onInput={(e) => {
+                                setEquipmentInformation({ ...equipmentInformation, units: e.target.value })
+                            }}
+                            onChange={(e) => {
+                                setEquipmentInformation({ ...equipmentInformation, units: e.target.value })
+                            }}
+                            value={equipmentInformation.units || ''}
                         />
                     </div>
                 </div>
                 <div className="form-v-sep"></div>
-                <div className="form-row" style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridGap: 2}}>
+                <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridGap: 2 }}>
                     <div className="select-box-container"
-                         style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div className="select-box-wrapper">
-                            <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Length
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Length
                             </div>
                             <input style={{
                                 textAlign: 'right',
                                 fontWeight: 'bold',
                                 paddingRight: (equipmentInformation?.equipment_length || '').trim().length > 0 ? 25 : 0
                             }}
-                                   tabIndex={5 + props.tabTimes} type="text"
-                                   readOnly={
-                                       (props.user?.user_code?.is_admin || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
-                                   }
-                                   ref={refLength}
-                                   onKeyDown={async (e) => {
-                                       let key = e.keyCode || e.which;
+                                tabIndex={5 + props.tabTimes} type="text"
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
+                                }
+                                ref={refLength}
+                                onKeyDown={async (e) => {
+                                    let key = e.keyCode || e.which;
 
-                                       if (key === 70) {
-                                           e.preventDefault();
+                                    if (key === 70) {
+                                        e.preventDefault();
 
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_length_unit: 'ft'
-                                           })
-                                       } else if (key === 73) {
-                                           e.preventDefault();
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_length_unit: 'in'
-                                           })
-                                       } else if (key === 38) {
-                                           e.preventDefault();
-                                           if (showLengthDropdownItems) {
-                                               let selectedIndex = lengthDropdownItems.findIndex(item => item.selected);
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_length_unit: 'ft'
+                                        })
+                                    } else if (key === 73) {
+                                        e.preventDefault();
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_length_unit: 'in'
+                                        })
+                                    } else if (key === 38) {
+                                        e.preventDefault();
+                                        if (showLengthDropdownItems) {
+                                            let selectedIndex = lengthDropdownItems.findIndex(item => item.selected);
 
-                                               if (selectedIndex === -1) {
-                                                   await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
-                                                       item.selected = index === 0;
-                                                       return item;
-                                                   }))
-                                               } else {
-                                                   await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
-                                                       if (selectedIndex === 0) {
-                                                           item.selected = index === (lengthDropdownItems.length - 1);
-                                                       } else {
-                                                           item.selected = index === (selectedIndex - 1)
-                                                       }
-                                                       return item;
-                                                   }))
-                                               }
-                                           } else {
-                                               await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
-                                                   item.selected = equipmentInformation.equipment_length_unit === item.value
-                                                   return item;
-                                               }))
+                                            if (selectedIndex === -1) {
+                                                await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
+                                                    item.selected = index === 0;
+                                                    return item;
+                                                }))
+                                            } else {
+                                                await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
+                                                    if (selectedIndex === 0) {
+                                                        item.selected = index === (lengthDropdownItems.length - 1);
+                                                    } else {
+                                                        item.selected = index === (selectedIndex - 1)
+                                                    }
+                                                    return item;
+                                                }))
+                                            }
+                                        } else {
+                                            await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
+                                                item.selected = equipmentInformation.equipment_length_unit === item.value
+                                                return item;
+                                            }))
 
-                                               await setShowLengthDropdownItems(true);
-                                           }
+                                            await setShowLengthDropdownItems(true);
+                                        }
 
-                                           refLengthPopupItems.current.map((r, i) => {
-                                               if (r && r.classList.contains('selected')) {
-                                                   r.scrollIntoView({
-                                                       behavior: 'auto',
-                                                       block: 'center',
-                                                       inline: 'nearest'
-                                                   })
-                                               }
-                                               return true;
-                                           });
+                                        refLengthPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains('selected')) {
+                                                r.scrollIntoView({
+                                                    behavior: 'auto',
+                                                    block: 'center',
+                                                    inline: 'nearest'
+                                                })
+                                            }
+                                            return true;
+                                        });
 
-                                       } else if (key === 40) {
-                                           e.preventDefault();
-                                           if (showLengthDropdownItems) {
-                                               let selectedIndex = lengthDropdownItems.findIndex(item => item.selected);
+                                    } else if (key === 40) {
+                                        e.preventDefault();
+                                        if (showLengthDropdownItems) {
+                                            let selectedIndex = lengthDropdownItems.findIndex(item => item.selected);
 
-                                               if (selectedIndex === -1) {
-                                                   await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
-                                                       item.selected = index === 0;
-                                                       return item;
-                                                   }))
-                                               } else {
-                                                   await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
-                                                       if (selectedIndex === (lengthDropdownItems.length - 1)) {
-                                                           item.selected = index === 0;
-                                                       } else {
-                                                           item.selected = index === (selectedIndex + 1)
-                                                       }
-                                                       return item;
-                                                   }))
-                                               }
-                                           } else {
-                                               await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
-                                                   item.selected = equipmentInformation.equipment_length_unit === item.value
-                                                   return item;
-                                               }))
+                                            if (selectedIndex === -1) {
+                                                await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
+                                                    item.selected = index === 0;
+                                                    return item;
+                                                }))
+                                            } else {
+                                                await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
+                                                    if (selectedIndex === (lengthDropdownItems.length - 1)) {
+                                                        item.selected = index === 0;
+                                                    } else {
+                                                        item.selected = index === (selectedIndex + 1)
+                                                    }
+                                                    return item;
+                                                }))
+                                            }
+                                        } else {
+                                            await setLengthDropdownItems(lengthDropdownItems.map((item, index) => {
+                                                item.selected = equipmentInformation.equipment_length_unit === item.value
+                                                return item;
+                                            }))
 
-                                               await setShowLengthDropdownItems(true);
-                                           }
+                                            await setShowLengthDropdownItems(true);
+                                        }
 
-                                           refLengthPopupItems.current.map((r, i) => {
-                                               if (r && r.classList.contains('selected')) {
-                                                   r.scrollIntoView({
-                                                       behavior: 'auto',
-                                                       block: 'center',
-                                                       inline: 'nearest'
-                                                   })
-                                               }
-                                               return true;
-                                           });
+                                        refLengthPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains('selected')) {
+                                                r.scrollIntoView({
+                                                    behavior: 'auto',
+                                                    block: 'center',
+                                                    inline: 'nearest'
+                                                })
+                                            }
+                                            return true;
+                                        });
 
-                                       } else if (key === 27) {
-                                           await setShowLengthDropdownItems(false);
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_length_unit: ''
-                                           })
-                                       } else if (key === 13) {
-                                           if (showLengthDropdownItems && lengthDropdownItems.findIndex(item => item.selected) > -1) {
-                                               await setEquipmentInformation({
-                                                   ...equipmentInformation,
-                                                   equipment_length_unit: lengthDropdownItems[lengthDropdownItems.findIndex(item => item.selected)].value
-                                               });
-                                               await setShowLengthDropdownItems(false);
-                                               refLength.current.focus();
-                                           }
-                                       } else if (key === 9) {
-                                           if (showLengthDropdownItems) {
-                                               e.preventDefault();
-                                               await setEquipmentInformation({
-                                                   ...equipmentInformation,
-                                                   equipment_length_unit: lengthDropdownItems[lengthDropdownItems.findIndex(item => item.selected)].value
-                                               });
-                                               await setShowLengthDropdownItems(false);
-                                               refLength.current.focus();
-                                           }
-                                       } else if ((key >= 48 && key <= 57) || (key >= 96 && key <= 105)) {
+                                    } else if (key === 27) {
+                                        await setShowLengthDropdownItems(false);
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_length_unit: ''
+                                        })
+                                    } else if (key === 13) {
+                                        if (showLengthDropdownItems && lengthDropdownItems.findIndex(item => item.selected) > -1) {
+                                            await setEquipmentInformation({
+                                                ...equipmentInformation,
+                                                equipment_length_unit: lengthDropdownItems[lengthDropdownItems.findIndex(item => item.selected)].value
+                                            });
+                                            await setShowLengthDropdownItems(false);
+                                            refLength.current.focus();
+                                        }
+                                    } else if (key === 9) {
+                                        if (showLengthDropdownItems) {
+                                            e.preventDefault();
+                                            await setEquipmentInformation({
+                                                ...equipmentInformation,
+                                                equipment_length_unit: lengthDropdownItems[lengthDropdownItems.findIndex(item => item.selected)].value
+                                            });
+                                            await setShowLengthDropdownItems(false);
+                                            refLength.current.focus();
+                                        }
+                                    } else if ((key >= 48 && key <= 57) || (key >= 96 && key <= 105)) {
 
-                                       } else if (key === 8 || key === 46) {
+                                    } else if (key === 8 || key === 46) {
 
-                                       } else {
-                                           e.preventDefault();
-                                       }
-                                   }}
+                                    } else {
+                                        e.preventDefault();
+                                    }
+                                }}
 
-                                   onInput={(e) => {
-                                       setEquipmentInformation({
-                                           ...equipmentInformation,
-                                           equipment_length: e.target.value
-                                       })
-                                   }}
-                                   onChange={(e) => {
-                                       setEquipmentInformation({
-                                           ...equipmentInformation,
-                                           equipment_length: e.target.value
-                                       })
-                                   }}
-                                   value={equipmentInformation.equipment_length || ''}
+                                onInput={(e) => {
+                                    setEquipmentInformation({
+                                        ...equipmentInformation,
+                                        equipment_length: e.target.value
+                                    })
+                                }}
+                                onChange={(e) => {
+                                    setEquipmentInformation({
+                                        ...equipmentInformation,
+                                        equipment_length: e.target.value
+                                    })
+                                }}
+                                value={equipmentInformation.equipment_length || ''}
                             />
                             {
                                 (equipmentInformation?.equipment_length || '').trim().length > 0 &&
@@ -961,7 +1113,7 @@ const EquipmentInformation = (props) => {
                                     }
 
                                     refLength.current.focus();
-                                }}/>
+                                }} />
                             }
                         </div>
                         {
@@ -1007,7 +1159,7 @@ const EquipmentInformation = (props) => {
                                                                 {
                                                                     item.selected &&
                                                                     <FontAwesomeIcon className="dropdown-selected"
-                                                                                     icon={faCaretRight}/>
+                                                                        icon={faCaretRight} />
                                                                 }
                                                             </div>
                                                         )
@@ -1022,165 +1174,165 @@ const EquipmentInformation = (props) => {
                     </div>
 
                     <div className="select-box-container"
-                         style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div className="select-box-wrapper">
-                            <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Width
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Width
                             </div>
                             <input style={{
                                 textAlign: 'right',
                                 fontWeight: 'bold',
                                 paddingRight: (equipmentInformation?.equipment_width || '').trim().length > 0 ? 25 : 0
                             }}
-                                   tabIndex={6 + props.tabTimes} type="text"
-                                   readOnly={
-                                       (props.user?.user_code?.is_admin || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
-                                   }
-                                   ref={refWidth}
-                                   onKeyDown={async (e) => {
-                                       let key = e.keyCode || e.which;
+                                tabIndex={6 + props.tabTimes} type="text"
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
+                                }
+                                ref={refWidth}
+                                onKeyDown={async (e) => {
+                                    let key = e.keyCode || e.which;
 
-                                       if (key === 70) {
-                                           e.preventDefault();
+                                    if (key === 70) {
+                                        e.preventDefault();
 
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_width_unit: 'ft'
-                                           })
-                                       } else if (key === 73) {
-                                           e.preventDefault();
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_width_unit: 'in'
-                                           })
-                                       } else if (key === 38) {
-                                           e.preventDefault();
-                                           if (showWidthDropdownItems) {
-                                               let selectedIndex = widthDropdownItems.findIndex(item => item.selected);
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_width_unit: 'ft'
+                                        })
+                                    } else if (key === 73) {
+                                        e.preventDefault();
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_width_unit: 'in'
+                                        })
+                                    } else if (key === 38) {
+                                        e.preventDefault();
+                                        if (showWidthDropdownItems) {
+                                            let selectedIndex = widthDropdownItems.findIndex(item => item.selected);
 
-                                               if (selectedIndex === -1) {
-                                                   await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
-                                                       item.selected = index === 0;
-                                                       return item;
-                                                   }))
-                                               } else {
-                                                   await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
-                                                       if (selectedIndex === 0) {
-                                                           item.selected = index === (widthDropdownItems.length - 1);
-                                                       } else {
-                                                           item.selected = index === (selectedIndex - 1)
-                                                       }
-                                                       return item;
-                                                   }))
-                                               }
-                                           } else {
-                                               await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
-                                                   item.selected = equipmentInformation.equipment_width_unit === item.value
-                                                   return item;
-                                               }))
+                                            if (selectedIndex === -1) {
+                                                await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
+                                                    item.selected = index === 0;
+                                                    return item;
+                                                }))
+                                            } else {
+                                                await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
+                                                    if (selectedIndex === 0) {
+                                                        item.selected = index === (widthDropdownItems.length - 1);
+                                                    } else {
+                                                        item.selected = index === (selectedIndex - 1)
+                                                    }
+                                                    return item;
+                                                }))
+                                            }
+                                        } else {
+                                            await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
+                                                item.selected = equipmentInformation.equipment_width_unit === item.value
+                                                return item;
+                                            }))
 
-                                               await setShowWidthDropdownItems(true);
-                                           }
+                                            await setShowWidthDropdownItems(true);
+                                        }
 
-                                           refWidthPopupItems.current.map((r, i) => {
-                                               if (r && r.classList.contains('selected')) {
-                                                   r.scrollIntoView({
-                                                       behavior: 'auto',
-                                                       block: 'center',
-                                                       inline: 'nearest'
-                                                   })
-                                               }
-                                               return true;
-                                           });
+                                        refWidthPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains('selected')) {
+                                                r.scrollIntoView({
+                                                    behavior: 'auto',
+                                                    block: 'center',
+                                                    inline: 'nearest'
+                                                })
+                                            }
+                                            return true;
+                                        });
 
-                                       } else if (key === 40) {
-                                           e.preventDefault();
-                                           if (showWidthDropdownItems) {
-                                               let selectedIndex = widthDropdownItems.findIndex(item => item.selected);
+                                    } else if (key === 40) {
+                                        e.preventDefault();
+                                        if (showWidthDropdownItems) {
+                                            let selectedIndex = widthDropdownItems.findIndex(item => item.selected);
 
-                                               if (selectedIndex === -1) {
-                                                   await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
-                                                       item.selected = index === 0;
-                                                       return item;
-                                                   }))
-                                               } else {
-                                                   await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
-                                                       if (selectedIndex === (widthDropdownItems.length - 1)) {
-                                                           item.selected = index === 0;
-                                                       } else {
-                                                           item.selected = index === (selectedIndex + 1)
-                                                       }
-                                                       return item;
-                                                   }))
-                                               }
-                                           } else {
-                                               await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
-                                                   item.selected = equipmentInformation.equipment_width_unit === item.value
-                                                   return item;
-                                               }))
+                                            if (selectedIndex === -1) {
+                                                await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
+                                                    item.selected = index === 0;
+                                                    return item;
+                                                }))
+                                            } else {
+                                                await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
+                                                    if (selectedIndex === (widthDropdownItems.length - 1)) {
+                                                        item.selected = index === 0;
+                                                    } else {
+                                                        item.selected = index === (selectedIndex + 1)
+                                                    }
+                                                    return item;
+                                                }))
+                                            }
+                                        } else {
+                                            await setWidthDropdownItems(widthDropdownItems.map((item, index) => {
+                                                item.selected = equipmentInformation.equipment_width_unit === item.value
+                                                return item;
+                                            }))
 
-                                               await setShowWidthDropdownItems(true);
-                                           }
+                                            await setShowWidthDropdownItems(true);
+                                        }
 
-                                           refWidthPopupItems.current.map((r, i) => {
-                                               if (r && r.classList.contains('selected')) {
-                                                   r.scrollIntoView({
-                                                       behavior: 'auto',
-                                                       block: 'center',
-                                                       inline: 'nearest'
-                                                   })
-                                               }
-                                               return true;
-                                           });
+                                        refWidthPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains('selected')) {
+                                                r.scrollIntoView({
+                                                    behavior: 'auto',
+                                                    block: 'center',
+                                                    inline: 'nearest'
+                                                })
+                                            }
+                                            return true;
+                                        });
 
-                                       } else if (key === 27) {
-                                           await setShowWidthDropdownItems(false);
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_width_unit: ''
-                                           })
-                                       } else if (key === 13) {
-                                           if (showWidthDropdownItems && widthDropdownItems.findIndex(item => item.selected) > -1) {
-                                               await setEquipmentInformation({
-                                                   ...equipmentInformation,
-                                                   equipment_width_unit: widthDropdownItems[widthDropdownItems.findIndex(item => item.selected)].value
-                                               });
-                                               await setShowWidthDropdownItems(false);
-                                               refWidth.current.focus();
-                                           }
-                                       } else if (key === 9) {
-                                           if (showWidthDropdownItems) {
-                                               e.preventDefault();
-                                               await setEquipmentInformation({
-                                                   ...equipmentInformation,
-                                                   equipment_width_unit: widthDropdownItems[widthDropdownItems.findIndex(item => item.selected)].value
-                                               });
-                                               await setShowWidthDropdownItems(false);
-                                               refWidth.current.focus();
-                                           }
-                                       } else if ((key >= 48 && key <= 57) || (key >= 96 && key <= 105)) {
+                                    } else if (key === 27) {
+                                        await setShowWidthDropdownItems(false);
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_width_unit: ''
+                                        })
+                                    } else if (key === 13) {
+                                        if (showWidthDropdownItems && widthDropdownItems.findIndex(item => item.selected) > -1) {
+                                            await setEquipmentInformation({
+                                                ...equipmentInformation,
+                                                equipment_width_unit: widthDropdownItems[widthDropdownItems.findIndex(item => item.selected)].value
+                                            });
+                                            await setShowWidthDropdownItems(false);
+                                            refWidth.current.focus();
+                                        }
+                                    } else if (key === 9) {
+                                        if (showWidthDropdownItems) {
+                                            e.preventDefault();
+                                            await setEquipmentInformation({
+                                                ...equipmentInformation,
+                                                equipment_width_unit: widthDropdownItems[widthDropdownItems.findIndex(item => item.selected)].value
+                                            });
+                                            await setShowWidthDropdownItems(false);
+                                            refWidth.current.focus();
+                                        }
+                                    } else if ((key >= 48 && key <= 57) || (key >= 96 && key <= 105)) {
 
-                                       } else if (key === 8 || key === 46) {
+                                    } else if (key === 8 || key === 46) {
 
-                                       } else {
-                                           e.preventDefault();
-                                       }
-                                   }}
+                                    } else {
+                                        e.preventDefault();
+                                    }
+                                }}
 
-                                   onInput={(e) => {
-                                       setEquipmentInformation({
-                                           ...equipmentInformation,
-                                           equipment_width: e.target.value
-                                       })
-                                   }}
-                                   onChange={(e) => {
-                                       setEquipmentInformation({
-                                           ...equipmentInformation,
-                                           equipment_width: e.target.value
-                                       })
-                                   }}
-                                   value={equipmentInformation.equipment_width || ''}
+                                onInput={(e) => {
+                                    setEquipmentInformation({
+                                        ...equipmentInformation,
+                                        equipment_width: e.target.value
+                                    })
+                                }}
+                                onChange={(e) => {
+                                    setEquipmentInformation({
+                                        ...equipmentInformation,
+                                        equipment_width: e.target.value
+                                    })
+                                }}
+                                value={equipmentInformation.equipment_width || ''}
                             />
                             {
                                 (equipmentInformation?.equipment_width || '').trim().length > 0 &&
@@ -1211,7 +1363,7 @@ const EquipmentInformation = (props) => {
                                     }
 
                                     refWidth.current.focus();
-                                }}/>
+                                }} />
                             }
                         </div>
                         {
@@ -1257,7 +1409,7 @@ const EquipmentInformation = (props) => {
                                                                 {
                                                                     item.selected &&
                                                                     <FontAwesomeIcon className="dropdown-selected"
-                                                                                     icon={faCaretRight}/>
+                                                                        icon={faCaretRight} />
                                                                 }
                                                             </div>
                                                         )
@@ -1272,187 +1424,187 @@ const EquipmentInformation = (props) => {
                     </div>
 
                     <div className="select-box-container"
-                         style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div className="select-box-wrapper">
-                            <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Height
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Height
                             </div>
                             <input style={{
                                 textAlign: 'right',
                                 fontWeight: 'bold',
                                 paddingRight: (equipmentInformation?.equipment_height || '').trim().length > 0 ? 25 : 0
                             }}
-                                   tabIndex={7 + props.tabTimes} type="text"
-                                   readOnly={
-                                       (props.user?.user_code?.is_admin || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
-                                       ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
-                                   }
-                                   ref={refHeight}
-                                   onKeyDown={async (e) => {
-                                       let key = e.keyCode || e.which;
+                                tabIndex={7 + props.tabTimes} type="text"
+                                readOnly={
+                                    (props.user?.user_code?.is_admin || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.save || 0) === 0 &&
+                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.edit || 0) === 0
+                                }
+                                ref={refHeight}
+                                onKeyDown={async (e) => {
+                                    let key = e.keyCode || e.which;
 
-                                       if (key === 70) {
-                                           e.preventDefault();
+                                    if (key === 70) {
+                                        e.preventDefault();
 
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_height_unit: 'ft'
-                                           })
-                                       } else if (key === 73) {
-                                           e.preventDefault();
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_height_unit: 'in'
-                                           })
-                                       } else if (key === 38) {
-                                           e.preventDefault();
-                                           if (showHeightDropdownItems) {
-                                               let selectedIndex = heightDropdownItems.findIndex(item => item.selected);
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_height_unit: 'ft'
+                                        })
+                                    } else if (key === 73) {
+                                        e.preventDefault();
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_height_unit: 'in'
+                                        })
+                                    } else if (key === 38) {
+                                        e.preventDefault();
+                                        if (showHeightDropdownItems) {
+                                            let selectedIndex = heightDropdownItems.findIndex(item => item.selected);
 
-                                               if (selectedIndex === -1) {
-                                                   await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
-                                                       item.selected = index === 0;
-                                                       return item;
-                                                   }))
-                                               } else {
-                                                   await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
-                                                       if (selectedIndex === 0) {
-                                                           item.selected = index === (heightDropdownItems.length - 1);
-                                                       } else {
-                                                           item.selected = index === (selectedIndex - 1)
-                                                       }
-                                                       return item;
-                                                   }))
-                                               }
-                                           } else {
-                                               await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
-                                                   item.selected = equipmentInformation.equipment_height_unit === item.value
-                                                   return item;
-                                               }))
+                                            if (selectedIndex === -1) {
+                                                await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
+                                                    item.selected = index === 0;
+                                                    return item;
+                                                }))
+                                            } else {
+                                                await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
+                                                    if (selectedIndex === 0) {
+                                                        item.selected = index === (heightDropdownItems.length - 1);
+                                                    } else {
+                                                        item.selected = index === (selectedIndex - 1)
+                                                    }
+                                                    return item;
+                                                }))
+                                            }
+                                        } else {
+                                            await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
+                                                item.selected = equipmentInformation.equipment_height_unit === item.value
+                                                return item;
+                                            }))
 
-                                               await setShowHeightDropdownItems(true);
-                                           }
+                                            await setShowHeightDropdownItems(true);
+                                        }
 
-                                           refHeightPopupItems.current.map((r, i) => {
-                                               if (r && r.classList.contains('selected')) {
-                                                   r.scrollIntoView({
-                                                       behavior: 'auto',
-                                                       block: 'center',
-                                                       inline: 'nearest'
-                                                   })
-                                               }
-                                               return true;
-                                           });
+                                        refHeightPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains('selected')) {
+                                                r.scrollIntoView({
+                                                    behavior: 'auto',
+                                                    block: 'center',
+                                                    inline: 'nearest'
+                                                })
+                                            }
+                                            return true;
+                                        });
 
-                                       } else if (key === 40) {
-                                           e.preventDefault();
-                                           if (showHeightDropdownItems) {
-                                               let selectedIndex = heightDropdownItems.findIndex(item => item.selected);
+                                    } else if (key === 40) {
+                                        e.preventDefault();
+                                        if (showHeightDropdownItems) {
+                                            let selectedIndex = heightDropdownItems.findIndex(item => item.selected);
 
-                                               if (selectedIndex === -1) {
-                                                   await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
-                                                       item.selected = index === 0;
-                                                       return item;
-                                                   }))
-                                               } else {
-                                                   await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
-                                                       if (selectedIndex === (heightDropdownItems.length - 1)) {
-                                                           item.selected = index === 0;
-                                                       } else {
-                                                           item.selected = index === (selectedIndex + 1)
-                                                       }
-                                                       return item;
-                                                   }))
-                                               }
-                                           } else {
-                                               await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
-                                                   item.selected = equipmentInformation.equipment_height_unit === item.value
-                                                   return item;
-                                               }))
+                                            if (selectedIndex === -1) {
+                                                await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
+                                                    item.selected = index === 0;
+                                                    return item;
+                                                }))
+                                            } else {
+                                                await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
+                                                    if (selectedIndex === (heightDropdownItems.length - 1)) {
+                                                        item.selected = index === 0;
+                                                    } else {
+                                                        item.selected = index === (selectedIndex + 1)
+                                                    }
+                                                    return item;
+                                                }))
+                                            }
+                                        } else {
+                                            await setHeightDropdownItems(heightDropdownItems.map((item, index) => {
+                                                item.selected = equipmentInformation.equipment_height_unit === item.value
+                                                return item;
+                                            }))
 
-                                               await setShowHeightDropdownItems(true);
-                                           }
+                                            await setShowHeightDropdownItems(true);
+                                        }
 
-                                           refHeightPopupItems.current.map((r, i) => {
-                                               if (r && r.classList.contains('selected')) {
-                                                   r.scrollIntoView({
-                                                       behavior: 'auto',
-                                                       block: 'center',
-                                                       inline: 'nearest'
-                                                   })
-                                               }
-                                               return true;
-                                           });
+                                        refHeightPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains('selected')) {
+                                                r.scrollIntoView({
+                                                    behavior: 'auto',
+                                                    block: 'center',
+                                                    inline: 'nearest'
+                                                })
+                                            }
+                                            return true;
+                                        });
 
-                                       } else if (key === 27) {
-                                           await setShowHeightDropdownItems(false);
-                                           setEquipmentInformation({
-                                               ...equipmentInformation,
-                                               equipment_height_unit: ''
-                                           })
-                                       } else if (key === 13) {
-                                           if (showHeightDropdownItems && heightDropdownItems.findIndex(item => item.selected) > -1) {
-                                               await setEquipmentInformation({
-                                                   ...equipmentInformation,
-                                                   equipment_height_unit: heightDropdownItems[heightDropdownItems.findIndex(item => item.selected)].value
-                                               });
-                                               await setShowHeightDropdownItems(false);
-                                               refHeight.current.focus();
-                                           }
-                                       } else if (key === 9) {
-                                           e.preventDefault();
+                                    } else if (key === 27) {
+                                        await setShowHeightDropdownItems(false);
+                                        setEquipmentInformation({
+                                            ...equipmentInformation,
+                                            equipment_height_unit: ''
+                                        })
+                                    } else if (key === 13) {
+                                        if (showHeightDropdownItems && heightDropdownItems.findIndex(item => item.selected) > -1) {
+                                            await setEquipmentInformation({
+                                                ...equipmentInformation,
+                                                equipment_height_unit: heightDropdownItems[heightDropdownItems.findIndex(item => item.selected)].value
+                                            });
+                                            await setShowHeightDropdownItems(false);
+                                            refHeight.current.focus();
+                                        }
+                                    } else if (key === 9) {
+                                        e.preventDefault();
 
-                                           if (showHeightDropdownItems) {
-                                               await setEquipmentInformation({
-                                                   ...equipmentInformation,
-                                                   equipment_height_unit: heightDropdownItems[heightDropdownItems.findIndex(item => item.selected)].value
-                                               });
-                                               await setShowHeightDropdownItems(false);
-                                               refHeight.current.focus();
-                                           }
+                                        if (showHeightDropdownItems) {
+                                            await setEquipmentInformation({
+                                                ...equipmentInformation,
+                                                equipment_height_unit: heightDropdownItems[heightDropdownItems.findIndex(item => item.selected)].value
+                                            });
+                                            await setShowHeightDropdownItems(false);
+                                            refHeight.current.focus();
+                                        }
 
-                                           validateEquipmentForSaving(e);
-                                       } else if ((key >= 48 && key <= 57) || (key >= 96 && key <= 105)) {
+                                        validateEquipmentForSaving(e);
+                                    } else if ((key >= 48 && key <= 57) || (key >= 96 && key <= 105)) {
 
-                                       } else if (key === 8 || key === 46) {
+                                    } else if (key === 8 || key === 46) {
 
-                                       } else {
-                                           e.preventDefault();
-                                       }
+                                    } else {
+                                        e.preventDefault();
+                                    }
 
-                                       switch (key) {
-                                           case 9: // tab
-                                               e.preventDefault();
-                                               if (showHeightDropdownItems) {
-                                                   await setEquipmentInformation({
-                                                       ...equipmentInformation,
-                                                       equipment_height_unit: heightDropdownItems[heightDropdownItems.findIndex(item => item.selected)].value
-                                                   });
-                                                   await setShowHeightDropdownItems(false);
-                                                   refHeight.current.focus();
-                                               }
+                                    switch (key) {
+                                        case 9: // tab
+                                            e.preventDefault();
+                                            if (showHeightDropdownItems) {
+                                                await setEquipmentInformation({
+                                                    ...equipmentInformation,
+                                                    equipment_height_unit: heightDropdownItems[heightDropdownItems.findIndex(item => item.selected)].value
+                                                });
+                                                await setShowHeightDropdownItems(false);
+                                                refHeight.current.focus();
+                                            }
 
-                                               validateEquipmentForSaving(e);
-                                               break;
+                                            validateEquipmentForSaving(e);
+                                            break;
 
-                                           default:
-                                               break;
-                                       }
-                                   }}
+                                        default:
+                                            break;
+                                    }
+                                }}
 
-                                   onInput={(e) => {
-                                       setEquipmentInformation({
-                                           ...equipmentInformation,
-                                           equipment_height: e.target.value
-                                       })
-                                   }}
-                                   onChange={(e) => {
-                                       setEquipmentInformation({
-                                           ...equipmentInformation,
-                                           equipment_height: e.target.value
-                                       })
-                                   }}
-                                   value={equipmentInformation.equipment_height || ''}
+                                onInput={(e) => {
+                                    setEquipmentInformation({
+                                        ...equipmentInformation,
+                                        equipment_height: e.target.value
+                                    })
+                                }}
+                                onChange={(e) => {
+                                    setEquipmentInformation({
+                                        ...equipmentInformation,
+                                        equipment_height: e.target.value
+                                    })
+                                }}
+                                value={equipmentInformation.equipment_height || ''}
                             />
                             {
                                 (equipmentInformation?.equipment_height || '').trim().length > 0 &&
@@ -1483,7 +1635,7 @@ const EquipmentInformation = (props) => {
                                     }
 
                                     refHeight.current.focus();
-                                }}/>
+                                }} />
                             }
                         </div>
                         {
@@ -1529,7 +1681,7 @@ const EquipmentInformation = (props) => {
                                                                 {
                                                                     item.selected &&
                                                                     <FontAwesomeIcon className="dropdown-selected"
-                                                                                     icon={faCaretRight}/>
+                                                                        icon={faCaretRight} />
                                                                 }
                                                             </div>
                                                         )
@@ -1545,7 +1697,7 @@ const EquipmentInformation = (props) => {
                 </div>
             </div>
 
-            <div className='form-bordered-box' style={{marginBottom: 10}}>
+            <div className='form-bordered-box' style={{ marginBottom: 10 }}>
                 <div className='form-header'>
                     <div className='top-border top-border-left'></div>
                     <div className='top-border top-border-middle'></div>
@@ -1602,36 +1754,36 @@ const EquipmentInformation = (props) => {
                                             {
                                                 ((props.user?.user_code?.is_admin || 0) === 1 ||
                                                     ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier equipment info')?.pivot?.delete || 0) === 1) &&
-                                                <FontAwesomeIcon icon={faTrashAlt} style={{marginRight: 10}}
-                                                                 onClick={(e) => {
-                                                                     e.stopPropagation();
-                                                                     if (window.confirm('Are you sure you want to proceed?')){
-                                                                         axios.post(props.serverUrl + '/deleteCarrierEquipment', {
-                                                                             id: eq.id,
-                                                                             carrier_id: equipmentInformation?.carrier?.id
-                                                                         }).then(res => {
-                                                                             if (res.data.result === 'OK'){
-                                                                                 setEquipmentInformation(equipmentInformation => {
-                                                                                     return {
-                                                                                         ...equipmentInformation,
-                                                                                         carrier: {
-                                                                                             ...(equipmentInformation?.carrier || {}),
-                                                                                             equipments_information: res.data.equipments_information
-                                                                                         }
-                                                                                     }
-                                                                                 })
-                                                                             }
-                                                                         }).catch(e => {
-                                                                             console.log(e);
-                                                                         })
-                                                                     }
-                                                                 }}
+                                                <FontAwesomeIcon icon={faTrashAlt} style={{ marginRight: 10 }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (window.confirm('Are you sure you want to proceed?')) {
+                                                            axios.post(props.serverUrl + '/deleteCarrierEquipment', {
+                                                                id: eq.id,
+                                                                carrier_id: equipmentInformation?.carrier?.id
+                                                            }).then(res => {
+                                                                if (res.data.result === 'OK') {
+                                                                    setEquipmentInformation(equipmentInformation => {
+                                                                        return {
+                                                                            ...equipmentInformation,
+                                                                            carrier: {
+                                                                                ...(equipmentInformation?.carrier || {}),
+                                                                                equipments_information: res.data.equipments_information
+                                                                            }
+                                                                        }
+                                                                    })
+                                                                }
+                                                            }).catch(e => {
+                                                                console.log(e);
+                                                            })
+                                                        }
+                                                    }}
                                                 />
                                             }
 
                                             {
                                                 (eq.id === equipmentInformation.id) &&
-                                                <FontAwesomeIcon icon={faPencilAlt}/>
+                                                <FontAwesomeIcon icon={faPencilAlt} />
                                             }
                                         </div>
                                     </div>
@@ -1650,27 +1802,45 @@ const mapStateToProps = (state) => {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
         user: state.systemReducers.user,
-        companyOpenedPanels: state.companyReducers.companyOpenedPanels,
-        adminOpenedPanels: state.adminReducers.adminOpenedPanels,
-        dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
-        customerOpenedPanels: state.customerReducers.customerOpenedPanels,
-        adminCustomerOpenedPanels: state.customerReducers.adminCustomerOpenedPanels,
-        adminCarrierOpenedPanels: state.carrierReducers.adminCarrierOpenedPanels,
-        loadBoardOpenedPanels: state.loadBoardReducers.loadBoardOpenedPanels,
-        invoiceOpenedPanels: state.invoiceReducers.invoiceOpenedPanels,
+
+        adminHomePanels: state.adminReducers.adminHomePanels,
+        companyHomePanels: state.companyReducers.companyHomePanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+        adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+        companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        adminReportPanels: state.reportReducers.adminReportPanels,
+        companyReportPanels: state.reportReducers.companyReportPanels,
+
         selectedCarrier: state.carrierReducers.selectedCarrier,
     }
 }
 
 export default connect(mapStateToProps, {
-    setCompanyOpenedPanels,
-    setAdminOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+
     setSelectedCarrier,
 })(EquipmentInformation)

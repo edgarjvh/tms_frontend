@@ -221,7 +221,10 @@ export const customerReducers = (state = {
     adminCustomerOpenedPanels: [],
 
 
-    panels: []
+    panels: [],
+
+    adminCustomerPanels: [],
+    companyCustomerPanels: []
 }, action) => {
     switch (action.type) {
         case customersConstants.SET_CUSTOMERS:
@@ -1452,13 +1455,13 @@ export const customerReducers = (state = {
                 selectedConsigneeCompanyDocumentNote: action.payload
             }
             break;
-        case customersConstants.SET_CUSTOMER_OPENED_PANELS:            
+        case customersConstants.SET_CUSTOMER_OPENED_PANELS:
             state = {
                 ...state,
                 customerOpenedPanels: action.payload
             }
             break;
-        case customersConstants.SET_ADMIN_CUSTOMER_OPENED_PANELS:            
+        case customersConstants.SET_ADMIN_CUSTOMER_OPENED_PANELS:
             state = {
                 ...state,
                 adminCustomerOpenedPanels: action.payload
@@ -1729,6 +1732,21 @@ export const customerReducers = (state = {
                 })
             }
             break;
+
+        case customersConstants.SET_ADMIN_CUSTOMER_PANELS:
+            state = {
+                ...state,
+                adminCustomerPanels: action.payload
+            }
+            break;
+
+        case customersConstants.SET_COMPANY_CUSTOMER_PANELS:
+            state = {
+                ...state,
+                companyCustomerPanels: action.payload
+            }
+            break;
+
         default:
             break;
     }

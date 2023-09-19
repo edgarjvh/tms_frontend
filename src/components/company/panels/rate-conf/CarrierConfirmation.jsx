@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import moment from "moment";
 import "./CarrierConfirmation.css";
 import NumberFormat from "react-number-format";
+import QRCode from 'react-qr-code';
 
 export default class CarrierConfirmation extends Component {
     constructor(props) {
@@ -59,7 +60,7 @@ export default class CarrierConfirmation extends Component {
                 }
 
                 {/* PAGE BLOCK */}
-                <div className="page-block" style={{ paddingTop: "2rem" }}>
+                <div className="page-block" style={{ paddingTop: "2rem", position: 'relative' }}>
                     <div
                         style={{
                             ...this.styleFlexRow,
@@ -106,6 +107,28 @@ export default class CarrierConfirmation extends Component {
                     >
                         LOAD CONFIRMATION AND RATE AGREEMENT
                     </div>
+
+                    {
+                        !this.props.isLoading &&
+                        <div style={{
+                            position: "absolute",
+                            right: 0,
+                            top: 50
+                        }}>
+                            <QRCode value={
+                                `Order Number: ${(this.props.selected_order?.order_number || '')}\nCarrier Assigned: ${(this.props.selectedCarrierInfo?.name || '')}\nPay Rate: ${new Intl.NumberFormat('en-US', {
+                                    style: 'currency',
+                                    currency: 'USD'
+                                }).format(Number(((this.props.selected_order?.order_carrier_ratings || []).reduce((a, b) => {
+                                    return {
+                                        total_charges: Number(a.total_charges) + Number(b.total_charges),
+                                    };
+                                }, { total_charges: "" })?.total_charges || "")
+                                    .toString()
+                                    .replace(",", "")))}`} size={100} />
+                        </div>
+                    }
+
                 </div>
 
                 {/* PAGE BLOCK */}
@@ -265,7 +288,7 @@ export default class CarrierConfirmation extends Component {
                                                                             : (pickup?.contact_primary_phone || 'work') === 'other'
                                                                                 ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                 : ''
-                                                            : (pickup?.contact_phone || '')
+                                                            : (customer?.contact_phone || '')
                                                     : (route?.type || '') === 'delivery'
                                                         ? (delivery?.contact_id || 0) > 0
                                                             ? (delivery?.contact_primary_phone || 'work') === 'work'
@@ -291,7 +314,7 @@ export default class CarrierConfirmation extends Component {
                                                                                 : (delivery?.contact_primary_phone || 'work') === 'other'
                                                                                     ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                     : ''
-                                                                : (delivery?.contact_phone || '')
+                                                                : (customer?.contact_phone || '')
                                                         : ''
 
                                             }
@@ -576,23 +599,45 @@ export default class CarrierConfirmation extends Component {
                         as certificate holder.
                     </div>
 
-                    <div style={{ ...this.styleFieldData, marginTop: "1.5rem" }}>
+                    <div style={{ ...this.styleFieldData, marginTop: "1.5rem", display: 'flex', flexDirection: "row", gap: 40 }}>
                         <div>
-                            <b>
-                                {(this.props.selectedCarrierInfo?.name || "").toUpperCase()}
-                            </b>
+                            <div>
+                                <b>
+                                    {(this.props.selectedCarrierInfo?.name || "").toUpperCase()}
+                                </b>
+                            </div>
+                            <div>
+                                {(this.props.selectedCarrierInfo?.address1 || "").toUpperCase()}{" "}
+                            </div>
+                            <div>
+                                {(this.props.selectedCarrierInfo?.address2 || "").toUpperCase()}
+                            </div>
+                            <div>
+                                {(this.props.selectedCarrierInfo?.city || "").toUpperCase()},{" "}
+                                {(this.props.selectedCarrierInfo?.state || "").toUpperCase()}{" "}
+                                {this.props.selectedCarrierInfo?.zip || ""}
+                            </div>
                         </div>
-                        <div>
-                            {(this.props.selectedCarrierInfo?.address1 || "").toUpperCase()}{" "}
+
+                        <div style={{ position: 'relative' }}>
+                            {
+                                !this.props.isLoading &&
+                                <div style={{ position: 'absolute', top: '50%', left: '0px', transform: 'translateY(-50%)' }}>
+                                    <QRCode value={
+                                        `Order Number: ${(this.props.selected_order?.order_number || '')}\nCarrier Assigned: ${(this.props.selectedCarrierInfo?.name || '')}\nPay Rate: ${new Intl.NumberFormat('en-US', {
+                                            style: 'currency',
+                                            currency: 'USD'
+                                        }).format(Number(((this.props.selected_order?.order_carrier_ratings || []).reduce((a, b) => {
+                                            return {
+                                                total_charges: Number(a.total_charges) + Number(b.total_charges),
+                                            };
+                                        }, { total_charges: "" })?.total_charges || "")
+                                            .toString()
+                                            .replace(",", "")))}`} size={100} />
+                                </div>
+                            }
                         </div>
-                        <div>
-                            {(this.props.selectedCarrierInfo?.address2 || "").toUpperCase()}
-                        </div>
-                        <div>
-                            {(this.props.selectedCarrierInfo?.city || "").toUpperCase()},{" "}
-                            {(this.props.selectedCarrierInfo?.state || "").toUpperCase()}{" "}
-                            {this.props.selectedCarrierInfo?.zip || ""}
-                        </div>
+
                     </div>
 
                     <div
@@ -642,7 +687,7 @@ export default class CarrierConfirmation extends Component {
 
             <div className="no-print" style={{ height: "2rem" }}></div>
 
-            <div className="container-sheet">
+            <div className="container-sheet" style={{ pageBreakBefore: 'always' }}>
                 {/* CANCELLED WATERMARK */}
                 {
                     (this.props.selected_order?.is_cancelled || 0) === 1 &&
@@ -753,7 +798,7 @@ export default class CarrierConfirmation extends Component {
                                                                             : (pickup?.contact_primary_phone || 'work') === 'other'
                                                                                 ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                 : ''
-                                                            : (pickup?.contact_phone || '')
+                                                            : (customer?.contact_phone || '')
                                                     : (route?.type || '') === 'delivery'
                                                         ? (delivery?.contact_id || 0) > 0
                                                             ? (delivery?.contact_primary_phone || 'work') === 'work'
@@ -779,7 +824,7 @@ export default class CarrierConfirmation extends Component {
                                                                                 : (delivery?.contact_primary_phone || 'work') === 'other'
                                                                                     ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                     : ''
-                                                                : (delivery?.contact_phone || '')
+                                                                : (customer?.contact_phone || '')
                                                         : ''
 
                                             }

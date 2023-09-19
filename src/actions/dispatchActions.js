@@ -662,3 +662,15 @@ export const setCustomerIsSavingOrder = bool => {
         payload: bool
     }
 }
+export const setAdminDispatchPanels = bool => {
+    return {
+        type: dispatchConstants.SET_ADMIN_DISPATCH_PANELS,
+        payload: bool
+    }
+}
+export const setCompanyDispatchPanels = bool => {
+    return {
+        type: dispatchConstants.SET_COMPANY_DISPATCH_PANELS,
+        payload: bool
+    }
+}

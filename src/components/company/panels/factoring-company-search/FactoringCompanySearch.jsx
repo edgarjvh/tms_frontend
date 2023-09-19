@@ -5,11 +5,23 @@ import $ from 'jquery';
 import Draggable from 'react-draggable';
 import './FactoringCompanySearch.css';
 import {
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+
 } from './../../../../actions';
 
 const FactoringCompanySearch = (props) => {
@@ -27,7 +39,7 @@ const FactoringCompanySearch = (props) => {
 
         window.setTimeout(() => {
             if (clickCount === 1) {
-                props.setSelectedFactoringCompany({...f});
+                props.setSelectedFactoringCompany({ ...f });
 
                 if (!props.openedPanels.includes(props.parentPanelName)) {
                     props.setOpenedPanels([...props.openedPanels, props.parentPanelName]);
@@ -77,16 +89,160 @@ const FactoringCompanySearch = (props) => {
 
                             await props.setFactoringCompanySearch([]);
                             closePanelBtnClick(null, props.panelName);
-                            
+
                         }
                     });
 
-                    
+
                 }
             }
 
             clickCount = 0;
         }, 300);
+    }
+
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+        }
     }
 
     return (
@@ -143,13 +299,27 @@ const FactoringCompanySearch = (props) => {
                                 ? props.factoringCompanies.map((f, i) => {
                                     return (
                                         <div className="trow" onClick={(e) => { rowClick(e, { ...f }) }} key={i}>
-                                            <div className="tcol code">{f.code + (f.code_number === 0 ? '' : f.code_number)}</div>
-                                            <div className="tcol name">{f.name}</div>
-                                            <div className="tcol address1">{f.address1}</div>
-                                            <div className="tcol address2">{f.address2}</div>
-                                            <div className="tcol city">{f.city}</div>
-                                            <div className="tcol state">{f.state}</div>
-                                            <div className="tcol zip">{f.zip}</div>
+                                            <div className="tcol code" style={{
+                                                textTransform: 'uppercase'
+                                            }}>{f.code + (f.code_number === 0 ? '' : f.code_number)}</div>
+                                            <div className="tcol name" style={{
+                                                textTransform: 'capitalize'
+                                            }}>{f.name}</div>
+                                            <div className="tcol address1" style={{
+                                                textTransform: 'capitalize'
+                                            }}>{f.address1}</div>
+                                            <div className="tcol address2" style={{
+                                                textTransform: 'capitalize'
+                                            }}>{f.address2}</div>
+                                            <div className="tcol city" style={{
+                                                textTransform: 'capitalize'
+                                            }}>{f.city}</div>
+                                            <div className="tcol state" style={{
+                                                textTransform: 'uppercase'
+                                            }}>{f.state}</div>
+                                            <div className="tcol zip" style={{
+                                                textTransform: 'uppercase'
+                                            }}>{f.zip}</div>
                                         </div>
                                     )
                                 })
@@ -165,18 +335,42 @@ const FactoringCompanySearch = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
-        customerOpenedPanels: state.customerReducers.customerOpenedPanels,
-        carrierOpenedPanels: state.carrierReducers.carrierOpenedPanels,
-        loadBoardOpenedPanels: state.loadBoardReducers.loadBoardOpenedPanels,
-        invoiceOpenedPanels: state.invoiceReducers.invoiceOpenedPanels,
+        adminHomePanels: state.adminReducers.adminHomePanels,
+        companyHomePanels: state.companyReducers.companyHomePanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+        adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+        companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        adminReportPanels: state.reportReducers.adminReportPanels,
+        companyReportPanels: state.reportReducers.companyReportPanels,
+
     }
 }
 
 export default connect(mapStateToProps, {
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+
 })(FactoringCompanySearch)

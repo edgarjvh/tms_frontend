@@ -16,14 +16,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import { useDetectClickOutside } from "react-detect-click-outside";
 import {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels
 } from './../../../actions';
 
 import {
@@ -665,6 +673,150 @@ const LoadBoard = (props) => {
         }
     }
 
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+    }
+
     return (
         <div className="load-board-main-container" style={{
             borderRadius: props.scale === 1 ? 0 : '20px',
@@ -755,15 +907,15 @@ const LoadBoard = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+                                                    
+                                                    
                                                     componentId={moment().format('x')}
 
                                                     order_id={item.id}
                                                 />
                                             }
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }}>
                                             <div className="order-number">{item.order_number}</div>
                                             <div className="starting-city-state">{
@@ -869,15 +1021,15 @@ const LoadBoard = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+                                                    
+                                                    
                                                     componentId={moment().format('x')}
 
                                                     order_id={item.id}
                                                 />
                                             }
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }}>
                                             <div className="order-number">{item.order_number}</div>
                                             <div className="carrier-code">{item.carrier?.code.toUpperCase() + (item.carrier?.code_number === 0 ? '' : item.carrier?.code_number)}</div>
@@ -984,15 +1136,15 @@ const LoadBoard = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+                                                    
+                                                    
                                                     componentId={moment().format('x')}
 
                                                     order_id={item.id}
                                                 />
                                             }
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }}>
                                             <div className="order-number">{item.order_number}</div>
                                             <div className="carrier-code">{item.carrier.code.toUpperCase() + (item.carrier.code_number === 0 ? '' : item.carrier.code_number)}</div>
@@ -1212,7 +1364,7 @@ const LoadBoard = (props) => {
                                     />
                                 }
 
-                                props.openPanel(panel, props.origin);
+                                openPanel(panel, props.origin);
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Print</div>
@@ -1251,14 +1403,14 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-                                                        openPanel={props.openPanel}
-                                                        closePanel={props.closePanel}
+                                                        
+                                                        
 
                                                         customer_id={selectedBillToCustomer.id}
                                                     />
                                                 }
 
-                                                props.openPanel(panel, props.origin);
+                                                openPanel(panel, props.origin);
                                             }}>
                                                 <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                                 <div className='mochi-button-base'>Company info</div>
@@ -1409,14 +1561,14 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-                                                        openPanel={props.openPanel}
-                                                        closePanel={props.closePanel}
+                                                        
+                                                        
 
                                                         carrier_id={selectedCarrier.id}
                                                     />
                                                 }
 
-                                                props.openPanel(panel, props.origin);
+                                                openPanel(panel, props.origin);
                                             }}>
                                                 <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                                 <div className='mochi-button-base'>Carrier info</div>
@@ -1685,15 +1837,15 @@ const LoadBoard = (props) => {
                                             title='Routing'
                                             tabTimes={39000 + props.tabTimes}
                                             origin={props.origin}
-                                            openPanel={props.openPanel}
-                                            closePanel={props.closePanel}
+                                            
+                                            
                                             componentId={moment().format('x')}
                                             isAdmin={props.isAdmin}
                                             selectedOrder={selectedOrder}
                                         />
                                     }
 
-                                    props.openPanel(panel, props.origin);
+                                    openPanel(panel, props.origin);
                                 }}>
                                     <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                     <div className='mochi-button-base'>Routing</div>
@@ -1818,14 +1970,14 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-                                                        openPanel={props.openPanel}
-                                                        closePanel={props.closePanel}
+                                                        
+                                                        
 
                                                         customer_id={selectedShipperCustomer.id}
                                                     />
                                                 }
 
-                                                props.openPanel(panel, props.origin);
+                                                openPanel(panel, props.origin);
                                             }}>
                                                 <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                                 <div className='mochi-button-base'>Company info</div>
@@ -2142,14 +2294,14 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-                                                        openPanel={props.openPanel}
-                                                        closePanel={props.closePanel}
+                                                        
+                                                        
 
                                                         customer_id={selectedConsigneeCustomer.id}
                                                     />
                                                 }
 
-                                                props.openPanel(panel, props.origin);
+                                                openPanel(panel, props.origin);
                                             }}>
                                                 <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
                                                 <div className='mochi-button-base'>Company info</div>
@@ -2440,13 +2592,13 @@ const LoadBoard = (props) => {
                                                     componentId={moment().format('x')}
                                                     isOnPanel={true}
                                                     origin={props.origin}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+                                                    
+                                                    
                                                     order_id={item.id}
                                                 />
                                             }
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }} >
                                             <div className="order-number">{item.order_number}</div>
                                             <div className="carrier-code">{item.carrier.code.toUpperCase() + (item.carrier.code_number === 0 ? '' : item.carrier.code_number)}</div>
@@ -2481,14 +2633,23 @@ const mapStateToProps = (state) => {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
         user: state.systemReducers.user,
-        companyOpenedPanels: state.companyReducers.companyOpenedPanels,
-        adminOpenedPanels: state.adminReducers.adminOpenedPanels,
-        dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
-        customerOpenedPanels: state.customerReducers.customerOpenedPanels,
-        adminCustomerOpenedPanels: state.customerReducers.adminCustomerOpenedPanels,
-        adminCarrierOpenedPanels: state.carrierReducers.adminCarrierOpenedPanels,
-        loadBoardOpenedPanels: state.loadBoardReducers.loadBoardOpenedPanels,
-        invoiceOpenedPanels: state.invoiceReducers.invoiceOpenedPanels,
+        
+        adminHomePanels: state.adminReducers.adminHomePanels,
+        companyHomePanels: state.companyReducers.companyHomePanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+        adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+        companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        adminReportPanels: state.reportReducers.adminReportPanels,
+        companyReportPanels: state.reportReducers.companyReportPanels,
 
         selectedOrder: state.dispatchReducers.selected_order,
         selectedCustomer: state.customerReducers.selectedCustomer,
@@ -2500,12 +2661,20 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps, {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels
 })(LoadBoard)

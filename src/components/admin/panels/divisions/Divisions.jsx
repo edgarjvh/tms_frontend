@@ -1,13 +1,13 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {connect} from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
 import axios from 'axios';
 import Draggable from 'react-draggable';
-import {useTransition, animated} from 'react-spring';
+import { useTransition, animated } from 'react-spring';
 import './Divisions.css';
 import MaskedInput from 'react-text-mask';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faCaretDown,
     faCaretRight,
@@ -17,7 +17,7 @@ import {
     faTrashAlt,
     faCopy
 } from '@fortawesome/free-solid-svg-icons';
-import {useDetectClickOutside} from "react-detect-click-outside";
+import { useDetectClickOutside } from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
 import "react-datepicker/dist/react-datepicker.css";
 import Loader from 'react-loader-spinner';
@@ -26,15 +26,25 @@ import moment from 'moment';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import ToPrint from './ToPrint.jsx';
 import {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCarrierOpenedPanels,
-    setCompanySetupOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+
     setSelectedCompany,
-    setSelectedCompanyDriver as setSelectedDriver
+    setSelectedCompanyDriver as setSelectedDriver,
 } from './../../../../actions';
 
 import {
@@ -44,8 +54,8 @@ import {
     Modal as DivisionModal,
     CustomerSearch, ContactSearch, RevenueInformation, OrderHistory
 } from './../../../company/panels';
-import {Dispatch} from "../../../company";
-import {useReactToPrint} from "react-to-print";
+import { Dispatch } from "../../../company";
+import { useReactToPrint } from "react-to-print";
 
 const Divisions = (props) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -127,64 +137,64 @@ const Divisions = (props) => {
     const [showMailingContactEmailCopyBtn, setShowMailingContactEmailCopyBtn] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: isLoading,
     });
 
     const divisionContactPhonesTransition = useTransition(showDivisionContactPhones, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showDivisionContactPhones
     });
 
     const divisionContactEmailsTransition = useTransition(showDivisionContactEmails, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showDivisionContactEmails
     });
 
     const noteTransition = useTransition(selectedNote?.id !== undefined, {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: selectedNote?.id !== undefined,
-        config: {duration: 100}
+        config: { duration: 100 }
     });
 
     const mailingContactNamesTransition = useTransition(showMailingContactNames, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showMailingContactNames
     });
 
     const mailingContactPhonesTransition = useTransition(showMailingContactPhones, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showMailingContactPhones
     });
 
     const mailingContactEmailsTransition = useTransition(showMailingContactEmails, {
-        from: {opacity: 0, top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, top: 'calc(100% + 7px)'},
-        config: {duration: 100},
+        from: { opacity: 0, top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, top: 'calc(100% + 7px)' },
+        config: { duration: 100 },
         reverse: showMailingContactEmails
     });
 
     const loadingDivisionOrdersTransition = useTransition(isLoadingDivisionOrders, {
-        from: {opacity: 0, display: 'block'},
-        enter: {opacity: 1, display: 'block'},
-        leave: {opacity: 0, display: 'none'},
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
         reverse: isLoadingDivisionOrders,
     });
 
@@ -343,7 +353,7 @@ const Divisions = (props) => {
             if (selectedDivision.id === undefined || selectedDivision.id === -1) {
                 selectedDivision.id = 0;
                 setSelectedDivision(selectedDivision => {
-                    return {...selectedDivision, id: 0}
+                    return { ...selectedDivision, id: 0 }
                 });
             }
 
@@ -514,7 +524,7 @@ const Divisions = (props) => {
 
                 axios.post(props.serverUrl + '/saveDivisionMailingAddress', mailing_address).then(res => {
                     if (res.data.result === 'OK') {
-                        setSelectedDivision({...selectedDivision, mailing_address: res.data.mailing_address});
+                        setSelectedDivision({ ...selectedDivision, mailing_address: res.data.mailing_address });
 
                         props.setSelectedDivision({
                             ...selectedDivision,
@@ -561,7 +571,7 @@ const Divisions = (props) => {
 
         refDivisionCode.current.focus();
 
-        setSelectedDivision({id: 0, code: clearCode ? '' : selectedDivision?.code});
+        setSelectedDivision({ id: 0, code: clearCode ? '' : selectedDivision?.code });
     }
 
     const searchDivisionByCode = (e) => {
@@ -669,15 +679,15 @@ const Divisions = (props) => {
                 panelName={`${props.panelName}-division-search`}
                 origin={props.origin}
                 suborigin='division'
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
                 customerSearch={divisionSearch}
 
                 callback={(id) => {
                     new Promise((resolve, reject) => {
                         if ((id || 0) > 0) {
-                            axios.post(props.serverUrl + '/getDivisionById', {id: id}).then(res => {
+                            axios.post(props.serverUrl + '/getDivisionById', { id: id }).then(res => {
                                 if (res.data.result === 'OK') {
                                     setSelectedDivision(res.data.division);
                                     setSelectedContact((res.data.division.contacts || []).find(c => c.is_primary === 1) || {});
@@ -691,10 +701,10 @@ const Divisions = (props) => {
                             });
                         }
                     }).then(response => {
-                        props.closePanel(`${props.panelName}-division-search`, props.origin);                        
+                        closePanel(`${props.panelName}-division-search`, props.origin);
                         refDivisionName.current.focus();
                     }).catch(e => {
-                        // props.closePanel(`${props.panelName}-division-search`, props.origin);
+                        // closePanel(`${props.panelName}-division-search`, props.origin);
                         refDivisionCode.current.focus();
                     })
 
@@ -702,7 +712,8 @@ const Divisions = (props) => {
             />
         }
 
-        props.openPanel(panel, props.origin);
+        // openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const handleContactSearch = () => {
@@ -754,10 +765,10 @@ const Divisions = (props) => {
                 owner='division'
                 origin={props.origin}
                 suborigin='division'
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
-                contactSearch={{search: filters}}
+                contactSearch={{ search: filters }}
 
                 callback={(contact) => {
                     new Promise((resolve, reject) => {
@@ -771,17 +782,17 @@ const Divisions = (props) => {
                             reject('no contact');
                         }
                     }).then(response => {
-                        props.closePanel(`${props.panelName}-contact-search`, props.origin);
+                        closePanel(`${props.panelName}-contact-search`, props.origin);
                         refDivisionName.current.focus();
                     }).catch(e => {
-                        props.closePanel(`${props.panelName}-contact-search`, props.origin);
+                        closePanel(`${props.panelName}-contact-search`, props.origin);
                         refDivisionCode.current.focus();
                     })
                 }}
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const remitToAddressBtn = () => {
@@ -881,9 +892,9 @@ const Divisions = (props) => {
             mailing_address.mailing_contact_primary_email = 'work';
         }
 
-        setSelectedDivision({...selectedDivision, mailing_address: mailing_address});
+        setSelectedDivision({ ...selectedDivision, mailing_address: mailing_address });
 
-        saveMailingAddress({keyCode: 9});
+        saveMailingAddress({ keyCode: 9 });
     }
 
     const mailingAddressClearBtn = () => {
@@ -916,7 +927,7 @@ const Divisions = (props) => {
 
     const saveHours = (e, name) => {
         let formatted = getFormattedHours(e.target.value);
-        let hours = {...selectedDivision?.hours || {}, division_id: selectedDivision?.id};
+        let hours = { ...selectedDivision?.hours || {}, division_id: selectedDivision?.id };
 
         if (name === 'hours open') {
             hours.hours_open = formatted;
@@ -946,7 +957,7 @@ const Divisions = (props) => {
 
         axios.post(props.serverUrl + '/saveDivisionHours', hours).then(async res => {
             if (res.data.result === 'OK') {
-                await setSelectedDivision({...selectedDivision, hours: res.data.hours});
+                await setSelectedDivision({ ...selectedDivision, hours: res.data.hours });
             }
         }).catch(e => {
             console.log('error saving division hours', e);
@@ -1049,15 +1060,15 @@ const Divisions = (props) => {
                 panelName={`${props.panelName}-revenue-information`}
                 origin={props.origin}
                 suborigin={'division'}
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedCustomer={selectedDivision}
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const orderHistoryBtnClick = () => {
@@ -1069,15 +1080,15 @@ const Divisions = (props) => {
                 panelName={`${props.panelName}-order-history`}
                 origin={props.origin}
                 suborigin={'division'}
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedCustomer={selectedDivision}
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const documentsBtnClick = () => {
@@ -1090,8 +1101,8 @@ const Divisions = (props) => {
                     panelName={`${props.panelName}-documents`}
                     origin={props.origin}
                     suborigin={'division'}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+                    
+                    
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedDivision }}
                     isAdmin={props.isAdmin}
@@ -1109,9 +1120,153 @@ const Divisions = (props) => {
                 />
             }
 
-            props.openPanel(panel, props.origin);
+            openPanel(panel, props.origin);
         } else {
             window.alert('You must select a division first!');
+        }
+    }
+
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
         }
     }
 
@@ -1130,7 +1285,7 @@ const Divisions = (props) => {
                             position: 'absolute',
                             flexDirection: 'column'
                         }}>
-                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                         </div>
                     </animated.div>
                 )
@@ -1160,7 +1315,7 @@ const Divisions = (props) => {
                                     {
                                         (isAddingDivision || isEditingDivision) &&
                                         <div className="mochi-button" onClick={() => {
-                                            saveDivision({keyCode: 9});
+                                            saveDivision({ keyCode: 9 });
                                         }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Save</div>
@@ -1215,138 +1370,138 @@ const Divisions = (props) => {
                             <div className="form-row">
                                 <div className={disabledDivisionCodeField}>
                                     <input tabIndex={1 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                           id="txt-division-code"
-                                           ref={refDivisionCode}
-                                           readOnly={isAddingDivision || isEditingDivision}
-                                           onKeyDown={(e) => {
-                                               searchDivisionByCode(e)
-                                           }}
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   code: e.target.value,
-                                                   code_number: 0
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   code: e.target.value,
-                                                   code_number: 0
-                                               })
-                                           }}
-                                           value={(selectedDivision.code_number || 0) === 0 ? (selectedDivision.code || '') : selectedDivision.code + selectedDivision.code_number}/>
+                                        id="txt-division-code"
+                                        ref={refDivisionCode}
+                                        readOnly={isAddingDivision || isEditingDivision}
+                                        onKeyDown={(e) => {
+                                            searchDivisionByCode(e)
+                                        }}
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                code: e.target.value,
+                                                code_number: 0
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                code: e.target.value,
+                                                code_number: 0
+                                            })
+                                        }}
+                                        value={(selectedDivision.code_number || 0) === 0 ? (selectedDivision.code || '') : selectedDivision.code + selectedDivision.code_number} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing + ' grow'}>
                                     <input tabIndex={2 + props.tabTimes} type="text" placeholder="Name"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           ref={refDivisionName}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   name: e.target.value
-                                               })
-                                           }}
-                                           value={selectedDivision?.name || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        ref={refDivisionName}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                name: e.target.value
+                                            })
+                                        }}
+                                        value={selectedDivision?.name || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
                                     <input tabIndex={3 + props.tabTimes} type="text" placeholder="Address 1"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   address1: e.target.value
-                                               })
-                                           }}
-                                           value={selectedDivision?.address1 || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                address1: e.target.value
+                                            })
+                                        }}
+                                        value={selectedDivision?.address1 || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
                                     <input tabIndex={4 + props.tabTimes} type="text" placeholder="Address 2"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   address2: e.target.value
-                                               })
-                                           }}
-                                           value={selectedDivision?.address2 || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                address2: e.target.value
+                                            })
+                                        }}
+                                        value={selectedDivision?.address2 || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
                                     <input tabIndex={5 + props.tabTimes} type="text" placeholder="City"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   city: e.target.value
-                                               })
-                                           }}
-                                           value={selectedDivision?.city || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                city: e.target.value
+                                            })
+                                        }}
+                                        value={selectedDivision?.city || ''} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing + ' input-state'}>
                                     <input tabIndex={6 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   state: e.target.value
-                                               })
-                                           }}
-                                           value={selectedDivision?.state || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                state: e.target.value
+                                            })
+                                        }}
+                                        value={selectedDivision?.state || ''} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing + ' input-zip-code'}>
                                     <input tabIndex={7 + props.tabTimes} type="text" placeholder="Postal Code"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   zip: e.target.value
-                                               })
-                                           }}
-                                           value={selectedDivision?.zip || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                zip: e.target.value
+                                            })
+                                        }}
+                                        value={selectedDivision?.zip || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' grow'}>
                                     <input tabIndex={8 + props.tabTimes} type="text" placeholder="Contact First Name"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact({
-                                                   ...selectedPrimaryContact,
-                                                   first_name: e.target.value
-                                               })
-                                           }}
-                                           value={selectedPrimaryContact.first_name || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onChange={e => {
+                                            setSelectedPrimaryContact({
+                                                ...selectedPrimaryContact,
+                                                first_name: e.target.value
+                                            })
+                                        }}
+                                        value={selectedPrimaryContact.first_name || ''} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing + ' grow'}>
                                     <input tabIndex={9 + props.tabTimes} type="text" placeholder="Contact Last Name"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact({
-                                                   ...selectedPrimaryContact,
-                                                   last_name: e.target.value
-                                               })
-                                           }}
-                                           value={selectedPrimaryContact.last_name || ''}/>
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onChange={e => {
+                                            setSelectedPrimaryContact({
+                                                ...selectedPrimaryContact,
+                                                last_name: e.target.value
+                                            })
+                                        }}
+                                        value={selectedPrimaryContact.last_name || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledOnAddingEditing + ' input-phone'}
-                                     style={{position: 'relative'}}>
+                                    style={{ position: 'relative' }}>
                                     <MaskedInput
                                         readOnly={!isAddingDivision && !isEditingDivision}
                                         tabIndex={10 + props.tabTimes}
@@ -1430,103 +1585,103 @@ const Divisions = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing + ' input-phone-ext'}>
                                     <input tabIndex={11 + props.tabTimes} type="text" placeholder="Ext"
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           onInput={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       phone_ext: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       phone_ext: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedPrimaryContact?.phone_ext || ''}
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        onInput={e => {
+                                            setSelectedPrimaryContact(selectedPrimaryContact => {
+                                                return {
+                                                    ...selectedPrimaryContact,
+                                                    phone_ext: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedPrimaryContact(selectedPrimaryContact => {
+                                                return {
+                                                    ...selectedPrimaryContact,
+                                                    phone_ext: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedPrimaryContact?.phone_ext || ''}
                                     />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledOnAddingEditing}
-                                     style={{position: 'relative', flexGrow: 1, minWidth: '50%'}}
-                                     onMouseEnter={() => {
-                                         if ((selectedPrimaryContact?.email_work || '') !== '' ||
-                                             (selectedPrimaryContact?.email_personal || '') !== '' ||
-                                             (selectedPrimaryContact?.email_other || '') !== '') {
-                                             setShowDivisionEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onFocus={() => {
-                                         if ((selectedPrimaryContact?.email_work || '') !== '' ||
-                                             (selectedPrimaryContact?.email_personal || '') !== '' ||
-                                             (selectedPrimaryContact?.email_other || '') !== '') {
-                                             setShowDivisionEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onBlur={() => {
-                                         window.setTimeout(() => {
-                                             setShowDivisionEmailCopyBtn(false);
-                                         }, 1000);
-                                     }}
-                                     onMouseLeave={() => {
-                                         setShowDivisionEmailCopyBtn(false);
-                                     }}
+                                    style={{ position: 'relative', flexGrow: 1, minWidth: '50%' }}
+                                    onMouseEnter={() => {
+                                        if ((selectedPrimaryContact?.email_work || '') !== '' ||
+                                            (selectedPrimaryContact?.email_personal || '') !== '' ||
+                                            (selectedPrimaryContact?.email_other || '') !== '') {
+                                            setShowDivisionEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if ((selectedPrimaryContact?.email_work || '') !== '' ||
+                                            (selectedPrimaryContact?.email_personal || '') !== '' ||
+                                            (selectedPrimaryContact?.email_other || '') !== '') {
+                                            setShowDivisionEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        window.setTimeout(() => {
+                                            setShowDivisionEmailCopyBtn(false);
+                                        }, 1000);
+                                    }}
+                                    onMouseLeave={() => {
+                                        setShowDivisionEmailCopyBtn(false);
+                                    }}
                                 >
                                     <input tabIndex={12 + props.tabTimes}
-                                           readOnly={!isAddingDivision && !isEditingDivision}
-                                           ref={refDivisionEmail}
-                                           type="text"
-                                           placeholder="E-Mail"
-                                           style={{textTransform: 'lowercase'}}
-                                           onInput={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
-                                                       email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
-                                                           (selectedPrimaryContact?.primary_email || '') === '')
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_work || ''),
-                                                       email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_personal || ''),
-                                                       email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_other || '')
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedPrimaryContact(selectedPrimaryContact => {
-                                                   return {
-                                                       ...selectedPrimaryContact,
-                                                       primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
-                                                       email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
-                                                           (selectedPrimaryContact?.primary_email || '') === '')
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_work || ''),
-                                                       email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_personal || ''),
-                                                       email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
-                                                           ? e.target.value
-                                                           : (selectedPrimaryContact?.email_other || '')
-                                                   }
-                                               })
-                                           }}
-                                           value={
-                                               selectedPrimaryContact?.primary_email === 'work'
-                                                   ? (selectedPrimaryContact?.email_work || '')
-                                                   : selectedPrimaryContact?.primary_email === 'personal'
-                                                       ? (selectedPrimaryContact?.email_personal || '')
-                                                       : selectedPrimaryContact?.primary_email === 'other'
-                                                           ? (selectedPrimaryContact?.email_other || '')
-                                                           : ''
-                                           }
+                                        readOnly={!isAddingDivision && !isEditingDivision}
+                                        ref={refDivisionEmail}
+                                        type="text"
+                                        placeholder="E-Mail"
+                                        style={{ textTransform: 'lowercase' }}
+                                        onInput={e => {
+                                            setSelectedPrimaryContact(selectedPrimaryContact => {
+                                                return {
+                                                    ...selectedPrimaryContact,
+                                                    primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
+                                                    email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
+                                                        (selectedPrimaryContact?.primary_email || '') === '')
+                                                        ? e.target.value
+                                                        : (selectedPrimaryContact?.email_work || ''),
+                                                    email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
+                                                        ? e.target.value
+                                                        : (selectedPrimaryContact?.email_personal || ''),
+                                                    email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
+                                                        ? e.target.value
+                                                        : (selectedPrimaryContact?.email_other || '')
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedPrimaryContact(selectedPrimaryContact => {
+                                                return {
+                                                    ...selectedPrimaryContact,
+                                                    primary_email: (selectedPrimaryContact?.primary_email || '') === '' ? 'work' : selectedPrimaryContact.primary_email,
+                                                    email_work: ((selectedPrimaryContact?.primary_email || '') === 'work' ||
+                                                        (selectedPrimaryContact?.primary_email || '') === '')
+                                                        ? e.target.value
+                                                        : (selectedPrimaryContact?.email_work || ''),
+                                                    email_personal: (selectedPrimaryContact?.primary_email || '') === 'personal'
+                                                        ? e.target.value
+                                                        : (selectedPrimaryContact?.email_personal || ''),
+                                                    email_other: (selectedPrimaryContact?.primary_email || '') === 'other'
+                                                        ? e.target.value
+                                                        : (selectedPrimaryContact?.email_other || '')
+                                                }
+                                            })
+                                        }}
+                                        value={
+                                            selectedPrimaryContact?.primary_email === 'work'
+                                                ? (selectedPrimaryContact?.email_work || '')
+                                                : selectedPrimaryContact?.primary_email === 'personal'
+                                                    ? (selectedPrimaryContact?.email_personal || '')
+                                                    : selectedPrimaryContact?.primary_email === 'other'
+                                                        ? (selectedPrimaryContact?.email_other || '')
+                                                        : ''
+                                        }
                                     />
                                     {
                                         (selectedPrimaryContact?.id || 0 > 0) &&
@@ -1555,7 +1710,7 @@ const Divisions = (props) => {
                                         }} icon={faCopy} onClick={(e) => {
                                             e.stopPropagation();
                                             navigator.clipboard.writeText(refDivisionEmail.current.value);
-                                        }}/>
+                                        }} />
                                     }
                                 </div>
                             </div>
@@ -1592,8 +1747,8 @@ const Divisions = (props) => {
                                                 removeAvatarUrl='/removeDivisioContactAvatar'
                                                 origin={props.origin}
                                                 owner='division'
-                                                openPanel={props.openPanel}
-                                                closePanel={props.closePanel}
+                                                
+                                                
                                                 componentId={moment().format('x')}
 
                                                 contactSearchCustomer={{
@@ -1613,7 +1768,7 @@ const Divisions = (props) => {
                                             />
                                         }
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">More</div>
@@ -1637,14 +1792,14 @@ const Divisions = (props) => {
                                                 removeAvatarUrl='/removeDivisioContactAvatar'
                                                 origin={props.origin}
                                                 owner='division'
-                                                openPanel={props.openPanel}
-                                                closePanel={props.closePanel}
+                                                
+                                                
                                                 componentId={moment().format('x')}
                                                 isEditingContact={true}
 
                                                 contactSearchCustomer={{
                                                     ...selectedDivision,
-                                                    selectedContact: {id: 0, division_id: selectedDivision?.id}
+                                                    selectedContact: { id: 0, division_id: selectedDivision?.id }
                                                 }}
 
                                                 selectedDivision={selectedDivision}
@@ -1653,7 +1808,7 @@ const Divisions = (props) => {
                                             />
                                         }
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Add Contact</div>
@@ -1674,297 +1829,297 @@ const Divisions = (props) => {
                             <div className="form-row">
                                 <div className={disabledDivisionContactFields + ' input-box-container grow'}>
                                     <input tabIndex={13 + props.tabTimes} type="text" placeholder="First Name"
-                                           ref={refDivisionContactFirstName}
-                                           onChange={e => {
-                                               setSelectedContact({...selectedContact, first_name: e.target.value})
-                                           }}
-                                           value={selectedContact?.first_name || ''}/>
+                                        ref={refDivisionContactFirstName}
+                                        onChange={e => {
+                                            setSelectedContact({ ...selectedContact, first_name: e.target.value })
+                                        }}
+                                        value={selectedContact?.first_name || ''} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledDivisionContactFields + ' input-box-container grow'}>
                                     <input tabIndex={14 + props.tabTimes} type="text" placeholder="Last Name"
-                                           onChange={e => setSelectedContact({
-                                               ...selectedContact,
-                                               last_name: e.target.value
-                                           })}
-                                           value={selectedContact?.last_name || ''}/>
+                                        onChange={e => setSelectedContact({
+                                            ...selectedContact,
+                                            last_name: e.target.value
+                                        })}
+                                        value={selectedContact?.last_name || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledDivisionContactFields + ' select-box-container'}
-                                     style={{width: '50%'}}>
+                                    style={{ width: '50%' }}>
                                     <div className="select-box-wrapper">
                                         <MaskedInput tabIndex={15 + props.tabTimes}
-                                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                                     guide={true}
-                                                     type="text"
-                                                     placeholder="Phone"
-                                                     ref={refDivisionContactPhone}
-                                                     onKeyDown={async (e) => {
-                                                         let key = e.keyCode || e.which;
+                                            mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                            guide={true}
+                                            type="text"
+                                            placeholder="Phone"
+                                            ref={refDivisionContactPhone}
+                                            onKeyDown={async (e) => {
+                                                let key = e.keyCode || e.which;
 
-                                                         switch (key) {
-                                                             case 37:
-                                                             case 38: // arrow left | arrow up
-                                                                 e.preventDefault();
-                                                                 if (showDivisionContactPhones) {
-                                                                     let selectedIndex = divisionContactPhoneItems.findIndex(item => item.selected);
+                                                switch (key) {
+                                                    case 37:
+                                                    case 38: // arrow left | arrow up
+                                                        e.preventDefault();
+                                                        if (showDivisionContactPhones) {
+                                                            let selectedIndex = divisionContactPhoneItems.findIndex(item => item.selected);
 
-                                                                     if (selectedIndex === -1) {
-                                                                         await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === 0) {
-                                                                                 item.selected = index === (divisionContactPhoneItems.length - 1);
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex - 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
+                                                            if (selectedIndex === -1) {
+                                                                await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (divisionContactPhoneItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                                     refDivisionContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (divisionContactPhoneItems.length > 1) {
-                                                                         await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                             return item;
-                                                                         }))
+                                                            refDivisionContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            if (divisionContactPhoneItems.length > 1) {
+                                                                await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
+                                                                    item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                    return item;
+                                                                }))
 
-                                                                         setShowDivisionContactPhones(true);
+                                                                setShowDivisionContactPhones(true);
 
-                                                                         refDivisionContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
+                                                                refDivisionContactPhonePopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+                                                        break;
 
-                                                             case 39:
-                                                             case 40: // arrow right | arrow down
-                                                                 e.preventDefault();
-                                                                 if (showDivisionContactPhones) {
-                                                                     let selectedIndex = divisionContactPhoneItems.findIndex(item => item.selected);
+                                                    case 39:
+                                                    case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (showDivisionContactPhones) {
+                                                            let selectedIndex = divisionContactPhoneItems.findIndex(item => item.selected);
 
-                                                                     if (selectedIndex === -1) {
-                                                                         await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === (divisionContactPhoneItems.length - 1)) {
-                                                                                 item.selected = index === 0;
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex + 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
+                                                            if (selectedIndex === -1) {
+                                                                await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
+                                                                    if (selectedIndex === (divisionContactPhoneItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                                     refDivisionContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (divisionContactPhoneItems.length > 1) {
-                                                                         await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                             return item;
-                                                                         }))
+                                                            refDivisionContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            if (divisionContactPhoneItems.length > 1) {
+                                                                await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
+                                                                    item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                    return item;
+                                                                }))
 
-                                                                         setShowDivisionContactPhones(true);
+                                                                setShowDivisionContactPhones(true);
 
-                                                                         refDivisionContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
+                                                                refDivisionContactPhonePopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+                                                        break;
 
-                                                             case 27: // escape
-                                                                 setShowDivisionContactPhones(false);
-                                                                 break;
+                                                    case 27: // escape
+                                                        setShowDivisionContactPhones(false);
+                                                        break;
 
-                                                             case 13: // enter
-                                                                 if (showDivisionContactPhones && divisionContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                                     await setSelectedContact({
-                                                                         ...selectedContact,
-                                                                         primary_phone: divisionContactPhoneItems[divisionContactPhoneItems.findIndex(item => item.selected)].type
-                                                                     });
+                                                    case 13: // enter
+                                                        if (showDivisionContactPhones && divisionContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                            await setSelectedContact({
+                                                                ...selectedContact,
+                                                                primary_phone: divisionContactPhoneItems[divisionContactPhoneItems.findIndex(item => item.selected)].type
+                                                            });
 
-                                                                     // validateContactForSaving({ keyCode: 9 });
-                                                                     setShowDivisionContactPhones(false);
-                                                                     refDivisionContactPhone.current.inputElement.focus();
-                                                                 }
-                                                                 break;
+                                                            // validateContactForSaving({ keyCode: 9 });
+                                                            setShowDivisionContactPhones(false);
+                                                            refDivisionContactPhone.current.inputElement.focus();
+                                                        }
+                                                        break;
 
-                                                             case 9: // tab
-                                                                 if (showDivisionContactPhones) {
-                                                                     e.preventDefault();
-                                                                     await setSelectedContact({
-                                                                         ...selectedContact,
-                                                                         primary_phone: divisionContactPhoneItems[divisionContactPhoneItems.findIndex(item => item.selected)].type
-                                                                     });
+                                                    case 9: // tab
+                                                        if (showDivisionContactPhones) {
+                                                            e.preventDefault();
+                                                            await setSelectedContact({
+                                                                ...selectedContact,
+                                                                primary_phone: divisionContactPhoneItems[divisionContactPhoneItems.findIndex(item => item.selected)].type
+                                                            });
 
-                                                                     // validateContactForSaving({ keyCode: 9 });
-                                                                     setShowDivisionContactPhones(false);
-                                                                     refDivisionContactPhone.current.inputElement.focus();
-                                                                 } else {
-                                                                     // validateContactForSaving({ keyCode: 9 });
-                                                                 }
-                                                                 break;
+                                                            // validateContactForSaving({ keyCode: 9 });
+                                                            setShowDivisionContactPhones(false);
+                                                            refDivisionContactPhone.current.inputElement.focus();
+                                                        } else {
+                                                            // validateContactForSaving({ keyCode: 9 });
+                                                        }
+                                                        break;
 
-                                                             default:
-                                                                 break;
-                                                         }
-                                                     }}
-                                                     onInput={(e) => {
-                                                         if ((selectedContact?.id || 0) === 0) {
-                                                             setSelectedContact({
-                                                                 ...selectedContact,
-                                                                 phone_work: e.target.value,
-                                                                 primary_phone: 'work'
-                                                             });
-                                                         } else {
-                                                             if ((selectedContact?.primary_phone || '') === '') {
-                                                                 setSelectedContact({
-                                                                     ...selectedContact,
-                                                                     phone_work: e.target.value,
-                                                                     primary_phone: 'work'
-                                                                 });
-                                                             } else {
-                                                                 switch (selectedContact?.primary_phone) {
-                                                                     case 'work':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'fax':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work_fax: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'mobile':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_mobile: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'direct':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_direct: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'other':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_other: e.target.value
-                                                                         });
-                                                                         break;
-                                                                 }
-                                                             }
-                                                         }
-                                                     }}
-                                                     onChange={(e) => {
-                                                         if ((selectedContact?.id || 0) === 0) {
-                                                             setSelectedContact({
-                                                                 ...selectedContact,
-                                                                 phone_work: e.target.value,
-                                                                 primary_phone: 'work'
-                                                             });
-                                                         } else {
-                                                             if ((selectedContact?.primary_phone || '') === '') {
-                                                                 setSelectedContact({
-                                                                     ...selectedContact,
-                                                                     phone_work: e.target.value,
-                                                                     primary_phone: 'work'
-                                                                 });
-                                                             } else {
-                                                                 switch (selectedContact?.primary_phone) {
-                                                                     case 'work':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'fax':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_work_fax: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'mobile':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_mobile: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'direct':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_direct: e.target.value
-                                                                         });
-                                                                         break;
-                                                                     case 'other':
-                                                                         setSelectedContact({
-                                                                             ...selectedContact,
-                                                                             phone_other: e.target.value
-                                                                         });
-                                                                         break;
-                                                                 }
-                                                             }
-                                                         }
-                                                     }}
-                                                     value={
-                                                         (selectedContact?.primary_phone || '') === 'work'
-                                                             ? (selectedContact?.phone_work || '')
-                                                             : (selectedContact?.primary_phone || '') === 'fax'
-                                                                 ? (selectedContact?.phone_work_fax || '')
-                                                                 : (selectedContact?.primary_phone || '') === 'mobile'
-                                                                     ? (selectedContact?.phone_mobile || '')
-                                                                     : (selectedContact?.primary_phone || '') === 'direct'
-                                                                         ? (selectedContact?.phone_direct || '')
-                                                                         : (selectedContact?.primary_phone || '') === 'other'
-                                                                             ? (selectedContact?.phone_other || '')
-                                                                             : ''
-                                                     }
+                                                    default:
+                                                        break;
+                                                }
+                                            }}
+                                            onInput={(e) => {
+                                                if ((selectedContact?.id || 0) === 0) {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        phone_work: e.target.value,
+                                                        primary_phone: 'work'
+                                                    });
+                                                } else {
+                                                    if ((selectedContact?.primary_phone || '') === '') {
+                                                        setSelectedContact({
+                                                            ...selectedContact,
+                                                            phone_work: e.target.value,
+                                                            primary_phone: 'work'
+                                                        });
+                                                    } else {
+                                                        switch (selectedContact?.primary_phone) {
+                                                            case 'work':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_work: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'fax':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_work_fax: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'mobile':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_mobile: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'direct':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_direct: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'other':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_other: e.target.value
+                                                                });
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            }}
+                                            onChange={(e) => {
+                                                if ((selectedContact?.id || 0) === 0) {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        phone_work: e.target.value,
+                                                        primary_phone: 'work'
+                                                    });
+                                                } else {
+                                                    if ((selectedContact?.primary_phone || '') === '') {
+                                                        setSelectedContact({
+                                                            ...selectedContact,
+                                                            phone_work: e.target.value,
+                                                            primary_phone: 'work'
+                                                        });
+                                                    } else {
+                                                        switch (selectedContact?.primary_phone) {
+                                                            case 'work':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_work: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'fax':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_work_fax: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'mobile':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_mobile: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'direct':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_direct: e.target.value
+                                                                });
+                                                                break;
+                                                            case 'other':
+                                                                setSelectedContact({
+                                                                    ...selectedContact,
+                                                                    phone_other: e.target.value
+                                                                });
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            }}
+                                            value={
+                                                (selectedContact?.primary_phone || '') === 'work'
+                                                    ? (selectedContact?.phone_work || '')
+                                                    : (selectedContact?.primary_phone || '') === 'fax'
+                                                        ? (selectedContact?.phone_work_fax || '')
+                                                        : (selectedContact?.primary_phone || '') === 'mobile'
+                                                            ? (selectedContact?.phone_mobile || '')
+                                                            : (selectedContact?.primary_phone || '') === 'direct'
+                                                                ? (selectedContact?.phone_direct || '')
+                                                                : (selectedContact?.primary_phone || '') === 'other'
+                                                                    ? (selectedContact?.phone_other || '')
+                                                                    : ''
+                                            }
                                         />
 
                                         {
@@ -1981,35 +2136,35 @@ const Divisions = (props) => {
                                         {
                                             divisionContactPhoneItems.length > 1 &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showDivisionContactPhones) {
-                                                                     setShowDivisionContactPhones(false);
-                                                                 } else {
-                                                                     if (divisionContactPhoneItems.length > 1) {
-                                                                         await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_phone || '')
-                                                                             return item;
-                                                                         }))
+                                                onClick={async () => {
+                                                    if (showDivisionContactPhones) {
+                                                        setShowDivisionContactPhones(false);
+                                                    } else {
+                                                        if (divisionContactPhoneItems.length > 1) {
+                                                            await setDivisionContactPhoneItems(divisionContactPhoneItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_phone || '')
+                                                                return item;
+                                                            }))
 
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowDivisionContactPhones(true);
+                                                            window.setTimeout(async () => {
+                                                                await setShowDivisionContactPhones(true);
 
-                                                                             refDivisionContactPhonePopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
+                                                                refDivisionContactPhonePopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }, 0)
+                                                        }
+                                                    }
 
-                                                                 refDivisionContactPhone.current.inputElement.focus();
-                                                             }}/>
+                                                    refDivisionContactPhone.current.inputElement.focus();
+                                                }} />
                                         }
                                     </div>
                                     {
@@ -2025,7 +2180,7 @@ const Divisions = (props) => {
                                                 ref={refDivisionContactPhoneDropDown}
                                             >
                                                 <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {
@@ -2061,20 +2216,20 @@ const Divisions = (props) => {
                                                                             }
 
                                                                             (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                                {
+                                                                                    item.type === 'work' ? item.phone
+                                                                                        : item.type === 'fax' ? item.phone
+                                                                                            : item.type === 'mobile' ? item.phone
+                                                                                                : item.type === 'direct' ? item.phone
+                                                                                                    : item.type === 'other' ? item.phone : ''
+                                                                                }
+                                                                            </b>)
 
                                                                             {
                                                                                 item.selected &&
                                                                                 <FontAwesomeIcon
                                                                                     className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
+                                                                                    icon={faCaretRight} />
                                                                             }
                                                                         </div>
                                                                     )
@@ -2088,29 +2243,29 @@ const Divisions = (props) => {
                                     }
                                 </div>
                                 <div className="form-h-sep"></div>
-                                <div style={{width: '50%', display: 'flex', justifyContent: 'space-between'}}>
+                                <div style={{ width: '50%', display: 'flex', justifyContent: 'space-between' }}>
                                     <div
                                         className={disabledDivisionContactFields + ' input-box-container input-phone-ext'}>
                                         <input tabIndex={16 + props.tabTimes} type="text" placeholder="Ext"
                                             // onKeyDown={validateContactForSaving}
-                                               onChange={e => setSelectedContact({
-                                                   ...selectedContact,
-                                                   phone_ext: e.target.value
-                                               })}
-                                               value={selectedContact.phone_ext || ''}/>
+                                            onChange={e => setSelectedContact({
+                                                ...selectedContact,
+                                                phone_ext: e.target.value
+                                            })}
+                                            value={selectedContact.phone_ext || ''} />
                                     </div>
                                     <div className={disabledDivisionContactFields + ' input-toggle-container'}>
                                         <input type="checkbox"
-                                               id={props.panelName + '-cbox-division-contacts-primary-btn'}
-                                               onChange={(e) => {
-                                                   setSelectedContact({
-                                                       ...selectedContact,
-                                                       is_primary: e.target.checked ? 1 : 0
-                                                   });
+                                            id={props.panelName + '-cbox-division-contacts-primary-btn'}
+                                            onChange={(e) => {
+                                                setSelectedContact({
+                                                    ...selectedContact,
+                                                    is_primary: e.target.checked ? 1 : 0
+                                                });
 
-                                                   saveContact({keyCode: 9});
-                                               }}
-                                               checked={(selectedContact.is_primary || 0) === 1}/>
+                                                saveContact({ keyCode: 9 });
+                                            }}
+                                            checked={(selectedContact.is_primary || 0) === 1} />
                                         <label htmlFor={props.panelName + '-cbox-division-contacts-primary-btn'}>
                                             <div className="label-text">Primary</div>
                                             <div className="input-toggle-btn"></div>
@@ -2121,29 +2276,29 @@ const Divisions = (props) => {
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledDivisionContactFields + ' select-box-container'}
-                                     style={{flexGrow: 1}}
-                                     onMouseEnter={() => {
-                                         if ((selectedContact?.email_work || '') !== '' ||
-                                             (selectedContact?.email_personal || '') !== '' ||
-                                             (selectedContact?.email_other || '') !== '') {
-                                             setShowDivisionContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onFocus={() => {
-                                         if ((selectedContact?.email_work || '') !== '' ||
-                                             (selectedContact?.email_personal || '') !== '' ||
-                                             (selectedContact?.email_other || '') !== '') {
-                                             setShowDivisionContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onBlur={() => {
-                                         window.setTimeout(() => {
-                                             setShowDivisionContactEmailCopyBtn(false);
-                                         }, 1000);
-                                     }}
-                                     onMouseLeave={() => {
-                                         setShowDivisionContactEmailCopyBtn(false);
-                                     }}>
+                                    style={{ flexGrow: 1 }}
+                                    onMouseEnter={() => {
+                                        if ((selectedContact?.email_work || '') !== '' ||
+                                            (selectedContact?.email_personal || '') !== '' ||
+                                            (selectedContact?.email_other || '') !== '') {
+                                            setShowDivisionContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if ((selectedContact?.email_work || '') !== '' ||
+                                            (selectedContact?.email_personal || '') !== '' ||
+                                            (selectedContact?.email_other || '') !== '') {
+                                            setShowDivisionContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        window.setTimeout(() => {
+                                            setShowDivisionContactEmailCopyBtn(false);
+                                        }, 1000);
+                                    }}
+                                    onMouseLeave={() => {
+                                        setShowDivisionContactEmailCopyBtn(false);
+                                    }}>
                                     <div className="select-box-wrapper">
                                         <input
                                             style={{
@@ -2410,7 +2565,7 @@ const Divisions = (props) => {
                                             }} icon={faCopy} onClick={(e) => {
                                                 e.stopPropagation();
                                                 navigator.clipboard.writeText(refDivisionContactEmail.current.value);
-                                            }}/>
+                                            }} />
                                         }
 
                                         {
@@ -2427,35 +2582,35 @@ const Divisions = (props) => {
                                         {
                                             divisionContactEmailItems.length > 1 &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showDivisionContactEmails) {
-                                                                     setShowDivisionContactEmails(false);
-                                                                 } else {
-                                                                     if (divisionContactEmailItems.length > 1) {
-                                                                         await setDivisionContactEmailItems(divisionContactEmailItems.map((item, index) => {
-                                                                             item.selected = item.type === (selectedContact?.primary_email || '')
-                                                                             return item;
-                                                                         }))
+                                                onClick={async () => {
+                                                    if (showDivisionContactEmails) {
+                                                        setShowDivisionContactEmails(false);
+                                                    } else {
+                                                        if (divisionContactEmailItems.length > 1) {
+                                                            await setDivisionContactEmailItems(divisionContactEmailItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_email || '')
+                                                                return item;
+                                                            }))
 
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowDivisionContactEmails(true);
+                                                            window.setTimeout(async () => {
+                                                                await setShowDivisionContactEmails(true);
 
-                                                                             refDivisionContactEmailPopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
+                                                                refDivisionContactEmailPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }, 0)
+                                                        }
+                                                    }
 
-                                                                 refDivisionContactEmail.current.focus();
-                                                             }}/>
+                                                    refDivisionContactEmail.current.focus();
+                                                }} />
                                         }
                                     </div>
                                     {
@@ -2471,7 +2626,7 @@ const Divisions = (props) => {
                                                 ref={refDivisionContactEmailDropDown}
                                             >
                                                 <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {
@@ -2505,18 +2660,18 @@ const Divisions = (props) => {
                                                                             }
 
                                                                             (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                                {
+                                                                                    item.type === 'work' ? item.email
+                                                                                        : item.type === 'personal' ? item.email
+                                                                                            : item.type === 'other' ? item.email : ''
+                                                                                }
+                                                                            </b>)
 
                                                                             {
                                                                                 item.selected &&
                                                                                 <FontAwesomeIcon
                                                                                     className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
+                                                                                    icon={faCaretRight} />
                                                                             }
                                                                         </div>
                                                                     )
@@ -2532,25 +2687,25 @@ const Divisions = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className={disabledDivisionContactFields + ' input-box-container grow'}>
                                     <input tabIndex={18 + props.tabTimes} type="text" placeholder="Notes"
-                                           onKeyDown={(e) => {
-                                               let key = e.keyCode || e.which;
+                                        onKeyDown={(e) => {
+                                            let key = e.keyCode || e.which;
 
-                                               if (key === 9) {
-                                                   saveContact(e);
-                                               }
-                                           }}
-                                           onChange={e => setSelectedContact({
-                                               ...selectedContact,
-                                               notes: e.target.value
-                                           })}
-                                           value={selectedContact.notes || ''}
+                                            if (key === 9) {
+                                                saveContact(e);
+                                            }
+                                        }}
+                                        onChange={e => setSelectedContact({
+                                            ...selectedContact,
+                                            notes: e.target.value
+                                        })}
+                                        value={selectedContact.notes || ''}
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/*CONTACT LIST*/}
-                        <div className="form-bordered-box" style={{height: 140}}>
+                        <div className="form-bordered-box" style={{ height: 140 }}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
                                 <div className="top-border top-border-middle"></div>
@@ -2587,7 +2742,7 @@ const Divisions = (props) => {
                             </div>
 
                             <div className="form-slider">
-                                <div className="form-slider-wrapper" style={{left: showingContactList ? 0 : '-100%'}}>
+                                <div className="form-slider-wrapper" style={{ left: showingContactList ? 0 : '-100%' }}>
                                     <div className="contact-list-box">
                                         {
                                             (selectedDivision?.contacts || []).length > 0 &&
@@ -2606,32 +2761,32 @@ const Divisions = (props) => {
                                                 (selectedDivision?.contacts || []).map((contact, index) => {
                                                     return (
                                                         <div className="contact-list-item" key={index}
-                                                             onDoubleClick={async () => {
-                                                                 let panel = {
-                                                                     panelName: `${props.panelName}-contacts`,
-                                                                     component: <Contacts
-                                                                         title='Contacts'
-                                                                         tabTimes={22000 + props.tabTimes}
-                                                                         panelName={`${props.panelName}-contacts`}
-                                                                         savingContactUrl='/saveContact'
-                                                                         deletingContactUrl='/deleteContact'
-                                                                         uploadAvatarUrl='/uploadAvatar'
-                                                                         removeAvatarUrl='/removeAvatar'
-                                                                         origin={props.origin}
-                                                                         owner='division'
-                                                                         openPanel={props.openPanel}
-                                                                         closePanel={props.closePanel}
-                                                                         componentId={moment().format('x')}
+                                                            onDoubleClick={async () => {
+                                                                let panel = {
+                                                                    panelName: `${props.panelName}-contacts`,
+                                                                    component: <Contacts
+                                                                        title='Contacts'
+                                                                        tabTimes={22000 + props.tabTimes}
+                                                                        panelName={`${props.panelName}-contacts`}
+                                                                        savingContactUrl='/saveContact'
+                                                                        deletingContactUrl='/deleteContact'
+                                                                        uploadAvatarUrl='/uploadAvatar'
+                                                                        removeAvatarUrl='/removeAvatar'
+                                                                        origin={props.origin}
+                                                                        owner='division'
+                                                                        
+                                                                        
+                                                                        componentId={moment().format('x')}
 
-                                                                         contactSearchCustomer={{
-                                                                             ...selectedDivision,
-                                                                             selectedContact: contact
-                                                                         }}
-                                                                     />
-                                                                 }
+                                                                        contactSearchCustomer={{
+                                                                            ...selectedDivision,
+                                                                            selectedContact: contact
+                                                                        }}
+                                                                    />
+                                                                }
 
-                                                                 props.openPanel(panel, props.origin);
-                                                             }} onClick={() => setSelectedContact(contact)}>
+                                                                openPanel(panel, props.origin);
+                                                            }} onClick={() => setSelectedContact(contact)}>
                                                             <div
                                                                 className="contact-list-col tcol first-name">{contact.first_name}</div>
                                                             <div
@@ -2653,13 +2808,13 @@ const Divisions = (props) => {
                                                             {
                                                                 (contact.id === (selectedContact?.id || 0)) &&
                                                                 <div className="contact-list-col tcol contact-selected">
-                                                                    <FontAwesomeIcon icon={faPencilAlt}/>
+                                                                    <FontAwesomeIcon icon={faPencilAlt} />
                                                                 </div>
                                                             }
                                                             {
                                                                 (contact.is_primary === 1) &&
                                                                 <div className="contact-list-col tcol pri">
-                                                                    <FontAwesomeIcon icon={faCheck}/>
+                                                                    <FontAwesomeIcon icon={faCheck} />
                                                                 </div>
                                                             }
                                                         </div>
@@ -2673,10 +2828,10 @@ const Divisions = (props) => {
                                         <div className="form-row">
                                             <div className="input-box-container grow">
                                                 <input type="text" placeholder="First Name"
-                                                       onChange={e => setContactSearch({
-                                                           ...contactSearch,
-                                                           first_name: e.target.value
-                                                       })} value={contactSearch.first_name || ''}/>
+                                                    onChange={e => setContactSearch({
+                                                        ...contactSearch,
+                                                        first_name: e.target.value
+                                                    })} value={contactSearch.first_name || ''} />
                                             </div>
                                             <div className="form-h-sep"></div>
                                             <div className="input-box-container grow">
@@ -2685,7 +2840,7 @@ const Divisions = (props) => {
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
                                                     last_name: e.target.value
-                                                })} value={contactSearch.last_name || ''}/>
+                                                })} value={contactSearch.last_name || ''} />
                                             </div>
                                         </div>
                                         <div className="form-v-sep"></div>
@@ -2696,7 +2851,7 @@ const Divisions = (props) => {
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
                                                     address1: e.target.value
-                                                })} value={contactSearch.address1 || ''}/>
+                                                })} value={contactSearch.address1 || ''} />
                                             </div>
                                         </div>
                                         <div className="form-v-sep"></div>
@@ -2707,7 +2862,7 @@ const Divisions = (props) => {
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
                                                     address2: e.target.value
-                                                })} value={contactSearch.address2 || ''}/>
+                                                })} value={contactSearch.address2 || ''} />
                                             </div>
                                         </div>
                                         <div className="form-v-sep"></div>
@@ -2718,7 +2873,7 @@ const Divisions = (props) => {
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
                                                     city: e.target.value
-                                                })} value={contactSearch.city || ''}/>
+                                                })} value={contactSearch.city || ''} />
                                             </div>
                                             <div className="form-h-sep"></div>
                                             <div className="input-box-container input-state">
@@ -2727,7 +2882,7 @@ const Divisions = (props) => {
                                                 }} onChange={e => setContactSearch({
                                                     ...contactSearch,
                                                     state: e.target.value
-                                                })} value={contactSearch.state || ''}/>
+                                                })} value={contactSearch.state || ''} />
                                             </div>
                                             <div className="form-h-sep"></div>
                                             <div className="input-box-container grow">
@@ -2735,41 +2890,41 @@ const Divisions = (props) => {
                                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                     guide={true}
                                                     type="text" placeholder="Phone (Work/Mobile/Fax)" onFocus={() => {
-                                                    setShowingContactList(false)
-                                                }} onChange={e => setContactSearch({
-                                                    ...contactSearch,
-                                                    phone: e.target.value
-                                                })} value={contactSearch.phone || ''}/>
+                                                        setShowingContactList(false)
+                                                    }} onChange={e => setContactSearch({
+                                                        ...contactSearch,
+                                                        phone: e.target.value
+                                                    })} value={contactSearch.phone || ''} />
                                             </div>
                                         </div>
                                         <div className="form-v-sep"></div>
                                         <div className="form-row">
                                             <div className="input-box-container grow">
                                                 <input type="text" placeholder="E-Mail"
-                                                       style={{textTransform: 'lowercase'}}
-                                                       onKeyDown={(e) => {
-                                                           e.preventDefault();
-                                                           let key = e.keyCode || e.which;
+                                                    style={{ textTransform: 'lowercase' }}
+                                                    onKeyDown={(e) => {
+                                                        e.preventDefault();
+                                                        let key = e.keyCode || e.which;
 
-                                                           if (key === 9) {
-                                                               let elems = document.getElementsByTagName('input');
+                                                        if (key === 9) {
+                                                            let elems = document.getElementsByTagName('input');
 
-                                                               for (var i = elems.length; i--;) {
-                                                                   if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                       elems[i].focus();
-                                                                       break;
-                                                                   }
-                                                               }
-                                                           }
-                                                       }}
-                                                       onFocus={() => {
-                                                           setShowingContactList(false)
-                                                       }}
-                                                       onChange={e => setContactSearch({
-                                                           ...contactSearch,
-                                                           email: e.target.value
-                                                       })}
-                                                       value={contactSearch.email || ''}/>
+                                                            for (var i = elems.length; i--;) {
+                                                                if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
+                                                                    elems[i].focus();
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    }}
+                                                    onFocus={() => {
+                                                        setShowingContactList(false)
+                                                    }}
+                                                    onChange={e => setContactSearch({
+                                                        ...contactSearch,
+                                                        email: e.target.value
+                                                    })}
+                                                    value={contactSearch.email || ''} />
                                             </div>
                                         </div>
                                     </div>
@@ -2791,7 +2946,7 @@ const Divisions = (props) => {
                                             return;
                                         }
 
-                                        setSelectedNote({id: 0, division_id: selectedDivision.id})
+                                        setSelectedNote({ id: 0, division_id: selectedDivision.id })
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Add Note</div>
@@ -2827,12 +2982,12 @@ const Divisions = (props) => {
                                         (selectedDivision?.notes || []).map((note, index) => {
                                             return (
                                                 <div className="notes-list-item" key={index}
-                                                     onClick={() => setSelectedNote(note)}>
+                                                    onClick={() => setSelectedNote(note)}>
                                                     <div className="notes-list-col tcol note-text">{note.text}</div>
                                                     {
                                                         (note.id === (selectedNote?.id || 0)) &&
                                                         <div className="notes-list-col tcol notes-selected">
-                                                            <FontAwesomeIcon icon={faPencilAlt}/>
+                                                            <FontAwesomeIcon icon={faPencilAlt} />
                                                         </div>
                                                     }
                                                 </div>
@@ -2847,7 +3002,7 @@ const Divisions = (props) => {
 
 
                 <div className="fields-container-col">
-                    <div className="fields-container-row" style={{display: 'flex', flexDirection: 'row'}}>
+                    <div className="fields-container-row" style={{ display: 'flex', flexDirection: 'row' }}>
                         {/*MAILING ADDRESS FORM*/}
                         <div className="form-bordered-box">
                             <div className="form-header">
@@ -2872,177 +3027,177 @@ const Divisions = (props) => {
                             <div className="form-row">
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container input-code'}>
                                     <input tabIndex={18 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-                                           ref={refDivisionMailingCode}
-                                           readOnly={true}
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       code: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       code: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={(selectedDivision?.mailing_address?.code || '') + ((selectedDivision?.mailing_address?.code_number || 0) === 0 ? '' : selectedDivision?.mailing_address?.code_number)}/>
+                                        ref={refDivisionMailingCode}
+                                        readOnly={true}
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    code: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    code: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={(selectedDivision?.mailing_address?.code || '') + ((selectedDivision?.mailing_address?.code_number || 0) === 0 ? '' : selectedDivision?.mailing_address?.code_number)} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container grow'}>
                                     <input tabIndex={19 + props.tabTimes} type="text" placeholder="Name"
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       name: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       name: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedDivision?.mailing_address?.name || ''}/>
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    name: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    name: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedDivision?.mailing_address?.name || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container grow'}>
                                     <input tabIndex={20 + props.tabTimes} type="text" placeholder="Address 1"
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       address1: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       address1: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedDivision?.mailing_address?.address1 || ''}/>
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    address1: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    address1: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedDivision?.mailing_address?.address1 || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container grow'}>
                                     <input tabIndex={21 + props.tabTimes} type="text" placeholder="Address 2"
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       address2: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       address2: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedDivision?.mailing_address?.address2 || ''}/>
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    address2: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    address2: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedDivision?.mailing_address?.address2 || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container grow'}>
                                     <input tabIndex={22 + props.tabTimes} type="text" placeholder="City"
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       city: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       city: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedDivision?.mailing_address?.city || ''}/>
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    city: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    city: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedDivision?.mailing_address?.city || ''} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container input-state'}>
                                     <input tabIndex={23 + props.tabTimes} type="text" placeholder="State" maxLength="2"
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       state: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       state: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedDivision?.mailing_address?.state || ''}/>
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    state: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    state: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedDivision?.mailing_address?.state || ''} />
                                 </div>
                                 <div className="form-h-sep"></div>
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container input-zip-code'}>
                                     <input tabIndex={24 + props.tabTimes} type="text" placeholder="Postal Code"
-                                           onKeyDown={saveMailingAddress}
-                                           onInput={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       zip: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           onChange={e => {
-                                               setSelectedDivision({
-                                                   ...selectedDivision,
-                                                   mailing_address: {
-                                                       ...selectedDivision?.mailing_address,
-                                                       zip: e.target.value
-                                                   }
-                                               })
-                                           }}
-                                           value={selectedDivision?.mailing_address?.zip || ''}/>
+                                        onKeyDown={saveMailingAddress}
+                                        onInput={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    zip: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedDivision({
+                                                ...selectedDivision,
+                                                mailing_address: {
+                                                    ...selectedDivision?.mailing_address,
+                                                    zip: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedDivision?.mailing_address?.zip || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className={disabledDivisionMailingAddressFields + ' select-box-container'} style={{flexGrow: 1}}>
+                                <div className={disabledDivisionMailingAddressFields + ' select-box-container'} style={{ flexGrow: 1 }}>
                                     <div className="select-box-wrapper">
                                         <input
                                             tabIndex={25 + props.tabTimes}
@@ -3189,7 +3344,7 @@ const Divisions = (props) => {
                                                                 }
                                                             });
 
-                                                            saveMailingAddress({keyCode: 9});
+                                                            saveMailingAddress({ keyCode: 9 });
                                                             setShowMailingContactNames(false);
                                                             refMailingContactName.current.focus();
                                                         }
@@ -3218,11 +3373,11 @@ const Divisions = (props) => {
                                                                 }
                                                             });
 
-                                                            saveMailingAddress({keyCode: 9});
+                                                            saveMailingAddress({ keyCode: 9 });
                                                             setShowMailingContactNames(false);
                                                             refMailingContactName.current.focus();
                                                         } else {
-                                                            saveMailingAddress({keyCode: 9});
+                                                            saveMailingAddress({ keyCode: 9 });
                                                         }
                                                         break;
 
@@ -3253,35 +3408,35 @@ const Divisions = (props) => {
                                         {
                                             ((selectedDivision?.contacts || []).length > 1 && (selectedDivision?.mailing_address?.code || '') !== '') &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showMailingContactNames) {
-                                                                     setShowMailingContactNames(false);
-                                                                 } else {
-                                                                     if ((selectedDivision?.contacts || []).length > 1) {
-                                                                         await setMailingContactNameItems((selectedDivision?.contacts || []).map((item, index) => {
-                                                                             item.selected = index === 0
-                                                                             return item;
-                                                                         }))
+                                                onClick={async () => {
+                                                    if (showMailingContactNames) {
+                                                        setShowMailingContactNames(false);
+                                                    } else {
+                                                        if ((selectedDivision?.contacts || []).length > 1) {
+                                                            await setMailingContactNameItems((selectedDivision?.contacts || []).map((item, index) => {
+                                                                item.selected = index === 0
+                                                                return item;
+                                                            }))
 
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowMailingContactNames(true);
+                                                            window.setTimeout(async () => {
+                                                                await setShowMailingContactNames(true);
 
-                                                                             refMailingContactNamePopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
+                                                                refMailingContactNamePopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }, 0)
+                                                        }
+                                                    }
 
-                                                                 refMailingContactName.current.focus();
-                                                             }}/>
+                                                    refMailingContactName.current.focus();
+                                                }} />
                                         }
                                     </div>
                                     {
@@ -3297,7 +3452,7 @@ const Divisions = (props) => {
                                                 ref={refMailingContactNameDropDown}
                                             >
                                                 <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {
@@ -3333,7 +3488,7 @@ const Divisions = (props) => {
                                                                                     }
                                                                                 });
 
-                                                                                saveMailingAddress({keyCode: 9});
+                                                                                saveMailingAddress({ keyCode: 9 });
                                                                                 setShowMailingContactNames(false);
                                                                                 refMailingContactName.current.focus();
                                                                             }}
@@ -3347,7 +3502,7 @@ const Divisions = (props) => {
                                                                                 item.selected &&
                                                                                 <FontAwesomeIcon
                                                                                     className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
+                                                                                    icon={faCaretRight} />
                                                                             }
                                                                         </div>
                                                                     )
@@ -3365,193 +3520,193 @@ const Divisions = (props) => {
                                 <div className={disabledDivisionMailingAddressFields + ' select-box-container input-phone'}>
                                     <div className="select-box-wrapper">
                                         <MaskedInput tabIndex={26 + props.tabTimes}
-                                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                                     guide={true}
-                                                     type="text"
-                                                     placeholder="Contact Phone"
-                                                     ref={refMailingContactPhone}
-                                                     onKeyDown={async (e) => {
-                                                         let key = e.keyCode || e.which;
+                                            mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                            guide={true}
+                                            type="text"
+                                            placeholder="Contact Phone"
+                                            ref={refMailingContactPhone}
+                                            onKeyDown={async (e) => {
+                                                let key = e.keyCode || e.which;
 
-                                                         switch (key) {
-                                                             case 37:
-                                                             case 38: // arrow left | arrow up
-                                                                 e.preventDefault();
-                                                                 if (showMailingContactPhones) {
-                                                                     let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
+                                                switch (key) {
+                                                    case 37:
+                                                    case 38: // arrow left | arrow up
+                                                        e.preventDefault();
+                                                        if (showMailingContactPhones) {
+                                                            let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
 
-                                                                     if (selectedIndex === -1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === 0) {
-                                                                                 item.selected = index === (mailingContactPhoneItems.length - 1);
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex - 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
+                                                            if (selectedIndex === -1) {
+                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (mailingContactPhoneItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                                     refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (mailingContactPhoneItems.length > 1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
+                                                            refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            if (mailingContactPhoneItems.length > 1) {
+                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
 
-                                                                         setShowMailingContactPhones(true);
+                                                                setShowMailingContactPhones(true);
 
-                                                                         refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
+                                                                refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+                                                        break;
 
-                                                             case 39:
-                                                             case 40: // arrow right | arrow down
-                                                                 e.preventDefault();
-                                                                 if (showMailingContactPhones) {
-                                                                     let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
+                                                    case 39:
+                                                    case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (showMailingContactPhones) {
+                                                            let selectedIndex = mailingContactPhoneItems.findIndex(item => item.selected);
 
-                                                                     if (selectedIndex === -1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
-                                                                     } else {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             if (selectedIndex === (mailingContactPhoneItems.length - 1)) {
-                                                                                 item.selected = index === 0;
-                                                                             } else {
-                                                                                 item.selected = index === (selectedIndex + 1)
-                                                                             }
-                                                                             return item;
-                                                                         }))
-                                                                     }
+                                                            if (selectedIndex === -1) {
+                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                    if (selectedIndex === (mailingContactPhoneItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                                     refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                         if (r && r.classList.contains('selected')) {
-                                                                             r.scrollIntoView({
-                                                                                 behavior: 'auto',
-                                                                                 block: 'center',
-                                                                                 inline: 'nearest'
-                                                                             })
-                                                                         }
-                                                                         return true;
-                                                                     });
-                                                                 } else {
-                                                                     if (mailingContactPhoneItems.length > 1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
+                                                            refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            if (mailingContactPhoneItems.length > 1) {
+                                                                await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
 
-                                                                         setShowMailingContactPhones(true);
+                                                                setShowMailingContactPhones(true);
 
-                                                                         refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                             if (r && r.classList.contains('selected')) {
-                                                                                 r.scrollIntoView({
-                                                                                     behavior: 'auto',
-                                                                                     block: 'center',
-                                                                                     inline: 'nearest'
-                                                                                 })
-                                                                             }
-                                                                             return true;
-                                                                         });
-                                                                     }
-                                                                 }
-                                                                 break;
+                                                                refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+                                                        break;
 
-                                                             case 27: // escape
-                                                                 setShowMailingContactPhones(false);
-                                                                 break;
+                                                    case 27: // escape
+                                                        setShowMailingContactPhones(false);
+                                                        break;
 
-                                                             case 13: // enter
-                                                                 if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                                     await setSelectedDivision({
-                                                                         ...selectedDivision,
-                                                                         mailing_address: {
-                                                                             ...selectedDivision.mailing_address,
-                                                                             mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
-                                                                         }
-                                                                     });
+                                                    case 13: // enter
+                                                        if (showMailingContactPhones && mailingContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                            await setSelectedDivision({
+                                                                ...selectedDivision,
+                                                                mailing_address: {
+                                                                    ...selectedDivision.mailing_address,
+                                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                                }
+                                                            });
 
-                                                                     saveMailingAddress({keyCode: 9});
-                                                                     setShowMailingContactPhones(false);
-                                                                     refMailingContactPhone.current.inputElement.focus();
-                                                                 }
-                                                                 break;
+                                                            saveMailingAddress({ keyCode: 9 });
+                                                            setShowMailingContactPhones(false);
+                                                            refMailingContactPhone.current.inputElement.focus();
+                                                        }
+                                                        break;
 
-                                                             case 9: // tab
-                                                                 if (showMailingContactPhones) {
-                                                                     e.preventDefault();
-                                                                     await setSelectedDivision({
-                                                                         ...selectedDivision,
-                                                                         mailing_address: {
-                                                                             ...selectedDivision.mailing_address,
-                                                                             mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
-                                                                         }
-                                                                     });
+                                                    case 9: // tab
+                                                        if (showMailingContactPhones) {
+                                                            e.preventDefault();
+                                                            await setSelectedDivision({
+                                                                ...selectedDivision,
+                                                                mailing_address: {
+                                                                    ...selectedDivision.mailing_address,
+                                                                    mailing_contact_primary_phone: mailingContactPhoneItems[mailingContactPhoneItems.findIndex(item => item.selected)].type
+                                                                }
+                                                            });
 
-                                                                     saveMailingAddress({keyCode: 9});
-                                                                     setShowMailingContactPhones(false);
-                                                                     refMailingContactPhone.current.inputElement.focus();
-                                                                 } else {
-                                                                     saveMailingAddress({keyCode: 9});
-                                                                 }
-                                                                 break;
+                                                            saveMailingAddress({ keyCode: 9 });
+                                                            setShowMailingContactPhones(false);
+                                                            refMailingContactPhone.current.inputElement.focus();
+                                                        } else {
+                                                            saveMailingAddress({ keyCode: 9 });
+                                                        }
+                                                        break;
 
-                                                             default:
-                                                                 break;
-                                                         }
-                                                     }}
-                                                     onInput={(e) => {
-                                                         // setSelectedDivision({
-                                                         //     ...selectedDivision,
-                                                         //     mailing_contact_phone: e.target.value
-                                                         // });
-                                                     }}
-                                                     onChange={(e) => {
-                                                         // setSelectedDivision({
-                                                         //     ...selectedDivision,
-                                                         //     mailing_contact_phone: e.target.value
-                                                         // });
-                                                     }}
-                                                     value={
-                                                         (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'work'
-                                                             ? (selectedDivision?.mailing_address?.mailing_contact?.phone_work || '')
-                                                             : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'fax'
-                                                                 ? (selectedDivision?.mailing_address?.mailing_contact?.phone_work_fax || '')
-                                                                 : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'mobile'
-                                                                     ? (selectedDivision?.mailing_address?.mailing_contact?.phone_mobile || '')
-                                                                     : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'direct'
-                                                                         ? (selectedDivision?.mailing_address?.mailing_contact?.phone_direct || '')
-                                                                         : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'other'
-                                                                             ? (selectedDivision?.mailing_address?.mailing_contact?.phone_other || '')
-                                                                             : ''
-                                                     }
+                                                    default:
+                                                        break;
+                                                }
+                                            }}
+                                            onInput={(e) => {
+                                                // setSelectedDivision({
+                                                //     ...selectedDivision,
+                                                //     mailing_contact_phone: e.target.value
+                                                // });
+                                            }}
+                                            onChange={(e) => {
+                                                // setSelectedDivision({
+                                                //     ...selectedDivision,
+                                                //     mailing_contact_phone: e.target.value
+                                                // });
+                                            }}
+                                            value={
+                                                (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'work'
+                                                    ? (selectedDivision?.mailing_address?.mailing_contact?.phone_work || '')
+                                                    : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'fax'
+                                                        ? (selectedDivision?.mailing_address?.mailing_contact?.phone_work_fax || '')
+                                                        : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'mobile'
+                                                            ? (selectedDivision?.mailing_address?.mailing_contact?.phone_mobile || '')
+                                                            : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'direct'
+                                                                ? (selectedDivision?.mailing_address?.mailing_contact?.phone_direct || '')
+                                                                : (selectedDivision?.mailing_address?.mailing_contact_primary_phone || '') === 'other'
+                                                                    ? (selectedDivision?.mailing_address?.mailing_contact?.phone_other || '')
+                                                                    : ''
+                                            }
                                         />
 
                                         {
@@ -3568,35 +3723,35 @@ const Divisions = (props) => {
                                         {
                                             mailingContactPhoneItems.length > 1 &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showMailingContactPhones) {
-                                                                     setShowMailingContactPhones(false);
-                                                                 } else {
-                                                                     if (mailingContactPhoneItems.length > 1) {
-                                                                         await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
+                                                onClick={async () => {
+                                                    if (showMailingContactPhones) {
+                                                        setShowMailingContactPhones(false);
+                                                    } else {
+                                                        if (mailingContactPhoneItems.length > 1) {
+                                                            await setMailingContactPhoneItems(mailingContactPhoneItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            }))
 
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowMailingContactPhones(true);
+                                                            window.setTimeout(async () => {
+                                                                await setShowMailingContactPhones(true);
 
-                                                                             refMailingContactPhonePopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
+                                                                refMailingContactPhonePopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }, 0)
+                                                        }
+                                                    }
 
-                                                                 refMailingContactPhone.current.inputElement.focus();
-                                                             }}/>
+                                                    refMailingContactPhone.current.inputElement.focus();
+                                                }} />
                                         }
                                     </div>
                                     {
@@ -3612,7 +3767,7 @@ const Divisions = (props) => {
                                                 ref={refMailingContactPhoneDropDown}
                                             >
                                                 <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {
@@ -3636,7 +3791,7 @@ const Divisions = (props) => {
                                                                                     }
                                                                                 });
 
-                                                                                saveMailingAddress({keyCode: 9});
+                                                                                saveMailingAddress({ keyCode: 9 });
                                                                                 setShowMailingContactPhones(false);
                                                                                 refMailingContactPhone.current.inputElement.focus();
                                                                             }}
@@ -3651,20 +3806,20 @@ const Divisions = (props) => {
                                                                             }
 
                                                                             (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.phone
-                                                                                    : item.type === 'fax' ? item.phone
-                                                                                        : item.type === 'mobile' ? item.phone
-                                                                                            : item.type === 'direct' ? item.phone
-                                                                                                : item.type === 'other' ? item.phone : ''
-                                                                            }
-                                                                        </b>)
+                                                                                {
+                                                                                    item.type === 'work' ? item.phone
+                                                                                        : item.type === 'fax' ? item.phone
+                                                                                            : item.type === 'mobile' ? item.phone
+                                                                                                : item.type === 'direct' ? item.phone
+                                                                                                    : item.type === 'other' ? item.phone : ''
+                                                                                }
+                                                                            </b>)
 
                                                                             {
                                                                                 item.selected &&
                                                                                 <FontAwesomeIcon
                                                                                     className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
+                                                                                    icon={faCaretRight} />
                                                                             }
                                                                         </div>
                                                                     )
@@ -3681,210 +3836,210 @@ const Divisions = (props) => {
                                 <div className="form-h-sep"></div>
                                 <div className={disabledDivisionMailingAddressFields + ' input-box-container input-phone-ext'}>
                                     <input tabIndex={27 + props.tabTimes} type="text" placeholder="Ext"
-                                           onKeyDown={saveMailingAddress}
-                                           onChange={e => {
-                                               // setSelectedDivision({ ...selectedDivision, mailing_ext: e.target.value })
-                                           }}
-                                           value={selectedDivision?.mailing_address?.mailing_contact?.phone_ext || ''}/>
+                                        onKeyDown={saveMailingAddress}
+                                        onChange={e => {
+                                            // setSelectedDivision({ ...selectedDivision, mailing_ext: e.target.value })
+                                        }}
+                                        value={selectedDivision?.mailing_address?.mailing_contact?.phone_ext || ''} />
                                 </div>
                             </div>
                             <div className="form-v-sep"></div>
                             <div className="form-row">
-                                <div className={disabledDivisionMailingAddressFields + ' select-box-container'} style={{flexGrow: 1}}
-                                     onMouseEnter={() => {
-                                         if ((selectedDivision?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                             (selectedDivision?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                             (selectedDivision?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                             setShowMailingContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onFocus={() => {
-                                         if ((selectedDivision?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
-                                             (selectedDivision?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
-                                             (selectedDivision?.mailing_address?.mailing_contact?.email_other || '') !== '') {
-                                             setShowMailingContactEmailCopyBtn(true);
-                                         }
-                                     }}
-                                     onBlur={() => {
-                                         window.setTimeout(() => {
-                                             setShowMailingContactEmailCopyBtn(false);
-                                         }, 1000);
-                                     }}
-                                     onMouseLeave={() => {
-                                         setShowMailingContactEmailCopyBtn(false);
-                                     }}>
+                                <div className={disabledDivisionMailingAddressFields + ' select-box-container'} style={{ flexGrow: 1 }}
+                                    onMouseEnter={() => {
+                                        if ((selectedDivision?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                            (selectedDivision?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                            (selectedDivision?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                            setShowMailingContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if ((selectedDivision?.mailing_address?.mailing_contact?.email_work || '') !== '' ||
+                                            (selectedDivision?.mailing_address?.mailing_contact?.email_personal || '') !== '' ||
+                                            (selectedDivision?.mailing_address?.mailing_contact?.email_other || '') !== '') {
+                                            setShowMailingContactEmailCopyBtn(true);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        window.setTimeout(() => {
+                                            setShowMailingContactEmailCopyBtn(false);
+                                        }, 1000);
+                                    }}
+                                    onMouseLeave={() => {
+                                        setShowMailingContactEmailCopyBtn(false);
+                                    }}>
 
                                     <div className="select-box-wrapper">
                                         <input tabIndex={28 + props.tabTimes} type="text" placeholder="E-Mail"
-                                               ref={refMailingContactEmail}
-                                               onKeyDown={async (e) => {
-                                                   let key = e.keyCode || e.which;
+                                            ref={refMailingContactEmail}
+                                            onKeyDown={async (e) => {
+                                                let key = e.keyCode || e.which;
 
-                                                   switch (key) {
-                                                       case 37:
-                                                       case 38: // arrow left | arrow up
-                                                           e.preventDefault();
-                                                           if (showMailingContactEmails) {
-                                                               let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
+                                                switch (key) {
+                                                    case 37:
+                                                    case 38: // arrow left | arrow up
+                                                        e.preventDefault();
+                                                        if (showMailingContactEmails) {
+                                                            let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
 
-                                                               if (selectedIndex === -1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
-                                                               } else {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       if (selectedIndex === 0) {
-                                                                           item.selected = index === (mailingContactEmailItems.length - 1);
-                                                                       } else {
-                                                                           item.selected = index === (selectedIndex - 1)
-                                                                       }
-                                                                       return item;
-                                                                   }))
-                                                               }
+                                                            if (selectedIndex === -1) {
+                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === (mailingContactEmailItems.length - 1);
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex - 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                               refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                   if (r && r.classList.contains('selected')) {
-                                                                       r.scrollIntoView({
-                                                                           behavior: 'auto',
-                                                                           block: 'center',
-                                                                           inline: 'nearest'
-                                                                       })
-                                                                   }
-                                                                   return true;
-                                                               });
-                                                           } else {
-                                                               if (mailingContactEmailItems.length > 1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
+                                                            refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            if (mailingContactEmailItems.length > 1) {
+                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
 
-                                                                   setShowMailingContactEmails(true);
+                                                                setShowMailingContactEmails(true);
 
-                                                                   refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                       if (r && r.classList.contains('selected')) {
-                                                                           r.scrollIntoView({
-                                                                               behavior: 'auto',
-                                                                               block: 'center',
-                                                                               inline: 'nearest'
-                                                                           })
-                                                                       }
-                                                                       return true;
-                                                                   });
-                                                               }
-                                                           }
-                                                           break;
+                                                                refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+                                                        break;
 
-                                                       case 39:
-                                                       case 40: // arrow right | arrow down
-                                                           e.preventDefault();
-                                                           if (showMailingContactEmails) {
-                                                               let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
+                                                    case 39:
+                                                    case 40: // arrow right | arrow down
+                                                        e.preventDefault();
+                                                        if (showMailingContactEmails) {
+                                                            let selectedIndex = mailingContactEmailItems.findIndex(item => item.selected);
 
-                                                               if (selectedIndex === -1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
-                                                               } else {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       if (selectedIndex === (mailingContactEmailItems.length - 1)) {
-                                                                           item.selected = index === 0;
-                                                                       } else {
-                                                                           item.selected = index === (selectedIndex + 1)
-                                                                       }
-                                                                       return item;
-                                                                   }))
-                                                               }
+                                                            if (selectedIndex === -1) {
+                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
+                                                            } else {
+                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                    if (selectedIndex === (mailingContactEmailItems.length - 1)) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === (selectedIndex + 1)
+                                                                    }
+                                                                    return item;
+                                                                }))
+                                                            }
 
-                                                               refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                   if (r && r.classList.contains('selected')) {
-                                                                       r.scrollIntoView({
-                                                                           behavior: 'auto',
-                                                                           block: 'center',
-                                                                           inline: 'nearest'
-                                                                       })
-                                                                   }
-                                                                   return true;
-                                                               });
-                                                           } else {
-                                                               if (mailingContactEmailItems.length > 1) {
-                                                                   await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                       item.selected = index === 0;
-                                                                       return item;
-                                                                   }))
+                                                            refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains('selected')) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: 'auto',
+                                                                        block: 'center',
+                                                                        inline: 'nearest'
+                                                                    })
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            if (mailingContactEmailItems.length > 1) {
+                                                                await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }))
 
-                                                                   setShowMailingContactEmails(true);
+                                                                setShowMailingContactEmails(true);
 
-                                                                   refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                       if (r && r.classList.contains('selected')) {
-                                                                           r.scrollIntoView({
-                                                                               behavior: 'auto',
-                                                                               block: 'center',
-                                                                               inline: 'nearest'
-                                                                           })
-                                                                       }
-                                                                       return true;
-                                                                   });
-                                                               }
-                                                           }
-                                                           break;
+                                                                refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }
+                                                        break;
 
-                                                       case 27: // escape
-                                                           setShowMailingContactEmails(false);
-                                                           break;
+                                                    case 27: // escape
+                                                        setShowMailingContactEmails(false);
+                                                        break;
 
-                                                       case 13: // enter
-                                                           if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                               await setSelectedDivision({
-                                                                   ...selectedDivision,
-                                                                   mailing_address: {
-                                                                       ...selectedDivision?.mailing_address,
-                                                                       mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
-                                                                   }
-                                                               });
+                                                    case 13: // enter
+                                                        if (showMailingContactEmails && mailingContactEmailItems.findIndex(item => item.selected) > -1) {
+                                                            await setSelectedDivision({
+                                                                ...selectedDivision,
+                                                                mailing_address: {
+                                                                    ...selectedDivision?.mailing_address,
+                                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                                }
+                                                            });
 
-                                                               saveMailingAddress({keyCode: 9});
-                                                               setShowMailingContactEmails(false);
-                                                               refMailingContactEmail.current.focus();
-                                                           }
-                                                           break;
+                                                            saveMailingAddress({ keyCode: 9 });
+                                                            setShowMailingContactEmails(false);
+                                                            refMailingContactEmail.current.focus();
+                                                        }
+                                                        break;
 
-                                                       case 9: // tab
-                                                           if (showMailingContactEmails) {
-                                                               e.preventDefault();
-                                                               await setSelectedDivision({
-                                                                   ...selectedDivision,
-                                                                   mailing_address: {
-                                                                       ...selectedDivision?.mailing_address,
-                                                                       mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
-                                                                   }
-                                                               });
+                                                    case 9: // tab
+                                                        if (showMailingContactEmails) {
+                                                            e.preventDefault();
+                                                            await setSelectedDivision({
+                                                                ...selectedDivision,
+                                                                mailing_address: {
+                                                                    ...selectedDivision?.mailing_address,
+                                                                    mailing_contact_primary_email: mailingContactEmailItems[mailingContactEmailItems.findIndex(item => item.selected)].type
+                                                                }
+                                                            });
 
-                                                               saveMailingAddress({keyCode: 9});
-                                                               setShowMailingContactEmails(false);
-                                                               refMailingContactEmail.current.focus();
-                                                           } else {
-                                                               saveMailingAddress({keyCode: 9});
-                                                           }
-                                                           break;
+                                                            saveMailingAddress({ keyCode: 9 });
+                                                            setShowMailingContactEmails(false);
+                                                            refMailingContactEmail.current.focus();
+                                                        } else {
+                                                            saveMailingAddress({ keyCode: 9 });
+                                                        }
+                                                        break;
 
-                                                       default:
-                                                           break;
-                                                   }
-                                               }}
-                                               onChange={e => {
-                                               }}
-                                               value={
-                                                   (selectedDivision?.mailing_address?.mailing_contact_primary_email || '') === 'work'
-                                                       ? (selectedDivision?.mailing_address?.mailing_contact?.email_work || '')
-                                                       : (selectedDivision?.mailing_address?.mailing_contact_primary_email || '') === 'personal'
-                                                           ? (selectedDivision?.mailing_address?.mailing_contact?.email_personal || '')
-                                                           : (selectedDivision?.mailing_address?.mailing_contact_primary_email || '') === 'other'
-                                                               ? (selectedDivision?.mailing_address?.mailing_contact?.email_other || '')
-                                                               : ''
-                                               }
+                                                    default:
+                                                        break;
+                                                }
+                                            }}
+                                            onChange={e => {
+                                            }}
+                                            value={
+                                                (selectedDivision?.mailing_address?.mailing_contact_primary_email || '') === 'work'
+                                                    ? (selectedDivision?.mailing_address?.mailing_contact?.email_work || '')
+                                                    : (selectedDivision?.mailing_address?.mailing_contact_primary_email || '') === 'personal'
+                                                        ? (selectedDivision?.mailing_address?.mailing_contact?.email_personal || '')
+                                                        : (selectedDivision?.mailing_address?.mailing_contact_primary_email || '') === 'other'
+                                                            ? (selectedDivision?.mailing_address?.mailing_contact?.email_other || '')
+                                                            : ''
+                                            }
                                         />
 
                                         {
@@ -3914,41 +4069,41 @@ const Divisions = (props) => {
                                             }} icon={faCopy} onClick={(e) => {
                                                 e.stopPropagation();
                                                 navigator.clipboard.writeText(refMailingContactEmail.current.value);
-                                            }}/>
+                                            }} />
                                         }
 
                                         {
                                             mailingContactEmailItems.length > 1 &&
                                             <FontAwesomeIcon className="dropdown-button" icon={faCaretDown}
-                                                             onClick={async () => {
-                                                                 if (showMailingContactEmails) {
-                                                                     setShowMailingContactEmails(false);
-                                                                 } else {
-                                                                     if (mailingContactEmailItems.length > 1) {
-                                                                         await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
-                                                                             item.selected = index === 0;
-                                                                             return item;
-                                                                         }))
+                                                onClick={async () => {
+                                                    if (showMailingContactEmails) {
+                                                        setShowMailingContactEmails(false);
+                                                    } else {
+                                                        if (mailingContactEmailItems.length > 1) {
+                                                            await setMailingContactEmailItems(mailingContactEmailItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            }))
 
-                                                                         window.setTimeout(async () => {
-                                                                             await setShowMailingContactEmails(true);
+                                                            window.setTimeout(async () => {
+                                                                await setShowMailingContactEmails(true);
 
-                                                                             refMailingContactEmailPopupItems.current.map((r, i) => {
-                                                                                 if (r && r.classList.contains('selected')) {
-                                                                                     r.scrollIntoView({
-                                                                                         behavior: 'auto',
-                                                                                         block: 'center',
-                                                                                         inline: 'nearest'
-                                                                                     })
-                                                                                 }
-                                                                                 return true;
-                                                                             });
-                                                                         }, 0)
-                                                                     }
-                                                                 }
+                                                                refMailingContactEmailPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains('selected')) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: 'auto',
+                                                                            block: 'center',
+                                                                            inline: 'nearest'
+                                                                        })
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }, 0)
+                                                        }
+                                                    }
 
-                                                                 refMailingContactEmail.current.focus();
-                                                             }}/>
+                                                    refMailingContactEmail.current.focus();
+                                                }} />
                                         }
                                     </div>
                                     {
@@ -3964,7 +4119,7 @@ const Divisions = (props) => {
                                                 ref={refMailingContactEmailDropDown}
                                             >
                                                 <div className="mochi-contextual-popup vertical below right"
-                                                     style={{height: 150}}>
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {
@@ -3988,7 +4143,7 @@ const Divisions = (props) => {
                                                                                     }
                                                                                 });
 
-                                                                                saveMailingAddress({keyCode: 9});
+                                                                                saveMailingAddress({ keyCode: 9 });
                                                                                 setShowMailingContactEmails(false);
                                                                                 refMailingContactEmail.current.focus();
                                                                             }}
@@ -4001,18 +4156,18 @@ const Divisions = (props) => {
                                                                             }
 
                                                                             (<b>
-                                                                            {
-                                                                                item.type === 'work' ? item.email
-                                                                                    : item.type === 'personal' ? item.email
-                                                                                        : item.type === 'other' ? item.email : ''
-                                                                            }
-                                                                        </b>)
+                                                                                {
+                                                                                    item.type === 'work' ? item.email
+                                                                                        : item.type === 'personal' ? item.email
+                                                                                            : item.type === 'other' ? item.email : ''
+                                                                                }
+                                                                            </b>)
 
                                                                             {
                                                                                 item.selected &&
                                                                                 <FontAwesomeIcon
                                                                                     className="dropdown-selected"
-                                                                                    icon={faCaretRight}/>
+                                                                                    icon={faCaretRight} />
                                                                             }
                                                                         </div>
                                                                     )
@@ -4049,51 +4204,51 @@ const Divisions = (props) => {
                                     <div className="top-border top-border-right"></div>
                                 </div>
 
-                                <div className="form-row" style={{justifyContent: 'space-around'}}>
+                                <div className="form-row" style={{ justifyContent: 'space-around' }}>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={39 + props.tabTimes} type="text" placeholder="Open"
-                                               onBlur={(e) => saveHours(e, 'hours open')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.hours_open = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.hours_open || '')}/>
+                                            onBlur={(e) => saveHours(e, 'hours open')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.hours_open = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.hours_open || '')} />
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={40 + props.tabTimes} type="text" placeholder="Close"
-                                               onBlur={(e) => saveHours(e, 'hours close')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.hours_close = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.hours_close || '')}/>
+                                            onBlur={(e) => saveHours(e, 'hours close')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.hours_close = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.hours_close || '')} />
                                     </div>
                                 </div>
 
-                                <div className="form-row" style={{justifyContent: 'space-around'}}>
+                                <div className="form-row" style={{ justifyContent: 'space-around' }}>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={41 + props.tabTimes} type="text" placeholder="Open"
-                                               onBlur={(e) => saveHours(e, 'hours open 2')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.hours_open2 = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.hours_open2 || '')}/>
+                                            onBlur={(e) => saveHours(e, 'hours open 2')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.hours_open2 = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.hours_open2 || '')} />
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={42 + props.tabTimes} type="text" placeholder="Close"
-                                               onBlur={(e) => saveHours(e, 'hours close 2')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.hours_close2 = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.hours_close2 || '')}/>
+                                            onBlur={(e) => saveHours(e, 'hours close 2')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.hours_close2 = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.hours_close2 || '')} />
                                     </div>
                                 </div>
                             </div>
@@ -4110,69 +4265,69 @@ const Divisions = (props) => {
                                     <div className="top-border top-border-right"></div>
                                 </div>
 
-                                <div className="form-row" style={{justifyContent: 'space-around'}}>
+                                <div className="form-row" style={{ justifyContent: 'space-around' }}>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={43 + props.tabTimes} type="text" placeholder="Open"
-                                               onBlur={(e) => saveHours(e, 'delivery hours open')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.delivery_hours_open = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.delivery_hours_open || '')}/>
+                                            onBlur={(e) => saveHours(e, 'delivery hours open')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.delivery_hours_open = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.delivery_hours_open || '')} />
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={44 + props.tabTimes} type="text" placeholder="Close"
-                                               onBlur={(e) => saveHours(e, 'delivery hours close')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.delivery_hours_close = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.delivery_hours_close || '')}/>
+                                            onBlur={(e) => saveHours(e, 'delivery hours close')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.delivery_hours_close = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.delivery_hours_close || '')} />
                                     </div>
                                 </div>
 
-                                <div className="form-row" style={{justifyContent: 'space-around'}}>
+                                <div className="form-row" style={{ justifyContent: 'space-around' }}>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={45 + props.tabTimes} type="text" placeholder="Open"
-                                               onBlur={(e) => saveHours(e, 'delivery hours open 2')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.delivery_hours_open2 = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.delivery_hours_open2 || '')}/>
+                                            onBlur={(e) => saveHours(e, 'delivery hours open 2')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.delivery_hours_open2 = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.delivery_hours_open2 || '')} />
                                     </div>
                                     <div className="form-h-sep"></div>
                                     <div className={disabledDivisionHoursFields + ' input-box-container'}>
                                         <input tabIndex={46 + props.tabTimes} type="text" placeholder="Close"
-                                               onKeyDown={(e) => {
+                                            onKeyDown={(e) => {
 
-                                                   let key = e.keyCode || e.which;
+                                                let key = e.keyCode || e.which;
 
-                                                   if (key === 9) {
-                                                       e.preventDefault();
-                                                       // let elems = document.getElementsByTagName('input');
+                                                if (key === 9) {
+                                                    e.preventDefault();
+                                                    // let elems = document.getElementsByTagName('input');
 
-                                                       // for (var i = elems.length; i--;) {
-                                                       //     if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === (1 + props.tabTimes).toString()) {
-                                                       //         elems[i].focus();
-                                                       //         break;
-                                                       //     }
-                                                       // }
+                                                    // for (var i = elems.length; i--;) {
+                                                    //     if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === (1 + props.tabTimes).toString()) {
+                                                    //         elems[i].focus();
+                                                    //         break;
+                                                    //     }
+                                                    // }
 
-                                                       refDivisionCode.current.focus();
-                                                   }
-                                               }}
-                                               onBlur={(e) => saveHours(e, 'delivery hours close 2')}
-                                               onChange={e => {
-                                                   let hours = (selectedDivision?.hours || {});
-                                                   hours.delivery_hours_close2 = e.target.value;
-                                                   setSelectedDivision({...selectedDivision, hours: hours});
-                                               }}
-                                               value={(selectedDivision?.hours?.delivery_hours_close2 || '')}/>
+                                                    refDivisionCode.current.focus();
+                                                }
+                                            }}
+                                            onBlur={(e) => saveHours(e, 'delivery hours close 2')}
+                                            onChange={e => {
+                                                let hours = (selectedDivision?.hours || {});
+                                                hours.delivery_hours_close2 = e.target.value;
+                                                setSelectedDivision({ ...selectedDivision, hours: hours });
+                                            }}
+                                            value={(selectedDivision?.hours?.delivery_hours_close2 || '')} />
                                     </div>
                                 </div>
                             </div>
@@ -4204,32 +4359,32 @@ const Divisions = (props) => {
                                                             origin={props.origin}
                                                             isOnPanel={true}
                                                             isAdmin={props.isAdmin}
-                                                            openPanel={props.openPanel}
-                                                            closePanel={props.closePanel}
+                                                            
+                                                            
                                                             componentId={moment().format('x')}
 
                                                             order_id={order.id}
                                                         />
                                                     }
 
-                                                    props.openPanel(panel, props.origin);
+                                                    openPanel(panel, props.origin);
                                                 }}>
                                                     <span style={{
                                                         color: "#4682B4",
                                                         fontWeight: 'bold',
                                                         marginRight: 5
                                                     }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
-                                                    ? order.routing[0].type === 'pickup'
-                                                        ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
-                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+                                                        ? order.routing[0].type === 'pickup'
+                                                            ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
+                                                                ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                                    ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                                    (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
 
-                                                        : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
-                                                            ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-                                                    : ''}
+                                                            : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
+                                                                ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
+                                                                    ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
+                                                                    (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
+                                                        : ''}
                                                 </div>
                                             )
                                         })
@@ -4242,7 +4397,7 @@ const Divisions = (props) => {
                                     <animated.div className='loading-container' style={style}>
                                         <div className="loading-container-wrapper">
                                             <Loader type="Circles" color="#009bdd" height={40} width={40}
-                                                    visible={item}/>
+                                                visible={item} />
                                         </div>
                                     </animated.div>
                                 )
@@ -4253,8 +4408,8 @@ const Divisions = (props) => {
                 </div>
 
 
-                <div className="fields-container-col" style={{alignItems: 'flex-end'}}>
-                    <div className="fields-container-row" style={{display: 'flex', flexDirection: 'column'}}>
+                <div className="fields-container-col" style={{ alignItems: 'flex-end' }}>
+                    <div className="fields-container-row" style={{ display: 'flex', flexDirection: 'column' }}>
                         {/*BUTTONS SECTION*/}
                         <div className="buttons-container">
                             <div className="mochi-button wrap" onClick={revenueInformationBtnClick}>
@@ -4287,6 +4442,28 @@ const Divisions = (props) => {
                                 <div className="mochi-button-base">Print Division Information</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
+
+                            <div className={disabledDivisionContactFields + ' input-toggle-container'} style={{ width: '100%', maxWidth: '100%' }}>
+                                <input type="checkbox"
+                                    id={props.panelName + '-cbox-division-type-btn'}
+                                    onChange={(e) => {
+                                        setSelectedDivision(prev => {
+                                            return {
+                                                ...prev,
+                                                type: e.target.checked ? 'company' : 'brokerage'
+                                            }
+                                        });
+
+                                        saveDivision({ keyCode: 9 });
+                                    }}
+                                    checked={(selectedDivision?.type || 'company') === 'company'} />
+                                <label htmlFor={props.panelName + '-cbox-division-type-btn'} style={{
+                                    backgroundColor: (selectedDivision?.type || 'company') === 'company' ? '#ffb80d' : 'rgba(70,130,180,0.7)'
+                                }}>
+                                    <div className="label-text" style={{ textTransform: 'capitalize', fontSize: '0.8rem' }}>{(selectedDivision?.type || 'company')}</div>
+                                    <div className="input-toggle-btn"></div>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4294,13 +4471,13 @@ const Divisions = (props) => {
 
             {
                 noteTransition((style, item) => item && (
-                    <animated.div style={{...style}}>
+                    <animated.div style={{ ...style }}>
                         <DivisionModal
                             selectedData={selectedNote}
                             setSelectedData={setSelectedNote}
                             selectedParent={selectedDivision}
                             setSelectedParent={(data) => {
-                                setSelectedDivision({...selectedDivision, notes: data.notes});
+                                setSelectedDivision({ ...selectedDivision, notes: data.notes });
                             }}
                             savingDataUrl='/saveDivisionNote'
                             deletingDataUrl='/deleteDivisionNote'
@@ -4321,18 +4498,45 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
-        companySetupOpenedPanels: state.companySetupReducers.companySetupOpenedPanels
+
+        adminHomePanels: state.adminReducers.adminHomePanels,
+        companyHomePanels: state.companyReducers.companyHomePanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+        adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+        companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        adminReportPanels: state.reportReducers.adminReportPanels,
+        companyReportPanels: state.reportReducers.companyReportPanels,
+
     }
 }
 
 export default connect(mapStateToProps, {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCarrierOpenedPanels,
-    setCompanySetupOpenedPanels,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+
     setSelectedCompany,
-    setSelectedDriver
+    setSelectedDriver,
 })(Divisions)

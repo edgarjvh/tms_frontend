@@ -250,7 +250,7 @@ export default class CustomerConfirmation extends Component {
                                                                                     : (pickup?.contact_primary_phone || 'work') === 'other'
                                                                                         ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                         : ''
-                                                                    : (pickup?.contact_phone || '')
+                                                                    : (customer?.contact_phone || '')
                                                             : (route?.type || '') === 'delivery'
                                                                 ? (delivery?.contact_id || 0) > 0
                                                                     ? (delivery?.contact_primary_phone || 'work') === 'work'
@@ -276,7 +276,7 @@ export default class CustomerConfirmation extends Component {
                                                                                         : (delivery?.contact_primary_phone || 'work') === 'other'
                                                                                             ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                             : ''
-                                                                        : (delivery?.contact_phone || '')
+                                                                        : (customer?.contact_phone || '')
                                                                 : ''
 
                                                     }

@@ -77,3 +77,10 @@ export const setReportsScreenFocused = bool => {
         payload: bool
     }
 }
+
+export const setCompanyHomePanels = bool => {
+    return {
+        type: companyConstants.SET_COMPANY_HOME_PANELS,
+        payload: bool
+    }
+}

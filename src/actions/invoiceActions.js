@@ -139,3 +139,15 @@ export const setLbInvoiceSelectedInternalNote = note => {
         payload: note
     }
 }
+export const setAdminInvoicePanels = note => {
+    return {
+        type: invoiceConstants.SET_ADMIN_INVOICE_PANELS,
+        payload: note
+    }
+}
+export const setCompanyInvoicePanels = note => {
+    return {
+        type: invoiceConstants.SET_COMPANY_INVOICE_PANELS,
+        payload: note
+    }
+}

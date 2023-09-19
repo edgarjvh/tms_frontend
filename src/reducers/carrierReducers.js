@@ -289,7 +289,13 @@ export const carrierReducers = (state = {
     lbCarrierInfoRating: 0,
 
 
-    panels: []
+    panels: [],
+
+    adminCarrierPanels: [],
+    companyCarrierPanels: []
+
+
+
 }, action) => {
     switch (action.type) {
         case carriersConstants.SET_CARRIERS:
@@ -1884,6 +1890,20 @@ export const carrierReducers = (state = {
                     }
                     return p;
                 })
+            }
+            break;
+
+        case carriersConstants.SET_ADMIN_CARRIER_PANELS:
+            state = {
+                ...state,
+                adminCarrierPanels: action.payload
+            }
+            break;
+
+        case carriersConstants.SET_COMPANY_CARRIER_PANELS:
+            state = {
+                ...state,
+                companyCarrierPanels: action.payload
             }
             break;
         default:

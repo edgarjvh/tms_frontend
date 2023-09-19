@@ -1,32 +1,70 @@
-import React, {useState, useRef, useEffect} from "react";
-import {connect} from "react-redux";
+import React, { useState, useRef, useEffect } from "react";
+import { connect } from "react-redux";
 import classnames from "classnames";
 import $ from "jquery";
 import "./Carriers.css";
-import {useTransition, animated} from "react-spring";
+import { useTransition, animated } from "react-spring";
 import moment from "moment";
 import MaskedInput from "react-text-mask";
-import PanelContainer from "./panels/panel-container/PanelContainer.jsx";
-// import CarrierModal from './modal/Modal.jsx';
 import accounting from "accounting";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck, faCopy, faSearch} from "@fortawesome/free-solid-svg-icons";
-import {useDetectClickOutside} from "react-detect-click-outside";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck, faCopy, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { useDetectClickOutside } from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
 import "react-datepicker/dist/react-datepicker.css";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
 import ToPrint from "./ToPrint.jsx";
-import {useReactToPrint} from "react-to-print";
+import { useReactToPrint } from "react-to-print";
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import {setCompanyOpenedPanels, setAdminOpenedPanels, setDispatchOpenedPanels, setCustomerOpenedPanels, setCarrierOpenedPanels, setLoadBoardOpenedPanels, setInvoiceOpenedPanels, setAdminCustomerOpenedPanels, setAdminCarrierOpenedPanels, setSelectedCarrier, setSelectedCarrierContact, setSelectedDriver, setSelectedInsurance} from "./../../../actions";
+import {
+    setSelectedCarrier,
+    setSelectedCarrierContact,
+    setSelectedDriver,
+    setSelectedInsurance,
+    
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels
+} from "./../../../actions";
 
-import {CarrierImport, Calendar, Contacts, CustomerSearch, ContactSearch, Documents, RevenueInformation, OrderHistory, FactoringCompany, EquipmentInformation, Modal as CarrierModal, ACHWiringInfo, MCNumbers} from "./../panels";
+import {
+    CarrierImport,
+    Calendar,
+    Contacts,
+    CustomerSearch,
+    ContactSearch,
+    Documents,
+    RevenueInformation,
+    OrderHistory,
+    FactoringCompany,
+    EquipmentInformation,
+    Modal as CarrierModal,
+    ACHWiringInfo,
+    MCNumbers
+} from "./../panels";
 
-import {Dispatch} from "./../../company";
+import { Dispatch } from "./../../company";
 
-import {SelectBox} from "./../../controls";
+import { SelectBox } from "./../../controls";
+
+import { MainForm } from './../forms';
+
+import { CompanyDrivers } from './../../admin/panels';
 
 const Carriers = props => {
     // DECLARATIONS
@@ -47,6 +85,11 @@ const Carriers = props => {
     const refFactoringCompanyCode = useRef();
     const refCarrierName = useRef();
     const refCarrierEmail = useRef();
+
+    const refDriverCode = useRef();
+    const refDriverName = useRef();
+    const refDriverEmail = useRef();
+
     const refFactoringCompanyName = useRef();
     const refCarrierContactPhone = useRef();
     const refCarrierContactFirstName = useRef();
@@ -171,121 +214,121 @@ const Carriers = props => {
     const [mcNumbersFilter, setMcNumbersFilter] = useState("");
 
     const loadingTransition = useTransition(isLoading, {
-        from: {opacity: 0, display: "block"},
-        enter: {opacity: 1, display: "block"},
-        leave: {opacity: 0, display: "none"},
+        from: { opacity: 0, display: "block" },
+        enter: { opacity: 1, display: "block" },
+        leave: { opacity: 0, display: "none" },
         reverse: isLoading,
     });
 
     const loadingCarrierOrdersTransition = useTransition(isLoadingCarrierOrders, {
-        from: {opacity: 0, display: "block"},
-        enter: {opacity: 1, display: "block"},
-        leave: {opacity: 0, display: "none"},
+        from: { opacity: 0, display: "block" },
+        enter: { opacity: 1, display: "block" },
+        leave: { opacity: 0, display: "none" },
         reverse: isLoadingCarrierOrders,
     });
 
     const carrierContactPhonesTransition = useTransition(showCarrierContactPhones, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: showCarrierContactPhones,
     });
 
     const carrierContactEmailsTransition = useTransition(showCarrierContactEmails, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: showCarrierContactEmails,
     });
 
     const equipmentTransition = useTransition(driverEquipmentDropdownItems.length > 0, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: driverEquipmentDropdownItems.length > 0,
     });
 
     const mailingContactNamesTransition = useTransition(showMailingContactNames, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: showMailingContactNames,
     });
 
     const mailingContactPhonesTransition = useTransition(showMailingContactPhones, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: showMailingContactPhones,
     });
 
     const mailingContactEmailsTransition = useTransition(showMailingContactEmails, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: showMailingContactEmails,
     });
 
     const insuranceTypeTransition = useTransition(insuranceTypeDropdownItems.length > 0, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: insuranceTypeDropdownItems.length > 0,
     });
 
     const insuranceCompanyTransition = useTransition(insuranceCompanyDropdownItems.length > 0, {
-        from: {opacity: 0, top: "calc(100% + 7px)"},
-        enter: {opacity: 1, top: "calc(100% + 12px)"},
-        leave: {opacity: 0, top: "calc(100% + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
         reverse: insuranceCompanyDropdownItems.length > 0,
     });
 
     const factoringCompanyContactNamesTransition = useTransition(showFactoringCompanyContactNames, {
-        from: {opacity: 0, top: "calc(-165px + 7px)"},
-        enter: {opacity: 1, top: "calc(-165px + 12px)"},
-        leave: {opacity: 0, top: "calc(-165px + 7px)"},
-        config: {duration: 100},
+        from: { opacity: 0, top: "calc(-165px + 7px)" },
+        enter: { opacity: 1, top: "calc(-165px + 12px)" },
+        leave: { opacity: 0, top: "calc(-165px + 7px)" },
+        config: { duration: 100 },
         reverse: showFactoringCompanyContactNames,
     });
 
     const calendarTransition = useTransition(isCalendarShown, {
-        from: {opacity: 0, display: "block", top: "calc(100% + 7px)"},
-        enter: {opacity: 1, display: "block", top: "calc(100% + 12px)"},
-        leave: {opacity: 0, display: "none", top: "calc(100% + 7px)"},
+        from: { opacity: 0, display: "block", top: "calc(100% + 7px)" },
+        enter: { opacity: 1, display: "block", top: "calc(100% + 12px)" },
+        leave: { opacity: 0, display: "none", top: "calc(100% + 7px)" },
         reverse: isCalendarShown,
-        config: {duration: 100},
+        config: { duration: 100 },
     });
 
     const noteTransition = useTransition(selectedNote?.id !== undefined, {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: selectedNote?.id !== undefined,
-        config: {duration: 100},
+        config: { duration: 100 },
     });
 
     const achWiringInfoTransition = useTransition(showingACHWiringInfo, {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: showingACHWiringInfo,
-        config: {duration: 100},
+        config: { duration: 100 },
     });
 
     const mcNumbersTransition = useTransition(showingMCNumbers, {
-        from: {opacity: 0},
-        enter: {opacity: 1},
-        leave: {opacity: 0},
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
         reverse: showingMCNumbers,
-        config: {duration: 100},
+        config: { duration: 100 },
     });
 
     const handledPrintCarrierInformation = useReactToPrint({
@@ -335,7 +378,7 @@ const Carriers = props => {
                 }
             }
 
-            let newSelectedCarrier = {...selectedCarrier};
+            let newSelectedCarrier = { ...selectedCarrier };
 
             if (newSelectedCarrier.id === undefined || newSelectedCarrier.id === -1) {
                 newSelectedCarrier.id = 0;
@@ -478,7 +521,7 @@ const Carriers = props => {
                                 },
                             };
                         });
-                        setSelectedContact({...res.data.contact});
+                        setSelectedContact({ ...res.data.contact });
 
                         contacts = res.data.contacts;
 
@@ -649,10 +692,10 @@ const Carriers = props => {
             setIsLoading(true);
 
             axios
-                .post(props.serverUrl + "/getCarrierById", {id: props.carrier_id})
+                .post(props.serverUrl + "/getCarrierById", { id: props.carrier_id })
                 .then(res => {
                     if (res.data.result === "OK") {
-                        let carrier = {...res.data.carrier};
+                        let carrier = { ...res.data.carrier };
 
                         let mailing_address = carrier?.mailing_address || {};
 
@@ -670,14 +713,14 @@ const Carriers = props => {
                                     (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                         ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                         : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                        : "";
+                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                        : "";
 
                                 mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -685,10 +728,10 @@ const Carriers = props => {
                                     (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                         ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                         : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                        : "";
+                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                            : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                : "";
                             }
                         }
 
@@ -706,14 +749,14 @@ const Carriers = props => {
                                     (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                         ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                         : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                        : "";
+                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                        : "";
 
                                 mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -721,10 +764,10 @@ const Carriers = props => {
                                     (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                         ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                         : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                        : "";
+                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                            : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                : "";
                             }
                         }
 
@@ -764,7 +807,6 @@ const Carriers = props => {
         } else {
             if ((props.selectedCarrier?.component_id || "") !== props.componentId) {
                 if ((selectedCarrier?.id || 0) > 0 && (props.selectedCarrier?.id || 0) > 0 && selectedCarrier.id === props.selectedCarrier.id) {
-                    console.log("here");
                     setSelectedCarrier(selectedCarrier => {
                         return {
                             ...selectedCarrier,
@@ -815,23 +857,23 @@ const Carriers = props => {
     }, [props.selectedCarrierInsurance]);
 
     useEffect(() => {
-        if (props.selectedCarrierDriver?.change_carrier || false) {
+        if (props.selectedDriver?.change_carrier || false) {
             setSelectedDriver({
-                ...props.selectedCarrierDriver,
+                ...props.selectedDriver,
             });
         } else {
-            if ((props.selectedCarrierDriver?.component_id || "") !== props.componentId) {
-                if ((selectedDriver?.id || 0) > 0 && (props.selectedCarrierDriver?.id || 0) > 0 && selectedDriver.id === props.selectedCarrierDriver.id) {
+            if ((props.selectedDriver?.component_id || "") !== props.componentId) {
+                if ((selectedDriver?.id || 0) > 0 && (props.selectedDriver?.id || 0) > 0 && selectedDriver.id === props.selectedDriver.id) {
                     setSelectedDriver(selectedDriver => {
                         return {
                             ...selectedDriver,
-                            ...props.selectedCarrierDriver,
+                            ...props.selectedDriver,
                         };
                     });
                 }
             }
         }
-    }, [props.selectedCarrierDriver]);
+    }, [props.selectedDriver]);
 
     useEffect(() => {
         if (props.screenFocused) {
@@ -841,7 +883,7 @@ const Carriers = props => {
         }
     }, [props.screenFocused]);
 
-    useEffect(() => {}, []);
+    useEffect(() => { }, []);
 
     useEffect(() => {
         if (isCalendarShown) {
@@ -1018,7 +1060,7 @@ const Carriers = props => {
         setShowingContactList(true);
         setSelectedDriver({});
         setSelectedInsurance({});
-        setSelectedCarrier({id: 0, code: clearCode ? "" : selectedCarrier.code});
+        setSelectedCarrier({ id: 0, code: clearCode ? "" : selectedCarrier.code });
 
         // refCarrierCode.current.focus();
     };
@@ -1083,17 +1125,17 @@ const Carriers = props => {
                     tabTimes={6000 + props.tabTimes}
                     panelName={`${props.panelName}-carrier-search`}
                     origin={props.origin}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+                    
+                    
                     suborigin={"carrier"}
                     componentId={moment().format("x")}
                     customerSearch={carrierSearch}
                     callback={id => {
                         new Promise((resolve, reject) => {
                             if ((id || 0) > 0) {
-                                axios.post(props.serverUrl + "/getCarrierById", {id: id}).then(res => {
+                                axios.post(props.serverUrl + "/getCarrierById", { id: id }).then(res => {
                                     if (res.data.result === "OK") {
-                                        let carrier = {...res.data.carrier};
+                                        let carrier = { ...res.data.carrier };
 
                                         let mailing_address = carrier?.mailing_address || {};
 
@@ -1111,14 +1153,14 @@ const Carriers = props => {
                                                     (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                                         ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                                         : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                        : "";
+                                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                                        : "";
 
                                                 mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -1126,10 +1168,10 @@ const Carriers = props => {
                                                     (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                                         ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                                         : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                        : "";
+                                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                                            : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                                : "";
                                             }
                                         }
 
@@ -1147,14 +1189,14 @@ const Carriers = props => {
                                                     (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                                         ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                                         : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                        : "";
+                                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                                        : "";
 
                                                 mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -1162,10 +1204,10 @@ const Carriers = props => {
                                                     (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                                         ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                                         : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                        : "";
+                                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                                            : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                                : "";
                                             }
                                         }
 
@@ -1214,11 +1256,11 @@ const Carriers = props => {
                             }
                         })
                             .then(response => {
-                                props.closePanel(`${props.panelName}-carrier-search`, props.origin);
+                                closePanel(`${props.panelName}-carrier-search`, props.origin);
                                 refCarrierName.current.focus();
                             })
                             .catch(e => {
-                                props.closePanel(`${props.panelName}-carrier-search`, props.origin);
+                                closePanel(`${props.panelName}-carrier-search`, props.origin);
                                 refCarrierCode.current.focus();
                             });
                     }}
@@ -1226,7 +1268,7 @@ const Carriers = props => {
             ),
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const searchCarrierByCode = e => {
@@ -1244,7 +1286,7 @@ const Carriers = props => {
                             if (res.data.carriers.length > 0) {
                                 setInitialValues();
 
-                                let carrier = {...res.data.carriers[0]};
+                                let carrier = { ...res.data.carriers[0] };
                                 let mailing_address = carrier?.mailing_address || {};
 
                                 if ((carrier?.remit_to_address_is_the_same || 0) === 1) {
@@ -1261,14 +1303,14 @@ const Carriers = props => {
                                             (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                                 ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                                 : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                : "";
+                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                                : "";
 
                                         mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -1276,10 +1318,10 @@ const Carriers = props => {
                                             (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                                 ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                                 : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                                : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                : "";
+                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                                    : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                        : "";
                                     }
                                 }
 
@@ -1297,14 +1339,14 @@ const Carriers = props => {
                                             (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                                 ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                                 : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                : "";
+                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                                : "";
 
                                         mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -1312,10 +1354,10 @@ const Carriers = props => {
                                             (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                                 ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                                 : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                                : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                : "";
+                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                                    : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                        : "";
                                     }
                                 }
 
@@ -1356,7 +1398,7 @@ const Carriers = props => {
 
     const getFactoringCompanyByCode = e => {
         let key = e.keyCode || e.which;
-        let _selectedCarrier = {...selectedCarrier};
+        let _selectedCarrier = { ...selectedCarrier };
 
         if (key === 9) {
             if (e.target.value.trim() === "") {
@@ -1368,7 +1410,7 @@ const Carriers = props => {
                 validateCarrierForSaving(e);
             } else {
                 axios
-                    .post(props.serverUrl + "/factoringCompanies", {code: e.target.value.trim().toLowerCase()})
+                    .post(props.serverUrl + "/factoringCompanies", { code: e.target.value.trim().toLowerCase() })
                     .then(async res => {
                         if (res.data.result === "OK") {
                             if (res.data.factoring_companies.length > 0) {
@@ -1481,15 +1523,15 @@ const Carriers = props => {
                     owner="carrier"
                     origin={props.origin}
                     suborigin="carrier"
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+                    
+                    
                     componentId={moment().format("x")}
-                    contactSearch={{search: filters}}
+                    contactSearch={{ search: filters }}
                     callback={contact => {
                         new Promise((resolve, reject) => {
                             if (contact) {
-                                setSelectedCarrier({...contact.carrier});
-                                setSelectedContact({...(contact.carrier.contacts || []).find(c => c.is_primary === 1)});
+                                setSelectedCarrier({ ...contact.carrier });
+                                setSelectedContact({ ...(contact.carrier.contacts || []).find(c => c.is_primary === 1) });
 
                                 setShowingContactList(true);
                                 setContactSearch({});
@@ -1500,11 +1542,11 @@ const Carriers = props => {
                             }
                         })
                             .then(response => {
-                                props.closePanel(`${props.panelName}-contact-search`, props.origin);
+                                closePanel(`${props.panelName}-contact-search`, props.origin);
                                 refCarrierName.current.focus();
                             })
                             .catch(e => {
-                                props.closePanel(`${props.panelName}-contact-search`, props.origin);
+                                closePanel(`${props.panelName}-contact-search`, props.origin);
                                 refCarrierCode.current.focus();
                             });
                     }}
@@ -1512,7 +1554,7 @@ const Carriers = props => {
             ),
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const validateMailingAddressToSave = e => {
@@ -1539,7 +1581,7 @@ const Carriers = props => {
             };
         });
 
-        validateCarrierForSaving({keyCode: 9});
+        validateCarrierForSaving({ keyCode: 9 });
         refCarrierMailingCode.current.focus();
     };
 
@@ -1556,7 +1598,7 @@ const Carriers = props => {
             }
         }
 
-        let currentCarrier = {...selectedCarrier};
+        let currentCarrier = { ...selectedCarrier };
 
         if ((currentCarrier?.id || 0) === 0) {
             window.alert("You must select a carrier first");
@@ -1593,14 +1635,14 @@ const Carriers = props => {
                 currentCarrier.mailing_carrier_contact_primary_phone === "work"
                     ? selectedContact?.phone_work || ""
                     : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
-                    ? selectedContact?.phone_work_fax || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
-                    ? selectedContact?.phone_mobile || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
-                    ? selectedContact?.phone_direct || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "other"
-                    ? selectedContact?.phone_other || ""
-                    : "";
+                        ? selectedContact?.phone_work_fax || ""
+                        : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
+                            ? selectedContact?.phone_mobile || ""
+                            : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
+                                ? selectedContact?.phone_direct || ""
+                                : currentCarrier.mailing_carrier_contact_primary_phone === "other"
+                                    ? selectedContact?.phone_other || ""
+                                    : "";
 
             mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? selectedContact?.phone_ext || "" : "";
 
@@ -1612,14 +1654,14 @@ const Carriers = props => {
                 currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ""
                     ? "work"
                     : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ""
-                    ? "fax"
-                    : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ""
-                    ? "mobile"
-                    : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ""
-                    ? "direct"
-                    : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ""
-                    ? "other"
-                    : "work";
+                        ? "fax"
+                        : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ""
+                            ? "mobile"
+                            : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ""
+                                ? "direct"
+                                : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ""
+                                    ? "other"
+                                    : "work";
 
             currentCarrier.mailing_carrier_contact_primary_email = currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].email_work !== "" ? "work" : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].email_personal !== "" ? "personal" : currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)].email_other !== "" ? "other" : "work";
 
@@ -1629,14 +1671,14 @@ const Carriers = props => {
                 currentCarrier.mailing_carrier_contact_primary_phone === "work"
                     ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ""
                     : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
-                    ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
-                    ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
-                    ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "other"
-                    ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ""
-                    : "";
+                        ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ""
+                        : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
+                            ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ""
+                            : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
+                                ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ""
+                                : currentCarrier.mailing_carrier_contact_primary_phone === "other"
+                                    ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ""
+                                    : "";
 
             mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || "" : "";
 
@@ -1644,10 +1686,10 @@ const Carriers = props => {
                 currentCarrier.mailing_carrier_contact_primary_email === "work"
                     ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ""
                     : currentCarrier.mailing_carrier_contact_primary_email === "personal"
-                    ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ""
-                    : currentCarrier.mailing_carrier_contact_primary_email === "other"
-                    ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ""
-                    : "";
+                        ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ""
+                        : currentCarrier.mailing_carrier_contact_primary_email === "other"
+                            ? currentCarrier.contacts[currentCarrier.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ""
+                            : "";
         } else if (currentCarrier.contacts.length > 0) {
             currentCarrier.mailing_carrier_contact_id = currentCarrier.contacts[0].id;
 
@@ -1661,14 +1703,14 @@ const Carriers = props => {
                 currentCarrier.mailing_carrier_contact_primary_phone === "work"
                     ? currentCarrier.contacts[0]?.phone_work || ""
                     : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
-                    ? currentCarrier.contacts[0]?.phone_work_fax || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
-                    ? currentCarrier.contacts[0]?.phone_mobile || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
-                    ? currentCarrier.contacts[0]?.phone_direct || ""
-                    : currentCarrier.mailing_carrier_contact_primary_phone === "other"
-                    ? currentCarrier.contacts[0]?.phone_other || ""
-                    : "";
+                        ? currentCarrier.contacts[0]?.phone_work_fax || ""
+                        : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
+                            ? currentCarrier.contacts[0]?.phone_mobile || ""
+                            : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
+                                ? currentCarrier.contacts[0]?.phone_direct || ""
+                                : currentCarrier.mailing_carrier_contact_primary_phone === "other"
+                                    ? currentCarrier.contacts[0]?.phone_other || ""
+                                    : "";
 
             mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? currentCarrier.contacts[0]?.phone_ext || "" : "";
 
@@ -1679,10 +1721,10 @@ const Carriers = props => {
             currentCarrier.mailing_carrier_contact_primary_email = "work";
         }
 
-        setSelectedCarrier({...currentCarrier, mailing_address: mailing_address});
+        setSelectedCarrier({ ...currentCarrier, mailing_address: mailing_address });
 
         window.setTimeout(() => {
-            validateCarrierForSaving({keyCode: 9});
+            validateCarrierForSaving({ keyCode: 9 });
         }, 500);
     };
 
@@ -1706,10 +1748,10 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-factoring-company`,
             fixedWidthPercentage: 70,
-            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} factoringCompanyId={0} selectedCarrier={{}} />,
+            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin}   componentId={moment().format("x")} factoringCompanyId={0} selectedCarrier={{}} />,
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const searchFactoringCompanyBtnClick = () => {
@@ -1757,8 +1799,8 @@ const Carriers = props => {
                     tabTimes={6000 + props.tabTimes}
                     panelName={`${props.panelName}-factoring-company-search`}
                     origin={props.origin}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+                    
+                    
                     suborigin={"factoring-company"}
                     componentId={moment().format("x")}
                     customerSearch={factoringCompanySearch}
@@ -1767,7 +1809,7 @@ const Carriers = props => {
                             if (factoringCompanyId) {
                                 if ((selectedCarrier?.id || 0) > 0) {
                                     axios
-                                        .post(props.serverUrl + "/getFactoringCompanyById", {id: factoringCompanyId})
+                                        .post(props.serverUrl + "/getFactoringCompanyById", { id: factoringCompanyId })
                                         .then(res => {
                                             setSelectedCarrier(selectedCarrier => {
                                                 return {
@@ -1777,30 +1819,30 @@ const Carriers = props => {
                                                 };
                                             });
 
-                                            validateCarrierForSaving({keyCode: 9});
+                                            validateCarrierForSaving({ keyCode: 9 });
 
                                             resolve("OK");
                                         })
-                                        .catch(e => {});
+                                        .catch(e => { });
                                 } else {
                                     let panel = {
                                         panelName: `${props.panelName}-factoring-company`,
                                         fixedWidthPercentage: 70,
-                                        component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} factoringCompanyId={factoringCompanyId} selectedCarrier={selectedCarrier} />,
+                                        component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin}   componentId={moment().format("x")} factoringCompanyId={factoringCompanyId} selectedCarrier={selectedCarrier} />,
                                     };
 
-                                    props.openPanel(panel, props.origin);
+                                    openPanel(panel, props.origin);
                                 }
                             } else {
                                 reject("no factoring company");
                             }
                         })
                             .then(response => {
-                                props.closePanel(`${props.panelName}-factoring-company-search`, props.origin);
+                                closePanel(`${props.panelName}-factoring-company-search`, props.origin);
                                 refFactoringCompanyName.current.focus();
                             })
                             .catch(e => {
-                                props.closePanel(`${props.panelName}-factoring-company-search`, props.origin);
+                                closePanel(`${props.panelName}-factoring-company-search`, props.origin);
                                 refFactoringCompanyCode.current.focus();
                             });
                     }}
@@ -1808,7 +1850,7 @@ const Carriers = props => {
             ),
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const moreFactoringCompanyBtnClick = () => {
@@ -1825,14 +1867,14 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-factoring-company`,
             fixedWidthPercentage: 70,
-            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} factoringCompanyId={selectedCarrier.factoring_company.id} selectedCarrier={selectedCarrier} />,
+            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin}   componentId={moment().format("x")} factoringCompanyId={selectedCarrier.factoring_company.id} selectedCarrier={selectedCarrier} />,
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const clearFactoringCompanyBtnClick = () => {
-        let _selectedCarrier = {...selectedCarrier};
+        let _selectedCarrier = { ...selectedCarrier };
         _selectedCarrier.factoring_company_id = null;
 
         setSelectedCarrier(selectedCarrier => {
@@ -1901,60 +1943,75 @@ const Carriers = props => {
                 if ((selectedDriver?.id || 0) > 0) {
                     if (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0) {
                         setIsSavingDriver(false);
+                        refCarrierCode.current.focus();
                         return;
                     }
                 } else {
                     if (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0) {
                         setIsSavingDriver(false);
+                        refCarrierCode.current.focus();
                         return;
                     }
                 }
             }
 
-            if ((selectedCarrier?.id || 0) > 0) {
-                let driver = {...selectedDriver, carrier_id: selectedCarrier.id};
-
-                if ((driver?.first_name || "").trim() !== "") {
-                    axios
-                        .post(props.serverUrl + "/saveCarrierDriver", driver)
-                        .then(res => {
-                            if (res.data.result === "OK") {
-                                setSelectedCarrier(selectedCarrier => {
-                                    return {
-                                        ...selectedCarrier,
-                                        drivers: res.data.drivers,
-                                    };
-                                });
-
-                                setSelectedDriver(selectedDriver => {
-                                    return {
-                                        ...selectedDriver,
-                                        id: res.data.driver.id,
-                                    };
-                                });
-
-                                props.setSelectedCarrier({
-                                    id: selectedCarrier.id,
-                                    drivers: res.data.drivers,
-                                    component_id: props.componentId,
-                                });
-
-                                props.setSelectedDriver({
-                                    ...res.data.driver,
-                                    component_id: props.componentId,
-                                });
-                            }
-
-                            setIsSavingDriver(false);
-                        })
-                        .catch(e => {
-                            console.log("error on saving carrier driver", e);
-                            setIsSavingDriver(false);
-                        });
-                } else {
-                    setIsSavingDriver(false);
-                }
+            if ((selectedCarrier?.id || 0) === 0) {
+                setIsSavingDriver(false);
+                refCarrierCode.current.focus();
+                return;
             }
+
+            let driver = {
+                ...selectedDriver,
+                mailing_address: null,
+                contacts: [],
+                license: null,
+                tractor: null,
+                trailer: null,
+                tractor: selectedDriver?.tractor?.number,
+                type_id: selectedDriver?.tractor?.type_id,
+                trailer: selectedDriver?.trailer?.number
+            }
+
+            if ((driver?.carrier_id || 0) === 0) {
+                driver.carrier_id = selectedCarrier.id;
+            }
+
+            if ((driver?.name || '') !== '') {
+
+                let first_name = driver.name.split(' ')[0].trim();
+                let last_name = driver.name.substring(first_name.length).trim();
+
+                driver.first_name = first_name;
+                driver.last_name = last_name;
+
+                axios.post(props.serverUrl + `/saveDriver`, { ...driver, sub_origin: 'carrier' }).then(res => {
+                    if (res.data.result === 'OK') {
+                        if (res.data.driver) {
+                            setSelectedDriver({});
+
+                            setSelectedCarrier(prev => {
+                                return {
+                                    ...prev,
+                                    drivers: (res.data.drivers || []).filter(x => x.owner_type === 'carrier')
+                                }
+                            });
+                        }
+                        setIsSavingDriver(false);
+
+                        refDriverCode.current.focus();
+                    } else {
+                        setIsSavingDriver(false);
+                    }
+                }).catch(e => {
+                    console.log('erros saving carrier driver', e);
+                    setIsSavingDriver(false);
+                })
+            } else {
+                refCarrierCode.current.focus();
+            }
+
+            setIsSavingDriver(false);
         }
     }, [isSavingDriver]);
 
@@ -1984,7 +2041,7 @@ const Carriers = props => {
                 }
             }
 
-            let insurance = {...selectedInsurance, carrier_id: selectedCarrier?.id || 0};
+            let insurance = { ...selectedInsurance, carrier_id: selectedCarrier?.id || 0 };
 
             if ((insurance.insurance_type_id || 0) > 0 && (insurance.company || "") !== "" && (insurance.expiration_date || "") !== "" && (insurance.amount || "") !== "") {
                 insurance.expiration_date = getFormattedDates(insurance.expiration_date);
@@ -2049,7 +2106,7 @@ const Carriers = props => {
             if (isCalendarShown) {
                 expiration_date = preSelectedExpirationDate.clone().format("MM/DD/YYYY");
 
-                let insurance = {...selectedInsurance, carrier_id: selectedCarrier.id};
+                let insurance = { ...selectedInsurance, carrier_id: selectedCarrier.id };
                 insurance.expiration_date = expiration_date;
 
                 await setSelectedInsurance(insurance);
@@ -2132,10 +2189,10 @@ const Carriers = props => {
                         panelName={`${props.panelName}-documents`}
                         origin={props.origin}
                         suborigin={"carrier"}
-                        openPanel={props.openPanel}
-                        closePanel={props.closePanel}
+                        
+                        
                         componentId={moment().format("x")}
-                        selectedOwner={{...selectedCarrier}}
+                        selectedOwner={{ ...selectedCarrier }}
                         selectedOwnerDocument={{
                             id: 0,
                             user_id: Math.floor(Math.random() * (15 - 1)) + 1,
@@ -2151,7 +2208,7 @@ const Carriers = props => {
                 ),
             };
 
-            props.openPanel(panel, props.origin);
+            openPanel(panel, props.origin);
         } else {
             window.alert("You must select a customer first!");
         }
@@ -2160,29 +2217,29 @@ const Carriers = props => {
     const revenueInformationBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-revenue-information`,
-            component: <RevenueInformation title="Revenue Information" tabTimes={23000 + props.tabTimes} panelName={`${props.panelName}-revenue-information`} origin={props.origin} suborigin={"carrier"} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+            component: <RevenueInformation title="Revenue Information" tabTimes={23000 + props.tabTimes} panelName={`${props.panelName}-revenue-information`} origin={props.origin} suborigin={"carrier"}   componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const equipmentInformationBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-equipment-information`,
             fixedWidthPercentage: 40,
-            component: <EquipmentInformation panelName={`${props.panelName}-equipment-information`} tabTimes={15000 + props.tabTimes} title={"Equipment Information"} origin={props.origin} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} carrier={selectedCarrier} />,
+            component: <EquipmentInformation panelName={`${props.panelName}-equipment-information`} tabTimes={15000 + props.tabTimes} title={"Equipment Information"} origin={props.origin}   componentId={moment().format("x")} carrier={selectedCarrier} />,
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const orderHistoryBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-order-history`,
-            component: <OrderHistory title="Order History" tabTimes={24000 + props.tabTimes} panelName={`${props.panelName}-order-history`} origin={props.origin} suborigin={"carrier"} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+            component: <OrderHistory title="Order History" tabTimes={24000 + props.tabTimes} panelName={`${props.panelName}-order-history`} origin={props.origin} suborigin={"carrier"}   componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const getFormattedDates = date => {
@@ -2270,10 +2327,10 @@ const Carriers = props => {
     const importCarrierBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-carrier-import`,
-            component: <CarrierImport title="Import Carriers" tabTimes={20000 + props.tabTimes} panelName={`${props.panelName}-carrier-import`} origin={props.origin} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} />,
+            component: <CarrierImport title="Import Carriers" tabTimes={20000 + props.tabTimes} panelName={`${props.panelName}-carrier-import`} origin={props.origin}   componentId={moment().format("x")} />,
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const getCarrierOrders = carrier => {
@@ -2297,6 +2354,167 @@ const Carriers = props => {
                 setIsLoadingCarrierOrders(false);
             });
     };
+
+    const searchDriverInfoByCode = () => {
+        if ((selectedDriver?.code || '') !== '') {
+            axios.post(props.serverUrl + `/getDriverByCode`, {
+                code: selectedDriver.code
+            }).then(res => {
+                if (res.data.result === 'OK') {
+
+                    setSelectedDriver({ ...res.data.driver });
+
+                    refDriverName.current.focus();
+                }
+            }).catch(e => {
+                console.log('error getting driver by code', e);
+            })
+        }
+    };
+
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+    }
 
     return (
         <div
@@ -2323,7 +2541,7 @@ const Carriers = props => {
             )}
 
             {(selectedCarrier?.id || 0) > 0 && (
-                <div style={{display: "none"}}>
+                <div style={{ display: "none" }}>
                     <ToPrint ref={refPrintCarrierInformation} selectedCarrier={selectedCarrier} />
                 </div>
             )}
@@ -2408,7 +2626,7 @@ const Carriers = props => {
                                     }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                     ref={refCarrierName}
-                                    onChange={e => setSelectedCarrier({...selectedCarrier, name: e.target.value})}
+                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, name: e.target.value })}
                                     value={selectedCarrier.name || ""}
                                 />
                             </div>
@@ -2420,7 +2638,7 @@ const Carriers = props => {
                                     tabIndex={45 + props.tabTimes}
                                     type="text"
                                     placeholder="Address 1"
-                                    style={{textTransform: "capitalize"}}
+                                    style={{ textTransform: "capitalize" }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                     onChange={e =>
                                         setSelectedCarrier({
@@ -2439,7 +2657,7 @@ const Carriers = props => {
                                     tabIndex={46 + props.tabTimes}
                                     type="text"
                                     placeholder="Address 2"
-                                    style={{textTransform: "capitalize"}}
+                                    style={{ textTransform: "capitalize" }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                     onChange={e =>
                                         setSelectedCarrier({
@@ -2462,7 +2680,7 @@ const Carriers = props => {
                                         textTransform: "capitalize",
                                     }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
-                                    onChange={e => setSelectedCarrier({...selectedCarrier, city: e.target.value})}
+                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, city: e.target.value })}
                                     value={selectedCarrier.city || ""}
                                 />
                             </div>
@@ -2474,7 +2692,7 @@ const Carriers = props => {
                                     placeholder="State"
                                     maxLength="2"
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
-                                    onChange={e => setSelectedCarrier({...selectedCarrier, state: e.target.value})}
+                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, state: e.target.value })}
                                     value={selectedCarrier.state || ""}
                                 />
                             </div>
@@ -2486,7 +2704,7 @@ const Carriers = props => {
                                     placeholder="Postal Code"
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                     onKeyDown={validateCarrierForSaving}
-                                    onChange={e => setSelectedCarrier({...selectedCarrier, zip: e.target.value})}
+                                    onChange={e => setSelectedCarrier({ ...selectedCarrier, zip: e.target.value })}
                                     value={selectedCarrier.zip || ""}
                                 />
                             </div>
@@ -2504,24 +2722,24 @@ const Carriers = props => {
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                     onInput={e => {
                                         if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({...selectedCarrier, contact_name: e.target.value});
+                                            setSelectedCarrier({ ...selectedCarrier, contact_name: e.target.value });
                                         }
                                     }}
                                     onChange={e => {
                                         if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({...selectedCarrier, contact_name: e.target.value});
+                                            setSelectedCarrier({ ...selectedCarrier, contact_name: e.target.value });
                                         }
                                     }}
                                     value={
                                         (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
                                             ? selectedCarrier?.contact_name || ""
                                             : // ? ''
-                                              selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + " " + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name
+                                            selectedCarrier?.contacts.find(c => c.is_primary === 1).first_name + " " + selectedCarrier?.contacts.find(c => c.is_primary === 1).last_name
                                     }
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="input-box-container input-phone" style={{position: "relative"}}>
+                            <div className="input-box-container input-phone" style={{ position: "relative" }}>
                                 <MaskedInput
                                     tabIndex={51 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
@@ -2550,16 +2768,16 @@ const Carriers = props => {
                                             ? selectedCarrier?.contact_phone || ""
                                             : // ? ''
                                             selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "work"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "fax"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "mobile"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "direct"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_direct
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "other"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_other
-                                            : ""
+                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work
+                                                : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "fax"
+                                                    ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_work_fax
+                                                    : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "mobile"
+                                                        ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_mobile
+                                                        : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "direct"
+                                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_direct
+                                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone === "other"
+                                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_other
+                                                                : ""
                                     }
                                 />
 
@@ -2583,12 +2801,12 @@ const Carriers = props => {
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                     onInput={e => {
                                         if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({...selectedCarrier, ext: e.target.value});
+                                            setSelectedCarrier({ ...selectedCarrier, ext: e.target.value });
                                         }
                                     }}
                                     onChange={e => {
                                         if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({...selectedCarrier, ext: e.target.value});
+                                            setSelectedCarrier({ ...selectedCarrier, ext: e.target.value });
                                         }
                                     }}
                                     value={
@@ -2596,8 +2814,8 @@ const Carriers = props => {
                                             ? selectedCarrier?.ext || ""
                                             : // ? ''
                                             (selectedCarrier?.contacts.find(c => c.is_primary === 1)?.primary_phone || "") === "work"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
-                                            : ""
+                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).phone_ext
+                                                : ""
                                     }
                                 />
                             </div>
@@ -2606,7 +2824,7 @@ const Carriers = props => {
                         <div className="form-row">
                             <div
                                 className="input-box-container"
-                                style={{position: "relative", flexGrow: 1}}
+                                style={{ position: "relative", flexGrow: 1 }}
                                 onMouseEnter={() => {
                                     if ((selectedCarrier?.email || "") !== "") {
                                         setShowCarrierEmailCopyBtn(true);
@@ -2630,18 +2848,18 @@ const Carriers = props => {
                                     tabIndex={53 + props.tabTimes}
                                     type="text"
                                     placeholder="E-Mail"
-                                    style={{textTransform: "lowercase"}}
+                                    style={{ textTransform: "lowercase" }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                     ref={refCarrierEmail}
                                     onKeyDown={validateCarrierForSaving}
                                     onInput={e => {
                                         if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({...selectedCarrier, email: e.target.value});
+                                            setSelectedCarrier({ ...selectedCarrier, email: e.target.value });
                                         }
                                     }}
                                     onChange={e => {
                                         if ((selectedCarrier?.contacts || []).length === 0) {
-                                            setSelectedCarrier({...selectedCarrier, email: e.target.value});
+                                            setSelectedCarrier({ ...selectedCarrier, email: e.target.value });
                                         }
                                     }}
                                     value={
@@ -2649,12 +2867,12 @@ const Carriers = props => {
                                             ? selectedCarrier?.email || ""
                                             : // ? ''
                                             selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === "work"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_work
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === "personal"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_personal
-                                            : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === "other"
-                                            ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_other
-                                            : ""
+                                                ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_work
+                                                : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === "personal"
+                                                    ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_personal
+                                                    : selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_email === "other"
+                                                        ? selectedCarrier?.contacts.find(c => c.is_primary === 1).email_other
+                                                        : ""
                                     }
                                 />
                                 {(selectedCarrier?.contacts || []).find(c => c.is_primary === 1) !== undefined && (
@@ -2708,8 +2926,8 @@ const Carriers = props => {
                                 id={props.panelName + "cbox-carrier-do-not-use-btn"}
                                 disabled={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                 onChange={e => {
-                                    setSelectedCarrier({...selectedCarrier, do_not_use: e.target.checked ? 1 : 0});
-                                    validateCarrierForSaving({keyCode: 9});
+                                    setSelectedCarrier({ ...selectedCarrier, do_not_use: e.target.checked ? 1 : 0 });
+                                    validateCarrierForSaving({ keyCode: 9 });
                                 }}
                                 checked={(selectedCarrier.do_not_use || 0) === 1}
                             />
@@ -2730,11 +2948,11 @@ const Carriers = props => {
                                     rating: newValue,
                                 });
 
-                                validateCarrierForSaving({keyCode: 9});
+                                validateCarrierForSaving({ keyCode: 9 });
                             }}
                         />
 
-                        <div className="input-box-container" style={{width: "100%", position: "relative"}}>
+                        <div className="input-box-container" style={{ width: "100%", position: "relative" }}>
                             <input
                                 tabIndex={76 + props.tabTimes}
                                 type="text"
@@ -2753,7 +2971,7 @@ const Carriers = props => {
                                     }
                                 }}
                                 onChange={e => {
-                                    setSelectedCarrier({...selectedCarrier, mc_number: e.target.value});
+                                    setSelectedCarrier({ ...selectedCarrier, mc_number: e.target.value });
                                 }}
                                 value={selectedCarrier.mc_number || ""}
                             />
@@ -2780,7 +2998,7 @@ const Carriers = props => {
                                 }}
                             />
                         </div>
-                        <div className="input-box-container" style={{width: "100%", position: "relative"}}>
+                        <div className="input-box-container" style={{ width: "100%", position: "relative" }}>
                             <input
                                 tabIndex={77 + props.tabTimes}
                                 type="text"
@@ -2788,7 +3006,7 @@ const Carriers = props => {
                                 readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                 onKeyDown={validateCarrierForSaving}
                                 onChange={e => {
-                                    setSelectedCarrier({...selectedCarrier, dot_number: e.target.value});
+                                    setSelectedCarrier({ ...selectedCarrier, dot_number: e.target.value });
                                 }}
                                 value={selectedCarrier.dot_number || ""}
                             />
@@ -2816,16 +3034,16 @@ const Carriers = props => {
                                 }}
                             />
                         </div>
-                        <div className="input-box-container" style={{width: "100%", position: "relative"}}>
+                        <div className="input-box-container" style={{ width: "100%", position: "relative" }}>
                             <input
                                 tabIndex={78 + props.tabTimes}
                                 type="text"
                                 placeholder="SCAC"
                                 readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
-                                style={{textTransform: "uppercase"}}
+                                style={{ textTransform: "uppercase" }}
                                 onKeyDown={validateCarrierForSaving}
                                 onChange={e => {
-                                    setSelectedCarrier({...selectedCarrier, scac: e.target.value});
+                                    setSelectedCarrier({ ...selectedCarrier, scac: e.target.value });
                                 }}
                                 value={selectedCarrier.scac || ""}
                             />
@@ -2853,7 +3071,7 @@ const Carriers = props => {
                                 }}
                             />
                         </div>
-                        <div className="input-box-container" style={{width: "100%", position: "relative"}}>
+                        <div className="input-box-container" style={{ width: "100%", position: "relative" }}>
                             <input
                                 tabIndex={79 + props.tabTimes}
                                 type="text"
@@ -2861,7 +3079,7 @@ const Carriers = props => {
                                 readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
                                 onKeyDown={validateCarrierForSaving}
                                 onChange={e => {
-                                    setSelectedCarrier({...selectedCarrier, fid: e.target.value});
+                                    setSelectedCarrier({ ...selectedCarrier, fid: e.target.value });
                                 }}
                                 value={selectedCarrier.fid || ""}
                             />
@@ -2889,7 +3107,7 @@ const Carriers = props => {
                                 }}
                             />
                         </div>
-                        <div className={insuranceStatusClasses()} style={{width: "100%"}}>
+                        <div className={insuranceStatusClasses()} style={{ width: "100%" }}>
                             <input type="text" placeholder="Insurance" readOnly={true} />
                         </div>
                     </div>
@@ -2941,8 +3159,8 @@ const Carriers = props => {
                                                     permissionName="carrier contacts"
                                                     origin={props.origin}
                                                     owner="carrier"
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+                                                    
+                                                    
                                                     componentId={moment().format("x")}
                                                     contactSearchCustomer={{
                                                         ...selectedCarrier,
@@ -2960,7 +3178,7 @@ const Carriers = props => {
                                             ),
                                         };
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -2990,18 +3208,18 @@ const Carriers = props => {
                                                     origin={props.origin}
                                                     owner="carrier"
                                                     isEditingContact={true}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+                                                    
+                                                    
                                                     componentId={moment().format("x")}
                                                     contactSearchCustomer={{
                                                         ...selectedCarrier,
-                                                        selectedContact: {id: 0, carrier_id: selectedCarrier?.id},
+                                                        selectedContact: { id: 0, carrier_id: selectedCarrier?.id },
                                                     }}
                                                 />
                                             ),
                                         };
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -3029,7 +3247,7 @@ const Carriers = props => {
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
                                     ref={refCarrierContactFirstName}
                                     onChange={e => {
-                                        setSelectedContact({...selectedContact, first_name: e.target.value});
+                                        setSelectedContact({ ...selectedContact, first_name: e.target.value });
                                     }}
                                     value={selectedContact.first_name || ""}
                                 />
@@ -3056,7 +3274,7 @@ const Carriers = props => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{width: "50%"}}>
+                            <div className="select-box-container" style={{ width: "50%" }}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput
                                         tabIndex={82 + props.tabTimes}
@@ -3203,7 +3421,7 @@ const Carriers = props => {
                                                             primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type,
                                                         });
 
-                                                        validateContactForSaving({keyCode: 9});
+                                                        validateContactForSaving({ keyCode: 9 });
                                                         setShowCarrierContactPhones(false);
                                                         refCarrierContactPhone.current.inputElement.focus();
                                                     }
@@ -3216,11 +3434,11 @@ const Carriers = props => {
                                                             primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type,
                                                         });
 
-                                                        validateContactForSaving({keyCode: 9});
+                                                        validateContactForSaving({ keyCode: 9 });
                                                         setShowCarrierContactPhones(false);
                                                         refCarrierContactPhone.current.inputElement.focus();
                                                     } else {
-                                                        validateContactForSaving({keyCode: 9});
+                                                        validateContactForSaving({ keyCode: 9 });
                                                     }
                                                     break;
                                                 default:
@@ -3394,7 +3612,7 @@ const Carriers = props => {
                                                 }}
                                                 ref={refCarrierContactPhoneDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{height: 150}}>
+                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {carrierContactPhoneItems.map((item, index) => {
@@ -3416,7 +3634,7 @@ const Carriers = props => {
                                                                                 };
                                                                             });
 
-                                                                            validateContactForSaving({keyCode: 9});
+                                                                            validateContactForSaving({ keyCode: 9 });
                                                                             setShowCarrierContactPhones(false);
                                                                             refCarrierContactPhone.current.inputElement.focus();
                                                                         }}
@@ -3435,7 +3653,7 @@ const Carriers = props => {
                                 )}
                             </div>
                             <div className="form-h-sep"></div>
-                            <div style={{width: "50%", display: "flex", justifyContent: "space-between"}}>
+                            <div style={{ width: "50%", display: "flex", justifyContent: "space-between" }}>
                                 <div className="input-box-container input-phone-ext">
                                     <input
                                         tabIndex={83 + props.tabTimes}
@@ -3461,7 +3679,7 @@ const Carriers = props => {
                                                 ...selectedContact,
                                                 is_primary: e.target.checked ? 1 : 0,
                                             });
-                                            validateContactForSaving({keyCode: 9});
+                                            validateContactForSaving({ keyCode: 9 });
                                         }}
                                         checked={(selectedContact.is_primary || 0) === 1}
                                     />
@@ -3476,7 +3694,7 @@ const Carriers = props => {
                         <div className="form-row">
                             <div
                                 className="select-box-container"
-                                style={{flexGrow: 1}}
+                                style={{ flexGrow: 1 }}
                                 onMouseEnter={() => {
                                     if ((selectedContact?.email_work || "") !== "" || (selectedContact?.email_personal || "") !== "" || (selectedContact?.email_other || "") !== "") {
                                         setShowCarrierContactEmailCopyBtn(true);
@@ -3646,7 +3864,7 @@ const Carriers = props => {
                                                             primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type,
                                                         });
 
-                                                        validateContactForSaving({keyCode: 9});
+                                                        validateContactForSaving({ keyCode: 9 });
                                                         setShowCarrierContactEmails(false);
                                                         refCarrierContactEmail.current.focus();
                                                     }
@@ -3660,11 +3878,11 @@ const Carriers = props => {
                                                             primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type,
                                                         });
 
-                                                        validateContactForSaving({keyCode: 9});
+                                                        validateContactForSaving({ keyCode: 9 });
                                                         setShowCarrierContactEmails(false);
                                                         refCarrierContactEmail.current.focus();
                                                     } else {
-                                                        validateContactForSaving({keyCode: 9});
+                                                        validateContactForSaving({ keyCode: 9 });
                                                     }
                                                     break;
 
@@ -3803,7 +4021,7 @@ const Carriers = props => {
                                                 }}
                                                 ref={refCarrierContactEmailDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{height: 150}}>
+                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {carrierContactEmailItems.map((item, index) => {
@@ -3823,7 +4041,7 @@ const Carriers = props => {
                                                                                 primary_email: item.type,
                                                                             });
 
-                                                                            validateContactForSaving({keyCode: 9});
+                                                                            validateContactForSaving({ keyCode: 9 });
                                                                             setShowCarrierContactEmails(false);
                                                                             refCarrierContactEmail.current.focus();
                                                                         }}
@@ -3848,7 +4066,7 @@ const Carriers = props => {
                                     placeholder="Notes"
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
                                     onKeyDown={validateContactForSaving}
-                                    onChange={e => setSelectedContact({...selectedContact, notes: e.target.value})}
+                                    onChange={e => setSelectedContact({ ...selectedContact, notes: e.target.value })}
                                     value={selectedContact.notes || ""}
                                 />
                             </div>
@@ -3892,7 +4110,7 @@ const Carriers = props => {
                         </div>
 
                         <div className="form-slider">
-                            <div className="form-slider-wrapper" style={{left: showingContactList ? 0 : "-100%"}}>
+                            <div className="form-slider-wrapper" style={{ left: showingContactList ? 0 : "-100%" }}>
                                 <div className="contact-list-box">
                                     {(selectedCarrier.contacts || []).length > 0 && (
                                         <div className="contact-list-header">
@@ -3929,8 +4147,8 @@ const Carriers = props => {
                                                                     permissionName="carrier contacts"
                                                                     origin={props.origin}
                                                                     owner="carrier"
-                                                                    openPanel={props.openPanel}
-                                                                    closePanel={props.closePanel}
+                                                                    
+                                                                    
                                                                     componentId={moment().format("x")}
                                                                     contactSearchCustomer={{
                                                                         ...selectedCarrier,
@@ -3948,21 +4166,21 @@ const Carriers = props => {
                                                             ),
                                                         };
 
-                                                        props.openPanel(panel, props.origin);
+                                                        openPanel(panel, props.origin);
                                                     }}
                                                     onClick={() => {
                                                         setSelectedContact(contact);
                                                         refCarrierContactFirstName.current.focus();
                                                     }}
                                                 >
-                                                    <div className="contact-list-col tcol first-name" style={{textTransform: "capitalize"}}>
+                                                    <div className="contact-list-col tcol first-name" style={{ textTransform: "capitalize" }}>
                                                         {contact.first_name}
                                                     </div>
-                                                    <div className="contact-list-col tcol last-name" style={{textTransform: "capitalize"}}>
+                                                    <div className="contact-list-col tcol last-name" style={{ textTransform: "capitalize" }}>
                                                         {contact.last_name}
                                                     </div>
                                                     <div className="contact-list-col tcol phone-work">{contact.primary_phone === "work" ? contact.phone_work : contact.primary_phone === "fax" ? contact.phone_work_fax : contact.primary_phone === "mobile" ? contact.phone_mobile : contact.primary_phone === "direct" ? contact.phone_direct : contact.primary_phone === "other" ? contact.phone_other : ""}</div>
-                                                    <div className="contact-list-col tcol email-work" style={{textTransform: "lowercase"}}>
+                                                    <div className="contact-list-col tcol email-work" style={{ textTransform: "lowercase" }}>
                                                         {contact.primary_email === "work" ? contact.email_work : contact.primary_email === "personal" ? contact.email_personal : contact.primary_email === "other" ? contact.email_other : ""}
                                                     </div>
                                                     {contact.id === (selectedContact?.id || 0) && (
@@ -4019,7 +4237,7 @@ const Carriers = props => {
                                             <input
                                                 type="text"
                                                 placeholder="Address 1"
-                                                style={{textTransform: "capitalize"}}
+                                                style={{ textTransform: "capitalize" }}
                                                 onFocus={() => {
                                                     setShowingContactList(false);
                                                 }}
@@ -4039,7 +4257,7 @@ const Carriers = props => {
                                             <input
                                                 type="text"
                                                 placeholder="Address 2"
-                                                style={{textTransform: "capitalize"}}
+                                                style={{ textTransform: "capitalize" }}
                                                 onFocus={() => {
                                                     setShowingContactList(false);
                                                 }}
@@ -4115,7 +4333,7 @@ const Carriers = props => {
                                             <input
                                                 type="text"
                                                 placeholder="E-Mail"
-                                                style={{textTransform: "lowercase"}}
+                                                style={{ textTransform: "lowercase" }}
                                                 onFocus={() => {
                                                     setShowingContactList(false);
                                                 }}
@@ -4135,52 +4353,132 @@ const Carriers = props => {
                     </div>
                 </div>
 
-                <div className="fields-container-col" style={{minWidth: "28%", maxWidth: "28%"}}>
-                    <div className="form-bordered-box">
+                <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
+                    <div className="form-bordered-box" style={{ gap: 2 }}>
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Driver Information</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.delete || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={() => {
-                                        if ((selectedCarrier.id || 0) === 0) {
-                                            window.alert("You must select a carrier first!");
-                                            return;
-                                        }
+                                <div className="mochi-button" onClick={() => {
+                                    if ((selectedCarrier?.id || 0) === 0) {
+                                        window.alert('You must select a carrier first!');
+                                        return;
+                                    }
 
-                                        if ((selectedDriver?.id || 0) === 0) {
-                                            window.alert("You must select a driver first!");
-                                            return;
-                                        }
+                                    if ((selectedDriver?.id || 0) === 0) {
+                                        window.alert('You must select a driver first!');
+                                        return;
+                                    }
 
-                                        if (window.confirm("Are you sure to delete this driver?")) {
-                                            axios
-                                                .post(props.serverUrl + "/deleteCarrierDriver", selectedDriver)
-                                                .then(res => {
-                                                    if (res.data.result === "OK") {
-                                                        setSelectedCarrier({...selectedCarrier, drivers: res.data.drivers});
-                                                        setSelectedDriver({});
+                                    let panel = {
+                                        panelName: `${props.panelName}-carrier-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Carrier Driver'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-carrier-drivers`}
+                                            savingDriverUrl='/saveDriver'
+                                            deletingDriverUrl='/deleteDriver'
+                                            uploadAvatarUrl='/uploadDriverAvatar'
+                                            removeAvatarUrl='/removeDriverAvatar'
+                                            origin={props.origin}
+                                            subOrigin='carrier'
+                                            owner='carrier'
+                                            isEditingDriver={true}
+                                            
+                                            
+                                            componentId={moment().format('x')}
+                                            selectedDriverId={selectedDriver.id}
+                                            selectedParent={selectedCarrier}
+
+                                            driverSearchCarrier={{
+                                                ...selectedCarrier,
+                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
+                                            }}
+                                        />
+                                    }
+
+                                    openPanel(panel, props.origin);
+                                }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">More</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
+                                <div className="mochi-button" onClick={() => {
+                                    if ((selectedCarrier?.id || 0) === 0) {
+                                        window.alert('You must select a carrier first!');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-carrier-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Carrier Driver'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-carrier-drivers`}
+                                            savingDriverUrl='/saveDriver'
+                                            deletingDriverUrl='/deleteDriver'
+                                            uploadAvatarUrl='/uploadDriverAvatar'
+                                            removeAvatarUrl='/removeDriverAvatar'
+                                            origin={props.origin}
+                                            subOrigin='carrier'
+                                            owner='carrier'
+                                            isEditingDriver={true}
+                                            
+                                            
+                                            componentId={moment().format('x')}
+                                            selectedParent={selectedCarrier}
+
+                                            driverSearchCarrier={{
+                                                ...selectedCarrier,
+                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
+                                            }}
+                                        />
+                                    }
+
+                                    openPanel(panel, props.origin);
+                                }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Add Driver</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
+                                <div className="mochi-button" onClick={() => {
+                                    if (window.confirm("Are you sure you want to proceed?")) {
+
+                                        axios.post(props.serverUrl + '/deleteDriver', {
+                                            id: selectedDriver.id,
+                                            sub_origin: 'carrier'
+                                        }).then(res => {
+                                            if (res.data.result === 'OK') {
+                                                setSelectedCarrier(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        drivers: (res.data.drivers || []).filter(x => x.owner_type === 'carrier')
                                                     }
-                                                })
-                                                .catch(e => {
-                                                    console.log("error deleting carrier driver", e);
                                                 });
-                                        }
-                                    }}
+
+                                                setSelectedDriver({});
+                                                refDriverCode.current.focus();
+                                            }
+                                        }).catch(e => {
+                                            console.log('error deleting driver');
+                                        });
+                                    }
+                                }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Delete</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
 
-                                <div
-                                    className="mochi-button"
-                                    onClick={() => {
-                                        setSelectedDriver({});
-                                        refCarrierDriverFirstName.current.focus();
-                                    }}
+                                <div className="mochi-button" onClick={() => {
+                                    setSelectedDriver({});
+                                    refDriverCode.current.focus();
+                                }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
@@ -4190,83 +4488,80 @@ const Carriers = props => {
                             <div className="top-border top-border-right"></div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="input-box-container grow">
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="input-box-container input-code">
                                 <input
                                     tabIndex={92 + props.tabTimes}
                                     type="text"
-                                    placeholder="First Name"
-                                    style={{
-                                        textTransform: "capitalize",
+                                    placeholder="Code"
+                                    maxLength="8"
+                                    ref={refDriverCode}
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9) {
+                                            searchDriverInfoByCode();
+                                        }
                                     }}
-                                    ref={refCarrierDriverFirstName}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({...selectedDriver, first_name: e.target.value});
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                code: e.target.value
+                                            }
+                                        })
                                     }}
-                                    onChange={e => {
-                                        setSelectedDriver({...selectedDriver, first_name: e.target.value});
-                                    }}
-                                    value={selectedDriver?.first_name || ""}
+                                    value={selectedDriver?.code || ''}
                                 />
                             </div>
-                            <div className="form-h-sep"></div>
+
                             <div className="input-box-container grow">
                                 <input
                                     tabIndex={93 + props.tabTimes}
                                     type="text"
-                                    placeholder="Last Name"
-                                    style={{
-                                        textTransform: "capitalize",
+                                    placeholder="Name"
+                                    style={{ textTransform: 'capitalize' }}
+                                    ref={refDriverName}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                name: e.target.value
+                                            }
+                                        })
                                     }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({...selectedDriver, last_name: e.target.value});
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({...selectedDriver, last_name: e.target.value});
-                                    }}
-                                    value={selectedDriver?.last_name || ""}
+                                    value={selectedDriver?.name || ''}
                                 />
                             </div>
                         </div>
 
-                        <div className="form-v-sep"></div>
-
-                        <div className="form-row">
-                            <div className="input-box-container" style={{width: "40%"}}>
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="input-box-container input-phone" style={{ width: '40%', position: 'relative' }}>
                                 <MaskedInput
                                     tabIndex={94 + props.tabTimes}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
-                                    mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
+                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                     guide={true}
-                                    type="text"
-                                    placeholder="Phone"
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({...selectedDriver, phone: e.target.value});
+                                    type="text" placeholder="Phone"
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                contact_phone: e.target.value
+                                            }
+                                        })
                                     }}
-                                    onChange={e => {
-                                        setSelectedDriver({...selectedDriver, phone: e.target.value});
-                                    }}
-                                    value={selectedDriver?.phone || ""}
+                                    value={selectedDriver?.contact_phone || ''}
                                 />
                             </div>
 
-                            <div className="form-h-sep"></div>
-
-                            <div
-                                className="input-box-container"
-                                style={{position: "relative", flexGrow: 1}}
+                            <div className="input-box-container grow" style={{ position: 'relative' }}
                                 onMouseEnter={() => {
-                                    if ((selectedDriver?.email || "") !== "") {
+                                    if ((selectedDriver?.email || '').trim() !== '') {
                                         setShowCarrierDriverEmailCopyBtn(true);
                                     }
                                 }}
                                 onFocus={() => {
-                                    if ((selectedDriver?.email || "") !== "") {
+                                    if ((selectedDriver?.email || '').trim() !== '') {
                                         setShowCarrierDriverEmailCopyBtn(true);
                                     }
                                 }}
@@ -4283,52 +4578,50 @@ const Carriers = props => {
                                     tabIndex={95 + props.tabTimes}
                                     type="text"
                                     placeholder="E-Mail"
-                                    style={{textTransform: "lowercase"}}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
-                                    ref={refCarrierDriverEmail}
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({...selectedDriver, email: e.target.value});
+                                    style={{ textTransform: 'lowercase' }}
+                                    ref={refDriverEmail}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                email: e.target.value
+                                            }
+                                        })
                                     }}
-                                    onChange={e => {
-                                        setSelectedDriver({...selectedDriver, email: e.target.value});
-                                    }}
-                                    value={selectedDriver?.email || ""}
+                                    value={selectedDriver?.email || ''}
                                 />
-                                {showCarrierDriverEmailCopyBtn && (
-                                    <FontAwesomeIcon
-                                        style={{
-                                            position: "absolute",
-                                            top: "50%",
-                                            right: 5,
-                                            zIndex: 1,
-                                            cursor: "pointer",
-                                            transform: "translateY(-50%)",
-                                            color: "#2bc1ff",
-                                            margin: 0,
-                                            transition: "ease 0.2s",
-                                            fontSize: "1rem",
-                                        }}
-                                        icon={faCopy}
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            navigator.clipboard.writeText(refCarrierDriverEmail.current.value);
-                                        }}
-                                    />
-                                )}
                             </div>
+
+                            {
+                                showCarrierDriverEmailCopyBtn &&
+                                <FontAwesomeIcon style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    right: 30,
+                                    zIndex: 1,
+                                    cursor: 'pointer',
+                                    transform: 'translateY(-50%)',
+                                    color: '#2bc1ff',
+                                    margin: 0,
+                                    transition: 'ease 0.2s',
+                                    fontSize: '1rem'
+                                }} icon={faCopy} onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(refDriverEmail.current.value);
+                                }} />
+                            }
                         </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div className="select-box-container" style={{flexGrow: 1}}>
+
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}>
                                 <div className="select-box-wrapper">
                                     <input
                                         type="text"
-                                        tabIndex={96 + props.tabTimes}
+                                        tabIndex={95 + props.tabTimes}
                                         placeholder="Equipment"
-                                        readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
                                         ref={refEquipment}
-                                        onKeyDown={async e => {
+                                        readOnly={(selectedCarrier?.id || 0) === 0}
+                                        onKeyDown={(e) => {
                                             let key = e.keyCode || e.which;
 
                                             switch (key) {
@@ -4336,22 +4629,26 @@ const Carriers = props => {
                                                 case 38: // arrow left | arrow up
                                                     e.preventDefault();
                                                     if (driverEquipmentDropdownItems.length > 0) {
-                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
+                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(
+                                                            (item) => item.selected
+                                                        );
 
                                                         if (selectedIndex === -1) {
-                                                            await setDriverEquipmentDropdownItems(
+                                                            setDriverEquipmentDropdownItems(
                                                                 driverEquipmentDropdownItems.map((item, index) => {
                                                                     item.selected = index === 0;
                                                                     return item;
                                                                 })
                                                             );
                                                         } else {
-                                                            await setDriverEquipmentDropdownItems(
+                                                            setDriverEquipmentDropdownItems(
                                                                 driverEquipmentDropdownItems.map((item, index) => {
                                                                     if (selectedIndex === 0) {
-                                                                        item.selected = index === driverEquipmentDropdownItems.length - 1;
+                                                                        item.selected =
+                                                                            index === driverEquipmentDropdownItems.length - 1;
                                                                     } else {
-                                                                        item.selected = index === selectedIndex - 1;
+                                                                        item.selected =
+                                                                            index === selectedIndex - 1;
                                                                     }
                                                                     return item;
                                                                 })
@@ -4369,18 +4666,18 @@ const Carriers = props => {
                                                             return true;
                                                         });
                                                     } else {
-                                                        axios
-                                                            .post(props.serverUrl + "/getEquipments")
-                                                            .then(async res => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setDriverEquipmentDropdownItems(
-                                                                        res.data.equipments.map((item, index) => {
-                                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0 ? index === 0 : item.id === selectedDriver?.equipment.id;
-                                                                            return item;
-                                                                        })
-                                                                    );
+                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                    item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                        ? index === 0
+                                                                        : item.id === selectedDriver.tractor.type.id;
+                                                                    return item;
+                                                                })
+                                                                );
 
-                                                                    refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                refDriverEquipmentPopupItems.current.map(
+                                                                    (r, i) => {
                                                                         if (r && r.classList.contains("selected")) {
                                                                             r.scrollIntoView({
                                                                                 behavior: "auto",
@@ -4389,11 +4686,12 @@ const Carriers = props => {
                                                                             });
                                                                         }
                                                                         return true;
-                                                                    });
-                                                                }
-                                                            })
-                                                            .catch(async e => {
-                                                                console.log("error getting driver equipments", e);
+                                                                    }
+                                                                );
+                                                            }
+                                                        })
+                                                            .catch(async (e) => {
+                                                                console.log("error getting equipments", e);
                                                             });
                                                     }
                                                     break;
@@ -4402,17 +4700,18 @@ const Carriers = props => {
                                                 case 40: // arrow right | arrow down
                                                     e.preventDefault();
                                                     if (driverEquipmentDropdownItems.length > 0) {
-                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(item => item.selected);
+                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(
+                                                            (item) => item.selected
+                                                        );
 
                                                         if (selectedIndex === -1) {
-                                                            await setDriverEquipmentDropdownItems(
-                                                                driverEquipmentDropdownItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                })
+                                                            setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            })
                                                             );
                                                         } else {
-                                                            await setDriverEquipmentDropdownItems(
+                                                            setDriverEquipmentDropdownItems(
                                                                 driverEquipmentDropdownItems.map((item, index) => {
                                                                     if (selectedIndex === driverEquipmentDropdownItems.length - 1) {
                                                                         item.selected = index === 0;
@@ -4435,18 +4734,19 @@ const Carriers = props => {
                                                             return true;
                                                         });
                                                     } else {
-                                                        axios
-                                                            .post(props.serverUrl + "/getEquipments")
-                                                            .then(async res => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setDriverEquipmentDropdownItems(
-                                                                        res.data.equipments.map((item, index) => {
-                                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0 ? index === 0 : item.id === selectedDriver?.equipment.id;
-                                                                            return item;
-                                                                        })
-                                                                    );
+                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(
+                                                                    res.data.equipments.map((item, index) => {
+                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedDriver.tractor.type.id;
+                                                                        return item;
+                                                                    })
+                                                                );
 
-                                                                    refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                refDriverEquipmentPopupItems.current.map(
+                                                                    (r, i) => {
                                                                         if (r && r.classList.contains("selected")) {
                                                                             r.scrollIntoView({
                                                                                 behavior: "auto",
@@ -4455,11 +4755,12 @@ const Carriers = props => {
                                                                             });
                                                                         }
                                                                         return true;
-                                                                    });
-                                                                }
-                                                            })
-                                                            .catch(async e => {
-                                                                console.log("error getting driver equipments", e);
+                                                                    }
+                                                                );
+                                                            }
+                                                        })
+                                                            .catch((e) => {
+                                                                console.log("error getting equipments", e);
                                                             });
                                                     }
                                                     break;
@@ -4469,78 +4770,113 @@ const Carriers = props => {
                                                     break;
 
                                                 case 13: // enter
-                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedDriver({
-                                                            ...selectedDriver,
-                                                            equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
-                                                            equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id,
-                                                        });
-                                                        validateDriverForSaving({keyCode: 9});
+                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex((item) => item.selected) > -1) {
+                                                        setSelectedDriver(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                tractor: {
+                                                                    ...(selectedDriver?.tractor || {}),
+                                                                    type: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)],
+                                                                    type_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)].id,
+                                                                }
+                                                            }
+                                                        })
+
                                                         setDriverEquipmentDropdownItems([]);
                                                         refEquipment.current.focus();
                                                     }
                                                     break;
 
                                                 case 9: // tab
-                                                    if (driverEquipmentDropdownItems.length > 0) {
-                                                        e.preventDefault();
-                                                        await setSelectedDriver({
-                                                            ...selectedDriver,
-                                                            equipment: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)],
-                                                            equipment_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex(item => item.selected)].id,
-                                                        });
-                                                        validateDriverForSaving({keyCode: 9});
+                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex((item) => item.selected) > -1) {
+                                                        setSelectedDriver(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                tractor: {
+                                                                    ...(selectedDriver?.tractor || {}),
+                                                                    type: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)],
+                                                                    type_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)].id,
+                                                                }
+                                                            }
+                                                        })
+
                                                         setDriverEquipmentDropdownItems([]);
                                                         refEquipment.current.focus();
                                                     }
                                                     break;
-
                                                 default:
                                                     break;
                                             }
                                         }}
-                                        onBlur={async () => {
-                                            if ((selectedDriver?.equipment?.id || 0) === 0) {
-                                                await setSelectedDriver({...selectedDriver, equipment: {}});
+                                        onBlur={() => {
+                                            if ((selectedDriver?.tractor?.type_id || 0) === 0) {
+                                                setSelectedDriver(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        tractor: {
+                                                            ...(selectedDriver?.tractor || {}),
+                                                            type: {},
+                                                            type_id: null
+                                                        }
+                                                    }
+                                                })
                                             }
                                         }}
-                                        onInput={async e => {
-                                            let equipment = selectedDriver?.equipment || {};
-                                            equipment.id = 0;
-                                            equipment.name = e.target.value;
-                                            await setSelectedDriver({...selectedDriver, equipment: equipment});
+                                        onInput={(e) => {
+                                            let type = selectedDriver?.tractor?.type || {};
+                                            type.id = 0;
+                                            type.name = e.target.value;
+
+                                            setSelectedDriver(prev => {
+                                                return {
+                                                    ...prev,
+                                                    tractor: {
+                                                        ...(selectedDriver?.tractor || {}),
+                                                        type: type,
+                                                        type_id: type.id
+                                                    }
+                                                }
+                                            })
 
                                             if (e.target.value.trim() === "") {
                                                 setDriverEquipmentDropdownItems([]);
                                             } else {
-                                                axios
-                                                    .post(props.serverUrl + "/getEquipments", {
-                                                        name: e.target.value.trim(),
-                                                    })
-                                                    .then(async res => {
-                                                        if (res.data.result === "OK") {
-                                                            await setDriverEquipmentDropdownItems(
-                                                                res.data.equipments.map((item, index) => {
-                                                                    item.selected = (selectedDriver?.equipment?.id || 0) === 0 ? index === 0 : item.id === selectedDriver?.equipment.id;
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        }
-                                                    })
-                                                    .catch(async e => {
-                                                        console.log("error getting driver equipments", e);
-                                                    });
+                                                axios.post(props.serverUrl + "/getEquipments", { name: e.target.value.trim() }).then((res) => {
+                                                    if (res.data.result === "OK") {
+                                                        setDriverEquipmentDropdownItems(
+                                                            res.data.equipments.map((item, index) => {
+                                                                item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedDriver.tractor.type.id;
+                                                                return item;
+                                                            })
+                                                        );
+                                                    }
+                                                }).catch((e) => {
+                                                    console.log("error getting equipments", e);
+                                                });
                                             }
                                         }}
-                                        onChange={async e => {
-                                            let equipment = selectedDriver?.equipment || {};
-                                            equipment.id = 0;
-                                            equipment.name = e.target.value;
-                                            await setSelectedDriver({...selectedDriver, equipment: equipment});
+                                        onChange={(e) => {
+                                            let type = selectedDriver?.tractor?.type || {};
+                                            type.id = 0;
+                                            type.name = e.target.value;
+
+                                            setSelectedDriver(prev => {
+                                                return {
+                                                    ...prev,
+                                                    tractor: {
+                                                        ...(selectedDriver?.tractor || {}),
+                                                        type: type,
+                                                        type_id: type.id
+                                                    }
+                                                }
+                                            })
                                         }}
-                                        value={selectedDriver?.equipment?.name || ""}
+                                        value={selectedDriver?.tractor?.type?.name || ""}
                                     />
-                                    {(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0 && (
+                                    {
+                                        (selectedCarrier?.id || 0) > 0 &&
                                         <FontAwesomeIcon
                                             className="dropdown-button"
                                             icon={faCaretDown}
@@ -4548,84 +4884,83 @@ const Carriers = props => {
                                                 if (driverEquipmentDropdownItems.length > 0) {
                                                     setDriverEquipmentDropdownItems([]);
                                                 } else {
-                                                    if ((selectedDriver?.equipment?.id || 0) === 0 && (selectedDriver?.equipment?.name || "") !== "") {
-                                                        axios
-                                                            .post(props.serverUrl + "/getEquipments", {
-                                                                name: selectedDriver?.equipment.name,
-                                                            })
-                                                            .then(async res => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setDriverEquipmentDropdownItems(
-                                                                        res.data.equipments.map((item, index) => {
-                                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0 ? index === 0 : item.id === selectedDriver?.equipment.id;
-                                                                            return item;
-                                                                        })
-                                                                    );
+                                                    if ((selectedDriver?.tractor?.type?.id || 0) === 0 && (selectedDriver?.tractor?.type?.name || "") !== "") {
+                                                        axios.post(props.serverUrl + "/getEquipments", {
+                                                            name: selectedDriver?.tractor?.type.name,
+                                                        }).then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(
+                                                                    res.data.equipments.map((item, index) => {
+                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedDriver.tractor.type.id;
+                                                                        return item;
+                                                                    })
+                                                                );
 
-                                                                    refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                                        if (r && r.classList.contains("selected")) {
-                                                                            r.scrollIntoView({
-                                                                                behavior: "auto",
-                                                                                block: "center",
-                                                                                inline: "nearest",
-                                                                            });
-                                                                        }
-                                                                        return true;
-                                                                    });
-                                                                }
-                                                            })
-                                                            .catch(async e => {
-                                                                console.log("error getting driver equipments", e);
-                                                            });
+                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }).catch((e) => {
+                                                            console.log("error getting equipments", e);
+                                                        });
                                                     } else {
-                                                        axios
-                                                            .post(props.serverUrl + "/getEquipments")
-                                                            .then(async res => {
-                                                                if (res.data.result === "OK") {
-                                                                    await setDriverEquipmentDropdownItems(
-                                                                        res.data.equipments.map((item, index) => {
-                                                                            item.selected = (selectedDriver?.equipment?.id || 0) === 0 ? index === 0 : item.id === selectedDriver?.equipment.id;
-                                                                            return item;
-                                                                        })
-                                                                    );
+                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(
+                                                                    res.data.equipments.map((item, index) => {
+                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedDriver.tractor.type.id;
+                                                                        return item;
+                                                                    })
+                                                                );
 
-                                                                    refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                                        if (r && r.classList.contains("selected")) {
-                                                                            r.scrollIntoView({
-                                                                                behavior: "auto",
-                                                                                block: "center",
-                                                                                inline: "nearest",
-                                                                            });
-                                                                        }
-                                                                        return true;
-                                                                    });
-                                                                }
-                                                            })
-                                                            .catch(async e => {
-                                                                console.log("error getting driver equipments", e);
-                                                            });
+                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }).catch(async (e) => {
+                                                            console.log("error getting equipments", e);
+                                                        });
                                                     }
                                                 }
 
                                                 refEquipment.current.focus();
                                             }}
                                         />
-                                    )}
+                                    }
                                 </div>
                                 {equipmentTransition(
                                     (style, item) =>
                                         item && (
                                             <animated.div
                                                 className="mochi-contextual-container"
-                                                id="mochi-contextual-container-driver-equipment"
+                                                id="mochi-contextual-container-equipment"
                                                 style={{
                                                     ...style,
-                                                    left: "-50%",
+                                                    left: "-50px",
                                                     display: "block",
                                                 }}
                                                 ref={refDriverEquipmentDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below left">
+                                                <div className="mochi-contextual-popup vertical below"
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {driverEquipmentDropdownItems.map((item, index) => {
@@ -4634,27 +4969,50 @@ const Carriers = props => {
                                                                     selected: item.selected,
                                                                 });
 
-                                                                const searchValue = (selectedDriver?.equipment?.id || 0) === 0 && (selectedDriver?.equipment?.name || "") !== "" ? selectedDriver?.equipment?.name : undefined;
+                                                                const searchValue = (selectedDriver?.tractor?.type?.id || 0) === 0 && (selectedDriver?.tractor?.type?.name || "") !== ""
+                                                                    ? selectedDriver?.tractor?.type?.name
+                                                                    : undefined;
 
                                                                 return (
                                                                     <div
                                                                         key={index}
                                                                         className={mochiItemClasses}
                                                                         id={item.id}
-                                                                        onClick={async () => {
-                                                                            await setSelectedDriver({
-                                                                                ...selectedDriver,
-                                                                                equipment: item,
-                                                                                equipment_id: item.id,
-                                                                            });
-                                                                            validateDriverForSaving({keyCode: 9});
+                                                                        onClick={() => {
+                                                                            setSelectedDriver(prev => {
+                                                                                return {
+                                                                                    ...prev,
+                                                                                    tractor: {
+                                                                                        ...(selectedDriver?.tractor || {}),
+                                                                                        type: item,
+                                                                                        type_id: item.id
+                                                                                    }
+                                                                                }
+                                                                            })
+
                                                                             setDriverEquipmentDropdownItems([]);
                                                                             refEquipment.current.focus();
                                                                         }}
-                                                                        ref={ref => refDriverEquipmentPopupItems.current.push(ref)}
+                                                                        ref={(ref) =>
+                                                                            refDriverEquipmentPopupItems.current.push(ref)
+                                                                        }
                                                                     >
-                                                                        {searchValue === undefined ? item.name : <Highlighter highlightClassName="mochi-item-highlight-text" searchWords={[searchValue]} autoEscape={true} textToHighlight={item.name} />}
-                                                                        {item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                                        {searchValue === undefined
+                                                                            ? item.name
+                                                                            : (
+                                                                                <Highlighter
+                                                                                    highlightClassName="mochi-item-highlight-text"
+                                                                                    searchWords={[searchValue]}
+                                                                                    autoEscape={true}
+                                                                                    textToHighlight={item.name}
+                                                                                />
+                                                                            )}
+                                                                        {item.selected && (
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}
+                                                                            />
+                                                                        )}
                                                                     </div>
                                                                 );
                                                             })}
@@ -4666,119 +5024,85 @@ const Carriers = props => {
                                 )}
                             </div>
                         </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
+
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="input-box-container" style={{ width: '50%' }}>
+                                <input
+                                    tabIndex={96 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Truck"
+                                    style={{ textTransform: 'uppercase' }}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                tractor: {
+                                                    ...(selectedDriver?.tractor || {}),
+                                                    number: e.target.value
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.tractor?.number || ''}
+                                />
+                            </div>
+
+                            <div className="input-box-container" style={{ width: '50%' }}>
+                                <input
+                                    tabIndex={97 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Trailer"
+                                    style={{ textTransform: 'uppercase' }}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                trailer: {
+                                                    ...(selectedDriver?.trailer || {}),
+                                                    number: e.target.value
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.trailer?.number || ''}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ gap: 2 }}>
                             <div className="input-box-container grow">
                                 <input
                                     tabIndex={97 + props.tabTimes}
                                     type="text"
-                                    placeholder="Truck"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({...selectedDriver, truck: e.target.value});
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({...selectedDriver, truck: e.target.value});
-                                    }}
-                                    value={selectedDriver?.truck || ""}
-                                />
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={98 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Trailer"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
-                                    onKeyDown={validateDriverForSaving}
-                                    onInput={e => {
-                                        setSelectedDriver({...selectedDriver, trailer: e.target.value});
-                                    }}
-                                    onChange={e => {
-                                        setSelectedDriver({...selectedDriver, trailer: e.target.value});
-                                    }}
-                                    value={selectedDriver?.trailer || ""}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={99 + props.tabTimes}
-                                    type="text"
                                     placeholder="Notes"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0}
-                                    onKeyDown={e => {
+                                    onKeyDown={(e) => {
                                         let key = e.keyCode || e.which;
 
                                         if (key === 9) {
-                                            if (selectedCarrier?.id || 0 > 0) {
-                                                let driver = {...selectedDriver, carrier_id: selectedCarrier.id};
-
-                                                if ((driver.first_name || "").trim() !== "") {
-                                                    e.preventDefault();
-
-                                                    axios
-                                                        .post(props.serverUrl + "/saveCarrierDriver", driver)
-                                                        .then(res => {
-                                                            if (res.data.result === "OK") {
-                                                                setSelectedCarrier(selectedCarrier => {
-                                                                    return {
-                                                                        ...selectedCarrier,
-                                                                        drivers: res.data.drivers,
-                                                                    };
-                                                                });
-                                                                setSelectedDriver({});
-
-                                                                props.setSelectedCarrier({
-                                                                    id: selectedCarrier.id,
-                                                                    drivers: res.data.drivers,
-                                                                    component_id: props.componentId,
-                                                                });
-
-                                                                refCarrierDriverFirstName.current.focus();
-                                                            }
-
-                                                            setIsSavingDriver(false);
-                                                        })
-                                                        .catch(e => {
-                                                            console.log("error on saving carrier driver", e);
-                                                            setIsSavingDriver(false);
-                                                        });
-                                                } else {
-                                                    e.preventDefault();
-                                                    setIsSavingDriver(false);
-                                                    refCarrierCode.current.focus();
-                                                }
-                                            } else {
-                                                e.preventDefault();
-                                                setIsSavingDriver(false);
-                                                refCarrierCode.current.focus();
-                                            }
+                                            e.preventDefault();
+                                            validateDriverForSaving(e);
                                         }
                                     }}
-                                    onInput={e => {
-                                        setSelectedDriver({...selectedDriver, notes: e.target.value});
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                notes: e.target.value
+                                            }
+                                        })
                                     }}
-                                    onChange={e => {
-                                        setSelectedDriver({...selectedDriver, notes: e.target.value});
-                                    }}
-                                    value={selectedDriver?.notes || ""}
+                                    value={selectedDriver?.notes || ''}
                                 />
                             </div>
                         </div>
 
-                        <div
-                            className="form-row"
-                            style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "flex-end",
-                                flexGrow: 1,
-                                paddingBottom: 10,
-                            }}
+                        <div className="form-row" style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
+                            flexGrow: 1,
+                            paddingBottom: 10,
+                        }}
                         >
                             <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -4787,10 +5111,162 @@ const Carriers = props => {
                             </div>
                         </div>
                     </div>
+
+                    {/* <MainForm
+                        formTitle={`Driver Information`}
+                        formButtons={[
+                            {
+                                title: "More",
+                                onClick: () => {
+                                    if ((selectedCarrier?.id || 0) === 0) {
+                                        window.alert('You must select a carrier first!');
+                                        return;
+                                    }
+
+                                    if ((selectedDriver?.id || 0) === 0) {
+                                        window.alert('You must select a driver first!');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-carrier-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Carrier Driver'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-carrier-drivers`}
+                                            savingDriverUrl='/saveDriver'
+                                            deletingDriverUrl='/deleteDriver'
+                                            uploadAvatarUrl='/uploadDriverAvatar'
+                                            removeAvatarUrl='/removeDriverAvatar'
+                                            origin={props.origin}
+                                            subOrigin='carrier'
+                                            owner='carrier'
+                                            isEditingDriver={true}
+                                            
+                                            
+                                            componentId={moment().format('x')}
+                                            selectedDriverId={selectedDriver.id}
+                                            selectedParent={selectedCarrier}
+
+                                            driverSearchCarrier={{
+                                                ...selectedCarrier,
+                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
+                                            }}
+                                        />
+                                    }
+
+                                    openPanel(panel, props.origin);
+                                },
+                                isEnabled: true,
+                            },
+                            {
+                                title: "Add Driver",
+                                onClick: () => {
+                                    if ((selectedCarrier?.id || 0) === 0) {
+                                        window.alert('You must select a carrier first!');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-carrier-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Carrier Driver'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-carrier-drivers`}
+                                            savingDriverUrl='/saveDriver'
+                                            deletingDriverUrl='/deleteDriver'
+                                            uploadAvatarUrl='/uploadDriverAvatar'
+                                            removeAvatarUrl='/removeDriverAvatar'
+                                            origin={props.origin}
+                                            subOrigin='carrier'
+                                            owner='carrier'
+                                            isEditingDriver={true}
+                                            
+                                            
+                                            componentId={moment().format('x')}
+                                            selectedParent={selectedCarrier}
+
+                                            driverSearchCarrier={{
+                                                ...selectedCarrier,
+                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
+                                            }}
+                                        />
+                                    }
+
+                                    openPanel(panel, props.origin);
+                                },
+                                isEnabled: true,
+                            },
+                            {
+                                title: "Delete",
+                                onClick: () => {
+                                    if (window.confirm("Are you sure you want to proceed?")) {
+
+                                        axios.post(props.serverUrl + '/deleteDriver', {
+                                            id: selectedDriver.id,
+                                            sub_origin: 'carrier'
+                                        }).then(res => {
+                                            if (res.data.result === 'OK') {
+                                                setSelectedCarrier(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        drivers: (res.data.drivers || []).filter(x => x.owner_type === 'carrier')
+                                                    }
+                                                });
+
+                                                setSelectedDriver({});
+                                                refDriverCode.current.focus();
+                                            }
+                                        }).catch(e => {
+                                            console.log('error deleting driver');
+                                        });
+                                    }
+                                },
+                                isEnabled: (selectedDriver?.id || 0) > 0,
+                            },
+                            {
+                                title: "Clear",
+                                onClick: () => {
+                                    setSelectedDriver({});
+                                    refDriverCode.current.focus();
+                                },
+                                isEnabled: true,
+                            },
+                        ]}
+                        refs={{
+                            refCode: refDriverCode,
+                            refName: refDriverName,
+                            refEmail: refDriverEmail,
+                            refFieldLastTab: refCarrierCode
+                        }}
+                        tabTimesFrom={92}
+                        tabTimes={props.tabTimes}
+                        searchByCode={searchDriverInfoByCode}
+                        validateForSaving={validateDriverForSaving}
+                        selectedParent={selectedDriver}
+                        setSelectedParent={setSelectedDriver}
+                        fields={[
+                            'email_driver_btn',
+                            'code',
+                            'name',
+                            'address1',
+                            'address2',
+                            'city',
+                            'state',
+                            'zip',
+                            'contact',
+                            'phone',
+                            'ext',
+                            'email',
+                            'notes'
+                        ]}
+                        triggerFields={['notes']}
+                        refFieldLastTab={refCarrierCode}
+                    /> */}
                 </div>
             </div>
 
-            <div className="fields-container-row" style={{marginTop: 10}}>
+            <div className="fields-container-row" style={{ marginTop: 10 }}>
                 <div className="fields-container-col">
                     <div
                         className="form-bordered-box"
@@ -4867,7 +5343,7 @@ const Carriers = props => {
                                                                 if ((res.data.mailing_address || []).length > 0) {
                                                                     let selectedCarrierCode = (selectedCarrier?.code || "") + ((selectedCarrier?.code_number || 0) === 0 ? "" : selectedCarrier.code_number);
 
-                                                                    let data = {...res.data.mailing_address[0]};
+                                                                    let data = { ...res.data.mailing_address[0] };
 
                                                                     if (data.type === "carrier") {
                                                                         let dataCode = (data.code || "") + ((data.code_number || 0) === 0 ? "" : data.code_number);
@@ -4876,12 +5352,12 @@ const Carriers = props => {
                                                                             remitToAddressBtn();
                                                                             refMailingContactName.current.focus();
                                                                         } else {
-                                                                            let currentCarrier = {...selectedCarrier};
+                                                                            let currentCarrier = { ...selectedCarrier };
                                                                             currentCarrier.remit_to_address_is_the_same = 0;
                                                                             currentCarrier.mailing_carrier_id = data.id;
                                                                             currentCarrier.mailing_address_id = null;
 
-                                                                            let mailing_address = {...data};
+                                                                            let mailing_address = { ...data };
 
                                                                             if (mailing_address.contacts.findIndex(x => x.is_primary === 1) > -1) {
                                                                                 currentCarrier.mailing_carrier_contact_id = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].id;
@@ -4890,14 +5366,14 @@ const Carriers = props => {
                                                                                     mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ""
                                                                                         ? "work"
                                                                                         : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ""
-                                                                                        ? "fax"
-                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ""
-                                                                                        ? "mobile"
-                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ""
-                                                                                        ? "direct"
-                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ""
-                                                                                        ? "other"
-                                                                                        : "work";
+                                                                                            ? "fax"
+                                                                                            : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ""
+                                                                                                ? "mobile"
+                                                                                                : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ""
+                                                                                                    ? "direct"
+                                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ""
+                                                                                                        ? "other"
+                                                                                                        : "work";
 
                                                                                 currentCarrier.mailing_carrier_contact_primary_email = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_work !== "" ? "work" : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_personal !== "" ? "personal" : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_other !== "" ? "other" : "work";
 
@@ -4907,14 +5383,14 @@ const Carriers = props => {
                                                                                     currentCarrier.mailing_carrier_contact_primary_phone === "work"
                                                                                         ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ""
                                                                                         : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "other"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ""
-                                                                                        : "";
+                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ""
+                                                                                            : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
+                                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ""
+                                                                                                : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
+                                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ""
+                                                                                                    : currentCarrier.mailing_carrier_contact_primary_phone === "other"
+                                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ""
+                                                                                                        : "";
 
                                                                                 mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || "" : "";
 
@@ -4922,10 +5398,10 @@ const Carriers = props => {
                                                                                     currentCarrier.mailing_carrier_contact_primary_email === "work"
                                                                                         ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ""
                                                                                         : currentCarrier.mailing_carrier_contact_primary_email === "personal"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_email === "other"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ""
-                                                                                        : "";
+                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ""
+                                                                                            : currentCarrier.mailing_carrier_contact_primary_email === "other"
+                                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ""
+                                                                                                : "";
                                                                             } else if (mailing_address.contacts.length > 0) {
                                                                                 currentCarrier.mailing_carrier_contact_id = mailing_address.contacts[0].id;
 
@@ -4939,14 +5415,14 @@ const Carriers = props => {
                                                                                     currentCarrier.mailing_carrier_contact_primary_phone === "work"
                                                                                         ? mailing_address.contacts[0]?.phone_work || ""
                                                                                         : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
-                                                                                        ? mailing_address.contacts[0]?.phone_work_fax || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
-                                                                                        ? mailing_address.contacts[0]?.phone_mobile || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
-                                                                                        ? mailing_address.contacts[0]?.phone_direct || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "other"
-                                                                                        ? mailing_address.contacts[0]?.phone_other || ""
-                                                                                        : "";
+                                                                                            ? mailing_address.contacts[0]?.phone_work_fax || ""
+                                                                                            : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
+                                                                                                ? mailing_address.contacts[0]?.phone_mobile || ""
+                                                                                                : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
+                                                                                                    ? mailing_address.contacts[0]?.phone_direct || ""
+                                                                                                    : currentCarrier.mailing_carrier_contact_primary_phone === "other"
+                                                                                                        ? mailing_address.contacts[0]?.phone_other || ""
+                                                                                                        : "";
 
                                                                                 mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? mailing_address.contacts[0]?.phone_ext || "" : "";
 
@@ -4957,7 +5433,7 @@ const Carriers = props => {
                                                                                 currentCarrier.mailing_carrier_contact_primary_email = "work";
                                                                             }
 
-                                                                            setSelectedCarrier({...currentCarrier, mailing_address: mailing_address});
+                                                                            setSelectedCarrier({ ...currentCarrier, mailing_address: mailing_address });
                                                                             validateCarrierForSaving(e);
                                                                             refCarrierMailingName.current.focus();
                                                                         }
@@ -4968,7 +5444,7 @@ const Carriers = props => {
                                                                                 remit_to_address_is_the_same: 0,
                                                                                 mailing_carrier_id: null,
                                                                                 mailing_address_id: data.id,
-                                                                                mailing_address: {...data},
+                                                                                mailing_address: { ...data },
                                                                             };
                                                                         });
 
@@ -5034,7 +5510,7 @@ const Carriers = props => {
                                     tabIndex={56 + props.tabTimes}
                                     type="text"
                                     placeholder="Address 1"
-                                    style={{textTransform: "capitalize"}}
+                                    style={{ textTransform: "capitalize" }}
                                     readOnly={((props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.edit || 0) === 0) || (selectedCarrier?.id || 0) === 0 || (selectedCarrier?.remit_to_address_is_the_same || 0) === 1 || (selectedCarrier?.mailing_carrier_id || 0) > 0}
                                     onChange={e => {
                                         setSelectedCarrier(prev => {
@@ -5058,7 +5534,7 @@ const Carriers = props => {
                                     tabIndex={57 + props.tabTimes}
                                     type="text"
                                     placeholder="Address 2"
-                                    style={{textTransform: "capitalize"}}
+                                    style={{ textTransform: "capitalize" }}
                                     readOnly={((props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.edit || 0) === 0) || (selectedCarrier?.id || 0) === 0 || (selectedCarrier?.remit_to_address_is_the_same || 0) === 1 || (selectedCarrier?.mailing_carrier_id || 0) > 0}
                                     onChange={e => {
                                         setSelectedCarrier(prev => {
@@ -5155,7 +5631,7 @@ const Carriers = props => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{flexGrow: 1}}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}>
                                 <div className="select-box-wrapper">
                                     <input
                                         style={{
@@ -5326,14 +5802,14 @@ const Carriers = props => {
                                                                     (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || "") !== ""
                                                                         ? "work"
                                                                         : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || "") !== ""
-                                                                        ? "fax"
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || "") !== ""
-                                                                        ? "mobile"
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || "") !== ""
-                                                                        ? "direct"
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || "") !== ""
-                                                                        ? "other"
-                                                                        : "",
+                                                                            ? "fax"
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || "") !== ""
+                                                                                ? "mobile"
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || "") !== ""
+                                                                                    ? "direct"
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || "") !== ""
+                                                                                        ? "other"
+                                                                                        : "",
                                                                 mailing_address: {
                                                                     ...(prev?.mailing_address || {}),
                                                                     contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || "") + " " + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || "")).trim(),
@@ -5341,23 +5817,23 @@ const Carriers = props => {
                                                                         (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "work"
                                                                             ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || ""
                                                                             : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "fax"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "mobile"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "direct"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "other"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || ""
-                                                                            : "",
+                                                                                ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || ""
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "mobile"
+                                                                                    ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || ""
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "direct"
+                                                                                        ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || ""
+                                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "other"
+                                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || ""
+                                                                                            : "",
                                                                     ext: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || "",
                                                                     email:
                                                                         (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "work"
                                                                             ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || ""
                                                                             : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "personal"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "other"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || ""
-                                                                            : "",
+                                                                                ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || ""
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "other"
+                                                                                    ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || ""
+                                                                                    : "",
                                                                 },
                                                             };
                                                         });
@@ -5379,14 +5855,14 @@ const Carriers = props => {
                                                                     (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || "") !== ""
                                                                         ? "work"
                                                                         : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || "") !== ""
-                                                                        ? "fax"
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || "") !== ""
-                                                                        ? "mobile"
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || "") !== ""
-                                                                        ? "direct"
-                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || "") !== ""
-                                                                        ? "other"
-                                                                        : "",
+                                                                            ? "fax"
+                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || "") !== ""
+                                                                                ? "mobile"
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || "") !== ""
+                                                                                    ? "direct"
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || "") !== ""
+                                                                                        ? "other"
+                                                                                        : "",
                                                                 mailing_address: {
                                                                     ...(prev?.mailing_address || {}),
                                                                     contact_name: ((mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].first_name || "") + " " + (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].last_name || "")).trim(),
@@ -5394,23 +5870,23 @@ const Carriers = props => {
                                                                         (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "work"
                                                                             ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work || ""
                                                                             : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "fax"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "mobile"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "direct"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "other"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || ""
-                                                                            : "",
+                                                                                ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_work_fax || ""
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "mobile"
+                                                                                    ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_mobile || ""
+                                                                                    : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "direct"
+                                                                                        ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_direct || ""
+                                                                                        : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_phone || "") === "other"
+                                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_other || ""
+                                                                                            : "",
                                                                     ext: mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].phone_ext || "",
                                                                     email:
                                                                         (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "work"
                                                                             ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_work || ""
                                                                             : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "personal"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || ""
-                                                                            : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "other"
-                                                                            ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || ""
-                                                                            : "",
+                                                                                ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_personal || ""
+                                                                                : (mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].primary_email || "") === "other"
+                                                                                    ? mailingContactNameItems[mailingContactNameItems.findIndex(item => item.selected)].email_other || ""
+                                                                                    : "",
                                                                 },
                                                             };
                                                         });
@@ -5560,7 +6036,7 @@ const Carriers = props => {
                                                 }}
                                                 ref={refMailingContactNameDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{height: 150}}>
+                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {mailingContactNameItems.map((item, index) => {
@@ -5872,7 +6348,7 @@ const Carriers = props => {
                                                 }}
                                                 ref={refMailingContactPhoneDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{height: 150}}>
+                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {mailingContactPhoneItems.map((item, index) => {
@@ -5943,7 +6419,7 @@ const Carriers = props => {
                         <div className="form-row">
                             <div
                                 className="select-box-container"
-                                style={{flexGrow: 1}}
+                                style={{ flexGrow: 1 }}
                                 onMouseEnter={() => {
                                     if ((selectedCarrier?.mailing_address?.email || "") !== "") {
                                         setShowMailingContactEmailCopyBtn(true);
@@ -5969,7 +6445,7 @@ const Carriers = props => {
                                         type="text"
                                         placeholder="E-Mail"
                                         readOnly={((props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.edit || 0) === 0) || (selectedCarrier?.mailing_address?.id || 0) === 0}
-                                        style={{textTransform: "lowercase"}}
+                                        style={{ textTransform: "lowercase" }}
                                         ref={refMailingContactEmail}
                                         onKeyDown={async e => {
                                             let key = e.keyCode || e.which;
@@ -6134,11 +6610,11 @@ const Carriers = props => {
                                                             };
                                                         });
 
-                                                        validateMailingAddressToSave({keyCode: 9});
+                                                        validateMailingAddressToSave({ keyCode: 9 });
                                                         setShowMailingContactEmails(false);
                                                         refMailingContactEmail.current.focus();
                                                     } else {
-                                                        validateMailingAddressToSave({keyCode: 9});
+                                                        validateMailingAddressToSave({ keyCode: 9 });
                                                     }
                                                     break;
 
@@ -6244,7 +6720,7 @@ const Carriers = props => {
                                                 }}
                                                 ref={refMailingContactEmailDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{height: 150}}>
+                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {mailingContactEmailItems.map((item, index) => {
@@ -6270,7 +6746,7 @@ const Carriers = props => {
                                                                                 };
                                                                             });
 
-                                                                            validateCarrierForSaving({keyCode: 9});
+                                                                            validateCarrierForSaving({ keyCode: 9 });
                                                                             setShowMailingContactEmails(false);
                                                                             refMailingContactEmail.current.focus();
                                                                         }}
@@ -6400,7 +6876,7 @@ const Carriers = props => {
                                             insurance_type_id: item.id,
                                             amount: (item.name || "").toLowerCase() === "cargo" ? accounting.formatNumber(100000, 2, ",", ".") : (item.name || "").toLowerCase() === "automotive liability" ? accounting.formatNumber(1000000, 2, ",", ".") : "",
                                         });
-                                        validateInsuranceForSaving({keyCode: 9});
+                                        validateInsuranceForSaving({ keyCode: 9 });
                                         setInsuranceTypeDropdownItems([]);
                                         refInsuranceCompany.current.focus();
                                     }
@@ -6413,14 +6889,14 @@ const Carriers = props => {
                                         insurance_type_id: item.id,
                                         amount: (item.name || "").toLowerCase() === "cargo" ? accounting.formatNumber(100000, 2, ",", ".") : (item.name || "").toLowerCase() === "automotive liability" ? accounting.formatNumber(1000000, 2, ",", ".") : "",
                                     });
-                                    validateInsuranceForSaving({keyCode: 9});
+                                    validateInsuranceForSaving({ keyCode: 9 });
                                     setInsuranceTypeDropdownItems([]);
                                     refInsuranceCompany.current.focus();
                                 }}
                                 onBlur={e => {
                                     if ((selectedInsurance?.insurance_type?.id || 0) === 0) {
                                         setSelectedInsurance(selectedInsurance => {
-                                            return {...selectedInsurance, insurance_type: {}};
+                                            return { ...selectedInsurance, insurance_type: {} };
                                         });
                                     }
                                 }}
@@ -6429,7 +6905,7 @@ const Carriers = props => {
                                     insurance_type.id = 0;
                                     insurance_type.name = e.target.value;
                                     setSelectedInsurance(selectedInsurance => {
-                                        return {...selectedInsurance, insurance_type: insurance_type};
+                                        return { ...selectedInsurance, insurance_type: insurance_type };
                                     });
 
                                     if (e.target.value.trim() === "") {
@@ -6459,7 +6935,7 @@ const Carriers = props => {
                                     insurance_type.id = 0;
                                     insurance_type.name = e.target.value;
                                     setSelectedInsurance(selectedInsurance => {
-                                        return {...selectedInsurance, insurance_type: insurance_type};
+                                        return { ...selectedInsurance, insurance_type: insurance_type };
                                     });
                                 }}
                                 value={selectedInsurance?.insurance_type?.name || ""}
@@ -6567,9 +7043,9 @@ const Carriers = props => {
                                     setInsuranceTypeDropdownItems([]);
                                     refInsuranceCompany.current.focus();
                                 }}
-                            />                            
+                            />
                             <div className="form-h-sep"></div>
-                            <div className="select-box-container" style={{flexGrow: 1}}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}>
                                 <div className="select-box-wrapper">
                                     <input
                                         type="text"
@@ -6723,7 +7199,7 @@ const Carriers = props => {
                                                             ...selectedInsurance,
                                                             company: insuranceCompanyDropdownItems[insuranceCompanyDropdownItems.findIndex(item => item.selected)].company,
                                                         });
-                                                        validateInsuranceForSaving({keyCode: 9});
+                                                        validateInsuranceForSaving({ keyCode: 9 });
                                                         setInsuranceCompanyDropdownItems([]);
                                                         refInsuranceCompany.current.focus();
                                                     }
@@ -6736,7 +7212,7 @@ const Carriers = props => {
                                                             ...selectedInsurance,
                                                             company: insuranceCompanyDropdownItems[insuranceCompanyDropdownItems.findIndex(item => item.selected)].company,
                                                         });
-                                                        validateInsuranceForSaving({keyCode: 9});
+                                                        validateInsuranceForSaving({ keyCode: 9 });
                                                         setInsuranceCompanyDropdownItems([]);
                                                         refInsuranceCompany.current.focus();
                                                     }
@@ -6796,7 +7272,7 @@ const Carriers = props => {
                                                 }}
                                                 ref={refInsuranceCompanyDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below" style={{height: 150}}>
+                                                <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {insuranceCompanyDropdownItems.map((item, index) => {
@@ -6817,7 +7293,7 @@ const Carriers = props => {
                                                                                 ...selectedInsurance,
                                                                                 company: item.company,
                                                                             });
-                                                                            validateInsuranceForSaving({keyCode: 9});
+                                                                            validateInsuranceForSaving({ keyCode: 9 });
                                                                             setInsuranceCompanyDropdownItems([]);
                                                                             refInsuranceCompany.current.focus();
                                                                         }}
@@ -6838,7 +7314,7 @@ const Carriers = props => {
                         </div>
                         <div className="form-v-sep"></div>
                         <div className="form-row">
-                            <div className="select-box-container" style={{width: "8rem"}}>
+                            <div className="select-box-container" style={{ width: "8rem" }}>
                                 <div className="select-box-wrapper">
                                     <MaskedInput
                                         tabIndex={88 + props.tabTimes}
@@ -6902,7 +7378,7 @@ const Carriers = props => {
                                                 }}
                                                 ref={refInsuranceCalendarDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below" style={{height: 275}}>
+                                                <div className="mochi-contextual-popup vertical below" style={{ height: 275 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             <Calendar
@@ -6912,7 +7388,7 @@ const Carriers = props => {
                                                                         ...selectedInsurance,
                                                                         expiration_date: day.format("MM/DD/YYYY"),
                                                                     });
-                                                                    validateInsuranceForSaving({keyCode: 9});
+                                                                    validateInsuranceForSaving({ keyCode: 9 });
                                                                 }}
                                                                 closeCalendar={() => {
                                                                     setIsCalendarShown(false);
@@ -7084,7 +7560,7 @@ const Carriers = props => {
                                             key={index}
                                             onClick={() => {
                                                 if ((props.user?.user_code?.is_admin || 0) === 1 || (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier insurances")?.pivot?.save || 0) === 1 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier insurances")?.pivot?.edit || 0) === 1)) {
-                                                    setSelectedInsurance({...insurance});
+                                                    setSelectedInsurance({ ...insurance });
                                                 }
                                             }}
                                         >
@@ -7105,7 +7581,7 @@ const Carriers = props => {
                     </div>
                 </div>
 
-                <div className="fields-container-col" style={{minWidth: "28%", maxWidth: "28%"}}>
+                <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
                     <div
                         className="form-bordered-box"
                         style={{
@@ -7141,8 +7617,26 @@ const Carriers = props => {
                                         <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
                                             <div style="min-width:25%;max-width:25%">${driver.first_name}</div>
                                             <div style="min-width:25%;max-width:25%">${driver.last_name}</div>
-                                            <div style="min-width:25%;max-width:25%">${driver.phone}</div>
-                                            <div style="min-width:25%;max-width:25%">${driver.email}</div>
+                                            <div style="min-width:25%;max-width:25%">${((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'work'
+                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_work || ''
+                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'fax'
+                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_work_fax || ''
+                                                        : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'mobile'
+                                                            ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_mobile || ''
+                                                            : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'direct'
+                                                                ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_direct || ''
+                                                                : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'other'
+                                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_other || ''
+                                                                    : (driver?.contact_phone || '')
+                                                }</div>
+                                            <div style="min-width:25%;max-width:25%">${((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'work'
+                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_work || ''
+                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'personal'
+                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_personal || ''
+                                                        : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'other'
+                                                            ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_other || ''
+                                                            : (driver?.email || '')
+                                                }</div>
                                         </div>
                                         `;
                                         });
@@ -7174,17 +7668,67 @@ const Carriers = props => {
                                         <div
                                             className="drivers-list-item"
                                             key={index}
+                                            onDoubleClick={async () => {
+                                                let panel = {
+                                                    panelName: `${props.panelName}-carrier-drivers`,
+                                                    component: <CompanyDrivers
+                                                        title='Carrier Driver'
+                                                        tabTimes={322000 + props.tabTimes}
+                                                        panelName={`${props.panelName}-carrier-drivers`}
+                                                        savingDriverUrl='/saveDriver'
+                                                        deletingDriverUrl='/deleteDriver'
+                                                        uploadAvatarUrl='/uploadDriverAvatar'
+                                                        removeAvatarUrl='/removeDriverAvatar'
+                                                        origin={props.origin}
+                                                        subOrigin='carrier'
+                                                        owner='carrier'
+                                                        isEditingDriver={true}
+                                                        
+                                                        
+                                                        componentId={moment().format('x')}
+                                                        selectedDriverId={driver.id}
+                                                        selectedParent={selectedCarrier}
+
+                                                        driverSearchCarrier={{
+                                                            ...selectedCarrier,
+                                                            selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
+                                                        }}
+                                                    />
+                                                }
+
+                                                openPanel(panel, props.origin);
+                                            }}
                                             onClick={() => {
                                                 if ((props.user?.user_code?.is_admin || 0) === 1 || (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 1 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 1)) {
-                                                    setSelectedDriver({...driver});
-                                                    refCarrierDriverFirstName.current.focus();
+                                                    setSelectedDriver({ ...driver });
+                                                    refDriverName.current.focus();
                                                 }
                                             }}
                                         >
                                             <div className="driver-list-col tcol first-name">{driver.first_name}</div>
                                             <div className="driver-list-col tcol last-name">{driver.last_name}</div>
-                                            <div className="driver-list-col tcol phone">{driver.phone}</div>
-                                            <div className="driver-list-col tcol email">{driver.email}</div>
+                                            <div className="driver-list-col tcol phone">{
+                                                ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'work'
+                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_work || ''
+                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'fax'
+                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_work_fax || ''
+                                                        : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'mobile'
+                                                            ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_mobile || ''
+                                                            : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'direct'
+                                                                ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_direct || ''
+                                                                : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'other'
+                                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_other || ''
+                                                                    : (driver?.contact_phone || '')
+                                            }</div>
+                                            <div className="driver-list-col tcol email">{
+                                                ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'work'
+                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_work || ''
+                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'personal'
+                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_personal || ''
+                                                        : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'other'
+                                                            ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_other || ''
+                                                            : (driver?.email || '')
+                                            }</div>
                                             {driver.id === (selectedDriver?.id || 0) && (
                                                 <div className="driver-list-col tcol driver-selected">
                                                     <FontAwesomeIcon icon={faPencilAlt} />
@@ -7199,7 +7743,7 @@ const Carriers = props => {
                 </div>
             </div>
 
-            <div className="fields-container-row" style={{marginTop: 10}}>
+            <div className="fields-container-row" style={{ marginTop: 10 }}>
                 <div className="fields-container-col">
                     <div
                         className="form-bordered-box"
@@ -7303,7 +7847,7 @@ const Carriers = props => {
                                     tabIndex={67 + props.tabTimes}
                                     type="text"
                                     placeholder="Address 1"
-                                    style={{textTransform: "capitalize"}}
+                                    style={{ textTransform: "capitalize" }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
                                     onChange={e => {
                                         let factoring_company = selectedCarrier.factoring_company || {};
@@ -7324,7 +7868,7 @@ const Carriers = props => {
                                     tabIndex={68 + props.tabTimes}
                                     type="text"
                                     placeholder="Address 2"
-                                    style={{textTransform: "capitalize"}}
+                                    style={{ textTransform: "capitalize" }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
                                     onChange={e => {
                                         let factoring_company = selectedCarrier.factoring_company || {};
@@ -7440,12 +7984,12 @@ const Carriers = props => {
                                         (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
                                             ? selectedCarrier?.factoring_company?.contact_name || ""
                                             : // ? ''
-                                              selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).first_name + " " + selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).last_name
+                                            selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).first_name + " " + selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).last_name
                                     }
                                 />
                             </div>
                             <div className="form-h-sep"></div>
-                            <div className="input-box-container input-phone" style={{position: "relative"}}>
+                            <div className="input-box-container input-phone" style={{ position: "relative" }}>
                                 <MaskedInput
                                     tabIndex={73 + props.tabTimes}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
@@ -7480,16 +8024,16 @@ const Carriers = props => {
                                             ? selectedCarrier?.factoring_company?.contact_phone || ""
                                             : // ? ''
                                             selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "work"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "fax"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "mobile"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "direct"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_direct
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "other"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_other
-                                            : ""
+                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
+                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "fax"
+                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work_fax
+                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "mobile"
+                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_mobile
+                                                        : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "direct"
+                                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_direct
+                                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "other"
+                                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_other
+                                                                : ""
                                     }
                                 />
 
@@ -7538,8 +8082,8 @@ const Carriers = props => {
                                             ? selectedCarrier?.factoring_company?.ext || ""
                                             : // ? ''
                                             (selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1)?.primary_phone || "") === "work"
-                                            ? selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
-                                            : ""
+                                                ? selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
+                                                : ""
                                     }
                                 />
                             </div>
@@ -7548,7 +8092,7 @@ const Carriers = props => {
                         <div className="form-row">
                             <div
                                 className="input-box-container"
-                                style={{position: "relative", flexGrow: 1}}
+                                style={{ position: "relative", flexGrow: 1 }}
                                 onMouseEnter={() => {
                                     if ((selectedCarrier?.factoring_company?.email || "") !== "") {
                                         setShowFactoringCompanyEmailCopyBtn(true);
@@ -7572,7 +8116,7 @@ const Carriers = props => {
                                     tabIndex={75 + props.tabTimes}
                                     type="text"
                                     placeholder="E-Mail"
-                                    style={{textTransform: "lowercase"}}
+                                    style={{ textTransform: "lowercase" }}
                                     readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
                                     ref={refFactoringCompanyEmail}
                                     onKeyDown={validateFactoringCompanyToSave}
@@ -7603,12 +8147,12 @@ const Carriers = props => {
                                             ? selectedCarrier?.factoring_company?.email || ""
                                             : // ? ''
                                             selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "work"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "personal"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_personal
-                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "other"
-                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_other
-                                            : ""
+                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
+                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "personal"
+                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_personal
+                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "other"
+                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_other
+                                                        : ""
                                     }
                                 />
 
@@ -7664,7 +8208,7 @@ const Carriers = props => {
                                             return;
                                         }
 
-                                        setSelectedNote({id: 0, carrier_id: selectedCarrier.id});
+                                        setSelectedNote({ id: 0, carrier_id: selectedCarrier.id });
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -7716,7 +8260,7 @@ const Carriers = props => {
                         </div>
                     </div>
                 </div>
-                <div className="fields-container-col" style={{minWidth: "28%", maxWidth: "28%"}}>
+                <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
                     <div className="form-bordered-box">
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
@@ -7753,10 +8297,10 @@ const Carriers = props => {
                                             onClick={() => {
                                                 let panel = {
                                                     panelName: `${props.panelName}-dispatch`,
-                                                    component: <Dispatch title="Dispatch" tabTimes={22000 + props.tabTimes} panelName={`${props.panelName}-dispatch`} origin={props.origin} isOnPanel={true} isAdmin={props.isAdmin} openPanel={props.openPanel} closePanel={props.closePanel} componentId={moment().format("x")} order_id={order.id} />,
+                                                    component: <Dispatch title="Dispatch" tabTimes={22000 + props.tabTimes} panelName={`${props.panelName}-dispatch`} origin={props.origin} isOnPanel={true} isAdmin={props.isAdmin}   componentId={moment().format("x")} order_id={order.id} />,
                                                 };
 
-                                                props.openPanel(panel, props.origin);
+                                                openPanel(panel, props.origin);
                                             }}
                                         >
                                             <span
@@ -7771,19 +8315,19 @@ const Carriers = props => {
                                             {(order?.routing || []).length >= 2
                                                 ? order.routing[0].type === "pickup"
                                                     ? (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || "") +
-                                                      ", " +
-                                                      (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || "") +
-                                                      " - " +
-                                                      (order.routing[order.routing.length - 1].type === "pickup"
-                                                          ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || "") + ", " + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || "")
-                                                          : (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || "") + ", " + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || ""))
+                                                    ", " +
+                                                    (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || "") +
+                                                    " - " +
+                                                    (order.routing[order.routing.length - 1].type === "pickup"
+                                                        ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || "") + ", " + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || "")
+                                                        : (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || "") + ", " + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || ""))
                                                     : (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || "") +
-                                                      ", " +
-                                                      (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || "") +
-                                                      " - " +
-                                                      (order.routing[order.routing.length - 1].type === "pickup"
-                                                          ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || "") + ", " + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || "")
-                                                          : (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || "") + ", " + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || ""))
+                                                    ", " +
+                                                    (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || "") +
+                                                    " - " +
+                                                    (order.routing[order.routing.length - 1].type === "pickup"
+                                                        ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || "") + ", " + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || "")
+                                                        : (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || "") + ", " + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || ""))
                                                 : ""}
                                         </div>
                                     );
@@ -7794,7 +8338,7 @@ const Carriers = props => {
                         {loadingCarrierOrdersTransition(
                             (style, item) =>
                                 item && (
-                                    <animated.div className="loading-container" style={{...style, zIndex: 0}}>
+                                    <animated.div className="loading-container" style={{ ...style, zIndex: 0 }}>
                                         <div className="loading-container-wrapper">
                                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                                         </div>
@@ -7814,8 +8358,8 @@ const Carriers = props => {
                                 setSelectedData={setSelectedNote}
                                 selectedParent={selectedCarrier}
                                 setSelectedParent={data => {
-                                    setSelectedCarrier({...selectedCarrier, notes: data.notes});
-                                    props.setSelectedCarrier({...selectedCarrier, notes: data.notes});
+                                    setSelectedCarrier({ ...selectedCarrier, notes: data.notes });
+                                    props.setSelectedCarrier({ ...selectedCarrier, notes: data.notes });
                                 }}
                                 savingDataUrl="/saveCarrierNote"
                                 deletingDataUrl="/deleteCarrierNote"
@@ -7859,8 +8403,8 @@ const Carriers = props => {
                                     panelName={`${props.panelName}-ach-wiring-info`}
                                     tabTimes={props.tabTimes}
                                     componentId={moment().format("x")}
-                                    openPanel={props.openPanel}
-                                    closePanel={props.closePanel}
+                                    
+                                    
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingACHWiringInfo(false);
@@ -7913,8 +8457,8 @@ const Carriers = props => {
                                     panelName={`${props.panelName}-mc-numbers`}
                                     tabTimes={props.tabTimes}
                                     componentId={moment().format("x")}
-                                    openPanel={props.openPanel}
-                                    closePanel={props.closePanel}
+                                    
+                                    
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingMCNumbers(false);
@@ -7927,10 +8471,10 @@ const Carriers = props => {
                                         setIsLoading(true);
 
                                         axios
-                                            .post(props.serverUrl + "/getCarrierById", {id: data})
+                                            .post(props.serverUrl + "/getCarrierById", { id: data })
                                             .then(res => {
                                                 if (res.data.result === "OK") {
-                                                    let carrier = {...res.data.carrier};
+                                                    let carrier = { ...res.data.carrier };
 
                                                     let mailing_address = carrier?.mailing_address || {};
 
@@ -7948,14 +8492,14 @@ const Carriers = props => {
                                                                 (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                                                     ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                                                     : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                                    : "";
+                                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                                                    : "";
 
                                                             mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -7963,10 +8507,10 @@ const Carriers = props => {
                                                                 (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                                                     ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                                                     : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                                    : "";
+                                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                                            : "";
                                                         }
                                                     }
 
@@ -7984,14 +8528,14 @@ const Carriers = props => {
                                                                 (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
                                                                     ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
                                                                     : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                                    : "";
+                                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                                                    : "";
 
                                                             mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
@@ -7999,10 +8543,10 @@ const Carriers = props => {
                                                                 (carrier?.mailing_carrier_contact_primary_email || "") === "work"
                                                                     ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
                                                                     : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                                                    : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                                    : "";
+                                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                                                            : "";
                                                         }
                                                     }
 
@@ -8053,33 +8597,52 @@ const mapStateToProps = state => {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
         user: state.systemReducers.user,
-        companyOpenedPanels: state.companyReducers.companyOpenedPanels,
-        adminOpenedPanels: state.adminReducers.adminOpenedPanels,
-        dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
-        customerOpenedPanels: state.customerReducers.customerOpenedPanels,
-        adminCustomerOpenedPanels: state.customerReducers.adminCustomerOpenedPanels,
-        adminCarrierOpenedPanels: state.carrierReducers.adminCarrierOpenedPanels,
-        loadBoardOpenedPanels: state.loadBoardReducers.loadBoardOpenedPanels,
-        invoiceOpenedPanels: state.invoiceReducers.invoiceOpenedPanels,
+
+        adminHomePanels: state.adminReducers.adminHomePanels,
+        companyHomePanels: state.companyReducers.companyHomePanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+        adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+        companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        adminReportPanels: state.reportReducers.adminReportPanels,
+        companyReportPanels: state.reportReducers.companyReportPanels,
+
         selectedCarrier: state.carrierReducers.selectedCarrier,
         selectedCarrierContact: state.carrierReducers.selectedContact,
         selectedDriver: state.carrierReducers.selectedDriver,
         selectedInsurance: state.carrierReducers.selectedInsurance,
+
+
     };
 };
 
 export default connect(mapStateToProps, {
-    setCompanyOpenedPanels,
-    setAdminOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
     setSelectedCarrier,
     setSelectedCarrierContact,
     setSelectedDriver,
     setSelectedInsurance,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels
 })(Carriers);

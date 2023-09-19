@@ -72,7 +72,7 @@ const EmailRecipientInput = (props) => {
                         textAlign: 'center',
                         paddingBottom: 10,
                         fontSize: 16
-                    }}>{props.dataEmail.title || 'E-Mail Carrier Confirmation'}</div>
+                    }}>{props.title || 'E-Mail Carrier Confirmation'}</div>
 
                     {/* BODY */}
 
@@ -685,6 +685,9 @@ const EmailRecipientInput = (props) => {
                                     console.log(e);
                                 }).finally(() => {
                                     setIsLoading(false);
+                                    window.setTimeout(() => {
+                                        props.close();
+                                    }, 2000);
                                 });
                             }
                         }}>

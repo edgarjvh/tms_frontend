@@ -20,14 +20,6 @@ import { Calendar, RatingScreen } from "./../panels";
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
     setSelectedOrder,
     setSelectedCustomer,
     setSelectedContact,
@@ -35,6 +27,23 @@ import {
     setSelectedCarrierContact,
     setSelectedDriver as setSelectedCarrierDriver,
     setSelectedInsurance as setSelectedCarrierInsurance,
+
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels
 } from "./../../../actions";
 import {
     ChangeCarrier,
@@ -130,6 +139,7 @@ const Dispatch = (props) => {
 
     const [dispatchEvent, setDispatchEvent] = useState({});
     const [dispatchEventLocation, setDispatchEventLocation] = useState("");
+    const refDispatchEventLocation = useRef();
     const [dispatchEventNotes, setDispatchEventNotes] = useState("");
     const [dispatchEventDate, setDispatchEventDate] = useState("");
     const [dispatchEventTime, setDispatchEventTime] = useState("");
@@ -231,7 +241,11 @@ const Dispatch = (props) => {
 
                     setIsLoading(false);
 
-                    refDispatchEvents.current.focus();
+                    if (refDispatchEvents?.current) {
+                        console.log(refDispatchEvents)
+                        refDispatchEvents.current.focus();
+                    }
+
                 }
             }).catch((e) => {
                 console.log("error getting order by id", e);
@@ -1410,8 +1424,8 @@ const Dispatch = (props) => {
                     tabTimes={29000}
                     panelName={`${props.panelName}-customer-search`}
                     origin={props.origin}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+
+
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
                     callback={(id) => {
@@ -1451,16 +1465,10 @@ const Dispatch = (props) => {
                             }
                         }).then((response) => {
                             if (response === "OK") {
-                                props.closePanel(
-                                    `${props.panelName}-customer-search`,
-                                    props.origin
-                                );
+                                closePanel(`${props.panelName}-customer-search`, props.origin);
                             }
                         }).catch((e) => {
-                            props.closePanel(
-                                `${props.panelName}-customer-search`,
-                                props.origin
-                            );
+                            closePanel(`${props.panelName}-customer-search`, props.origin);
                             setSelectedBillToCustomer({});
                             setSelectedBillToCustomerContact({});
                             refBillToCompanyCode.current.focus();
@@ -1470,7 +1478,7 @@ const Dispatch = (props) => {
             ),
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const shipperCompanySearch = () => {
@@ -1521,8 +1529,8 @@ const Dispatch = (props) => {
                     tabTimes={29000}
                     panelName={`${props.panelName}-customer-search`}
                     origin={props.origin}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+
+
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
                     callback={(id) => {
@@ -1675,7 +1683,7 @@ const Dispatch = (props) => {
 
 
                         }).then((response) => {
-                            props.closePanel(
+                            closePanel(
                                 `${props.panelName}-customer-search`,
                                 props.origin
                             );
@@ -1689,7 +1697,7 @@ const Dispatch = (props) => {
             ),
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const consigneeCompanySearch = () => {
@@ -1750,8 +1758,8 @@ const Dispatch = (props) => {
                     tabTimes={29000}
                     panelName={`${props.panelName}-customer-search`}
                     origin={props.origin}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+
+
                     suborigin={"customer"}
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
@@ -1805,13 +1813,13 @@ const Dispatch = (props) => {
                             }
                         }).then((response) => {
                             if (response === "OK") {
-                                props.closePanel(
+                                closePanel(
                                     `${props.panelName}-customer-search`,
                                     props.origin
                                 );
                             }
                         }).catch((e) => {
-                            props.closePanel(
+                            closePanel(
                                 `${props.panelName}-customer-search`,
                                 props.origin
                             );
@@ -1824,7 +1832,7 @@ const Dispatch = (props) => {
             ),
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const getCarrierInfoByCode = (e) => {
@@ -1841,55 +1849,84 @@ const Dispatch = (props) => {
                     return;
                 }
 
-                axios.post(props.serverUrl + "/carriers", { code: e.target.value.toLowerCase() }).then((res) => {
+                if ((selectedOrder?.division?.id || 0) === 0) {
+                    e.preventDefault();
+                    window.alert("You must select a division first!");
+                    setSelectedCarrier({});
+                    setSelectedCarrierContact({});
+                    setSelectedCarrierDriver({});
+                    return;
+                }
+
+                axios.post(props.serverUrl + "/getOrderCarrierByCode", {
+                    code: e.target.value.toLowerCase(),
+                    division_type: selectedOrder?.division?.type
+                }).then((res) => {
                     if (res.data.result === "OK") {
-                        if (res.data.carriers.length > 0) {
-                            setSelectedCarrier(res.data.carriers[0]);
+                        setSelectedCarrier({});
+                        setSelectedCarrierDriver({});
+                        setSelectedCarrierInsurance({});
+                        setSelectedCarrierContact({});
 
-                            let selected_order = { ...selectedOrder, carrier_contact_id: null } || {
-                                order_number: 0,
-                            };
+                        if (res.data.carrier) {
+                            let carrier = { ...res.data.carrier };
+                            let driver = null;
+                            let contact = null;
 
-                            if ((res.data.carriers[0].contacts || []).length > 0) {
-                                let carrierPrimaryContact = res.data.carriers[0].contacts.find(x => x.is_primary === 1);
+                            if (res.data.owner_type === 'carrier') {
+                                if ((carrier?.contacts || []).length > 0) {
+                                    contact = carrier.contacts.find(x => (x.is_primary || 0) === 1) || carrier.contacts[0];
+                                }
 
-                                if (carrierPrimaryContact) {
-                                    setSelectedCarrierContact(carrierPrimaryContact)
-                                    selected_order.carrier_contact_id = carrierPrimaryContact.id;
-                                    selected_order.carrier_contact_primary_phone = carrierPrimaryContact.primary_phone || 'work'
-                                } else {
-                                    setSelectedCarrierContact(res.data.carriers[0].contacts[0])
-                                    selected_order.carrier_contact_id = res.data.carriers[0].contacts[0].id;
-                                    selected_order.carrier_contact_primary_phone = res.data.carriers[0].primary_phone || 'work'
+                                if ((carrier?.drivers || []).length > 0) {
+                                    if ((res.data?.driver_code || '') !== '') {
+                                        driver = carrier.drivers.find(x => (x.code || '').toUpperCase() === (res.data.driver_code).toUpperCase());
+                                    } else {
+                                        driver = { ...carrier.drivers[0] };
+                                    }
                                 }
                             }
 
-                            setSelectedCarrierInsurance({});
+                            setSelectedCarrier(carrier);
+                            setSelectedCarrierContact(contact);
+                            setSelectedCarrierDriver(driver);
 
+                            let selected_order = {
+                                ...selectedOrder,
+                                carrier_id: carrier?.id,
+                                carrier: carrier,
+                                equipment_id: driver?.tractor?.type_id,
+                                equipment: driver?.tractor?.type,
+                                carrier_contact_id: contact?.id,
+                                carrier_contact_primary_phone: contact?.primary_phone || 'work',
+                                carrier_driver_id: driver?.id,
+                                driver: driver
+                            };
 
+                            setSelectedOrder(prev => {
+                                return {
+                                    ...prev,
+                                    carrier_id: carrier?.id,
+                                    carrier: carrier,
+                                    equipment_id: driver?.tractor?.type_id,
+                                    equipment: driver?.tractor?.type,
+                                    carrier_contact_id: contact?.id,
+                                    carrier_contact_primary_phone: contact?.primary_phone || 'work',
+                                    carrier_driver_id: driver?.id,
+                                    driver: driver
+                                }
+                            });
 
-                            selected_order.bill_to_customer_id = selectedBillToCustomer?.id || 0;
-                            selected_order.shipper_customer_id = selectedShipperCustomer?.id || 0;
-                            selected_order.consignee_customer_id = selectedConsigneeCustomer?.id || 0;
-                            selected_order.carrier_id = res.data.carriers[0].id;
-
-                            if (res.data.carriers[0].drivers.length > 0) {
-                                // setSelectedCarrierDriver({
-                                //     ...res.data.carriers[0].drivers[0],
-                                //     name: res.data.carriers[0].drivers[0].first_name +
-                                //         (res.data.carriers[0].drivers[0].last_name.trim() === ""
-                                //             ? ""
-                                //             : " " + res.data.carriers[0].drivers[0].last_name),
-                                // });
-                                // selected_order.carrier_driver_id = res.data.carriers[0].drivers[0].id;
-
-                                setSelectedCarrierDriver({});
-                                selected_order.carrier_driver_id = null;
-                                selected_order.equipment = res.data.carriers[0].drivers[0].equipment;
-                                selected_order.equipment_id = res.data.carriers[0].drivers[0].equipment_id;
-                            }
-
-                            if ((selected_order.events || []).find((el) => el.event_type === "carrier assigned") === undefined) {
+                            if (!(selected_order?.events || []).find(x => x.event_type === 'carrier assigned')) {
+                                let event_notes = res.data.owner_type === 'carrier'
+                                    ? 'Assigned Carrier '
+                                    : res.data.owner_type === 'agent'
+                                        ? 'Assigned Agent '
+                                        : res.data.owner_type === 'company'
+                                            ? 'Assigned Company Driver '
+                                            : res.data.owner_type === 'operator'
+                                                ? 'Assigned Owner Operator '
+                                                : ' ';
                                 let event_parameters = {
                                     order_id: selected_order.id,
                                     time: moment().format("HHmm"),
@@ -1899,15 +1936,15 @@ const Dispatch = (props) => {
                                     user_code_id: props.user.user_code.id || null,
                                     event_location: "",
                                     event_notes:
-                                        "Assigned Carrier " +
-                                        res.data.carriers[0].code +
-                                        (res.data.carriers[0].code_number === 0
+                                        event_notes +
+                                        carrier.code +
+                                        ((carrier?.code_number || 0) === 0
                                             ? ""
-                                            : res.data.carriers[0].code_number) +
+                                            : carrier.code_number) +
                                         " - " +
-                                        res.data.carriers[0].name,
+                                        carrier.name,
                                     event_type_id: 2,
-                                    new_carrier_id: res.data.carriers[0].id,
+                                    new_carrier_id: carrier.id,
                                 };
 
                                 if (!isCreatingTemplate && !isEditingTemplate) {
@@ -1980,7 +2017,7 @@ const Dispatch = (props) => {
                                             }
                                         } else if (res.data.result === "ORDER ID NOT VALID") {
                                             window.alert("The order number is not valid!");
-                                            goToTabindex((74 + props.tabTimes).toString());
+                                            refEventDate.current.inputElement.focus();
                                         }
                                     }).catch((e) => {
                                         console.log("error saving order event", e);
@@ -2284,8 +2321,8 @@ const Dispatch = (props) => {
                     tabTimes={69000}
                     panelName={`${props.panelName}-carrier-search`}
                     origin={props.origin}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+
+
                     suborigin={"carrier"}
                     componentId={moment().format("x")}
                     customerSearch={carrierSearch}
@@ -2324,15 +2361,6 @@ const Dispatch = (props) => {
                                         selected_order.carrier_id = carrier.id;
 
                                         if (carrier.drivers.length > 0) {
-                                            // setSelectedCarrierDriver({
-                                            //     ...carrier.drivers[0],
-                                            //     name:
-                                            //         carrier.drivers[0].first_name +
-                                            //         (carrier.drivers[0].last_name.trim() === ""
-                                            //             ? ""
-                                            //             : " " + carrier.drivers[0].last_name),
-                                            // });
-                                            // selected_order.carrier_driver_id = carrier.drivers[0].id;
                                             setSelectedCarrierDriver({});
                                             selected_order.carrier_driver_id = null;
                                         }
@@ -2428,7 +2456,7 @@ const Dispatch = (props) => {
                                                         }
                                                     } else if (res.data.result === "ORDER ID NOT VALID") {
                                                         window.alert("The order number is not valid!");
-                                                        goToTabindex((74 + props.tabTimes).toString());
+                                                        refEventDate.current.inputElement.focus();
                                                     }
                                                     setIsLoading(false);
                                                 }).catch((e) => {
@@ -2472,7 +2500,7 @@ const Dispatch = (props) => {
                             })
                         }).then((response) => {
                             if (response === "OK") {
-                                props.closePanel(
+                                closePanel(
                                     `${props.panelName}-carrier-search`,
                                     props.origin
                                 );
@@ -2480,7 +2508,7 @@ const Dispatch = (props) => {
                                 refDriverName.current.focus();
                             }
                         }).catch((e) => {
-                            props.closePanel(
+                            closePanel(
                                 `${props.panelName}-carrier-search`,
                                 props.origin
                             );
@@ -2491,7 +2519,7 @@ const Dispatch = (props) => {
             ),
         };
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     };
 
     const validateBillToCompanyInfoForSaving = (e) => {
@@ -3586,7 +3614,7 @@ const Dispatch = (props) => {
             };
 
             if ((selectedCarrier?.id || 0) > 0) {
-                if ((driver.first_name || "").trim() !== "") {
+                if ((driver.name || "").trim() !== "") {
                     axios.post(props.serverUrl + "/saveCarrierDriver", driver).then((res) => {
                         if (res.data.result === "OK") {
                             setSelectedCarrier((selectedCarrier) => {
@@ -4443,8 +4471,16 @@ const Dispatch = (props) => {
                         let order = JSON.parse(JSON.stringify(res.data.order));
 
                         setSelectedOrder({});
-                        setSelectedOrder(order);
+                        setSelectedOrder({
+                            ...order,
+                            division: {
+                                ...(order?.division || {}),
+                                name: (order?.division?.name || '') + ' - ' + (order?.division?.type || '')
+                            }
+                        });
                         // await setTempRouting(order.routing);
+
+
 
                         setSelectedBillToCustomer({ ...order.bill_to_company });
                         setSelectedBillToCustomerContact({
@@ -4996,13 +5032,157 @@ const Dispatch = (props) => {
                 tabTimes={95000 + props.tabTimes}
                 panelName={`${props.panelName}-order-import`}
                 origin={props.origin}
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+
+
                 componentId={moment().format('x')}
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
+    }
+
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+        }
     }
 
     return (
@@ -5074,7 +5254,19 @@ const Dispatch = (props) => {
                                         />
                                     </div>
                                     <div className="form-h-sep"></div>
-                                    
+
+                                    <span className="fas fa-chevron-left" style={{
+                                        fontSize: '1rem',
+                                        margin: '0px 7px 0px 7px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                                        color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? '#4096ee' : 'rgba(0,0,0,0.3)'
+                                    }} onClick={() => {
+                                        getOrderByOrderNumber({ keyCode: 9 }, 'previous');
+                                    }}></span>
+
                                     <div
                                         className="input-box-container"
                                         style={{
@@ -5108,7 +5300,19 @@ const Dispatch = (props) => {
                                             value={selectedOrder?.order_number || ""}
                                         />
                                     </div>
-                                    
+
+                                    <span className="fas fa-chevron-right" style={{
+                                        fontSize: '1rem',
+                                        margin: '0px 7px 0px 7px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                                        color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? '#4096ee' : 'rgba(0,0,0,0.3)'
+                                    }} onClick={() => {
+                                        getOrderByOrderNumber({ keyCode: 9 }, 'next');
+                                    }}></span>
+
                                     <div className="form-h-sep"></div>
                                     <div
                                         className="input-box-container"
@@ -5149,17 +5353,7 @@ const Dispatch = (props) => {
                                         />
                                     </div>
                                     <div className="form-h-sep"></div>
-                                    <span className="fas fa-chevron-left" style={{
-                                        fontSize: '1rem',
-                                        margin: '0px 7px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        cursor: 'pointer',
-                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
-                                        color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.3)'
-                                    }} onClick={() => {
-                                        getOrderByOrderNumber({keyCode: 9}, 'previous');
-                                    }}></span>
+
                                     <div className="mochi-button" onClick={dispatchClearBtnClick}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">
                                             (
@@ -5169,24 +5363,13 @@ const Dispatch = (props) => {
                                             )
                                         </div>
                                     </div>
-                                    <span className="fas fa-chevron-right" style={{
-                                        fontSize: '1rem',
-                                        margin: '0px 0px 0px 7px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        cursor: 'pointer',
-                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
-                                        color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.3)'
-                                    }} onClick={() => {
-                                        getOrderByOrderNumber({keyCode: 9}, 'next');
-                                    }}></span>
                                 </div>
                             </div>
                         </div>
                         <div style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
                             <div className="form-borderless-box">
                                 <div className="form-row" style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <div className="select-box-container" style={{flexGrow: 1}}>
+                                    <div className="select-box-container" style={{ flexGrow: 1 }}>
                                         <div className="select-box-wrapper">
                                             <input
                                                 type="text"
@@ -5241,12 +5424,11 @@ const Dispatch = (props) => {
                                                                     axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
                                                                         if (res.data.result === "OK") {
                                                                             await setDivisionItems(res.data.divisions.map((item, index) => {
-                                                                                item.selected =
-                                                                                    (selectedOrder?.division?.id ||
-                                                                                        0) === 0
-                                                                                        ? index === 0
-                                                                                        : item.id ===
-                                                                                        selectedOrder.division.id;
+                                                                                let str = item.type;
+                                                                                item.name = item.name + " - " + (str.charAt(0).toUpperCase() + str.slice(1));
+                                                                                item.selected = (selectedOrder?.division?.id || 0) === 0
+                                                                                    ? index === 0
+                                                                                    : item.id === selectedOrder.division.id;
                                                                                 return item;
                                                                             }));
 
@@ -5281,14 +5463,10 @@ const Dispatch = (props) => {
                                                                     } else {
                                                                         await setDivisionItems(
                                                                             divisionItems.map((item, index) => {
-                                                                                if (
-                                                                                    selectedIndex ===
-                                                                                    divisionItems.length - 1
-                                                                                ) {
+                                                                                if (selectedIndex === divisionItems.length - 1) {
                                                                                     item.selected = index === 0;
                                                                                 } else {
-                                                                                    item.selected =
-                                                                                        index === selectedIndex + 1;
+                                                                                    item.selected = index === selectedIndex + 1;
                                                                                 }
                                                                                 return item;
                                                                             })
@@ -5306,41 +5484,33 @@ const Dispatch = (props) => {
                                                                         return true;
                                                                     });
                                                                 } else {
-                                                                    axios
-                                                                        .post(props.serverUrl + "/getDivisions")
-                                                                        .then(async (res) => {
-                                                                            if (res.data.result === "OK") {
-                                                                                await setDivisionItems(
-                                                                                    res.data.divisions.map(
-                                                                                        (item, index) => {
-                                                                                            item.selected =
-                                                                                                (selectedOrder?.division?.id ||
-                                                                                                    0) === 0
-                                                                                                    ? index === 0
-                                                                                                    : item.id ===
-                                                                                                    selectedOrder.division.id;
-                                                                                            return item;
-                                                                                        }
-                                                                                    )
-                                                                                );
+                                                                    axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                                        if (res.data.result === "OK") {
+                                                                            await setDivisionItems(res.data.divisions.map(
+                                                                                (item, index) => {
+                                                                                    let str = item.type;
+                                                                                    item.name = item.name + " - " + (str.charAt(0).toUpperCase() + str.slice(1));
+                                                                                    item.selected = (selectedOrder?.division?.id || 0) === 0
+                                                                                        ? index === 0
+                                                                                        : item.id === selectedOrder.division.id;
+                                                                                    return item;
+                                                                                }
+                                                                            ));
 
-                                                                                refDivisionPopupItems.current.map(
-                                                                                    (r, i) => {
-                                                                                        if (
-                                                                                            r &&
-                                                                                            r.classList.contains("selected")
-                                                                                        ) {
-                                                                                            r.scrollIntoView({
-                                                                                                behavior: "auto",
-                                                                                                block: "center",
-                                                                                                inline: "nearest",
-                                                                                            });
-                                                                                        }
-                                                                                        return true;
+                                                                            refDivisionPopupItems.current.map(
+                                                                                (r, i) => {
+                                                                                    if (r && r.classList.contains("selected")) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: "auto",
+                                                                                            block: "center",
+                                                                                            inline: "nearest",
+                                                                                        });
                                                                                     }
-                                                                                );
-                                                                            }
-                                                                        })
+                                                                                    return true;
+                                                                                }
+                                                                            );
+                                                                        }
+                                                                    })
                                                                         .catch(async (e) => {
                                                                             console.log("error getting divisions", e);
                                                                         });
@@ -5352,26 +5522,11 @@ const Dispatch = (props) => {
                                                                 break;
 
                                                             case 13: // enter
-                                                                if (
-                                                                    divisionItems.length > 0 &&
-                                                                    divisionItems.findIndex(
-                                                                        (item) => item.selected
-                                                                    ) > -1
-                                                                ) {
+                                                                if (divisionItems.length > 0 && divisionItems.findIndex((item) => item.selected) > -1) {
                                                                     await setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        division:
-                                                                            divisionItems[
-                                                                            divisionItems.findIndex(
-                                                                                (item) => item.selected
-                                                                            )
-                                                                            ],
-                                                                        division_id:
-                                                                            divisionItems[
-                                                                                divisionItems.findIndex(
-                                                                                    (item) => item.selected
-                                                                                )
-                                                                            ].id,
+                                                                        division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                                        division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id,
                                                                     });
 
                                                                     validateOrderForSaving({ keyCode: 9 });
@@ -5386,18 +5541,8 @@ const Dispatch = (props) => {
                                                                     e.preventDefault();
                                                                     await setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        division:
-                                                                            divisionItems[
-                                                                            divisionItems.findIndex(
-                                                                                (item) => item.selected
-                                                                            )
-                                                                            ],
-                                                                        division_id:
-                                                                            divisionItems[
-                                                                                divisionItems.findIndex(
-                                                                                    (item) => item.selected
-                                                                                )
-                                                                            ].id,
+                                                                        division: divisionItems[divisionItems.findIndex((item) => item.selected)],
+                                                                        division_id: divisionItems[divisionItems.findIndex((item) => item.selected)].id,
                                                                     });
                                                                     validateOrderForSaving({ keyCode: 9 });
                                                                     setDivisionItems([]);
@@ -5442,11 +5587,11 @@ const Dispatch = (props) => {
                                                                 if (res.data.result === "OK") {
                                                                     await setDivisionItems(
                                                                         res.data.divisions.map((item, index) => {
-                                                                            item.selected =
-                                                                                (selectedOrder?.division?.id || 0) === 0
-                                                                                    ? index === 0
-                                                                                    : item.id ===
-                                                                                    selectedOrder.division.id;
+                                                                            let str = item.type;
+                                                                            item.name = item.name + " - " + (str.charAt(0).toUpperCase() + str.slice(1));
+                                                                            item.selected = (selectedOrder?.division?.id || 0) === 0
+                                                                                ? index === 0
+                                                                                : item.id === selectedOrder.division.id;
                                                                             return item;
                                                                         })
                                                                     );
@@ -5467,7 +5612,7 @@ const Dispatch = (props) => {
                                                         division_id: division.id,
                                                     });
                                                 }}
-                                                value={selectedOrder?.division?.name || ""}
+                                                value={(selectedOrder?.division?.name || "")}
                                             />
                                             {
                                                 (selectedOrder?.is_cancelled || 0) === 0 &&
@@ -5482,78 +5627,66 @@ const Dispatch = (props) => {
                                                                 (selectedOrder?.division?.id || 0) === 0 &&
                                                                 (selectedOrder?.division?.name || "") !== ""
                                                             ) {
-                                                                axios
-                                                                    .post(props.serverUrl + "/getDivisions", {
-                                                                        name: selectedOrder?.division.name,
-                                                                    })
-                                                                    .then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setDivisionItems(
-                                                                                res.data.divisions.map((item, index) => {
-                                                                                    item.selected =
-                                                                                        (selectedOrder?.division?.id || 0) ===
-                                                                                            0
-                                                                                            ? index === 0
-                                                                                            : item.id ===
-                                                                                            selectedOrder.division.id;
-                                                                                    return item;
-                                                                                })
-                                                                            );
+                                                                axios.post(props.serverUrl + "/getDivisions", {
+                                                                    name: selectedOrder?.division.name,
+                                                                }).then(async (res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        await setDivisionItems(
+                                                                            res.data.divisions.map((item, index) => {
+                                                                                let str = item.type;
+                                                                                item.name = item.name + " - " + (str.charAt(0).toUpperCase() + str.slice(1));
+                                                                                item.selected = (selectedOrder?.division?.id || 0) === 0
+                                                                                    ? index === 0
+                                                                                    : item.id === selectedOrder.division.id;
+                                                                                return item;
+                                                                            })
+                                                                        );
 
-                                                                            refDivisionPopupItems.current.map(
-                                                                                (r, i) => {
-                                                                                    if (
-                                                                                        r &&
-                                                                                        r.classList.contains("selected")
-                                                                                    ) {
-                                                                                        r.scrollIntoView({
-                                                                                            behavior: "auto",
-                                                                                            block: "center",
-                                                                                            inline: "nearest",
-                                                                                        });
-                                                                                    }
-                                                                                    return true;
+                                                                        refDivisionPopupItems.current.map(
+                                                                            (r, i) => {
+                                                                                if (r && r.classList.contains("selected")) {
+                                                                                    r.scrollIntoView({
+                                                                                        behavior: "auto",
+                                                                                        block: "center",
+                                                                                        inline: "nearest",
+                                                                                    });
                                                                                 }
-                                                                            );
-                                                                        }
-                                                                    })
+                                                                                return true;
+                                                                            }
+                                                                        );
+                                                                    }
+                                                                })
                                                                     .catch(async (e) => {
                                                                         console.log("error getting divisions", e);
                                                                     });
                                                             } else {
-                                                                axios
-                                                                    .post(props.serverUrl + "/getDivisions")
-                                                                    .then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setDivisionItems(
-                                                                                res.data.divisions.map((item, index) => {
-                                                                                    item.selected =
-                                                                                        (selectedOrder?.division?.id || 0) ===
-                                                                                            0
-                                                                                            ? index === 0
-                                                                                            : item.id ===
-                                                                                            selectedOrder.division.id;
-                                                                                    return item;
-                                                                                })
-                                                                            );
+                                                                axios.post(props.serverUrl + "/getDivisions").then(async (res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        await setDivisionItems(
+                                                                            res.data.divisions.map((item, index) => {
+                                                                                let str = item.type;
+                                                                                item.name = item.name + " - " + (str.charAt(0).toUpperCase() + str.slice(1));
+                                                                                item.selected = (selectedOrder?.division?.id || 0) === 0
+                                                                                    ? index === 0
+                                                                                    : item.id === selectedOrder.division.id;
+                                                                                return item;
+                                                                            })
+                                                                        );
 
-                                                                            refDivisionPopupItems.current.map(
-                                                                                (r, i) => {
-                                                                                    if (
-                                                                                        r &&
-                                                                                        r.classList.contains("selected")
-                                                                                    ) {
-                                                                                        r.scrollIntoView({
-                                                                                            behavior: "auto",
-                                                                                            block: "center",
-                                                                                            inline: "nearest",
-                                                                                        });
-                                                                                    }
-                                                                                    return true;
+                                                                        refDivisionPopupItems.current.map(
+                                                                            (r, i) => {
+                                                                                if (r && r.classList.contains("selected")) {
+                                                                                    r.scrollIntoView({
+                                                                                        behavior: "auto",
+                                                                                        block: "center",
+                                                                                        inline: "nearest",
+                                                                                    });
                                                                                 }
-                                                                            );
-                                                                        }
-                                                                    })
+                                                                                return true;
+                                                                            }
+                                                                        );
+                                                                    }
+                                                                })
                                                                     .catch(async (e) => {
                                                                         console.log("error getting divisions", e);
                                                                     });
@@ -5580,10 +5713,7 @@ const Dispatch = (props) => {
                                                         }}
                                                         ref={refDivisionDropDown}
                                                     >
-                                                        <div
-                                                            className="mochi-contextual-popup vertical below"
-                                                            style={{ height: 150 }}
-                                                        >
+                                                        <div className="mochi-contextual-popup vertical below" style={{ height: 150 }} >
                                                             <div className="mochi-contextual-popup-content">
                                                                 <div className="mochi-contextual-popup-wrapper">
                                                                     {divisionItems.map((item, index) => {
@@ -5592,13 +5722,10 @@ const Dispatch = (props) => {
                                                                             selected: item.selected,
                                                                         });
 
-                                                                        const searchValue =
-                                                                            (selectedOrder?.division?.id || 0) ===
-                                                                                0 &&
-                                                                                (selectedOrder?.division?.name || "") !==
-                                                                                ""
-                                                                                ? selectedOrder?.division?.name
-                                                                                : undefined;
+                                                                        const searchValue = (selectedOrder?.division?.id || 0) === 0 &&
+                                                                            (selectedOrder?.division?.name || "") !== ""
+                                                                            ? selectedOrder?.division?.name
+                                                                            : undefined;
 
                                                                         return (
                                                                             <div
@@ -5617,19 +5744,14 @@ const Dispatch = (props) => {
                                                                                             keyCode: 9,
                                                                                         });
                                                                                         setDivisionItems([]);
-                                                                                        // refDivision.current.focus();
                                                                                         refLoadType.current.focus();
                                                                                     }, 0);
                                                                                 }}
                                                                                 ref={(ref) =>
-                                                                                    refDivisionPopupItems.current.push(
-                                                                                        ref
-                                                                                    )
+                                                                                    refDivisionPopupItems.current.push(ref)
                                                                                 }
                                                                             >
-                                                                                {searchValue === undefined ? (
-                                                                                    item.name
-                                                                                ) : (
+                                                                                {searchValue === undefined ? (item.name) : (
                                                                                     <Highlighter
                                                                                         highlightClassName="mochi-item-highlight-text"
                                                                                         searchWords={[searchValue]}
@@ -7021,14 +7143,14 @@ const Dispatch = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-                                                        openPanel={props.openPanel}
-                                                        closePanel={props.closePanel}
+
+
                                                         customer_id={selectedBillToCustomer.id}
                                                     />
                                                 ),
                                             };
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }}
                                     >
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -7062,11 +7184,41 @@ const Dispatch = (props) => {
                                                 ),
                                             };
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }}
                                     >
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Rate load</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                    <div className="mochi-button" onClick={() => {
+                                        setSelectedBillToCustomer({});
+                                        refBillToCompanyCode.current.focus();
+
+                                        if ((selectedOrder?.id || 0) > 0) {
+                                            let order = { ...selectedOrder };
+
+                                            setSelectedOrder(prev => {
+                                                return {
+                                                    ...prev,
+                                                    bill_to_customer_id: null,
+                                                    bill_to_company: {}
+                                                }
+                                            })
+
+                                            axios.post(props.serverUrl + '/saveOrder', {
+                                                ...order,
+                                                bill_to_customer_id: null,
+                                                bill_to_company: {}
+                                            }).then(res => {
+
+                                            }).catch(e => {
+                                                console.log('error clearing bill to company')
+                                            })
+                                        }
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Clear</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                 </div>
@@ -7377,10 +7529,19 @@ const Dispatch = (props) => {
                             </div>
                         </div>
 
-                        <div className="form-bordered-box" style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
+                        <div className="form-bordered-box" style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10, gap: 2 }}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
-                                <div className="form-title">Carrier</div>
+                                <div className="form-title">{
+                                    (selectedOrder?.division?.type || 'brokerage') === 'brokerage'
+                                        ? 'Carrier'
+                                        : (selectedOrder?.division?.type || 'brokerage') === 'company'
+                                            ? (selectedOrder?.carrier_owner_type || 'company') === 'company'
+                                                ? 'Driver'
+                                                : 'Owner Operator'
+                                            : 'Carrier'
+
+                                }</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
                                     {((selectedOrder?.is_cancelled || 0) === 0 && (selectedCarrier?.id || 0) === 0) && (
@@ -7393,7 +7554,7 @@ const Dispatch = (props) => {
 
                                     <div className="mochi-button" onClick={() => {
                                         if ((selectedCarrier.id || 0) === 0) {
-                                            window.alert("You must select a carrier first!");
+                                            window.alert(`You must select a carrier first!`);
                                             return;
                                         }
 
@@ -7410,24 +7571,74 @@ const Dispatch = (props) => {
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+
+
                                                     carrier_id={selectedCarrier.id}
                                                 />
                                             ),
                                         };
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Carrier Info</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+
+                                    <div className="mochi-button" onClick={() => {
+                                        setSelectedCarrier({});
+                                        setSelectedCarrierContact({});
+                                        setSelectedCarrierDriver({});
+                                        setSelectedCarrierInsurance({});
+
+                                        refCarrierCode.current.focus();
+
+                                        if ((selectedOrder?.id || 0) > 0) {
+                                            let order = {
+                                                ...selectedOrder,
+                                                carrier: {},
+                                                carrier_id: null,
+                                                carrier_contact_id: null,
+                                                carrier_contact_primary_phone: 'work',
+                                                carrier_owner_type: '',
+                                                carrier_driver_id: null,
+                                                equipment: {},
+                                                equipment_id: null,
+                                                driver: {}
+                                            }
+
+                                            setSelectedOrder(prev => {
+                                                return {
+                                                    ...prev,
+                                                    carrier: {},
+                                                    carrier_id: null,
+                                                    carrier_contact_id: null,
+                                                    carrier_contact_primary_phone: 'work',
+                                                    carrier_owner_type: '',
+                                                    carrier_driver_id: null,
+                                                    equipment: {},
+                                                    equipment_id: null,
+                                                    driver: {}
+                                                }
+                                            })
+
+                                            axios.post(props.serverUrl + '/saveOrder', order).then(res => {
+
+                                            }).catch(e => {
+                                                console.log('error clearing carrier')
+                                            })
+                                        }
+
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Clear</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                 </div>
                                 <div className="top-border top-border-right"></div>
                             </div>
 
-                            <div className="form-row">
+                            <div className="form-row" style={{ gap: 2 }}>
                                 <div className="input-box-container input-code">
                                     <input
                                         tabIndex={54 + props.tabTimes}
@@ -7462,13 +7673,13 @@ const Dispatch = (props) => {
                                         }
                                     />
                                 </div>
-                                <div className="form-h-sep"></div>
+
                                 <div className="input-box-container grow">
                                     <input
                                         tabIndex={55 + props.tabTimes}
                                         type="text"
                                         placeholder="Name"
-                                        onKeyDown={validateCarrierInfoForSaving}
+                                        // onKeyDown={validateCarrierInfoForSaving}
                                         onInput={(e) => {
                                             setSelectedCarrier({
                                                 ...selectedCarrier,
@@ -7484,13 +7695,16 @@ const Dispatch = (props) => {
                                         value={selectedCarrier?.name || ""}
                                     />
                                 </div>
-                                <div className="form-h-sep"></div>
-                                <div className={insuranceStatusClasses()} style={{ width: "7rem" }}>
-                                    <input type="text" placeholder="Insurance" readOnly={true} />
-                                </div>
+
+                                {
+                                    ((selectedCarrier?.id || 0) > 0 && (selectedOrder?.carrier_owner_type || '') === 'carrier') &&
+                                    <div className={insuranceStatusClasses()} style={{ width: "7rem" }}>
+                                        <input type="text" placeholder="Insurance" readOnly={true} />
+                                    </div>
+                                }
                             </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
+
+                            <div className="form-row" style={{ gap: 2 }}>
                                 <div className="input-box-container grow">
                                     <input
                                         tabIndex={56 + props.tabTimes}
@@ -7528,8 +7742,8 @@ const Dispatch = (props) => {
                                     />
                                 </div>
                             </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
+
+                            <div className="form-row" style={{ gap: 2 }}>
                                 <div className="select-box-container grow">
                                     <div className="select-box-wrapper">
                                         <input
@@ -7835,7 +8049,7 @@ const Dispatch = (props) => {
                                             }}
                                             onInput={(e) => { }}
                                             onChange={(e) => { }}
-                                            value={(selectedCarrierContact?.first_name || '') + ' ' + (selectedCarrierContact?.last_name || '')}
+                                            value={((selectedCarrierContact?.first_name || '') + ' ' + (selectedCarrierContact?.last_name || '')).trim()}
                                         />
 
                                         {
@@ -7977,7 +8191,6 @@ const Dispatch = (props) => {
                                     }
                                 </div>
 
-                                <div className="form-h-sep"></div>
                                 <div className="select-box-container input-phone">
                                     <div className="select-box-wrapper">
                                         <MaskedInput tabIndex={58 + props.tabTimes}
@@ -8335,7 +8548,7 @@ const Dispatch = (props) => {
                                         ))
                                     }
                                 </div>
-                                <div className="form-h-sep"></div>
+
                                 <div className="input-box-container input-phone-ext">
                                     <input
                                         tabIndex={59 + props.tabTimes}
@@ -8359,8 +8572,8 @@ const Dispatch = (props) => {
                                         }
                                     />
                                 </div>
-                                <div className="form-h-sep"></div>
-                                <div className="select-box-container" style={{ width: "9rem" }}>
+
+                                <div className="select-box-container" style={{ flexGrow: 1 }}>
                                     <div className="select-box-wrapper">
                                         <input
                                             type="text"
@@ -8418,24 +8631,17 @@ const Dispatch = (props) => {
                                                                     .post(props.serverUrl + "/getEquipments")
                                                                     .then((res) => {
                                                                         if (res.data.result === "OK") {
-                                                                            setEquipmentItems(
-                                                                                res.data.equipments.map((item, index) => {
-                                                                                    item.selected =
-                                                                                        (selectedOrder?.equipment?.id ||
-                                                                                            0) === 0
-                                                                                            ? index === 0
-                                                                                            : item.id ===
-                                                                                            selectedOrder.equipment.id;
-                                                                                    return item;
-                                                                                })
+                                                                            setEquipmentItems(res.data.equipments.map((item, index) => {
+                                                                                item.selected = (selectedOrder?.equipment?.id || 0) === 0
+                                                                                    ? index === 0
+                                                                                    : item.id === selectedOrder.equipment.id;
+                                                                                return item;
+                                                                            })
                                                                             );
 
                                                                             refEquipmentPopupItems.current.map(
                                                                                 (r, i) => {
-                                                                                    if (
-                                                                                        r &&
-                                                                                        r.classList.contains("selected")
-                                                                                    ) {
+                                                                                    if (r && r.classList.contains("selected")) {
                                                                                         r.scrollIntoView({
                                                                                             behavior: "auto",
                                                                                             block: "center",
@@ -8462,23 +8668,18 @@ const Dispatch = (props) => {
                                                                 );
 
                                                                 if (selectedIndex === -1) {
-                                                                    setEquipmentItems(
-                                                                        equipmentItems.map((item, index) => {
-                                                                            item.selected = index === 0;
-                                                                            return item;
-                                                                        })
+                                                                    setEquipmentItems(equipmentItems.map((item, index) => {
+                                                                        item.selected = index === 0;
+                                                                        return item;
+                                                                    })
                                                                     );
                                                                 } else {
                                                                     setEquipmentItems(
                                                                         equipmentItems.map((item, index) => {
-                                                                            if (
-                                                                                selectedIndex ===
-                                                                                equipmentItems.length - 1
-                                                                            ) {
+                                                                            if (selectedIndex === equipmentItems.length - 1) {
                                                                                 item.selected = index === 0;
                                                                             } else {
-                                                                                item.selected =
-                                                                                    index === selectedIndex + 1;
+                                                                                item.selected = index === selectedIndex + 1;
                                                                             }
                                                                             return item;
                                                                         })
@@ -8502,22 +8703,16 @@ const Dispatch = (props) => {
                                                                         if (res.data.result === "OK") {
                                                                             setEquipmentItems(
                                                                                 res.data.equipments.map((item, index) => {
-                                                                                    item.selected =
-                                                                                        (selectedOrder?.equipment?.id ||
-                                                                                            0) === 0
-                                                                                            ? index === 0
-                                                                                            : item.id ===
-                                                                                            selectedOrder.equipment.id;
+                                                                                    item.selected = (selectedOrder?.equipment?.id || 0) === 0
+                                                                                        ? index === 0
+                                                                                        : item.id === selectedOrder.equipment.id;
                                                                                     return item;
                                                                                 })
                                                                             );
 
                                                                             refEquipmentPopupItems.current.map(
                                                                                 (r, i) => {
-                                                                                    if (
-                                                                                        r &&
-                                                                                        r.classList.contains("selected")
-                                                                                    ) {
+                                                                                    if (r && r.classList.contains("selected")) {
                                                                                         r.scrollIntoView({
                                                                                             behavior: "auto",
                                                                                             block: "center",
@@ -8540,85 +8735,46 @@ const Dispatch = (props) => {
                                                             break;
 
                                                         case 13: // enter
-                                                            if (
-                                                                equipmentItems.length > 0 &&
-                                                                equipmentItems.findIndex(
-                                                                    (item) => item.selected
-                                                                ) > -1
-                                                            ) {
+                                                            if (equipmentItems.length > 0 && equipmentItems.findIndex((item) => item.selected) > -1) {
                                                                 new Promise((resolve, reject) => {
                                                                     setSelectedOrder((selectedOrder) => {
                                                                         return {
                                                                             ...selectedOrder,
-                                                                            equipment:
-                                                                                equipmentItems[
-                                                                                equipmentItems.findIndex(
-                                                                                    (item) => item.selected
-                                                                                )
-                                                                                ],
-                                                                            equipment_id:
-                                                                                equipmentItems[
-                                                                                    equipmentItems.findIndex(
-                                                                                        (item) => item.selected
-                                                                                    )
-                                                                                ].id,
+                                                                            equipment: equipmentItems[equipmentItems.findIndex((item) => item.selected)],
+                                                                            equipment_id: equipmentItems[equipmentItems.findIndex((item) => item.selected)].id,
                                                                         };
                                                                     });
 
                                                                     resolve("OK");
-                                                                })
-                                                                    .then((response) => {
-                                                                        validateOrderForSaving({ keyCode: 9 });
-                                                                        setEquipmentItems([]);
-                                                                        refDriverName.current.focus();
-                                                                    })
-                                                                    .catch((e) => {
-
-                                                                    });
+                                                                }).then((response) => {
+                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                    setEquipmentItems([]);
+                                                                    refDriverName.current.focus();
+                                                                }).catch((e) => { });
                                                             }
                                                             break;
 
                                                         case 9: // tab
-                                                            if (
-                                                                equipmentItems.length > 0 &&
-                                                                equipmentItems.findIndex(
-                                                                    (item) => item.selected
-                                                                ) > -1
-                                                            ) {
+                                                            if (equipmentItems.length > 0 && equipmentItems.findIndex((item) => item.selected) > -1) {
                                                                 e.preventDefault();
 
                                                                 new Promise((resolve, reject) => {
                                                                     setSelectedOrder((selectedOrder) => {
                                                                         return {
                                                                             ...selectedOrder,
-                                                                            equipment:
-                                                                                equipmentItems[
-                                                                                equipmentItems.findIndex(
-                                                                                    (item) => item.selected
-                                                                                )
-                                                                                ],
-                                                                            equipment_id:
-                                                                                equipmentItems[
-                                                                                    equipmentItems.findIndex(
-                                                                                        (item) => item.selected
-                                                                                    )
-                                                                                ].id,
+                                                                            equipment: equipmentItems[equipmentItems.findIndex((item) => item.selected)],
+                                                                            equipment_id: equipmentItems[equipmentItems.findIndex((item) => item.selected)].id,
                                                                         };
                                                                     });
 
                                                                     resolve("OK");
-                                                                })
-                                                                    .then((response) => {
-                                                                        validateOrderForSaving({ keyCode: 9 });
-                                                                        setEquipmentItems([]);
-                                                                        refDriverName.current.focus();
-                                                                    })
-                                                                    .catch((e) => {
-
-                                                                    });
+                                                                }).then((response) => {
+                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                    setEquipmentItems([]);
+                                                                    refDriverName.current.focus();
+                                                                }).catch((e) => { });
                                                             }
                                                             break;
-
                                                         default:
                                                             break;
                                                     }
@@ -8656,19 +8812,16 @@ const Dispatch = (props) => {
                                                         if (res.data.result === "OK") {
                                                             setEquipmentItems(
                                                                 res.data.equipments.map((item, index) => {
-                                                                    item.selected =
-                                                                        (selectedOrder?.equipment?.id || 0) === 0
-                                                                            ? index === 0
-                                                                            : item.id ===
-                                                                            selectedOrder.equipment.id;
+                                                                    item.selected = (selectedOrder?.equipment?.id || 0) === 0
+                                                                        ? index === 0
+                                                                        : item.id === selectedOrder.equipment.id;
                                                                     return item;
                                                                 })
                                                             );
                                                         }
-                                                    })
-                                                        .catch((e) => {
-                                                            console.log("error getting equipments", e);
-                                                        });
+                                                    }).catch((e) => {
+                                                        console.log("error getting equipments", e);
+                                                    });
                                                 }
                                             }}
                                             onChange={(e) => {
@@ -8694,22 +8847,16 @@ const Dispatch = (props) => {
                                                     if (equipmentItems.length > 0) {
                                                         setEquipmentItems([]);
                                                     } else {
-                                                        if (
-                                                            (selectedOrder?.equipment?.id || 0) === 0 &&
-                                                            (selectedOrder?.equipment?.name || "") !== ""
-                                                        ) {
+                                                        if ((selectedOrder?.equipment?.id || 0) === 0 && (selectedOrder?.equipment?.name || "") !== "") {
                                                             axios.post(props.serverUrl + "/getEquipments", {
                                                                 name: selectedOrder?.equipment.name,
                                                             }).then((res) => {
                                                                 if (res.data.result === "OK") {
                                                                     setEquipmentItems(
                                                                         res.data.equipments.map((item, index) => {
-                                                                            item.selected =
-                                                                                (selectedOrder?.equipment?.id || 0) ===
-                                                                                    0
-                                                                                    ? index === 0
-                                                                                    : item.id ===
-                                                                                    selectedOrder.equipment.id;
+                                                                            item.selected = (selectedOrder?.equipment?.id || 0) === 0
+                                                                                ? index === 0
+                                                                                : item.id === selectedOrder.equipment.id;
                                                                             return item;
                                                                         })
                                                                     );
@@ -8733,12 +8880,9 @@ const Dispatch = (props) => {
                                                                 if (res.data.result === "OK") {
                                                                     setEquipmentItems(
                                                                         res.data.equipments.map((item, index) => {
-                                                                            item.selected =
-                                                                                (selectedOrder?.equipment?.id || 0) ===
-                                                                                    0
-                                                                                    ? index === 0
-                                                                                    : item.id ===
-                                                                                    selectedOrder.equipment.id;
+                                                                            item.selected = (selectedOrder?.equipment?.id || 0) === 0
+                                                                                ? index === 0
+                                                                                : item.id === selectedOrder.equipment.id;
                                                                             return item;
                                                                         })
                                                                     );
@@ -8788,12 +8932,9 @@ const Dispatch = (props) => {
                                                                         selected: item.selected,
                                                                     });
 
-                                                                    const searchValue =
-                                                                        (selectedOrder?.equipment?.id || 0) === 0 &&
-                                                                            (selectedOrder?.equipment?.name || "") !==
-                                                                            ""
-                                                                            ? selectedOrder?.equipment?.name
-                                                                            : undefined;
+                                                                    const searchValue = (selectedOrder?.equipment?.id || 0) === 0 && (selectedOrder?.equipment?.name || "") !== ""
+                                                                        ? selectedOrder?.equipment?.name
+                                                                        : undefined;
 
                                                                     return (
                                                                         <div
@@ -8811,32 +8952,26 @@ const Dispatch = (props) => {
                                                                                     });
 
                                                                                     resolve("OK");
-                                                                                })
-                                                                                    .then((response) => {
-                                                                                        validateOrderForSaving({
-                                                                                            keyCode: 9,
-                                                                                        });
-                                                                                        setEquipmentItems([]);
-                                                                                        refDriverName.current.focus();
-                                                                                    })
-                                                                                    .catch((e) => {
-
-                                                                                    });
+                                                                                }).then((response) => {
+                                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                                    setEquipmentItems([]);
+                                                                                    refDriverName.current.focus();
+                                                                                }).catch((e) => { });
                                                                             }}
                                                                             ref={(ref) =>
                                                                                 refEquipmentPopupItems.current.push(ref)
                                                                             }
                                                                         >
-                                                                            {searchValue === undefined ? (
-                                                                                item.name
-                                                                            ) : (
-                                                                                <Highlighter
-                                                                                    highlightClassName="mochi-item-highlight-text"
-                                                                                    searchWords={[searchValue]}
-                                                                                    autoEscape={true}
-                                                                                    textToHighlight={item.name}
-                                                                                />
-                                                                            )}
+                                                                            {searchValue === undefined
+                                                                                ? item.name
+                                                                                : (
+                                                                                    <Highlighter
+                                                                                        highlightClassName="mochi-item-highlight-text"
+                                                                                        searchWords={[searchValue]}
+                                                                                        autoEscape={true}
+                                                                                        textToHighlight={item.name}
+                                                                                    />
+                                                                                )}
                                                                             {item.selected && (
                                                                                 <FontAwesomeIcon
                                                                                     className="dropdown-selected"
@@ -8854,8 +8989,8 @@ const Dispatch = (props) => {
                                     )}
                                 </div>
                             </div>
-                            <div className="form-v-sep"></div>
-                            <div className="form-row">
+
+                            <div className="form-row" style={{ gap: 2 }}>
                                 <div className="select-box-container" style={{ width: "9rem" }}>
                                     <div className="select-box-wrapper">
                                         <input
@@ -8863,104 +8998,90 @@ const Dispatch = (props) => {
                                             tabIndex={61 + props.tabTimes}
                                             placeholder="Driver Name"
                                             ref={refDriverName}
-                                            readOnly={(selectedOrder?.is_cancelled || 0) === 1}
+                                            readOnly={
+                                                ((selectedOrder?.is_cancelled || 0) === 1) ||
+                                                !((selectedOrder?.carrier_owner_type || '') === 'carrier' || (selectedOrder?.carrier_owner_type || '') === 'agent')
+                                            }
                                             onKeyDown={async (e) => {
                                                 if ((selectedOrder?.is_cancelled || 0) === 0) {
                                                     let key = e.keyCode || e.which;
 
-                                                    switch (key) {
-                                                        case 37:
-                                                        case 38: // arrow left | arrow up
-                                                            e.preventDefault();
-                                                            if (driverItems.length > 0) {
-                                                                let selectedIndex = driverItems.findIndex(
-                                                                    (item) => item.selected
-                                                                );
-
-                                                                if (selectedIndex === -1) {
-                                                                    await setDriverItems(
-                                                                        driverItems.map((item, index) => {
-                                                                            item.selected = index === 0;
-                                                                            return item;
-                                                                        })
+                                                    if ((selectedOrder?.carrier_owner_type || '') === 'carrier' || (selectedOrder?.carrier_owner_type || '') === 'agent') {
+                                                        switch (key) {
+                                                            case 37:
+                                                            case 38: // arrow left | arrow up
+                                                                e.preventDefault();
+                                                                if (driverItems.length > 0) {
+                                                                    let selectedIndex = driverItems.findIndex(
+                                                                        (item) => item.selected
                                                                     );
-                                                                } else {
-                                                                    await setDriverItems(
-                                                                        driverItems.map((item, index) => {
-                                                                            if (selectedIndex === 0) {
-                                                                                item.selected =
-                                                                                    index === driverItems.length - 1;
-                                                                            } else {
-                                                                                item.selected =
-                                                                                    index === selectedIndex - 1;
-                                                                            }
-                                                                            return item;
-                                                                        })
-                                                                    );
-                                                                }
 
-                                                                refDriverPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains("selected")) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: "auto",
-                                                                            block: "center",
-                                                                            inline: "nearest",
-                                                                        });
+                                                                    if (selectedIndex === -1) {
+                                                                        await setDriverItems(
+                                                                            driverItems.map((item, index) => {
+                                                                                item.selected = index === 0;
+                                                                                return item;
+                                                                            })
+                                                                        );
+                                                                    } else {
+                                                                        await setDriverItems(
+                                                                            driverItems.map((item, index) => {
+                                                                                if (selectedIndex === 0) {
+                                                                                    item.selected = index === driverItems.length - 1;
+                                                                                } else {
+                                                                                    item.selected = index === selectedIndex - 1;
+                                                                                }
+                                                                                return item;
+                                                                            })
+                                                                        );
                                                                     }
-                                                                    return true;
-                                                                });
-                                                            } else {
-                                                                if ((selectedCarrier?.id || 0) > 0) {
-                                                                    axios.post(props.serverUrl + "/getDriversByCarrierId",
-                                                                        {
-                                                                            carrier_id: selectedCarrier.id,
+
+                                                                    refDriverPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
                                                                         }
-                                                                    )
-                                                                        .then(async (res) => {
+                                                                        return true;
+                                                                    });
+                                                                } else {
+                                                                    if ((selectedCarrier?.id || 0) > 0) {
+                                                                        axios.post(props.serverUrl + "/getDriversByCarrierId",
+                                                                            {
+                                                                                carrier_id: selectedCarrier.id,
+                                                                                agent_id: selectedCarrier.id,
+                                                                                owner_type: selectedOrder?.carrier_owner_type,
+                                                                                name: selectedCarrierDriver?.name
+                                                                            }
+                                                                        ).then(async (res) => {
                                                                             if (res.data.result === "OK") {
                                                                                 if (res.data.count > 0) {
                                                                                     await setDriverItems([
-                                                                                        ...[
-                                                                                            {
-                                                                                                first_name: "Clear",
-                                                                                                id: null,
-                                                                                            },
-                                                                                        ],
-                                                                                        ...res.data.drivers.map(
-                                                                                            (item, index) => {
-                                                                                                item.selected =
-                                                                                                    (selectedCarrierDriver?.id ||
-                                                                                                        0) === 0
-                                                                                                        ? index === 0
-                                                                                                        : item.id ===
-                                                                                                        selectedCarrierDriver.id;
-
-                                                                                                item.name =
-                                                                                                    item.first_name +
-                                                                                                    (item.last_name.trim() === ""
-                                                                                                        ? ""
-                                                                                                        : " " + item.last_name);
-                                                                                                return item;
-                                                                                            }
-                                                                                        ),
+                                                                                        ...[{
+                                                                                            name: "Clear",
+                                                                                            id: null,
+                                                                                        }],
+                                                                                        ...res.data.drivers.map((item, index) => {
+                                                                                            item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                                                                                ? index === 0
+                                                                                                : item.id === selectedCarrierDriver.id;
+                                                                                            return item;
+                                                                                        }),
                                                                                     ]);
                                                                                 } else {
                                                                                     await setDriverItems([
-                                                                                        ...[
-                                                                                            {
-                                                                                                first_name: "Clear",
-                                                                                                id: null,
-                                                                                            },
-                                                                                        ],
+                                                                                        ...[{
+                                                                                            name: "Clear",
+                                                                                            id: null,
+                                                                                        }],
                                                                                     ]);
                                                                                 }
 
                                                                                 refDriverPopupItems.current.map(
                                                                                     (r, i) => {
-                                                                                        if (
-                                                                                            r &&
-                                                                                            r.classList.contains("selected")
-                                                                                        ) {
+                                                                                        if (r && r.classList.contains("selected")) {
                                                                                             r.scrollIntoView({
                                                                                                 behavior: "auto",
                                                                                                 block: "center",
@@ -8972,223 +9093,246 @@ const Dispatch = (props) => {
                                                                                 );
                                                                             }
                                                                         })
-                                                                        .catch(async (e) => {
-                                                                            console.log("error getting carrier drivers", e);
-                                                                        });
+                                                                            .catch(async (e) => {
+                                                                                console.log("error getting carrier drivers", e);
+                                                                            });
+                                                                    }
                                                                 }
-                                                            }
-                                                            break;
+                                                                break;
 
-                                                        case 39:
-                                                        case 40: // arrow right | arrow down
-                                                            e.preventDefault();
-                                                            if (driverItems.length > 0) {
-                                                                let selectedIndex = driverItems.findIndex(
-                                                                    (item) => item.selected
-                                                                );
-
-                                                                if (selectedIndex === -1) {
-                                                                    await setDriverItems(
-                                                                        driverItems.map((item, index) => {
-                                                                            item.selected = index === 0;
-                                                                            return item;
-                                                                        })
+                                                            case 39:
+                                                            case 40: // arrow right | arrow down
+                                                                e.preventDefault();
+                                                                if (driverItems.length > 0) {
+                                                                    let selectedIndex = driverItems.findIndex(
+                                                                        (item) => item.selected
                                                                     );
-                                                                } else {
-                                                                    await setDriverItems(
-                                                                        driverItems.map((item, index) => {
-                                                                            if (
-                                                                                selectedIndex ===
-                                                                                driverItems.length - 1
-                                                                            ) {
+
+                                                                    if (selectedIndex === -1) {
+                                                                        await setDriverItems(
+                                                                            driverItems.map((item, index) => {
                                                                                 item.selected = index === 0;
-                                                                            } else {
-                                                                                item.selected =
-                                                                                    index === selectedIndex + 1;
-                                                                            }
-                                                                            return item;
-                                                                        })
-                                                                    );
-                                                                }
+                                                                                return item;
+                                                                            })
+                                                                        );
+                                                                    } else {
+                                                                        await setDriverItems(
+                                                                            driverItems.map((item, index) => {
+                                                                                if (selectedIndex === driverItems.length - 1) {
+                                                                                    item.selected = index === 0;
+                                                                                } else {
+                                                                                    item.selected = index === selectedIndex + 1;
+                                                                                }
+                                                                                return item;
+                                                                            })
+                                                                        );
+                                                                    }
 
-                                                                refDriverPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains("selected")) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: "auto",
-                                                                            block: "center",
-                                                                            inline: "nearest",
+                                                                    refDriverPopupItems.current.map((r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
+                                                                        }
+                                                                        return true;
+                                                                    });
+                                                                } else {
+                                                                    if ((selectedCarrier?.id || 0) > 0) {
+                                                                        axios.post(props.serverUrl + "/getDriversByCarrierId",
+                                                                            {
+                                                                                carrier_id: selectedCarrier.id,
+                                                                                agent_id: selectedCarrier.id,
+                                                                                owner_type: selectedOrder?.carrier_owner_type,
+                                                                                name: selectedCarrierDriver?.name
+                                                                            }
+                                                                        ).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                if (res.data.count > 0) {
+                                                                                    await setDriverItems([
+                                                                                        ...[{
+                                                                                            name: "Clear",
+                                                                                            id: null,
+                                                                                        }],
+                                                                                        ...res.data.drivers.map(
+                                                                                            (item, index) => {
+                                                                                                item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                                                                                    ? index === 0
+                                                                                                    : item.id === selectedCarrierDriver.id;
+                                                                                                return item;
+                                                                                            }
+                                                                                        ),
+                                                                                    ]);
+                                                                                } else {
+                                                                                    await setDriverItems([
+                                                                                        ...[{
+                                                                                            name: "Clear",
+                                                                                            id: null,
+                                                                                        }],
+                                                                                    ]);
+                                                                                }
+
+                                                                                refDriverPopupItems.current.map(
+                                                                                    (r, i) => {
+                                                                                        if (r && r.classList.contains("selected")) {
+                                                                                            r.scrollIntoView({
+                                                                                                behavior: "auto",
+                                                                                                block: "center",
+                                                                                                inline: "nearest",
+                                                                                            });
+                                                                                        }
+                                                                                        return true;
+                                                                                    }
+                                                                                );
+                                                                            }
+                                                                        }).catch(async (e) => {
+                                                                            console.log("error getting carrier drivers", e);
                                                                         });
                                                                     }
-                                                                    return true;
-                                                                });
-                                                            } else {
-                                                                if ((selectedCarrier?.id || 0) > 0) {
-                                                                    axios.post(props.serverUrl + "/getDriversByCarrierId",
-                                                                        {
-                                                                            carrier_id: selectedCarrier.id,
-                                                                        }
-                                                                    ).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            if (res.data.count > 0) {
-                                                                                await setDriverItems([
-                                                                                    ...[
-                                                                                        {
-                                                                                            first_name: "Clear",
-                                                                                            id: null,
-                                                                                        },
-                                                                                    ],
-                                                                                    ...res.data.drivers.map(
-                                                                                        (item, index) => {
-                                                                                            item.selected =
-                                                                                                (selectedCarrierDriver?.id ||
-                                                                                                    0) === 0
-                                                                                                    ? index === 0
-                                                                                                    : item.id ===
-                                                                                                    selectedCarrierDriver.id;
+                                                                }
+                                                                break;
 
-                                                                                            item.name =
-                                                                                                item.first_name +
-                                                                                                (item.last_name.trim() === ""
-                                                                                                    ? ""
-                                                                                                    : " " + item.last_name);
-                                                                                            return item;
-                                                                                        }
-                                                                                    ),
-                                                                                ]);
+                                                            case 27: // escape
+                                                                setDriverItems([]);
+                                                                break;
+
+                                                            case 13: // enter
+                                                                if (driverItems.length > 0 && driverItems.findIndex((item) => item.selected) > -1) {
+                                                                    if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
+                                                                        await setSelectedCarrierDriver({ name: "" });
+
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_driver_id: null,
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                });
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
                                                                             } else {
-                                                                                await setDriverItems([
-                                                                                    ...[
-                                                                                        {
-                                                                                            first_name: "Clear",
-                                                                                            id: null,
-                                                                                        },
-                                                                                    ],
-                                                                                ]);
+
                                                                             }
 
-                                                                            refDriverPopupItems.current.map(
-                                                                                (r, i) => {
-                                                                                    if (
-                                                                                        r &&
-                                                                                        r.classList.contains("selected")
-                                                                                    ) {
-                                                                                        r.scrollIntoView({
-                                                                                            behavior: "auto",
-                                                                                            block: "center",
-                                                                                            inline: "nearest",
-                                                                                        });
-                                                                                    }
-                                                                                    return true;
-                                                                                }
-                                                                            );
-                                                                        }
-                                                                    })
-                                                                        .catch(async (e) => {
-                                                                            console.log("error getting carrier drivers", e);
+                                                                            setIsSavingOrder(false);
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                            setIsSavingOrder(false);
                                                                         });
+
+                                                                        refDriverPhone.current.inputElement.focus();
+                                                                    } else {
+                                                                        await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
+                                                                        await setSelectedOrder({
+                                                                            ...selectedOrder,
+                                                                            carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
+                                                                            equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
+                                                                            equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
+                                                                        })
+
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
+                                                                            equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
+                                                                            equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
+                                                                            } else {
+
+                                                                            }
+
+                                                                            setIsSavingOrder(false);
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                            setIsSavingOrder(false);
+                                                                        });
+
+                                                                        refDriverPhone.current.inputElement.focus();
+                                                                    }
+
+                                                                    setDriverItems([]);
                                                                 }
-                                                            }
-                                                            break;
+                                                                break;
 
-                                                        case 27: // escape
-                                                            setDriverItems([]);
-                                                            break;
+                                                            case 9: // tab
+                                                                if (driverItems.length > 0) {
+                                                                    e.preventDefault();
+                                                                    if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
+                                                                        await setSelectedCarrierDriver({ name: "" });
 
-                                                        case 13: // enter
-                                                            if (driverItems.length > 0 && driverItems.findIndex((item) => item.selected) > -1) {
-                                                                if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
-                                                                    await setSelectedCarrierDriver({ name: "" });
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_driver_id: null,
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                });
 
-                                                                    axios.post(props.serverUrl + "/saveOrder", {
-                                                                        ...selectedOrder,
-                                                                        carrier_driver_id: null,
-                                                                    }).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                            });
-                                                                            await props.setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                                component_id: props.componentId,
-                                                                            });
-                                                                        } else {
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
+                                                                            } else {
 
-                                                                        }
+                                                                            }
 
-                                                                        setIsSavingOrder(false);
-                                                                    }).catch((e) => {
-                                                                        console.log("error saving order", e);
-                                                                        setIsSavingOrder(false);
-                                                                    });
+                                                                            setIsSavingOrder(false);
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                            setIsSavingOrder(false);
+                                                                        });
 
-                                                                    refDriverPhone.current.focus();
-                                                                } else {
-                                                                    await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
-                                                                    await setSelectedOrder({
-                                                                        ...selectedOrder,
-                                                                        equipment: driverItems[driverItems.findIndex((item) => item.selected)].equipment,
-                                                                        equipment_id: driverItems[driverItems.findIndex((item) => item.selected)].equipment_id
-                                                                    })
-                                                                    validateCarrierDriverForSaving({ keyCode: 9 });
-                                                                    refDriverPhone.current.inputElement.focus();
+                                                                        refDriverPhone.current.inputElement.focus();
+                                                                    } else {
+                                                                        await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
+
+                                                                        await setSelectedOrder({
+                                                                            ...selectedOrder,
+                                                                            carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
+                                                                            equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
+                                                                            equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
+                                                                        })
+
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
+                                                                            equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
+                                                                            equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
+                                                                            } else {
+
+                                                                            }
+
+                                                                            setIsSavingOrder(false);
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                            setIsSavingOrder(false);
+                                                                        });
+
+                                                                        refDriverPhone.current.inputElement.focus();
+                                                                    }
+
+                                                                    setDriverItems([]);
                                                                 }
+                                                                break;
 
-                                                                setDriverItems([]);
-                                                            }
-                                                            break;
-
-                                                        case 9: // tab
-                                                            if (driverItems.length > 0) {
-                                                                e.preventDefault();
-                                                                if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
-                                                                    await setSelectedCarrierDriver({ name: "" });
-
-                                                                    axios.post(props.serverUrl + "/saveOrder", {
-                                                                        ...selectedOrder,
-                                                                        carrier_driver_id: null,
-                                                                    }).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                            });
-
-                                                                            await props.setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                                component_id: props.componentId,
-                                                                            });
-                                                                        } else {
-
-                                                                        }
-
-                                                                        setIsSavingOrder(false);
-                                                                    }).catch((e) => {
-                                                                        console.log("error saving order", e);
-                                                                        setIsSavingOrder(false);
-                                                                    });
-
-                                                                    refDriverPhone.current.focus();
-                                                                } else {
-                                                                    await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
-
-                                                                    await setSelectedOrder({
-                                                                        ...selectedOrder,
-                                                                        equipment: driverItems[driverItems.findIndex((item) => item.selected)].equipment,
-                                                                        equipment_id: driverItems[driverItems.findIndex((item) => item.selected)].equipment_id
-                                                                    })
-
-                                                                    refDriverPhone.current.inputElement.focus();
-                                                                }
-
-                                                                setDriverItems([]);
-                                                            }
-
-                                                            await validateCarrierDriverForSaving({
-                                                                keyCode: 9,
-                                                            });
-                                                            break;
-
-                                                        default:
-                                                            break;
+                                                            default:
+                                                                break;
+                                                        };
                                                     }
                                                 }
                                             }}
@@ -9197,60 +9341,90 @@ const Dispatch = (props) => {
                                                     if ((selectedCarrierDriver?.id || 0) > 0) {
                                                         if (e.target.value.trim() === "") {
                                                             setSelectedCarrierDriver({ name: "" });
+                                                            setSelectedOrder(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    carrier_driver_id: null
+                                                                }
+                                                            })
                                                         }
                                                     }
                                                 }
                                             }}
                                             onInput={async (e) => {
-                                                let driver = selectedCarrierDriver || {};
-
-                                                let splitted = e.target.value.split(" ");
-                                                let first_name = splitted[0];
-
-                                                let last_name = "";
-
-                                                splitted.map((item, index) => {
-                                                    if (index > 0) {
-                                                        last_name +=
-                                                            item + (index < splitted.length - 1 ? " " : "");
+                                                setSelectedCarrierDriver(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        name: e.target.value
                                                     }
-                                                    return true;
                                                 });
 
-                                                setSelectedCarrierDriver({
-                                                    ...driver,
-                                                    name: e.target.value,
-                                                    first_name: first_name,
-                                                    last_name: last_name,
-                                                });
+                                                if ((selectedCarrier?.id || '') > 0) {
+                                                    axios.post(props.serverUrl + "/getDriversByCarrierId",
+                                                        {
+                                                            carrier_id: selectedCarrier.id,
+                                                            agent_id: selectedCarrier.id,
+                                                            owner_type: selectedOrder?.carrier_owner_type,
+                                                            name: selectedCarrierDriver?.name
+                                                        }
+                                                    ).then(async (res) => {
+                                                        if (res.data.result === "OK") {
+                                                            if (res.data.count > 0) {
+                                                                await setDriverItems([
+                                                                    ...[{
+                                                                        name: "Clear",
+                                                                        id: null,
+                                                                    }],
+                                                                    ...res.data.drivers.map(
+                                                                        (item, index) => {
+                                                                            item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                                                                ? index === 0
+                                                                                : item.id === selectedCarrierDriver.id;
+                                                                            return item;
+                                                                        }
+                                                                    ),
+                                                                ]);
+                                                            } else {
+                                                                await setDriverItems([
+                                                                    ...[{
+                                                                        name: "Clear",
+                                                                        id: null,
+                                                                    }],
+                                                                ]);
+                                                            }
+
+                                                            refDriverPopupItems.current.map(
+                                                                (r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                }
+                                                            );
+                                                        }
+                                                    }).catch(async (e) => {
+                                                        console.log("error getting carrier drivers", e);
+                                                    });
+                                                }
                                             }}
                                             onChange={async (e) => {
-                                                let driver = selectedCarrierDriver || {};
-
-                                                let splitted = e.target.value.split(" ");
-                                                let first_name = splitted[0];
-
-                                                let last_name = "";
-
-                                                splitted.map((item, index) => {
-                                                    if (index > 0) {
-                                                        last_name +=
-                                                            item + (index < splitted.length - 1 ? " " : "");
+                                                setSelectedCarrierDriver(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        name: e.target.value
                                                     }
-                                                    return true;
-                                                });
-
-                                                setSelectedCarrierDriver({
-                                                    ...driver,
-                                                    name: e.target.value,
-                                                    first_name: first_name,
-                                                    last_name: last_name,
                                                 });
                                             }}
                                             value={selectedCarrierDriver?.name || ""}
                                         />
                                         {
-                                            ((selectedOrder?.is_cancelled || 0) === 0 && (selectedCarrier?.drivers || []).length >= 0) && (
+                                            ((selectedOrder?.is_cancelled || 0) === 0 &&
+                                                ((selectedOrder?.carrier_owner_type || '') === 'carrier' || (selectedOrder?.carrier_owner_type || '') === 'agent') &&
+                                                ((selectedCarrier?.drivers || []).length > 0)) && (
                                                 <FontAwesomeIcon
                                                     className="dropdown-button"
                                                     icon={faCaretDown}
@@ -9263,52 +9437,37 @@ const Dispatch = (props) => {
                                                                     axios.post(props.serverUrl + "/getDriversByCarrierId",
                                                                         {
                                                                             carrier_id: selectedCarrier.id,
+                                                                            agent_id: selectedCarrier.id,
+                                                                            owner_type: selectedOrder?.carrier_owner_type,
+                                                                            name: selectedCarrierDriver?.name
                                                                         }
                                                                     ).then(async (res) => {
                                                                         if (res.data.result === "OK") {
                                                                             if (res.data.count > 0) {
                                                                                 await setDriverItems([
-                                                                                    ...[
-                                                                                        {
-                                                                                            first_name: "Clear",
-                                                                                            id: null,
-                                                                                        },
-                                                                                    ],
-                                                                                    ...res.data.drivers.map(
-                                                                                        (item, index) => {
-                                                                                            item.selected =
-                                                                                                (selectedCarrierDriver?.id ||
-                                                                                                    0) === 0
-                                                                                                    ? index === 0
-                                                                                                    : item.id ===
-                                                                                                    selectedCarrierDriver.id;
-
-                                                                                            item.name =
-                                                                                                item.first_name +
-                                                                                                (item.last_name.trim() === ""
-                                                                                                    ? ""
-                                                                                                    : " " + item.last_name);
-                                                                                            return item;
-                                                                                        }
-                                                                                    ),
+                                                                                    ...[{
+                                                                                        name: "Clear",
+                                                                                        id: null,
+                                                                                    }],
+                                                                                    ...res.data.drivers.map((item, index) => {
+                                                                                        item.selected = (selectedCarrierDriver?.id || 0) === 0
+                                                                                            ? index === 0
+                                                                                            : item.id === selectedCarrierDriver.id;
+                                                                                        return item;
+                                                                                    }),
                                                                                 ]);
                                                                             } else {
                                                                                 await setDriverItems([
-                                                                                    ...[
-                                                                                        {
-                                                                                            first_name: "Clear",
-                                                                                            id: null,
-                                                                                        },
-                                                                                    ],
+                                                                                    ...[{
+                                                                                        name: "Clear",
+                                                                                        id: null,
+                                                                                    }],
                                                                                 ]);
                                                                             }
 
                                                                             refDriverPopupItems.current.map(
                                                                                 (r, i) => {
-                                                                                    if (
-                                                                                        r &&
-                                                                                        r.classList.contains("selected")
-                                                                                    ) {
+                                                                                    if (r && r.classList.contains("selected")) {
                                                                                         r.scrollIntoView({
                                                                                             behavior: "auto",
                                                                                             block: "center",
@@ -9355,13 +9514,7 @@ const Dispatch = (props) => {
                                                                         selected: item.selected,
                                                                     });
 
-                                                                    const searchValue =
-                                                                        (selectedCarrierDriver?.first_name || "") +
-                                                                        ((
-                                                                            selectedCarrierDriver?.last_name || ""
-                                                                        ).trim() === ""
-                                                                            ? ""
-                                                                            : " " + selectedCarrierDriver?.last_name);
+                                                                    // const searchValue = (selectedCarrierDriver?.name || '').trim();
 
                                                                     return (
                                                                         <div
@@ -9386,8 +9539,7 @@ const Dispatch = (props) => {
                                                                                             });
                                                                                             props.setSelectedOrder({
                                                                                                 ...res.data.order,
-                                                                                                component_id:
-                                                                                                    props.componentId,
+                                                                                                component_id: props.componentId,
                                                                                             });
                                                                                         } else {
 
@@ -9399,18 +9551,36 @@ const Dispatch = (props) => {
                                                                                         setIsSavingOrder(false);
                                                                                     });
 
-                                                                                    refDriverPhone.current.focus();
+                                                                                    refDriverPhone.current.inputElement.focus();
                                                                                 } else {
                                                                                     setSelectedCarrierDriver(item);
 
                                                                                     setSelectedOrder({
                                                                                         ...selectedOrder,
-                                                                                        equipment: item.equipment,
-                                                                                        equipment_id: item.equipment_id
+                                                                                        carrier_driver_id: item.id,
+                                                                                        equipment: item?.tractor?.type,
+                                                                                        equipment_id: item?.tractor?.type_id
                                                                                     })
 
-                                                                                    validateCarrierDriverForSaving({
-                                                                                        keyCode: 9,
+                                                                                    axios.post(props.serverUrl + "/saveOrder", {
+                                                                                        ...selectedOrder,
+                                                                                        carrier_driver_id: item.id,
+                                                                                        equipment: item?.tractor?.type,
+                                                                                        equipment_id: item?.tractor?.type_id
+                                                                                    }).then(async (res) => {
+                                                                                        if (res.data.result === "OK") {
+                                                                                            await props.setSelectedOrder({
+                                                                                                ...res.data.order,
+                                                                                                component_id: props.componentId,
+                                                                                            });
+                                                                                        } else {
+
+                                                                                        }
+
+                                                                                        setIsSavingOrder(false);
+                                                                                    }).catch((e) => {
+                                                                                        console.log("error saving order", e);
+                                                                                        setIsSavingOrder(false);
                                                                                     });
 
                                                                                     refDriverPhone.current.inputElement.focus();
@@ -9418,32 +9588,8 @@ const Dispatch = (props) => {
 
                                                                                 setDriverItems([]);
                                                                             }}
-                                                                            ref={(ref) =>
-                                                                                refDriverPopupItems.current.push(ref)
-                                                                            }>
-                                                                            {searchValue === undefined ? (
-                                                                                (item?.first_name || "") +
-                                                                                ((item?.last_name || "") === ""
-                                                                                    ? ""
-                                                                                    : " " + item.last_name)
-                                                                            ) : (
-                                                                                <Highlighter
-                                                                                    highlightClassName="mochi-item-highlight-text"
-                                                                                    searchWords={[
-                                                                                        selectedCarrierDriver?.first_name ||
-                                                                                        "",
-                                                                                        selectedCarrierDriver?.last_name ||
-                                                                                        "",
-                                                                                    ]}
-                                                                                    autoEscape={true}
-                                                                                    textToHighlight={
-                                                                                        (item?.first_name || "") +
-                                                                                        ((item?.last_name || "") === ""
-                                                                                            ? ""
-                                                                                            : " " + item.last_name)
-                                                                                    }
-                                                                                />
-                                                                            )}
+                                                                            ref={(ref) => refDriverPopupItems.current.push(ref)}>
+                                                                            {item.name}
                                                                             {item.selected && (
                                                                                 <FontAwesomeIcon
                                                                                     className="dropdown-selected"
@@ -9460,7 +9606,7 @@ const Dispatch = (props) => {
                                             )
                                     )}
                                 </div>
-                                <div className="form-h-sep"></div>
+
                                 <div className="input-box-container grow">
                                     <MaskedInput
                                         tabIndex={62 + props.tabTimes}
@@ -9469,37 +9615,45 @@ const Dispatch = (props) => {
                                         guide={true}
                                         type="text"
                                         placeholder="Driver Phone"
-                                        readOnly={(selectedOrder?.is_cancelled || 0) === 1}
+                                        // readOnly={
+                                        //     (selectedOrder?.is_cancelled || 0) === 1 ||
+                                        //     !((selectedOrder?.carrier_owner_type || '') === 'carrier' || (selectedOrder?.carrier_owner_type || '') === 'agent')
+                                        // }
+                                        readOnly={true}
                                         onKeyDown={(e) => {
                                             if ((selectedOrder?.is_cancelled || 0) === 0) {
-                                                validateCarrierDriverForSaving(e)
+                                                // validateCarrierDriverForSaving(e)
                                             }
                                         }}
                                         onInput={(e) => {
                                             setSelectedCarrierDriver({
                                                 ...selectedCarrierDriver,
-                                                phone: e.target.value,
+                                                contact_phone: e.target.value,
                                             });
                                         }}
                                         onChange={(e) => {
                                             setSelectedCarrierDriver({
                                                 ...selectedCarrierDriver,
-                                                phone: e.target.value,
+                                                contact_phone: e.target.value,
                                             });
                                         }}
-                                        value={selectedCarrierDriver.phone || ""}
+                                        value={selectedCarrierDriver?.contact_phone || ""}
                                     />
                                 </div>
-                                <div className="form-h-sep"></div>
+
                                 <div className="input-box-container" style={{ maxWidth: "5.8rem", minWidth: "5.8rem" }}>
                                     <input
                                         tabIndex={63 + props.tabTimes}
                                         type="text"
                                         placeholder="Unit Number"
-                                        readOnly={(selectedOrder?.is_cancelled || 0) === 1}
+                                        // readOnly={
+                                        //     (selectedOrder?.is_cancelled || 0) === 1 ||
+                                        //     !((selectedOrder?.carrier_owner_type || '') === 'carrier' || (selectedOrder?.carrier_owner_type || '') === 'agent')
+                                        // }
+                                        readOnly={true}
                                         onKeyDown={(e) => {
                                             if ((selectedOrder?.is_cancelled || 0) === 0) {
-                                                validateCarrierDriverForSaving(e);
+                                                // validateCarrierDriverForSaving(e);
                                             }
                                         }}
                                         onInput={(e) => {
@@ -9514,16 +9668,17 @@ const Dispatch = (props) => {
                                                 truck: e.target.value,
                                             });
                                         }}
-                                        value={selectedCarrierDriver.truck || ""}
+                                        value={selectedCarrierDriver?.tractor?.number || ""}
                                     />
                                 </div>
-                                <div className="form-h-sep"></div>
+
                                 <div className="input-box-container" style={{ maxWidth: "5.8rem", minWidth: "5.8rem" }}>
                                     <input
                                         tabIndex={64 + props.tabTimes}
                                         type="text"
                                         placeholder="Trailer Number"
-                                        readOnly={(selectedOrder?.is_cancelled || 0) === 1}
+                                        // readOnly={(selectedOrder?.is_cancelled || 0) === 1}
+                                        readOnly={true}
                                         onKeyDown={(e) => {
                                             if ((selectedOrder?.is_cancelled || 0) === 0) {
                                                 e.preventDefault();
@@ -9553,7 +9708,7 @@ const Dispatch = (props) => {
                                                     ),
                                                 };
 
-                                                props.openPanel(panel, props.origin);
+                                                openPanel(panel, props.origin);
                                             }
                                         }}
                                         onInput={(e) => {
@@ -9568,11 +9723,11 @@ const Dispatch = (props) => {
                                                 trailer: e.target.value,
                                             });
                                         }}
-                                        value={selectedCarrierDriver.trailer || ""}
+                                        value={selectedCarrierDriver?.trailer?.number || ""}
                                     />
                                 </div>
                             </div>
-                            <div className="form-v-sep"></div>
+
                             <div
                                 className="form-row"
                                 style={{
@@ -9606,7 +9761,7 @@ const Dispatch = (props) => {
                                             ),
                                         };
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left"> (</div>
@@ -9641,7 +9796,7 @@ const Dispatch = (props) => {
                                             ),
                                         };
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -9852,7 +10007,7 @@ const Dispatch = (props) => {
                                 ),
                             };
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}
                     >
                         <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -9879,15 +10034,15 @@ const Dispatch = (props) => {
                                         tabTimes={37000 + props.tabTimes}
                                         panelName={`${props.panelName}-order`}
                                         origin={props.origin}
-                                        openPanel={props.openPanel}
-                                        closePanel={props.closePanel}
+
+
                                         componentId={moment().format("x")}
                                         selectedOrderId={selectedOrder?.id || 0}
                                     />
                                 ),
                             };
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}
                     >
                         <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -9914,15 +10069,15 @@ const Dispatch = (props) => {
                                         tabTimes={40000 + props.tabTimes}
                                         panelName={`${props.panelName}-bol`}
                                         origin={props.origin}
-                                        openPanel={props.openPanel}
-                                        closePanel={props.closePanel}
+
+
                                         componentId={moment().format("x")}
                                         selectedOrder={selectedOrder}
                                     />
                                 ),
                             };
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}
                     >
                         <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -9953,8 +10108,8 @@ const Dispatch = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={"order"}
-                                        openPanel={props.openPanel}
-                                        closePanel={props.closePanel}
+
+
                                         componentId={moment().format("x")}
                                         selectedOwner={{ ...selectedOrder }}
                                         selectedOwnerDocument={{
@@ -9972,7 +10127,7 @@ const Dispatch = (props) => {
                                 ),
                             };
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}
                     >
                         <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -9999,13 +10154,13 @@ const Dispatch = (props) => {
                                         isOnPanel={true}
                                         isAdmin={props.isAdmin}
                                         origin={props.origin}
-                                        openPanel={props.openPanel}
-                                        closePanel={props.closePanel}
+
+
                                     />
                                 ),
                             };
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}
                     >
                         <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -10043,7 +10198,7 @@ const Dispatch = (props) => {
                                 ),
                             };
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}
                     >
                         <div className="mochi-button-decorator mochi-button-decorator-left">
@@ -10795,8 +10950,8 @@ const Dispatch = (props) => {
                                         title="Routing"
                                         tabTimes={39000 + props.tabTimes}
                                         origin={props.origin}
-                                        openPanel={props.openPanel}
-                                        closePanel={props.closePanel}
+
+
                                         componentId={moment().format("x")}
                                         selectedOrder={selectedOrder}
                                         isAdmin={props.isAdmin}
@@ -10804,7 +10959,7 @@ const Dispatch = (props) => {
                                 ),
                             };
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}
                     >
                         <div className="mochi-button-decorator mochi-button-decorator-left"> (</div>
@@ -11446,13 +11601,13 @@ const Dispatch = (props) => {
                                     componentId={moment().format('x')}
                                     isOnPanel={true}
                                     origin={props.origin}
-                                    openPanel={props.openPanel}
-                                    closePanel={props.closePanel}
+
+
                                     order_id={(selectedOrder?.id || 0)}
                                 />
                             }
 
-                            props.openPanel(panel, props.origin);
+                            openPanel(panel, props.origin);
                         }}>Invoiced</div>
                         : (selectedOrder?.is_cancelled || 0) === 0
                             ? <div className="mochi-button" style={{ marginLeft: 80 }} onClick={() => {
@@ -11551,14 +11706,14 @@ const Dispatch = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-                                                        openPanel={props.openPanel}
-                                                        closePanel={props.closePanel}
+
+
                                                         customer_id={selectedShipperCustomer.id}
                                                     />
                                                 ),
                                             };
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }}
                                     >
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -15122,14 +15277,14 @@ const Dispatch = (props) => {
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+
+
                                                     customer_id={selectedConsigneeCustomer.id}
                                                 />
                                             ),
                                         };
 
-                                        props.openPanel(panel, props.origin);
+                                        openPanel(panel, props.origin);
                                     }}
                                     >
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -15467,7 +15622,7 @@ const Dispatch = (props) => {
                                                         <input
                                                             tabIndex={37 + props.tabTimes}
                                                             type="text"
-                                                            style={{textTransform: 'capitalize'}}
+                                                            style={{ textTransform: 'capitalize' }}
                                                             placeholder="Address 1"
                                                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                             onInput={(e) => {
@@ -15614,7 +15769,7 @@ const Dispatch = (props) => {
                                                         <input
                                                             tabIndex={38 + props.tabTimes}
                                                             type="text"
-                                                            style={{textTransform: 'capitalize'}}
+                                                            style={{ textTransform: 'capitalize' }}
                                                             placeholder="Address 2"
                                                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                             onInput={(e) => {
@@ -15761,7 +15916,7 @@ const Dispatch = (props) => {
                                                         <input
                                                             tabIndex={39 + props.tabTimes}
                                                             type="text"
-                                                            style={{textTransform: 'capitalize'}}
+                                                            style={{ textTransform: 'capitalize' }}
                                                             placeholder="City"
                                                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                             onInput={(e) => {
@@ -16193,7 +16348,7 @@ const Dispatch = (props) => {
                                                                 tabIndex={42 + props.tabTimes}
                                                                 type="text"
                                                                 placeholder="Contact Name"
-                                                                style={{textTransform: 'capitalize'}}
+                                                                style={{ textTransform: 'capitalize' }}
                                                                 ref={refConsigneeContactName}
                                                                 readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                                 onKeyDown={async (e) => {
@@ -16951,7 +17106,7 @@ const Dispatch = (props) => {
                                                                 tabIndex={43 + props.tabTimes}
                                                                 mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/,]}
                                                                 guide={true}
-                                                                type="text"                                                                
+                                                                type="text"
                                                                 placeholder="Contact Phone"
                                                                 ref={refConsigneeContactPhone}
                                                                 readOnly={(selectedOrder?.is_cancelled || 0) === 1}
@@ -18844,8 +18999,7 @@ const Dispatch = (props) => {
                                                             setDispatchEventItems(
                                                                 dispatchEventItems.map((item, index) => {
                                                                     if (selectedIndex === 0) {
-                                                                        item.selected =
-                                                                            index === dispatchEventItems.length - 1;
+                                                                        item.selected = index === dispatchEventItems.length - 1;
                                                                     } else {
                                                                         item.selected = index === selectedIndex - 1;
                                                                     }
@@ -19020,168 +19174,82 @@ const Dispatch = (props) => {
                                                         if (item !== undefined) {
                                                             let eventItem = dispatchEventItems.find((el) => el.selected);
 
-
                                                             setSelectedOrderEvent(item);
 
                                                             setDispatchEvent(eventItem);
                                                             setDispatchEventLocation(item.customer.city + ", " + item.customer.state);
 
                                                             if ((eventItem?.name || "").toLowerCase() === "arrived") {
-                                                                setDispatchEventNotes("Arrived at " + item.customer.code + (item.customer.code_number === 0
-                                                                    ? ""
-                                                                    : item.customer.code_number) + " - " + item.customer.name
-                                                                );
+                                                                setDispatchEventNotes("Arrived at " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                             }
 
                                                             if ((eventItem?.name || "").toLowerCase() === "loaded") {
-                                                                setDispatchEventNotes(
-                                                                    "Loaded at Shipper " +
-                                                                    item.customer.code +
-                                                                    (item.customer.code_number === 0
-                                                                        ? ""
-                                                                        : item.customer.code_number) +
-                                                                    " - " +
-                                                                    item.customer.name
-                                                                );
+                                                                setDispatchEventNotes("Loaded at Shipper " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                             }
 
                                                             if ((eventItem?.name || "").toLowerCase() === "delivered") {
-                                                                setDispatchEventNotes(
-                                                                    "Delivered at Consignee " +
-                                                                    item.customer.code +
-                                                                    (item.customer.code_number === 0
-                                                                        ? ""
-                                                                        : item.customer.code_number) +
-                                                                    " - " +
-                                                                    item.customer.name
-                                                                );
+                                                                setDispatchEventNotes("Delivered at Consignee " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                             }
 
                                                             window.setTimeout(() => {
                                                                 setShowDispatchEventSecondPageItems(false);
                                                                 setDispatchEventItems([]);
-                                                                goToTabindex((74 + props.tabTimes).toString());
-
+                                                                refEventDate.current.inputElement.focus();
                                                             }, 0);
                                                         }
                                                     } else {
                                                         let item = dispatchEventItems[dispatchEventItems.findIndex((item) => item.selected)];
 
-                                                        console.log(item)
-
                                                         if ((item?.name || "").toLowerCase() === "arrived") {
-                                                            if (
-                                                                (selectedOrder?.pickups || []).length > 0 ||
-                                                                (selectedOrder?.deliveries || []).length > 0
-                                                            ) {
-                                                                setDispatchEventItems(
-                                                                    dispatchEventItems.map((item, index) => {
-                                                                        item.selected =
-                                                                            (item?.name || "").toLowerCase() ===
-                                                                            "arrived";
-                                                                        return item;
-                                                                    })
-                                                                );
+                                                            if (getPickupsOnRouting().length > 0 || getDeliveriesOnRouting().length > 0) {
+                                                                setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                    item.selected = (item?.name || "").toLowerCase() === "arrived";
+                                                                    return item;
+                                                                }));
 
                                                                 let arriveIndex = -1;
                                                                 let departureIndex = -1;
 
-                                                                for (
-                                                                    let i = 0;
-                                                                    i < (selectedOrder?.events || []).length;
-                                                                    i++
-                                                                ) {
+                                                                for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                     let event = (selectedOrder?.events || [])[i];
 
-                                                                    if (
-                                                                        (
-                                                                            event.event_type?.name || ""
-                                                                        ).toLowerCase() === "arrived"
-                                                                    ) {
+                                                                    if ((event.event_type?.name || "").toLowerCase() === "arrived") {
                                                                         arriveIndex = i;
                                                                         break;
                                                                     }
                                                                 }
 
-                                                                for (
-                                                                    let i = 0;
-                                                                    i < (selectedOrder?.events || []).length;
-                                                                    i++
-                                                                ) {
+                                                                for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                     let event = (selectedOrder?.events || [])[i];
 
-                                                                    if (
-                                                                        (
-                                                                            event.event_type?.name || ""
-                                                                        ).toLowerCase() === "departed"
-                                                                    ) {
+                                                                    if ((event.event_type?.name || "").toLowerCase() === "departed") {
                                                                         departureIndex = i;
                                                                         break;
                                                                     }
                                                                 }
 
-                                                                if (
-                                                                    (arriveIndex === -1 && departureIndex === -1) ||
-                                                                    (departureIndex > -1 &&
-                                                                        departureIndex < arriveIndex)
-                                                                ) {
+                                                                if ((arriveIndex === -1 && departureIndex === -1) || (departureIndex > -1 && departureIndex < arriveIndex)) {
                                                                     let items = [
-                                                                        ...(selectedOrder?.pickups || []).filter(
-                                                                            (pu) => {
-                                                                                return (
-                                                                                    selectedOrder?.events.find(
-                                                                                        (el) =>
-                                                                                            (
-                                                                                                el.event_type?.name || ""
-                                                                                            ).toLowerCase() === "arrived" &&
-                                                                                            el.shipper_id ===
-                                                                                            (pu.customer?.id || 0)
-                                                                                    ) === undefined
-                                                                                );
-                                                                            }
-                                                                        ),
-                                                                        ...(selectedOrder?.deliveries || []).filter(
-                                                                            (delivery) => {
-                                                                                return (
-                                                                                    selectedOrder?.events.find(
-                                                                                        (el) =>
-                                                                                            (
-                                                                                                el.event_type?.name || ""
-                                                                                            ).toLowerCase() === "arrived" &&
-                                                                                            el.consignee_id ===
-                                                                                            (delivery?.customer.id || 0)
-                                                                                    ) === undefined
-                                                                                );
-                                                                            }
-                                                                        ),
+                                                                        ...getPickupsOnRouting().filter((pu) => {
+                                                                            return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "arrived" && el.shipper_id === (pu.customer?.id || 0)) === undefined);
+                                                                        }),
+                                                                        ...getDeliveriesOnRouting().filter((delivery) => {
+                                                                            return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "arrived" && el.consignee_id === (delivery?.customer.id || 0)) === undefined);
+                                                                        }),
                                                                     ];
 
                                                                     if (items.length > 0) {
                                                                         if (items.length === 1) {
                                                                             setDispatchEvent(item);
-                                                                            setDispatchEventLocation(
-                                                                                items[0].customer.city +
-                                                                                ", " +
-                                                                                items[0].customer.state
-                                                                            );
-                                                                            setDispatchEventNotes(
-                                                                                "Arrived at " +
-                                                                                items[0].customer.code +
-                                                                                (items[0].customer.code_number === 0
-                                                                                    ? ""
-                                                                                    : items[0].customer.code_number) +
-                                                                                " - " +
-                                                                                items[0].customer.name
-                                                                            );
+                                                                            setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                            setDispatchEventNotes("Arrived at " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                             setSelectedOrderEvent(items[0]);
 
                                                                             window.setTimeout(() => {
                                                                                 setDispatchEventItems([]);
                                                                                 setDispatchEventSecondPageItems([]);
-                                                                                setShowDispatchEventSecondPageItems(
-                                                                                    false
-                                                                                );
-                                                                                goToTabindex((74 + props.tabTimes).toString());
+                                                                                setShowDispatchEventSecondPageItems(false);
+                                                                                refEventDate.current.inputElement.focus();
                                                                             }, 0);
                                                                         } else {
                                                                             items = items.map((x, i) => {
@@ -19190,9 +19258,7 @@ const Dispatch = (props) => {
                                                                             });
                                                                         }
                                                                     } else {
-                                                                        window.alert(
-                                                                            "No shippers or consignees available!"
-                                                                        );
+                                                                        window.alert("No shippers or consignees available!");
                                                                         refDispatchEvents.current.focus();
                                                                         return;
                                                                     }
@@ -19202,44 +19268,29 @@ const Dispatch = (props) => {
                                                                         setShowDispatchEventSecondPageItems(true);
                                                                     }, 0);
                                                                 } else {
-                                                                    window.alert(
-                                                                        "You must enter a 'departed' event for the last 'arrived' event first!"
-                                                                    );
+                                                                    window.alert("You must enter a 'departed' event for the last 'arrived' event first!");
                                                                     refDispatchEvents.current.focus();
                                                                     return;
                                                                 }
                                                             } else {
-                                                                window.alert(
-                                                                    "No shippers or consignees available!"
-                                                                );
+                                                                window.alert("No shippers or consignees available!");
                                                                 refDispatchEvents.current.focus();
                                                                 return;
                                                             }
-                                                        } else if ((item?.name || "").toLowerCase() === "departed") {
-                                                            setDispatchEventItems(
-                                                                dispatchEventItems.map((item, index) => {
-                                                                    item.selected =
-                                                                        (item?.name || "").toLowerCase() ===
-                                                                        "arrived";
-                                                                    return item;
-                                                                })
-                                                            );
+                                                        } else if (item.type === "departed") {
+                                                            setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                item.selected = (item?.name || "").toLowerCase() === "arrived";
+                                                                return item;
+                                                            }));
 
                                                             let arriveIndex = -1;
                                                             let departureIndex = -1;
                                                             let arrived_customer = {};
 
-                                                            for (
-                                                                let i = 0;
-                                                                i < (selectedOrder?.events || []).length;
-                                                                i++
-                                                            ) {
+                                                            for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                 let event = (selectedOrder?.events || [])[i];
 
-                                                                if (
-                                                                    (event.event_type?.name || "").toLowerCase() ===
-                                                                    "arrived"
-                                                                ) {
+                                                                if ((event.event_type?.name || "").toLowerCase() === "arrived") {
                                                                     arrived_customer = {
                                                                         ...event.arrived_customer,
                                                                     };
@@ -19248,111 +19299,57 @@ const Dispatch = (props) => {
                                                                 }
                                                             }
 
-                                                            for (
-                                                                let i = 0;
-                                                                i < (selectedOrder?.events || []).length;
-                                                                i++
-                                                            ) {
+                                                            for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                 let event = (selectedOrder?.events || [])[i];
 
-                                                                if (
-                                                                    (event.event_type?.name || "").toLowerCase() ===
-                                                                    "departed"
-                                                                ) {
+                                                                if ((event.event_type?.name || "").toLowerCase() === "departed") {
                                                                     departureIndex = i;
                                                                     break;
                                                                 }
                                                             }
 
-                                                            if (
-                                                                (arriveIndex === -1 && departureIndex === -1) ||
-                                                                (departureIndex > -1 &&
-                                                                    departureIndex < arriveIndex)
-                                                            ) {
-                                                                window.alert(
-                                                                    "You must enter an 'arrived' event first!"
-                                                                );
+                                                            if ((arriveIndex === -1 && departureIndex === -1) || (departureIndex > -1 && departureIndex < arriveIndex)) {
+                                                                window.alert("You must enter an 'arrived' event first!");
                                                                 refDispatchEvents.current.focus();
                                                                 return;
                                                             } else {
                                                                 setDispatchEvent(item);
-                                                                setDispatchEventLocation(
-                                                                    arrived_customer.city +
-                                                                    ", " +
-                                                                    arrived_customer.state
-                                                                );
-                                                                setDispatchEventNotes(
-                                                                    "Departed at " +
-                                                                    arrived_customer.code +
-                                                                    (arrived_customer.code_number === 0
-                                                                        ? ""
-                                                                        : arrived_customer.code_number) +
-                                                                    " - " +
-                                                                    arrived_customer.name
-                                                                );
+                                                                setDispatchEventLocation(arrived_customer.city + ", " + arrived_customer.state);
+                                                                setDispatchEventNotes("Departed at " + arrived_customer.code + (arrived_customer.code_number === 0 ? "" : arrived_customer.code_number) + " - " + arrived_customer.name);
                                                                 setSelectedOrderEvent(arrived_customer);
 
                                                                 window.setTimeout(() => {
                                                                     setDispatchEventItems([]);
                                                                     setDispatchEventSecondPageItems([]);
                                                                     setShowDispatchEventSecondPageItems(false);
-                                                                    goToTabindex((74 + props.tabTimes).toString());
+                                                                    refEventDate.current.inputElement.focus();
                                                                 }, 0);
                                                             }
                                                         } else if ((item?.name || "").toLowerCase() === "loaded") {
-                                                            if (
-                                                                (selectedOrder?.pickups || []).length > 0 ||
-                                                                (selectedOrder?.deliveries || []).length > 0
-                                                            ) {
-                                                                setDispatchEventItems(
-                                                                    dispatchEventItems.map((item, index) => {
-                                                                        item.selected =
-                                                                            (item?.name || "").toLowerCase() ===
-                                                                            "loaded";
-                                                                        return item;
-                                                                    })
-                                                                );
+                                                            if (getPickupsOnRouting().length > 0) {
+                                                                setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                    item.selected = (item?.name || "").toLowerCase() === "loaded";
+                                                                    return item;
+                                                                }));
 
                                                                 let items = [
-                                                                    ...(selectedOrder?.pickups || []).filter(
-                                                                        (pu) => {
-                                                                            return (
-                                                                                selectedOrder?.events.find(
-                                                                                    (el) =>
-                                                                                        (
-                                                                                            el.event_type?.name || ""
-                                                                                        ).toLowerCase() === "loaded" &&
-                                                                                        el.shipper_id === pu.customer.id
-                                                                                ) === undefined
-                                                                            );
-                                                                        }
-                                                                    ),
+                                                                    ...getPickupsOnRouting().filter((pu) => {
+                                                                        return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "loaded" && el.shipper_id === pu.customer.id) === undefined);
+                                                                    }),
                                                                 ];
 
                                                                 if (items.length > 0) {
                                                                     if (items.length === 1) {
                                                                         setDispatchEvent(item);
-                                                                        setDispatchEventLocation(
-                                                                            items[0].customer.city +
-                                                                            ", " +
-                                                                            items[0].customer.state
-                                                                        );
-                                                                        setDispatchEventNotes(
-                                                                            "Loaded at Shipper " +
-                                                                            items[0].customer.code +
-                                                                            (items[0].customer.code_number === 0
-                                                                                ? ""
-                                                                                : items[0].customer.code_number) +
-                                                                            " - " +
-                                                                            items[0].customer.name
-                                                                        );
+                                                                        setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                        setDispatchEventNotes("Loaded at Shipper " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                         setSelectedOrderEvent(items[0]);
 
                                                                         window.setTimeout(() => {
                                                                             setDispatchEventItems([]);
                                                                             setDispatchEventSecondPageItems([]);
                                                                             setShowDispatchEventSecondPageItems(false);
-                                                                            goToTabindex((74 + props.tabTimes).toString());
+                                                                            refEventDate.current.inputElement.focus();
                                                                         }, 0);
                                                                     } else {
                                                                         items = items.map((x, i) => {
@@ -19376,29 +19373,16 @@ const Dispatch = (props) => {
                                                                 return;
                                                             }
                                                         } else if ((item?.name || "").toLowerCase() === "delivered") {
-                                                            if ((selectedOrder?.deliveries || []).length > 0) {
-                                                                setDispatchEventItems(
-                                                                    dispatchEventItems.map((item, index) => {
-                                                                        item.selected =
-                                                                            (item?.name || "").toLowerCase() ===
-                                                                            "delivered";
-                                                                        return item;
-                                                                    })
-                                                                );
+                                                            if (getDeliveriesOnRouting().length > 0) {
+                                                                setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                    item.selected = (item?.name || "").toLowerCase() === "delivered";
+                                                                    return item;
+                                                                }));
 
                                                                 let items = [
-                                                                    ...(selectedOrder?.deliveries || []).filter(
+                                                                    ...getDeliveriesOnRouting().filter(
                                                                         (delivery) => {
-                                                                            return (
-                                                                                selectedOrder?.events.find(
-                                                                                    (el) =>
-                                                                                        (
-                                                                                            el.event_type?.name || ""
-                                                                                        ).toLowerCase() === "delivered" &&
-                                                                                        el.consignee_id ===
-                                                                                        delivery.customer.id
-                                                                                ) === undefined
-                                                                            );
+                                                                            return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "delivered" && el.consignee_id === delivery.customer.id) === undefined);
                                                                         }
                                                                     ),
                                                                 ];
@@ -19406,27 +19390,15 @@ const Dispatch = (props) => {
                                                                 if (items.length > 0) {
                                                                     if (items.length === 1) {
                                                                         setDispatchEvent(item);
-                                                                        setDispatchEventLocation(
-                                                                            items[0].customer.city +
-                                                                            ", " +
-                                                                            items[0].customer.state
-                                                                        );
-                                                                        setDispatchEventNotes(
-                                                                            "Delivered at Consignee " +
-                                                                            items[0].customer.code +
-                                                                            (items[0].customer.code_number === 0
-                                                                                ? ""
-                                                                                : items[0].customer.code_number) +
-                                                                            " - " +
-                                                                            items[0].customer.name
-                                                                        );
+                                                                        setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                        setDispatchEventNotes("Delivered at Consignee " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                         setSelectedOrderEvent(items[0]);
 
                                                                         window.setTimeout(() => {
                                                                             setDispatchEventItems([]);
                                                                             setDispatchEventSecondPageItems([]);
                                                                             setShowDispatchEventSecondPageItems(false);
-                                                                            goToTabindex((74 + props.tabTimes).toString());
+                                                                            refEventDate.current.inputElement.focus();
                                                                         }, 0);
                                                                     } else {
                                                                         items = items.map((x, i) => {
@@ -19453,217 +19425,99 @@ const Dispatch = (props) => {
                                                             setDispatchEvent(item);
                                                             setDispatchEventLocation("");
                                                             setDispatchEventNotes("");
-                                                            setDispatchEventItems([]);
-                                                            goToTabindex((72 + props.tabTimes).toString());
+                                                            setDispatchEventItems([]);                                                            
+                                                            refDispatchEventLocation.current.focus();
                                                         }
                                                     }
                                                 }
                                                 break;
 
                                             case 9: // tab
-                                                if (
-                                                    dispatchEventItems.length > 0 ||
-                                                    showDispatchEventSecondPageItems
-                                                ) {
+                                                if (dispatchEventItems.length > 0 || showDispatchEventSecondPageItems) {
                                                     e.preventDefault();
-                                                    if (
-                                                        dispatchEventItems.length > 0 &&
-                                                        dispatchEventItems.findIndex(
-                                                            (item) => item.selected
-                                                        ) > -1
-                                                    ) {
+                                                    if (dispatchEventItems.length > 0 && dispatchEventItems.findIndex((item) => item.selected) > -1) {
                                                         if (showDispatchEventSecondPageItems) {
-                                                            let item = dispatchEventSecondPageItems.find(
-                                                                (el) => el.selected
-                                                            );
+                                                            let item = dispatchEventSecondPageItems.find((el) => el.selected);
 
                                                             if (item !== undefined) {
-                                                                let eventItem = dispatchEventItems.find(
-                                                                    (el) => el.selected
-                                                                );
+                                                                let eventItem = dispatchEventItems.find((el) => el.selected);
 
                                                                 setSelectedOrderEvent(item);
 
                                                                 setDispatchEvent(eventItem);
-                                                                setDispatchEventLocation(
-                                                                    item.customer.city + ", " + item.customer.state
-                                                                );
+                                                                setDispatchEventLocation(item.customer.city + ", " + item.customer.state);
 
-                                                                if (
-                                                                    (eventItem?.name || "").toLowerCase() ===
-                                                                    "arrived"
-                                                                ) {
-                                                                    setDispatchEventNotes(
-                                                                        "Arrived at " +
-                                                                        item.customer.code +
-                                                                        (item.customer.code_number === 0
-                                                                            ? ""
-                                                                            : item.customer.code_number) +
-                                                                        " - " +
-                                                                        item.customer.name
-                                                                    );
+                                                                if ((eventItem?.name || "").toLowerCase() === "arrived") {
+                                                                    setDispatchEventNotes("Arrived at " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                                 }
 
-                                                                if (
-                                                                    (eventItem?.name || "").toLowerCase() ===
-                                                                    "loaded"
-                                                                ) {
-                                                                    setDispatchEventNotes(
-                                                                        "Loaded at Shipper " +
-                                                                        item.customer.code +
-                                                                        (item.customer.code_number === 0
-                                                                            ? ""
-                                                                            : item.customer.code_number) +
-                                                                        " - " +
-                                                                        item.customer.name
-                                                                    );
+                                                                if ((eventItem?.name || "").toLowerCase() === "loaded") {
+                                                                    setDispatchEventNotes("Loaded at Shipper " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                                 }
 
-                                                                if (
-                                                                    (eventItem?.name || "").toLowerCase() ===
-                                                                    "delivered"
-                                                                ) {
-                                                                    setDispatchEventNotes(
-                                                                        "Delivered at Consignee " +
-                                                                        item.customer.code +
-                                                                        (item.customer.code_number === 0
-                                                                            ? ""
-                                                                            : item.customer.code_number) +
-                                                                        " - " +
-                                                                        item.customer.name
-                                                                    );
+                                                                if ((eventItem?.name || "").toLowerCase() === "delivered") {
+                                                                    setDispatchEventNotes("Delivered at Consignee " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                                 }
 
                                                                 window.setTimeout(() => {
                                                                     setShowDispatchEventSecondPageItems(false);
                                                                     setDispatchEventItems([]);
-                                                                    goToTabindex((74 + props.tabTimes).toString());
+                                                                    refEventDate.current.inputElement.focus();
                                                                 }, 0);
                                                             }
                                                         } else {
-                                                            let item =
-                                                                dispatchEventItems[
-                                                                dispatchEventItems.findIndex(
-                                                                    (item) => item.selected
-                                                                )
-                                                                ];
+                                                            let item = dispatchEventItems[dispatchEventItems.findIndex((item) => item.selected)];
 
-                                                            if (
-                                                                (item?.name || "").toLowerCase() === "arrived"
-                                                            ) {
-                                                                if (
-                                                                    (selectedOrder?.pickups || []).length > 0 ||
-                                                                    (selectedOrder?.deliveries || []).length > 0
-                                                                ) {
-                                                                    setDispatchEventItems(
-                                                                        dispatchEventItems.map((item, index) => {
-                                                                            item.selected =
-                                                                                (item?.name || "").toLowerCase() ===
-                                                                                "arrived";
-                                                                            return item;
-                                                                        })
-                                                                    );
+                                                            if ((item?.name || "").toLowerCase() === "arrived") {
+                                                                if (getPickupsOnRouting().length > 0 || getDeliveriesOnRouting().length > 0) {
+                                                                    setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                        item.selected = (item?.name || "").toLowerCase() === "arrived";
+                                                                        return item;
+                                                                    }));
 
                                                                     let arriveIndex = -1;
                                                                     let departureIndex = -1;
 
-                                                                    for (
-                                                                        let i = 0;
-                                                                        i < (selectedOrder?.events || []).length;
-                                                                        i++
-                                                                    ) {
+                                                                    for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                         let event = (selectedOrder?.events || [])[i];
 
-                                                                        if (
-                                                                            (
-                                                                                event.event_type?.name || ""
-                                                                            ).toLowerCase() === "arrived"
-                                                                        ) {
+                                                                        if ((event.event_type?.name || "").toLowerCase() === "arrived") {
                                                                             arriveIndex = i;
                                                                             break;
                                                                         }
                                                                     }
 
-                                                                    for (
-                                                                        let i = 0;
-                                                                        i < (selectedOrder?.events || []).length;
-                                                                        i++
-                                                                    ) {
+                                                                    for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                         let event = (selectedOrder?.events || [])[i];
 
-                                                                        if (
-                                                                            (
-                                                                                event.event_type?.name || ""
-                                                                            ).toLowerCase() === "departed"
-                                                                        ) {
+                                                                        if ((event.event_type?.name || "").toLowerCase() === "departed") {
                                                                             departureIndex = i;
                                                                             break;
                                                                         }
                                                                     }
 
-                                                                    if (
-                                                                        (arriveIndex === -1 &&
-                                                                            departureIndex === -1) ||
-                                                                        (departureIndex > -1 &&
-                                                                            departureIndex < arriveIndex)
-                                                                    ) {
+                                                                    if ((arriveIndex === -1 && departureIndex === -1) || (departureIndex > -1 && departureIndex < arriveIndex)) {
                                                                         let items = [
-                                                                            ...(selectedOrder?.pickups || []).filter(
-                                                                                (pu) => {
-                                                                                    return (
-                                                                                        selectedOrder?.events.find(
-                                                                                            (el) =>
-                                                                                                (
-                                                                                                    el.event_type?.name || ""
-                                                                                                ).toLowerCase() === "arrived" &&
-                                                                                                el.shipper_id ===
-                                                                                                (pu.customer?.id || 0)
-                                                                                        ) === undefined
-                                                                                    );
-                                                                                }
-                                                                            ),
-                                                                            ...(selectedOrder?.deliveries || []).filter(
-                                                                                (delivery) => {
-                                                                                    return (
-                                                                                        selectedOrder?.events.find(
-                                                                                            (el) =>
-                                                                                                (
-                                                                                                    el.event_type?.name || ""
-                                                                                                ).toLowerCase() === "arrived" &&
-                                                                                                el.consignee_id ===
-                                                                                                (delivery?.customer.id || 0)
-                                                                                        ) === undefined
-                                                                                    );
-                                                                                }
-                                                                            ),
+                                                                            ...getPickupsOnRouting().filter((pu) => {
+                                                                                return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "arrived" && el.shipper_id === (pu.customer?.id || 0)) === undefined);
+                                                                            }),
+                                                                            ...getDeliveriesOnRouting().filter((delivery) => {
+                                                                                return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "arrived" && el.consignee_id === (delivery?.customer.id || 0)) === undefined);
+                                                                            }),
                                                                         ];
 
                                                                         if (items.length > 0) {
                                                                             if (items.length === 1) {
                                                                                 setDispatchEvent(item);
-                                                                                setDispatchEventLocation(
-                                                                                    items[0].customer.city +
-                                                                                    ", " +
-                                                                                    items[0].customer.state
-                                                                                );
-                                                                                setDispatchEventNotes(
-                                                                                    "Arrived at " +
-                                                                                    items[0].customer.code +
-                                                                                    (items[0].customer.code_number === 0
-                                                                                        ? ""
-                                                                                        : items[0].customer.code_number) +
-                                                                                    " - " +
-                                                                                    items[0].customer.name
-                                                                                );
+                                                                                setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                                setDispatchEventNotes("Arrived at " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                                 setSelectedOrderEvent(items[0]);
 
                                                                                 window.setTimeout(() => {
                                                                                     setDispatchEventItems([]);
                                                                                     setDispatchEventSecondPageItems([]);
-                                                                                    setShowDispatchEventSecondPageItems(
-                                                                                        false
-                                                                                    );
-                                                                                    goToTabindex((74 + props.tabTimes).toString());
+                                                                                    setShowDispatchEventSecondPageItems(false);
+                                                                                    refEventDate.current.inputElement.focus();
                                                                                 }, 0);
                                                                             } else {
                                                                                 items = items.map((x, i) => {
@@ -19672,9 +19526,7 @@ const Dispatch = (props) => {
                                                                                 });
                                                                             }
                                                                         } else {
-                                                                            window.alert(
-                                                                                "No shippers or consignees available!"
-                                                                            );
+                                                                            window.alert("No shippers or consignees available!");
                                                                             refDispatchEvents.current.focus();
                                                                             return;
                                                                         }
@@ -19684,45 +19536,29 @@ const Dispatch = (props) => {
                                                                             setShowDispatchEventSecondPageItems(true);
                                                                         }, 0);
                                                                     } else {
-                                                                        window.alert(
-                                                                            "You must enter a 'departed' event for the last 'arrived' event first!"
-                                                                        );
+                                                                        window.alert("You must enter a 'departed' event for the last 'arrived' event first!");
                                                                         refDispatchEvents.current.focus();
                                                                         return;
                                                                     }
                                                                 } else {
-                                                                    window.alert(
-                                                                        "No shippers or consignees available!"
-                                                                    );
+                                                                    window.alert("No shippers or consignees available!");
                                                                     refDispatchEvents.current.focus();
                                                                     return;
                                                                 }
                                                             } else if (item.type === "departed") {
-                                                                setDispatchEventItems(
-                                                                    dispatchEventItems.map((item, index) => {
-                                                                        item.selected =
-                                                                            (item?.name || "").toLowerCase() ===
-                                                                            "arrived";
-                                                                        return item;
-                                                                    })
-                                                                );
+                                                                setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                    item.selected = (item?.name || "").toLowerCase() === "arrived";
+                                                                    return item;
+                                                                }));
 
                                                                 let arriveIndex = -1;
                                                                 let departureIndex = -1;
                                                                 let arrived_customer = {};
 
-                                                                for (
-                                                                    let i = 0;
-                                                                    i < (selectedOrder?.events || []).length;
-                                                                    i++
-                                                                ) {
+                                                                for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                     let event = (selectedOrder?.events || [])[i];
 
-                                                                    if (
-                                                                        (
-                                                                            event.event_type?.name || ""
-                                                                        ).toLowerCase() === "arrived"
-                                                                    ) {
+                                                                    if ((event.event_type?.name || "").toLowerCase() === "arrived") {
                                                                         arrived_customer = {
                                                                             ...event.arrived_customer,
                                                                         };
@@ -19731,116 +19567,57 @@ const Dispatch = (props) => {
                                                                     }
                                                                 }
 
-                                                                for (
-                                                                    let i = 0;
-                                                                    i < (selectedOrder?.events || []).length;
-                                                                    i++
-                                                                ) {
+                                                                for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
                                                                     let event = (selectedOrder?.events || [])[i];
 
-                                                                    if (
-                                                                        (
-                                                                            event.event_type?.name || ""
-                                                                        ).toLowerCase() === "departed"
-                                                                    ) {
+                                                                    if ((event.event_type?.name || "").toLowerCase() === "departed") {
                                                                         departureIndex = i;
                                                                         break;
                                                                     }
                                                                 }
 
-                                                                if (
-                                                                    (arriveIndex === -1 && departureIndex === -1) ||
-                                                                    (departureIndex > -1 &&
-                                                                        departureIndex < arriveIndex)
-                                                                ) {
-                                                                    window.alert(
-                                                                        "You must enter an 'arrived' event first!"
-                                                                    );
+                                                                if ((arriveIndex === -1 && departureIndex === -1) || (departureIndex > -1 && departureIndex < arriveIndex)) {
+                                                                    window.alert("You must enter an 'arrived' event first!");
                                                                     refDispatchEvents.current.focus();
                                                                     return;
                                                                 } else {
                                                                     setDispatchEvent(item);
-                                                                    setDispatchEventLocation(
-                                                                        arrived_customer.city +
-                                                                        ", " +
-                                                                        arrived_customer.state
-                                                                    );
-                                                                    setDispatchEventNotes(
-                                                                        "Departed at " +
-                                                                        arrived_customer.code +
-                                                                        (arrived_customer.code_number === 0
-                                                                            ? ""
-                                                                            : arrived_customer.code_number) +
-                                                                        " - " +
-                                                                        arrived_customer.name
-                                                                    );
+                                                                    setDispatchEventLocation(arrived_customer.city + ", " + arrived_customer.state);
+                                                                    setDispatchEventNotes("Departed at " + arrived_customer.code + (arrived_customer.code_number === 0 ? "" : arrived_customer.code_number) + " - " + arrived_customer.name);
                                                                     setSelectedOrderEvent(arrived_customer);
 
                                                                     window.setTimeout(() => {
                                                                         setDispatchEventItems([]);
                                                                         setDispatchEventSecondPageItems([]);
                                                                         setShowDispatchEventSecondPageItems(false);
-                                                                        goToTabindex((74 + props.tabTimes).toString());
+                                                                        refEventDate.current.inputElement.focus();
                                                                     }, 0);
                                                                 }
-                                                            } else if (
-                                                                (item?.name || "").toLowerCase() === "loaded"
-                                                            ) {
-                                                                if (
-                                                                    (selectedOrder?.pickups || []).length > 0 ||
-                                                                    (selectedOrder?.deliveries || []).length > 0
-                                                                ) {
-                                                                    setDispatchEventItems(
-                                                                        dispatchEventItems.map((item, index) => {
-                                                                            item.selected =
-                                                                                (item?.name || "").toLowerCase() ===
-                                                                                "loaded";
-                                                                            return item;
-                                                                        })
-                                                                    );
+                                                            } else if ((item?.name || "").toLowerCase() === "loaded") {
+                                                                if (getPickupsOnRouting().length > 0) {
+                                                                    setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                        item.selected = (item?.name || "").toLowerCase() === "loaded";
+                                                                        return item;
+                                                                    }));
 
                                                                     let items = [
-                                                                        ...(selectedOrder?.pickups || []).filter(
-                                                                            (pu) => {
-                                                                                return (
-                                                                                    selectedOrder?.events.find(
-                                                                                        (el) =>
-                                                                                            (
-                                                                                                el.event_type?.name || ""
-                                                                                            ).toLowerCase() === "loaded" &&
-                                                                                            el.shipper_id === pu.customer.id
-                                                                                    ) === undefined
-                                                                                );
-                                                                            }
-                                                                        ),
+                                                                        ...getPickupsOnRouting().filter((pu) => {
+                                                                            return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "loaded" && el.shipper_id === pu.customer.id) === undefined);
+                                                                        }),
                                                                     ];
 
                                                                     if (items.length > 0) {
                                                                         if (items.length === 1) {
                                                                             setDispatchEvent(item);
-                                                                            setDispatchEventLocation(
-                                                                                items[0].customer.city +
-                                                                                ", " +
-                                                                                items[0].customer.state
-                                                                            );
-                                                                            setDispatchEventNotes(
-                                                                                "Loaded at Shipper " +
-                                                                                items[0].customer.code +
-                                                                                (items[0].customer.code_number === 0
-                                                                                    ? ""
-                                                                                    : items[0].customer.code_number) +
-                                                                                " - " +
-                                                                                items[0].customer.name
-                                                                            );
+                                                                            setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                            setDispatchEventNotes("Loaded at Shipper " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                             setSelectedOrderEvent(items[0]);
 
                                                                             window.setTimeout(() => {
                                                                                 setDispatchEventItems([]);
                                                                                 setDispatchEventSecondPageItems([]);
-                                                                                setShowDispatchEventSecondPageItems(
-                                                                                    false
-                                                                                );
-                                                                                goToTabindex((74 + props.tabTimes).toString());
+                                                                                setShowDispatchEventSecondPageItems(false);
+                                                                                refEventDate.current.inputElement.focus();
                                                                             }, 0);
                                                                         } else {
                                                                             items = items.map((x, i) => {
@@ -19863,34 +19640,17 @@ const Dispatch = (props) => {
                                                                     refDispatchEvents.current.focus();
                                                                     return;
                                                                 }
-                                                            } else if (
-                                                                (item?.name || "").toLowerCase() === "delivered"
-                                                            ) {
-                                                                if (
-                                                                    (selectedOrder?.deliveries || []).length > 0
-                                                                ) {
-                                                                    setDispatchEventItems(
-                                                                        dispatchEventItems.map((item, index) => {
-                                                                            item.selected =
-                                                                                (item?.name || "").toLowerCase() ===
-                                                                                "delivered";
-                                                                            return item;
-                                                                        })
-                                                                    );
+                                                            } else if ((item?.name || "").toLowerCase() === "delivered") {
+                                                                if (getDeliveriesOnRouting().length > 0) {
+                                                                    setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                        item.selected = (item?.name || "").toLowerCase() === "delivered";
+                                                                        return item;
+                                                                    }));
 
                                                                     let items = [
-                                                                        ...(selectedOrder?.deliveries || []).filter(
+                                                                        ...getDeliveriesOnRouting().filter(
                                                                             (delivery) => {
-                                                                                return (
-                                                                                    selectedOrder?.events.find(
-                                                                                        (el) =>
-                                                                                            (
-                                                                                                el.event_type?.name || ""
-                                                                                            ).toLowerCase() === "delivered" &&
-                                                                                            el.consignee_id ===
-                                                                                            delivery.customer.id
-                                                                                    ) === undefined
-                                                                                );
+                                                                                return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "delivered" && el.consignee_id === delivery.customer.id) === undefined);
                                                                             }
                                                                         ),
                                                                     ];
@@ -19898,29 +19658,15 @@ const Dispatch = (props) => {
                                                                     if (items.length > 0) {
                                                                         if (items.length === 1) {
                                                                             setDispatchEvent(item);
-                                                                            setDispatchEventLocation(
-                                                                                items[0].customer.city +
-                                                                                ", " +
-                                                                                items[0].customer.state
-                                                                            );
-                                                                            setDispatchEventNotes(
-                                                                                "Delivered at Consignee " +
-                                                                                items[0].customer.code +
-                                                                                (items[0].customer.code_number === 0
-                                                                                    ? ""
-                                                                                    : items[0].customer.code_number) +
-                                                                                " - " +
-                                                                                items[0].customer.name
-                                                                            );
+                                                                            setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                            setDispatchEventNotes("Delivered at Consignee " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                             setSelectedOrderEvent(items[0]);
 
                                                                             window.setTimeout(() => {
                                                                                 setDispatchEventItems([]);
                                                                                 setDispatchEventSecondPageItems([]);
-                                                                                setShowDispatchEventSecondPageItems(
-                                                                                    false
-                                                                                );
-                                                                                goToTabindex((74 + props.tabTimes).toString());
+                                                                                setShowDispatchEventSecondPageItems(false);
+                                                                                refEventDate.current.inputElement.focus();
                                                                             }, 0);
                                                                         } else {
                                                                             items = items.map((x, i) => {
@@ -19947,8 +19693,8 @@ const Dispatch = (props) => {
                                                                 setDispatchEvent(item);
                                                                 setDispatchEventLocation("");
                                                                 setDispatchEventNotes("");
-                                                                setDispatchEventItems([]);
-                                                                goToTabindex((72 + props.tabTimes).toString());
+                                                                setDispatchEventItems([]);                                                                
+                                                                refDispatchEventLocation.current.focus();
                                                             }
                                                         }
                                                     }
@@ -20035,37 +19781,31 @@ const Dispatch = (props) => {
                                                 return;
                                             }
 
-                                            axios
-                                                .post(props.serverUrl + "/getEventTypes", {
-                                                    name: dispatchEvent?.name || "",
-                                                })
-                                                .then((res) => {
-                                                    if (res.data.result === "OK") {
-                                                        setDispatchEventItems(
-                                                            res.data.event_types.map((item, index) => {
-                                                                item.selected =
-                                                                    (dispatchEvent?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === dispatchEvent.id;
-                                                                return item;
-                                                            })
-                                                        );
+                                            axios.post(props.serverUrl + "/getEventTypes", {
+                                                name: dispatchEvent?.name || "",
+                                            }).then((res) => {
+                                                if (res.data.result === "OK") {
+                                                    setDispatchEventItems(
+                                                        res.data.event_types.map((item, index) => {
+                                                            item.selected = (dispatchEvent?.id || 0) === 0 ? index === 0 : item.id === dispatchEvent.id;
+                                                            return item;
+                                                        })
+                                                    );
 
-                                                        refDispatchEventPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains("selected")) {
-                                                                r.scrollIntoView({
-                                                                    behavior: "auto",
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                });
-                                                            }
-                                                            return true;
-                                                        });
-                                                    }
-                                                })
-                                                .catch((e) => {
-                                                    console.log("error getting event types", e);
-                                                });
+                                                    refDispatchEventPopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains("selected")) {
+                                                            r.scrollIntoView({
+                                                                behavior: "auto",
+                                                                block: "center",
+                                                                inline: "nearest",
+                                                            });
+                                                        }
+                                                        return true;
+                                                    });
+                                                }
+                                            }).catch((e) => {
+                                                console.log("error getting event types", e);
+                                            });
                                         }
 
                                         refDispatchEvents.current.focus();
@@ -20129,150 +19869,56 @@ const Dispatch = (props) => {
                                                                                 );
                                                                             }}
                                                                             onClick={() => {
-                                                                                if (
-                                                                                    (item?.name || "").toLowerCase() ===
-                                                                                    "arrived"
-                                                                                ) {
-                                                                                    if (
-                                                                                        (selectedOrder?.pickups || [])
-                                                                                            .length > 0 ||
-                                                                                        (selectedOrder?.deliveries || [])
-                                                                                            .length > 0
-                                                                                    ) {
-                                                                                        setDispatchEventItems(
-                                                                                            dispatchEventItems.map(
-                                                                                                (item, index) => {
-                                                                                                    item.selected =
-                                                                                                        (
-                                                                                                            item?.name || ""
-                                                                                                        ).toLowerCase() ===
-                                                                                                        "arrived";
-                                                                                                    return item;
-                                                                                                }
-                                                                                            )
-                                                                                        );
+                                                                                if ((item?.name || "").toLowerCase() === "arrived") {
+                                                                                    if (getPickupsOnRouting().length > 0 || getDeliveriesOnRouting().length > 0) {
+                                                                                        setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                                            item.selected = (item?.name || "").toLowerCase() === "arrived";
+                                                                                            return item;
+                                                                                        }));
 
                                                                                         let arriveIndex = -1;
                                                                                         let departureIndex = -1;
 
-                                                                                        for (
-                                                                                            let i = 0;
-                                                                                            i <
-                                                                                            (selectedOrder?.events || [])
-                                                                                                .length;
-                                                                                            i++
-                                                                                        ) {
-                                                                                            let event =
-                                                                                                (selectedOrder?.events || [])[
-                                                                                                i
-                                                                                                ];
+                                                                                        for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
+                                                                                            let event = (selectedOrder?.events || [])[i];
 
-                                                                                            if (
-                                                                                                (
-                                                                                                    event.event_type?.name || ""
-                                                                                                ).toLowerCase() === "arrived"
-                                                                                            ) {
+                                                                                            if ((event.event_type?.name || "").toLowerCase() === "arrived") {
                                                                                                 arriveIndex = i;
                                                                                                 break;
                                                                                             }
                                                                                         }
 
-                                                                                        for (
-                                                                                            let i = 0;
-                                                                                            i <
-                                                                                            (selectedOrder?.events || [])
-                                                                                                .length;
-                                                                                            i++
-                                                                                        ) {
-                                                                                            let event =
-                                                                                                (selectedOrder?.events || [])[
-                                                                                                i
-                                                                                                ];
+                                                                                        for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
+                                                                                            let event = (selectedOrder?.events || [])[i];
 
-                                                                                            if (
-                                                                                                (
-                                                                                                    event.event_type?.name || ""
-                                                                                                ).toLowerCase() === "departed"
-                                                                                            ) {
+                                                                                            if ((event.event_type?.name || "").toLowerCase() === "departed") {
                                                                                                 departureIndex = i;
                                                                                                 break;
                                                                                             }
                                                                                         }
 
-                                                                                        if (
-                                                                                            (arriveIndex === -1 &&
-                                                                                                departureIndex === -1) ||
-                                                                                            (departureIndex > -1 &&
-                                                                                                departureIndex < arriveIndex)
-                                                                                        ) {
+                                                                                        if ((arriveIndex === -1 && departureIndex === -1) || (departureIndex > -1 && departureIndex < arriveIndex)) {
                                                                                             let items = [
-                                                                                                ...(
-                                                                                                    selectedOrder?.pickups || []
-                                                                                                ).filter((pu) => {
-                                                                                                    return (
-                                                                                                        selectedOrder?.events.find(
-                                                                                                            (el) =>
-                                                                                                                (
-                                                                                                                    el.event_type?.name ||
-                                                                                                                    ""
-                                                                                                                ).toLowerCase() ===
-                                                                                                                "arrived" &&
-                                                                                                                el.shipper_id ===
-                                                                                                                (pu.customer?.id || 0)
-                                                                                                        ) === undefined
-                                                                                                    );
+                                                                                                ...getPickupsOnRouting().filter((pu) => {
+                                                                                                    return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "arrived" && el.shipper_id === (pu.customer?.id || 0)) === undefined);
                                                                                                 }),
-                                                                                                ...(
-                                                                                                    selectedOrder?.deliveries ||
-                                                                                                    []
-                                                                                                ).filter((delivery) => {
-                                                                                                    return (
-                                                                                                        selectedOrder?.events.find(
-                                                                                                            (el) =>
-                                                                                                                (
-                                                                                                                    el.event_type?.name ||
-                                                                                                                    ""
-                                                                                                                ).toLowerCase() ===
-                                                                                                                "arrived" &&
-                                                                                                                el.consignee_id ===
-                                                                                                                (delivery?.id || 0)
-                                                                                                        ) === undefined
-                                                                                                    );
+                                                                                                ...getDeliveriesOnRouting().filter((delivery) => {
+                                                                                                    return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "arrived" && el.consignee_id === (delivery?.id || 0)) === undefined);
                                                                                                 }),
                                                                                             ];
 
                                                                                             if (items.length > 0) {
                                                                                                 if (items.length === 1) {
                                                                                                     setDispatchEvent(item);
-                                                                                                    setDispatchEventLocation(
-                                                                                                        items[0].customer.city +
-                                                                                                        ", " +
-                                                                                                        items[0].customer.state
-                                                                                                    );
-                                                                                                    setDispatchEventNotes(
-                                                                                                        "Arrived at " +
-                                                                                                        items[0].customer.code +
-                                                                                                        (items[0].customer
-                                                                                                            .code_number === 0
-                                                                                                            ? ""
-                                                                                                            : items[0].customer
-                                                                                                                .code_number) +
-                                                                                                        " - " +
-                                                                                                        items[0].customer.name
-                                                                                                    );
-                                                                                                    setSelectedOrderEvent(
-                                                                                                        items[0]
-                                                                                                    );
+                                                                                                    setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                                                    setDispatchEventNotes("Arrived at " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
+                                                                                                    setSelectedOrderEvent(items[0]);
 
                                                                                                     window.setTimeout(() => {
                                                                                                         setDispatchEventItems([]);
-                                                                                                        setDispatchEventSecondPageItems(
-                                                                                                            []
-                                                                                                        );
-                                                                                                        setShowDispatchEventSecondPageItems(
-                                                                                                            false
-                                                                                                        );
-                                                                                                        goToTabindex((74 + props.tabTimes).toString());
+                                                                                                        setDispatchEventSecondPageItems([]);
+                                                                                                        setShowDispatchEventSecondPageItems(false);
+                                                                                                        refEventDate.current.inputElement.focus();
                                                                                                     }, 0);
                                                                                                 } else {
                                                                                                     items = items.map((x, i) => {
@@ -20281,70 +19927,39 @@ const Dispatch = (props) => {
                                                                                                     });
                                                                                                 }
                                                                                             } else {
-                                                                                                window.alert(
-                                                                                                    "No shippers or consignees available!"
-                                                                                                );
+                                                                                                window.alert("No shippers or consignees available!");
                                                                                                 refDispatchEvents.current.focus();
                                                                                                 return;
                                                                                             }
 
                                                                                             window.setTimeout(() => {
-                                                                                                setDispatchEventSecondPageItems(
-                                                                                                    items
-                                                                                                );
-                                                                                                setShowDispatchEventSecondPageItems(
-                                                                                                    true
-                                                                                                );
+                                                                                                setDispatchEventSecondPageItems(items);
+                                                                                                setShowDispatchEventSecondPageItems(true);
                                                                                             }, 0);
                                                                                         } else {
-                                                                                            window.alert(
-                                                                                                "You must enter a 'departed' event for the last 'arrived' event first!"
-                                                                                            );
+                                                                                            window.alert("You must enter a 'departed' event for the last 'arrived' event first!");
                                                                                             refDispatchEvents.current.focus();
                                                                                             return;
                                                                                         }
                                                                                     } else {
-                                                                                        window.alert(
-                                                                                            "No shippers or consignees available!"
-                                                                                        );
+                                                                                        window.alert("No shippers or consignees available!");
                                                                                         refDispatchEvents.current.focus();
                                                                                         return;
                                                                                     }
-                                                                                } else if (
-                                                                                    (item?.name || "").toLowerCase() ===
-                                                                                    "departed"
-                                                                                ) {
-                                                                                    setDispatchEventItems(
-                                                                                        dispatchEventItems.map(
-                                                                                            (item, index) => {
-                                                                                                item.selected =
-                                                                                                    (
-                                                                                                        item?.name || ""
-                                                                                                    ).toLowerCase() === "arrived";
-                                                                                                return item;
-                                                                                            }
-                                                                                        )
-                                                                                    );
+                                                                                } else if ((item?.name || "").toLowerCase() === "departed") {
+                                                                                    setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                                        item.selected = (item?.name || "").toLowerCase() === "arrived";
+                                                                                        return item;
+                                                                                    }));
 
                                                                                     let arriveIndex = -1;
                                                                                     let departureIndex = -1;
                                                                                     let arrived_customer = {};
 
-                                                                                    for (
-                                                                                        let i = 0;
-                                                                                        i <
-                                                                                        (selectedOrder?.events || [])
-                                                                                            .length;
-                                                                                        i++
-                                                                                    ) {
-                                                                                        let event =
-                                                                                            (selectedOrder?.events || [])[i];
+                                                                                    for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
+                                                                                        let event = (selectedOrder?.events || [])[i];
 
-                                                                                        if (
-                                                                                            (
-                                                                                                event.event_type?.name || ""
-                                                                                            ).toLowerCase() === "arrived"
-                                                                                        ) {
+                                                                                        if ((event.event_type?.name || "").toLowerCase() === "arrived") {
                                                                                             arrived_customer = {
                                                                                                 ...event.arrived_customer,
                                                                                             };
@@ -20353,141 +19968,57 @@ const Dispatch = (props) => {
                                                                                         }
                                                                                     }
 
-                                                                                    for (
-                                                                                        let i = 0;
-                                                                                        i <
-                                                                                        (selectedOrder?.events || [])
-                                                                                            .length;
-                                                                                        i++
-                                                                                    ) {
-                                                                                        let event =
-                                                                                            (selectedOrder?.events || [])[i];
+                                                                                    for (let i = 0; i < (selectedOrder?.events || []).length; i++) {
+                                                                                        let event = (selectedOrder?.events || [])[i];
 
-                                                                                        if (
-                                                                                            (
-                                                                                                event.event_type?.name || ""
-                                                                                            ).toLowerCase() === "departed"
-                                                                                        ) {
+                                                                                        if ((event.event_type?.name || "").toLowerCase() === "departed") {
                                                                                             departureIndex = i;
                                                                                             break;
                                                                                         }
                                                                                     }
 
-                                                                                    if (
-                                                                                        (arriveIndex === -1 &&
-                                                                                            departureIndex === -1) ||
-                                                                                        (departureIndex > -1 &&
-                                                                                            departureIndex < arriveIndex)
-                                                                                    ) {
-                                                                                        window.alert(
-                                                                                            "You must enter an 'arrived' event first!"
-                                                                                        );
+                                                                                    if ((arriveIndex === -1 && departureIndex === -1) || (departureIndex > -1 && departureIndex < arriveIndex)) {
+                                                                                        window.alert("You must enter an 'arrived' event first!");
                                                                                         refDispatchEvents.current.focus();
                                                                                         return;
                                                                                     } else {
                                                                                         setDispatchEvent(item);
-                                                                                        setDispatchEventLocation(
-                                                                                            arrived_customer.city +
-                                                                                            ", " +
-                                                                                            arrived_customer.state
-                                                                                        );
-                                                                                        setDispatchEventNotes(
-                                                                                            "Departed at " +
-                                                                                            arrived_customer.code +
-                                                                                            (arrived_customer.code_number ===
-                                                                                                0
-                                                                                                ? ""
-                                                                                                : arrived_customer.code_number) +
-                                                                                            " - " +
-                                                                                            arrived_customer.name
-                                                                                        );
-                                                                                        setSelectedOrderEvent(
-                                                                                            arrived_customer
-                                                                                        );
+                                                                                        setDispatchEventLocation(arrived_customer.city + ", " + arrived_customer.state);
+                                                                                        setDispatchEventNotes("Departed at " + arrived_customer.code + (arrived_customer.code_number === 0 ? "" : arrived_customer.code_number) + " - " + arrived_customer.name);
+                                                                                        setSelectedOrderEvent(arrived_customer);
 
                                                                                         window.setTimeout(() => {
                                                                                             setDispatchEventItems([]);
-                                                                                            setDispatchEventSecondPageItems(
-                                                                                                []
-                                                                                            );
-                                                                                            setShowDispatchEventSecondPageItems(
-                                                                                                false
-                                                                                            );
-                                                                                            goToTabindex((74 + props.tabTimes).toString());
+                                                                                            setDispatchEventSecondPageItems([]);
+                                                                                            setShowDispatchEventSecondPageItems(false);
+                                                                                            refEventDate.current.inputElement.focus();
                                                                                         }, 0);
                                                                                     }
-                                                                                } else if (
-                                                                                    (item?.name || "").toLowerCase() ===
-                                                                                    "loaded"
-                                                                                ) {
-                                                                                    if (
-                                                                                        (selectedOrder?.pickups || [])
-                                                                                            .length > 0 ||
-                                                                                        (selectedOrder?.deliveries || [])
-                                                                                            .length > 0
-                                                                                    ) {
-                                                                                        setDispatchEventItems(
-                                                                                            dispatchEventItems.map(
-                                                                                                (item, index) => {
-                                                                                                    item.selected =
-                                                                                                        (
-                                                                                                            item?.name || ""
-                                                                                                        ).toLowerCase() ===
-                                                                                                        "loaded";
-                                                                                                    return item;
-                                                                                                }
-                                                                                            )
-                                                                                        );
+                                                                                } else if ((item?.name || "").toLowerCase() === "loaded") {
+                                                                                    if (getPickupsOnRouting().length > 0) {
+                                                                                        setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                                            item.selected = (item?.name || "").toLowerCase() === "loaded";
+                                                                                            return item;
+                                                                                        }));
 
                                                                                         let items = [
-                                                                                            ...(
-                                                                                                selectedOrder?.pickups || []
-                                                                                            ).filter((pu) => {
-                                                                                                return (
-                                                                                                    selectedOrder?.events.find(
-                                                                                                        (el) =>
-                                                                                                            (
-                                                                                                                el.event_type?.name ||
-                                                                                                                ""
-                                                                                                            ).toLowerCase() ===
-                                                                                                            "loaded" &&
-                                                                                                            el.shipper_id ===
-                                                                                                            (pu.customer?.id || 0)
-                                                                                                    ) === undefined
-                                                                                                );
+                                                                                            ...getPickupsOnRouting().filter((pu) => {
+                                                                                                return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "loaded" && el.shipper_id === (pu.customer?.id || 0)) === undefined);
                                                                                             }),
                                                                                         ];
 
                                                                                         if (items.length > 0) {
                                                                                             if (items.length === 1) {
                                                                                                 setDispatchEvent(item);
-                                                                                                setDispatchEventLocation(
-                                                                                                    items[0].customer.city +
-                                                                                                    ", " +
-                                                                                                    items[0].customer.state
-                                                                                                );
-                                                                                                setDispatchEventNotes(
-                                                                                                    "Loaded at Shipper " +
-                                                                                                    items[0].customer.code +
-                                                                                                    (items[0].customer
-                                                                                                        .code_number === 0
-                                                                                                        ? ""
-                                                                                                        : items[0].customer
-                                                                                                            .code_number) +
-                                                                                                    " - " +
-                                                                                                    items[0].customer.name
-                                                                                                );
+                                                                                                setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                                                setDispatchEventNotes("Loaded at Shipper " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                                                 setSelectedOrderEvent(items[0]);
 
                                                                                                 window.setTimeout(() => {
                                                                                                     setDispatchEventItems([]);
-                                                                                                    setDispatchEventSecondPageItems(
-                                                                                                        []
-                                                                                                    );
-                                                                                                    setShowDispatchEventSecondPageItems(
-                                                                                                        false
-                                                                                                    );
-                                                                                                    goToTabindex((74 + props.tabTimes).toString());
+                                                                                                    setDispatchEventSecondPageItems([]);
+                                                                                                    setShowDispatchEventSecondPageItems(false);
+                                                                                                    refEventDate.current.inputElement.focus();
                                                                                                 }, 0);
                                                                                             } else {
                                                                                                 items = items.map((x, i) => {
@@ -20496,99 +20027,45 @@ const Dispatch = (props) => {
                                                                                                 });
                                                                                             }
                                                                                         } else {
-                                                                                            window.alert(
-                                                                                                "No shippers available!"
-                                                                                            );
+                                                                                            window.alert("No shippers available!");
                                                                                             refDispatchEvents.current.focus();
                                                                                             return;
                                                                                         }
 
                                                                                         window.setTimeout(() => {
-                                                                                            setDispatchEventSecondPageItems(
-                                                                                                items
-                                                                                            );
-                                                                                            setShowDispatchEventSecondPageItems(
-                                                                                                true
-                                                                                            );
+                                                                                            setDispatchEventSecondPageItems(items);
+                                                                                            setShowDispatchEventSecondPageItems(true);
                                                                                         }, 0);
                                                                                     } else {
-                                                                                        window.alert(
-                                                                                            "No shippers available!"
-                                                                                        );
+                                                                                        window.alert("No shippers available!");
                                                                                         refDispatchEvents.current.focus();
                                                                                         return;
                                                                                     }
-                                                                                } else if (
-                                                                                    (item?.name || "").toLowerCase() ===
-                                                                                    "delivered"
-                                                                                ) {
-                                                                                    if (
-                                                                                        (selectedOrder?.deliveries || [])
-                                                                                            .length > 0
-                                                                                    ) {
-                                                                                        setDispatchEventItems(
-                                                                                            dispatchEventItems.map(
-                                                                                                (item, index) => {
-                                                                                                    item.selected =
-                                                                                                        (
-                                                                                                            item?.name || ""
-                                                                                                        ).toLowerCase() ===
-                                                                                                        "delivered";
-                                                                                                    return item;
-                                                                                                }
-                                                                                            )
-                                                                                        );
+                                                                                } else if ((item?.name || "").toLowerCase() === "delivered") {
+                                                                                    if (getDeliveriesOnRouting().length > 0) {
+                                                                                        setDispatchEventItems(dispatchEventItems.map((item, index) => {
+                                                                                            item.selected = (item?.name || "").toLowerCase() === "delivered";
+                                                                                            return item;
+                                                                                        }));
 
                                                                                         let items = [
-                                                                                            ...(
-                                                                                                selectedOrder?.deliveries || []
-                                                                                            ).filter((delivery) => {
-                                                                                                return (
-                                                                                                    selectedOrder?.events.find(
-                                                                                                        (el) =>
-                                                                                                            (
-                                                                                                                el.event_type?.name ||
-                                                                                                                ""
-                                                                                                            ).toLowerCase() ===
-                                                                                                            "delivered" &&
-                                                                                                            el.consignee_id ===
-                                                                                                            (delivery.customer
-                                                                                                                ?.id || 0)
-                                                                                                    ) === undefined
-                                                                                                );
+                                                                                            ...getDeliveriesOnRouting().filter((delivery) => {
+                                                                                                return (selectedOrder?.events.find((el) => (el.event_type?.name || "").toLowerCase() === "delivered" && el.consignee_id === (delivery.customer?.id || 0)) === undefined);
                                                                                             }),
                                                                                         ];
 
                                                                                         if (items.length > 0) {
                                                                                             if (items.length === 1) {
                                                                                                 setDispatchEvent(item);
-                                                                                                setDispatchEventLocation(
-                                                                                                    items[0].customer.city +
-                                                                                                    ", " +
-                                                                                                    items[0].customer.state
-                                                                                                );
-                                                                                                setDispatchEventNotes(
-                                                                                                    "Delivered at Consignee " +
-                                                                                                    items[0].customer.code +
-                                                                                                    (items[0].customer
-                                                                                                        .code_number === 0
-                                                                                                        ? ""
-                                                                                                        : items[0].customer
-                                                                                                            .code_number) +
-                                                                                                    " - " +
-                                                                                                    items[0].customer.name
-                                                                                                );
+                                                                                                setDispatchEventLocation(items[0].customer.city + ", " + items[0].customer.state);
+                                                                                                setDispatchEventNotes("Delivered at Consignee " + items[0].customer.code + (items[0].customer.code_number === 0 ? "" : items[0].customer.code_number) + " - " + items[0].customer.name);
                                                                                                 setSelectedOrderEvent(items[0]);
 
                                                                                                 window.setTimeout(() => {
                                                                                                     setDispatchEventItems([]);
-                                                                                                    setDispatchEventSecondPageItems(
-                                                                                                        []
-                                                                                                    );
-                                                                                                    setShowDispatchEventSecondPageItems(
-                                                                                                        false
-                                                                                                    );
-                                                                                                    goToTabindex((74 + props.tabTimes).toString());
+                                                                                                    setDispatchEventSecondPageItems([]);
+                                                                                                    setShowDispatchEventSecondPageItems(false);
+                                                                                                    refEventDate.current.inputElement.focus();
                                                                                                 }, 0);
                                                                                             } else {
                                                                                                 items = items.map((x, i) => {
@@ -20597,25 +20074,17 @@ const Dispatch = (props) => {
                                                                                                 });
                                                                                             }
                                                                                         } else {
-                                                                                            window.alert(
-                                                                                                "No consignees available!"
-                                                                                            );
+                                                                                            window.alert("No consignees available!");
                                                                                             refDispatchEvents.current.focus();
                                                                                             return;
                                                                                         }
 
                                                                                         window.setTimeout(() => {
-                                                                                            setDispatchEventSecondPageItems(
-                                                                                                items
-                                                                                            );
-                                                                                            setShowDispatchEventSecondPageItems(
-                                                                                                true
-                                                                                            );
+                                                                                            setDispatchEventSecondPageItems(items);
+                                                                                            setShowDispatchEventSecondPageItems(true);
                                                                                         }, 0);
                                                                                     } else {
-                                                                                        window.alert(
-                                                                                            "No consignees available!"
-                                                                                        );
+                                                                                        window.alert("No consignees available!");
                                                                                         refDispatchEvents.current.focus();
                                                                                         return;
                                                                                     }
@@ -20623,15 +20092,11 @@ const Dispatch = (props) => {
                                                                                     setDispatchEvent(item);
                                                                                     setDispatchEventLocation("");
                                                                                     setDispatchEventNotes("");
-                                                                                    setDispatchEventItems([]);
-                                                                                    goToTabindex((72 + props.tabTimes).toString());
+                                                                                    setDispatchEventItems([]);                                                                                    
+                                                                                    refDispatchEventLocation.current.focus();
                                                                                 }
                                                                             }}
-                                                                            ref={(ref) =>
-                                                                                refDispatchEventPopupItems.current.push(
-                                                                                    ref
-                                                                                )
-                                                                            }
+                                                                            ref={(ref) => refDispatchEventPopupItems.current.push(ref)}
                                                                         >
                                                                             {searchValue === undefined ? (
                                                                                 item.name
@@ -20669,106 +20134,45 @@ const Dispatch = (props) => {
                                                                                 className={mochiItemClasses}
                                                                                 id={item.id}
                                                                                 onClick={() => {
-                                                                                    let eventItem =
-                                                                                        dispatchEventItems.find(
-                                                                                            (el) => el.selected
-                                                                                        );
+                                                                                    let eventItem = dispatchEventItems.find((el) => el.selected);
 
                                                                                     setSelectedOrderEvent(item);
 
                                                                                     setDispatchEvent(eventItem);
-                                                                                    setDispatchEventLocation(
-                                                                                        item.customer.city +
-                                                                                        ", " +
-                                                                                        item.customer.state
-                                                                                    );
+                                                                                    setDispatchEventLocation(item.customer.city + ", " + item.customer.state);
 
-                                                                                    if (
-                                                                                        (
-                                                                                            eventItem?.name || ""
-                                                                                        ).toLowerCase() === "arrived"
-                                                                                    ) {
-                                                                                        setDispatchEventNotes(
-                                                                                            "Arrived at " +
-                                                                                            item.customer.code +
-                                                                                            (item.customer.code_number === 0
-                                                                                                ? ""
-                                                                                                : item.customer.code_number) +
-                                                                                            " - " +
-                                                                                            item.customer.name
-                                                                                        );
+                                                                                    if ((eventItem?.name || "").toLowerCase() === "arrived") {
+                                                                                        setDispatchEventNotes("Arrived at " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                                                     }
 
-                                                                                    if (
-                                                                                        (
-                                                                                            eventItem?.name || ""
-                                                                                        ).toLowerCase() === "loaded"
-                                                                                    ) {
-                                                                                        setDispatchEventNotes(
-                                                                                            "Loaded at Shipper " +
-                                                                                            item.customer.code +
-                                                                                            (item.customer.code_number === 0
-                                                                                                ? ""
-                                                                                                : item.customer.code_number) +
-                                                                                            " - " +
-                                                                                            item.customer.name
-                                                                                        );
+                                                                                    if ((eventItem?.name || "").toLowerCase() === "loaded") {
+                                                                                        setDispatchEventNotes("Loaded at Shipper " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                                                     }
 
-                                                                                    if (
-                                                                                        (
-                                                                                            eventItem?.name || ""
-                                                                                        ).toLowerCase() === "delivered"
-                                                                                    ) {
-                                                                                        setDispatchEventNotes(
-                                                                                            "Delivered at Consignee " +
-                                                                                            item.customer.code +
-                                                                                            (item.customer.code_number === 0
-                                                                                                ? ""
-                                                                                                : item.customer.code_number) +
-                                                                                            " - " +
-                                                                                            item.customer.name
-                                                                                        );
+                                                                                    if ((eventItem?.name || "").toLowerCase() === "delivered") {
+                                                                                        setDispatchEventNotes("Delivered at Consignee " + item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.name);
                                                                                     }
 
                                                                                     window.setTimeout(() => {
-                                                                                        setShowDispatchEventSecondPageItems(
-                                                                                            false
-                                                                                        );
+                                                                                        setShowDispatchEventSecondPageItems(false);
                                                                                         setDispatchEventItems([]);
-                                                                                        goToTabindex((74 + props.tabTimes).toString());
+                                                                                        refEventDate.current.inputElement.focus();
                                                                                     }, 0);
                                                                                 }}
                                                                                 onMouseOver={() => {
-                                                                                    setDispatchEventSecondPageItems(
-                                                                                        dispatchEventSecondPageItems.map(
-                                                                                            (i, index) => {
-                                                                                                i.selected = i.id === item.id;
-                                                                                                return i;
-                                                                                            }
-                                                                                        )
-                                                                                    );
+                                                                                    setDispatchEventSecondPageItems(dispatchEventSecondPageItems.map((i, index) => {
+                                                                                        i.selected = i.id === item.id;
+                                                                                        return i;
+                                                                                    }));
                                                                                 }}
-                                                                                ref={(ref) =>
-                                                                                    refDispatchEventSecondPagePopupItems.current.push(
-                                                                                        ref
-                                                                                    )
-                                                                                }
+                                                                                ref={(ref) => refDispatchEventSecondPagePopupItems.current.push(ref)}
                                                                             >
                                                                                 <Highlighter
                                                                                     highlightClassName="mochi-item-highlight-text"
                                                                                     searchWords={[]}
                                                                                     autoEscape={true}
                                                                                     textToHighlight={
-                                                                                        item.customer.code +
-                                                                                        (item.customer.code_number === 0
-                                                                                            ? ""
-                                                                                            : item.customer.code_number) +
-                                                                                        " - " +
-                                                                                        item.customer.city +
-                                                                                        ", " +
-                                                                                        item.customer.state
-                                                                                    }
+                                                                                        item.customer.code + (item.customer.code_number === 0 ? "" : item.customer.code_number) + " - " + item.customer.city + ", " + item.customer.state}
                                                                                 />
                                                                                 {item.selected && (
                                                                                     <FontAwesomeIcon
@@ -20794,6 +20198,7 @@ const Dispatch = (props) => {
                     <div className="input-box-container" style={{ width: "10rem" }}>
                         <input
                             tabIndex={72 + props.tabTimes}
+                            ref={refDispatchEventLocation}
                             type="text"
                             placeholder="Event Location"
                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
@@ -21071,10 +20476,10 @@ const Dispatch = (props) => {
                                         await setDispatchEventTime(formatted);
 
                                         if ((dispatchEvent?.name || "") === "") {
-                                            goToTabindex((1 + props.tabTimes).toString());
+                                            refOrderNumber.current.focus();
                                         } else {
                                             if ((selectedOrder?.id || 0) === 0) {
-                                                goToTabindex((1 + props.tabTimes).toString());
+                                                refOrderNumber.current.focus();
                                                 return;
                                             }
 
@@ -21392,13 +20797,13 @@ const Dispatch = (props) => {
                                         panelName={`${props.panelName}-routing-map`}
                                         componentId={moment().format('x')}
                                         origin={props.origin}
-                                        openPanel={props.openPanel}
-                                        closePanel={props.closePanel}
+
+
                                         selectedOrder={selectedOrder}
                                     />
                                 }
 
-                                props.openPanel(panel, props.origin);
+                                openPanel(panel, props.origin);
                             }}
                         >
                             {mileageLoaderVisible ? (
@@ -22279,8 +21684,8 @@ const Dispatch = (props) => {
                                     panelName={`${props.panelName}-change-carrier`}
                                     tabTimes={props.tabTimes}
                                     componentId={moment().format("x")}
-                                    openPanel={props.openPanel}
-                                    closePanel={props.closePanel}
+
+
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingChangeCarrier(false);
@@ -22391,14 +21796,23 @@ const mapStateToProps = (state) => {
         scale: state.systemReducers.scale,
         user: state.systemReducers.user,
         serverUrl: state.systemReducers.serverUrl,
-        companyOpenedPanels: state.companyReducers.companyOpenedPanels,
-        adminOpenedPanels: state.adminReducers.adminOpenedPanels,
-        dispatchOpenedPanels: state.dispatchReducers.dispatchOpenedPanels,
-        customerOpenedPanels: state.customerReducers.customerOpenedPanels,
-        adminCustomerOpenedPanels: state.customerReducers.adminCustomerOpenedPanels,
-        adminCarrierOpenedPanels: state.carrierReducers.adminCarrierOpenedPanels,
-        loadBoardOpenedPanels: state.loadBoardReducers.loadBoardOpenedPanels,
-        invoiceOpenedPanels: state.invoiceReducers.invoiceOpenedPanels,
+
+        adminHomePanels: state.adminReducers.adminHomePanels,
+        companyHomePanels: state.companyReducers.companyHomePanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+        adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+        companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        adminReportPanels: state.reportReducers.adminReportPanels,
+        companyReportPanels: state.reportReducers.companyReportPanels,
 
         selectedOrder: state.dispatchReducers.selected_order,
         selectedCustomer: state.customerReducers.selectedCustomer,
@@ -22411,14 +21825,6 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCustomerOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCustomerOpenedPanels,
-    setAdminCarrierOpenedPanels,
     setSelectedOrder,
     setSelectedCustomer,
     setSelectedContact,
@@ -22426,4 +21832,20 @@ export default connect(mapStateToProps, {
     setSelectedCarrierContact,
     setSelectedCarrierDriver,
     setSelectedCarrierInsurance,
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels
 })(Dispatch);

@@ -1148,37 +1148,31 @@ export default class ToPrint extends Component {
                                                 <div style={{
                                                     ...this.styleFlexRow
                                                 }}>
-                                                    <span style={{ ...this.styleFieldDataBold }}>{((driver.first_name || '') + ' ' + (driver.last_name || '')).toUpperCase()}</span>
+                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver?.name || '').toUpperCase()}</span>
                                                 </div>
 
                                                 <div style={{
                                                     ...this.styleFlexRow
                                                 }}>
-                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver.phone || '').toUpperCase()}</span>
+                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver?.contact_phone || '').toUpperCase()}</span>
                                                 </div>
                                                 
                                                 <div style={{
                                                     ...this.styleFlexRow
                                                 }}>
-                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver.email || '').toLowerCase()}</span>
+                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver?.email || '').toLowerCase()}</span>
+                                                </div>                                                
+
+                                                <div style={{
+                                                    ...this.styleFlexRow
+                                                }}>
+                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver?.tractor?.number || '').toUpperCase()}</span>
                                                 </div>
 
                                                 <div style={{
                                                     ...this.styleFlexRow
                                                 }}>
-                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver.equipment?.name || '').toUpperCase()}</span>
-                                                </div>
-
-                                                <div style={{
-                                                    ...this.styleFlexRow
-                                                }}>
-                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver.truck || '').toUpperCase()}</span>
-                                                </div>
-
-                                                <div style={{
-                                                    ...this.styleFlexRow
-                                                }}>
-                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver.trailer || '').toUpperCase()}</span>
+                                                    <span style={{ ...this.styleFieldDataBold }}>{(driver?.trailer?.number || '').toUpperCase()}</span>
                                                 </div>
                                             </div>
                                         )

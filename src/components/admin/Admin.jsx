@@ -26,10 +26,12 @@ import {
     setReportsScreenFocused,
     setInvoiceScreenFocused,
     setSetupCompanyScreenFocused,
+    setAdminHomePanels
 } from '../../actions/adminActions';
 
 import {
-    setCompanySetupOpenedPanels
+    setCompanySetupOpenedPanels,
+    setAdminCompanySetupPanels,
 } from './../../actions/companySetupActions';
 
 import {
@@ -101,6 +103,8 @@ import {
     setCustomerSelectedConsigneeCompanyInfo,
     setCustomerConsigneeCompanySearch,
     setCustomerSelectedConsigneeCompanyContact,
+
+    setAdminCustomerPanels
 } from '../../actions/customersActions';
 
 import {
@@ -159,8 +163,20 @@ import {
     setSelectedCustomerCarrierInfoDocument,
     setCustomerCarrierInfoDocumentTags as setSelectedCustomerCarrierInfoDocumentTags,
     setSelectedCustomerCarrierInfoDocumentNote,
-
+    setAdminCarrierPanels
 } from '../../actions/carriersActions';
+
+import {
+    setAdminInvoicePanels
+} from '../../actions/invoiceActions';
+
+import {
+    setAdminReportPanels
+} from '../../actions/reportsActions';
+
+import {
+    setAdminDispatchPanels
+} from '../../actions/dispatchActions';
 
 import { Dispatch, Customers, Carriers, Reports, Invoice } from './../company';
 import { AdminHome, CompanySetup } from './';
@@ -302,10 +318,10 @@ function Admin(props) {
         props.setScale(props.scale === 1 ? 0.7 : 1);
     }
 
-    const adminHomePanelTransition = useTransition(adminHomePanels, {
+    const adminHomePanelTransition = useTransition(props.adminHomePanels, {
         from: panel => {
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(-100%)`,
             }
         },
@@ -325,44 +341,16 @@ function Admin(props) {
 
             }
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
     })
 
-    const dispatchPanelTransition = useTransition(dispatchPanels, {
+    const dispatchPanelTransition = useTransition(props.adminDispatchPanels, {
         from: panel => {
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (dispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
-            }
-        },
-        enter: panel => {
-            return {
-                display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
-            }
-        },
-        leave: panel => {
-            return {
-                right: `calc(-100%)`,
-            }
-        },
-        update: panel => {
-            if (panel === undefined) {                
-            }
-            return {
-                width: `calc(${baseWidth}% - ${panelGap * (dispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
-            }
-        },
-    })
-
-    const customerPanelTransition = useTransition(customerPanels, {
-        from: panel => {
-            return {
-                width: `calc(${baseWidth}% - ${panelGap * (customerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminDispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(-100%)`,
             }
         },
@@ -381,16 +369,16 @@ function Admin(props) {
             if (panel === undefined) {
             }
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (customerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminDispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
     })
 
-    const carrierPanelTransition = useTransition(carrierPanels, {
+    const customerPanelTransition = useTransition(props.adminCustomerPanels, {
         from: panel => {
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminCustomerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(-100%)`,
             }
         },
@@ -407,19 +395,18 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                
             }
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (carrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminCustomerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
     })
 
-    const reportsPanelTransition = useTransition(reportsPanels, {
+    const carrierPanelTransition = useTransition(props.adminCarrierPanels, {
         from: panel => {
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (reportsPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminCarrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(-100%)`,
             }
         },
@@ -436,19 +423,19 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                
+
             }
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (reportsPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminCarrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
     })
 
-    const invoicePanelTransition = useTransition(invoicePanels, {
+    const reportsPanelTransition = useTransition(props.adminReportPanels, {
         from: panel => {
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (invoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminReportPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(-100%)`,
             }
         },
@@ -465,19 +452,19 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                
+
             }
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (invoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminReportPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
     })
 
-    const companySetupPanelTransition = useTransition(companySetupPanels, {
+    const invoicePanelTransition = useTransition(props.adminInvoicePanels, {
         from: panel => {
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (companySetupPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminInvoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(-100%)`,
             }
         },
@@ -494,10 +481,39 @@ function Admin(props) {
         },
         update: panel => {
             if (panel === undefined) {
-                
+
             }
             return {
-                width: `calc(${baseWidth}% - ${panelGap * (companySetupPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminInvoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
+
+    const companySetupPanelTransition = useTransition(props.adminCompanySetupPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * ((props.adminCompanySetupPanels || []).findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (props.adminCompanySetupPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
@@ -513,65 +529,75 @@ function Admin(props) {
 
     const openPanel = (panel, origin) => {
         if (origin === 'admin-home') {
-            if (adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
-                setAdminHomePanels(adminHomePanels => [...adminHomePanels, panel]);
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
             }
         }
 
-        if (origin === 'dispatch') {
-            if (dispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
-                setDispatchPanels(dispatchPanels => [...dispatchPanels, panel]);
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
             }
         }
 
-        if (origin === 'customer') {
-            if (customerPanels.find(p => p.panelName === panel.panelName) === undefined) {
-                setCustomerPanels(customerPanels => [...customerPanels, panel]);
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
             }
         }
 
-        if (origin === 'carrier') {
-            if (carrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
-                setCarrierPanels(carrierPanels => [...carrierPanels, panel]);
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
             }
         }
 
-        if (origin === 'company') {
-            if (companySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
-                setCompanySetupPanels(companySetupPanels => [...companySetupPanels, panel]);
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
             }
         }
 
-        if (origin === 'invoice') {
-            if (invoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
-                setInvoicePanels(invoicePanels => [...invoicePanels, panel]);
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
             }
         }
     }
 
     const closePanel = (panelName, origin) => {
         if (origin === 'admin-home') {
-            setAdminHomePanels(adminHomePanels.filter(panel => panel.panelName !== panelName));
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
         }
 
-        if (origin === 'dispatch') {
-            setDispatchPanels(dispatchPanels.filter(panel => panel.panelName !== panelName));
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
         }
 
-        if (origin === 'customer') {
-            setCustomerPanels(customerPanels.filter(panel => panel.panelName !== panelName));
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
         }
 
-        if (origin === 'carrier') {
-            setCarrierPanels(carrierPanels.filter(panel => panel.panelName !== panelName));
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
         }
 
-        if (origin === 'company') {
-            setCompanySetupPanels(companySetupPanels.filter(panel => panel.panelName !== panelName));
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
         }
 
-        if (origin === 'invoice') {
-            setInvoicePanels(invoicePanels.filter(panel => panel.panelName !== panelName));
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
         }
     }
 
@@ -802,7 +828,7 @@ function Admin(props) {
                         }}>
                             {
                                 carrierPanelTransition((style, panel, item, index) => {
-                                    const origin = 'carrier';
+                                    const origin = 'admin-carrier';
 
                                     return (
                                         <Draggable
@@ -859,7 +885,7 @@ function Admin(props) {
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
                                 isAdmin={true}
-                                origin='carrier'
+                                origin='admin-carrier'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />
@@ -875,7 +901,7 @@ function Admin(props) {
                         }}>
                             {
                                 companySetupPanelTransition((style, panel, item, index) => {
-                                    const origin = 'company';
+                                    const origin = 'admin-company-setup';
 
                                     return (
                                         <Draggable
@@ -932,9 +958,9 @@ function Admin(props) {
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
                                 isAdmin={true}
-                                origin='company'
+                                origin='admin-company-setup'
                                 openPanel={openPanel}
-                                closePanel={(panelName, origin) => {                                    
+                                closePanel={(panelName, origin) => {
                                     closePanel(panelName, origin);
                                 }}
                             />
@@ -950,7 +976,7 @@ function Admin(props) {
                         }}>
                             {
                                 customerPanelTransition((style, panel, item, index) => {
-                                    const origin = 'customer';
+                                    const origin = 'admin-customer';
 
                                     return (
                                         <Draggable
@@ -1007,7 +1033,7 @@ function Admin(props) {
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
                                 isAdmin={true}
-                                origin='customer'
+                                origin='admin-customer'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />
@@ -1025,7 +1051,7 @@ function Admin(props) {
                         }}>
                             {
                                 dispatchPanelTransition((style, panel, item, index) => {
-                                    const origin = 'dispatch';
+                                    const origin = 'admin-dispatch';
 
                                     return (
                                         <Draggable
@@ -1082,7 +1108,7 @@ function Admin(props) {
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
                                 isAdmin={true}
-                                origin='dispatch'
+                                origin='admin-dispatch'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />
@@ -1098,7 +1124,7 @@ function Admin(props) {
                         }}>
                             {
                                 invoicePanelTransition((style, panel, item, index) => {
-                                    const origin = 'invoice';
+                                    const origin = 'admin-invoice';
 
                                     return (
                                         <Draggable
@@ -1163,7 +1189,7 @@ function Admin(props) {
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
                                 isAdmin={true}
-                                origin='invoice'
+                                origin='admin-invoice'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />
@@ -1179,7 +1205,7 @@ function Admin(props) {
                         }}>
                             {
                                 reportsPanelTransition((style, panel, item, index) => {
-                                    const origin = 'reports';
+                                    const origin = 'admin-report';
 
                                     return (
                                         <Draggable
@@ -1244,7 +1270,7 @@ function Admin(props) {
                                 componentId={moment().format('x')}
                                 isOnPanel={false}
                                 isAdmin={false}
-                                origin='reports'
+                                origin='admin-report'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
                             />
@@ -1320,6 +1346,14 @@ const mapStateToProps = state => {
         selectedFactoringCompany: state.carrierReducers.adminSelectedFactoringCompany,
         selectedFactoringCompanyContact: state.carrierReducers.adminSelectedFactoringCompanyContact,
         equipmentInformation: state.carrierReducers.adminEquipmentInformation,
+
+        adminHomePanels: state.adminReducers.adminHomePanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        adminReportPanels: state.reportReducers.adminReportPanels
     }
 }
 
@@ -1414,4 +1448,12 @@ export default connect(mapStateToProps, {
     setSelectedCustomerCarrierInfoDocument,
     setSelectedCustomerCarrierInfoDocumentTags,
     setSelectedCustomerCarrierInfoDocumentNote,
+
+    setAdminHomePanels,
+    setAdminCarrierPanels,
+    setAdminCompanySetupPanels,
+    setAdminCustomerPanels,
+    setAdminDispatchPanels,
+    setAdminInvoicePanels,
+    setAdminReportPanels
 })(Admin)

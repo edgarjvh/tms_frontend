@@ -244,12 +244,7 @@ export const setEquipmentInformation = info => {
 
 // ================================= ADMIN ====================================
 
-export const setAdminCarrierPanels = panels => {
-    return {
-        type: carriersConstants.SET_ADMIN_CARRIER_PANELS,
-        payload: panels
-    }
-}
+
 export const setAdminCarriers = carriers => {
     return {
         type: carriersConstants.SET_ADMIN_CARRIERS,
@@ -1458,6 +1453,18 @@ export const setCarrierOpenedPanels = panels => {
 export const setAdminCarrierOpenedPanels = panels => {
     return {
         type: carriersConstants.SET_ADMIN_CARRIER_OPENED_PANELS,
+        payload: panels
+    }
+}
+export const setAdminCarrierPanels = panels => {
+    return {
+        type: carriersConstants.SET_ADMIN_CARRIER_PANELS,
+        payload: panels
+    }
+}
+export const setCompanyCarrierPanels = panels => {
+    return {
+        type: carriersConstants.SET_COMPANY_CARRIER_PANELS,
         payload: panels
     }
 }

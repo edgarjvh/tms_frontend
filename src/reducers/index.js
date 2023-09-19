@@ -7,3 +7,4 @@ export * from './invoiceReducers';
 export * from './dispatchReducers';
 export * from './loadBoardReducers';
 export * from './companySetupReducers';
+export * from './reportReducers';

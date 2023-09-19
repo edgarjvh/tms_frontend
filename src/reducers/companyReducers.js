@@ -19,6 +19,7 @@ export const companyReducers = (state = {
     loadBoardScreenFocused: false,
     invoiceScreenFocused: false,
     companyOpenedPanels: [],
+    companyHomePanels: []
 }, action) => {
     switch (action.type) {
         case companyConstants.SET_PAGES:
@@ -123,6 +124,12 @@ export const companyReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 loadBoardScreenFocused: action.payload ? false : state.loadBoardScreenFocused,
                 loginScreenFocused: action.payload ? false : state.loginScreenFocused,
+            }
+            break;
+        case companyConstants.SET_COMPANY_HOME_PANELS:
+            state = {
+                ...state,
+                companyHomePanels: action.payload
             }
             break;
         default:

@@ -24,6 +24,9 @@ export const invoiceReducers = (state = {
     selectedOrderInvoiceCarrierDocumentNote: {},
     selectedOrderInvoiceInternalNote: {},
     selectedOrderInvoiceBillingNote: {},
+
+    adminInvoicePanels: [],
+    companyInvoicePanels: []
 }, action) => {
     switch (action.type) {
         case invoiceConstants.SET_SELECTED_DOCUMENT:
@@ -190,6 +193,19 @@ export const invoiceReducers = (state = {
                     }
                     return p;
                 })
+            }
+            break;
+        case invoiceConstants.SET_ADMIN_INVOICE_PANELS:
+            state = {
+                ...state,
+                adminInvoicePanels: action.payload
+            }
+            break;
+            
+        case invoiceConstants.SET_COMPANY_INVOICE_PANELS:
+            state = {
+                ...state,
+                companyInvoicePanels: action.payload
             }
             break;
         default:

@@ -29,13 +29,23 @@ import moment from 'moment';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import ToPrint from './ToPrint.jsx';
 import {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCarrierOpenedPanels,
-    setCompanySetupOpenedPanels,
+    setAdminHomePanels,
+setCompanyHomePanels,
+setAdminCarrierPanels,
+setCompanyCarrierPanels,
+setAdminCompanySetupPanels,
+setCompanyCompanySetupPanels,
+setAdminCustomerPanels,
+setCompanyCustomerPanels,
+setAdminDispatchPanels,
+setCompanyDispatchPanels,
+setAdminInvoicePanels,
+setCompanyInvoicePanels,
+setAdminLoadBoardPanels,
+setCompanyLoadBoardPanels,
+setAdminReportPanels,
+setCompanyReportPanels,
+
     setSelectedCompany,
     setSelectedCompanyDriver as setSelectedDriver
 } from './../../../../actions';
@@ -47,6 +57,11 @@ import {
     Modal as AgentModal,
     CustomerSearch, ContactSearch, RevenueInformation, OrderHistory
 } from './../../../company/panels';
+
+import { MainForm } from './../../../company/forms';
+
+import { CompanyDrivers } from './../../panels';
+
 import { Dispatch } from "../../../company";
 import { useReactToPrint } from "react-to-print";
 
@@ -176,6 +191,7 @@ const Agents = (props) => {
     const [isSavingDriver, setIsSavingDriver] = useState(false);
     const refDriverCode = useRef();
     const refDriverName = useRef();
+    const refDriverEmail = useRef();
 
     const [showAgentDriverEmailCopyBtn, setShowAgentDriverEmailCopyBtn] = useState(false);
     const refAgentDriverEmail = useRef();
@@ -754,8 +770,8 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-agent-search`}
                 origin={props.origin}
                 suborigin='agent'
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
                 customerSearch={agentSearch}
 
@@ -776,10 +792,10 @@ const Agents = (props) => {
                             });
                         }
                     }).then(response => {
-                        props.closePanel(`${props.panelName}-agent-search`, props.origin);
+                        closePanel(`${props.panelName}-agent-search`, props.origin);
                         refAgentName.current.focus();
                     }).catch(e => {
-                        props.closePanel(`${props.panelName}-agent-search`, props.origin);
+                        closePanel(`${props.panelName}-agent-search`, props.origin);
                         refAgentCode.current.focus();
                     })
 
@@ -787,7 +803,7 @@ const Agents = (props) => {
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const handleContactSearch = () => {
@@ -839,8 +855,8 @@ const Agents = (props) => {
                 owner='agent'
                 origin={props.origin}
                 suborigin='agent'
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
                 contactSearch={{ search: filters }}
 
@@ -856,17 +872,17 @@ const Agents = (props) => {
                             reject('no contact');
                         }
                     }).then(response => {
-                        props.closePanel(`${props.panelName}-contact-search`, props.origin);
+                        closePanel(`${props.panelName}-contact-search`, props.origin);
                         refAgentName.current.focus();
                     }).catch(e => {
-                        props.closePanel(`${props.panelName}-contact-search`, props.origin);
+                        closePanel(`${props.panelName}-contact-search`, props.origin);
                         refAgentCode.current.focus();
                     })
                 }}
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const remitToAddressBtn = () => {
@@ -1207,15 +1223,15 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-revenue-information`}
                 origin={props.origin}
                 suborigin={'agent'}
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedAgent={selectedAgent}
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const orderHistoryBtnClick = () => {
@@ -1227,15 +1243,15 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-order-history`}
                 origin={props.origin}
                 suborigin={'agent'}
-                openPanel={props.openPanel}
-                closePanel={props.closePanel}
+                
+                
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedAgent={selectedAgent}
             />
         }
 
-        props.openPanel(panel, props.origin);
+        openPanel(panel, props.origin);
     }
 
     const documentsBtnClick = () => {
@@ -1248,8 +1264,8 @@ const Agents = (props) => {
                     panelName={`${props.panelName}-documents`}
                     origin={props.origin}
                     suborigin={'company-agent'}
-                    openPanel={props.openPanel}
-                    closePanel={props.closePanel}
+                    
+                    
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedAgent }}
                     isAdmin={props.isAdmin}
@@ -1267,7 +1283,7 @@ const Agents = (props) => {
                 />
             }
 
-            props.openPanel(panel, props.origin);
+            openPanel(panel, props.origin);
         } else {
             window.alert('You must select a agent first!');
         }
@@ -1275,53 +1291,75 @@ const Agents = (props) => {
 
     useEffect(() => {
         if (isSavingDriver) {
+
             if ((props.user?.is_admin || 0) === 0) {
                 if ((selectedDriver?.id || 0) > 0) {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 0) {
                         setIsSavingDriver(false);
                         return;
                     }
                 } else {
-                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 0) {
+                    if (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 0) {
                         setIsSavingDriver(false);
                         return;
                     }
                 }
             }
 
-            if ((selectedAgent?.id || 0) > 0) {
-                let driver = { ...selectedDriver, agent_id: selectedAgent.id };
+            if ((selectedAgent?.id || 0) === 0) {
+                setIsSavingDriver(false);
+                refAddedDate.current.inputElement.focus();
+                return;
+            }
 
-                console.log(driver);
+            let driver = {
+                ...selectedDriver,
+                mailing_address: null,
+                contacts: [],
+                license: null,
+                tractor_info: null,
+                trailer_info: null
+            }
 
-                if ((driver?.first_name || '').trim() !== '') {
+            if ((driver?.agent_id || 0) === 0) {
+                driver.agent_id = selectedAgent.id;
+            }
 
-                    axios.post(props.serverUrl + '/saveAgentDriver', driver).then(res => {
-                        if (res.data.result === 'OK') {
-                            setSelectedAgent(selectedAgent => {
+            if ((driver?.name || '') !== '') {
+
+                let first_name = driver.name.split(' ')[0].trim();
+                let last_name = driver.name.substring(first_name.length).trim();
+
+                driver.first_name = first_name;
+                driver.last_name = last_name;
+
+                axios.post(props.serverUrl + `/saveDriver`, { ...driver, sub_origin: 'agent' }).then(res => {
+                    if (res.data.result === 'OK') {
+                        if (res.data.driver) {
+                            setSelectedDriver({});
+
+                            setSelectedAgent(prev => {
                                 return {
-                                    ...selectedAgent,
-                                    drivers: res.data.drivers
+                                    ...prev,
+                                    drivers: (res.data.drivers || []).filter(x => x.owner_type === 'agent')
                                 }
                             });
 
-                            setSelectedDriver(selectedDriver => {
-                                return {
-                                    ...selectedDriver,
-                                    id: res.data.driver.id
-                                }
-                            });
+                            refDriverName.current.focus();
                         }
-
                         setIsSavingDriver(false);
-                    }).catch(e => {
-                        console.log('error on saving agent driver', e);
+                    } else {
                         setIsSavingDriver(false);
-                    });
-                } else {
+                    }
+                }).catch(e => {
+                    console.log('erros saving agent driver', e);
                     setIsSavingDriver(false);
-                }
+                })
+            } else {
+                refAddedDate.current.inputElement.focus();
             }
+
+            setIsSavingDriver(false);
         }
     }, [isSavingDriver])
 
@@ -1335,6 +1373,167 @@ const Agents = (props) => {
         }
     }
 
+    const searchDriverInfoByCode = () => {
+        if ((selectedDriver?.code || '') !== '') {
+            axios.post(props.serverUrl + `/getDriverByCode`, {
+                code: selectedDriver.code
+            }).then(res => {
+                if (res.data.result === 'OK') {
+
+                    setSelectedDriver({ ...res.data.driver });
+
+                    refDriverName.current.focus();
+                }
+            }).catch(e => {
+                console.log('error getting driver by code', e);
+            })
+        }
+    };
+
+    const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
+    }
+
+    const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+    }
+    
     return (
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
@@ -2953,7 +3152,7 @@ const Agents = (props) => {
 
                     <div className="select-box-container">
                         <div className="select-box-wrapper">
-                            <MaskedInput tabIndex={39 + props.tabTimes}
+                            <MaskedInput tabIndex={42 + props.tabTimes}
                                 mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                 guide={false}
                                 type="text" placeholder="Added Date"
@@ -3144,7 +3343,7 @@ const Agents = (props) => {
 
                     <div className="select-box-container">
                         <div className="select-box-wrapper">
-                            <MaskedInput tabIndex={40 + props.tabTimes}
+                            <MaskedInput tabIndex={43 + props.tabTimes}
                                 mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                 guide={false}
                                 type="text" placeholder="Termination Date"
@@ -3334,7 +3533,7 @@ const Agents = (props) => {
                     </div>
 
                     <div className="input-box-container">
-                        <input tabIndex={41 + props.tabTimes} type="text" placeholder="Regional Manager"
+                        <input tabIndex={44 + props.tabTimes} type="text" placeholder="Regional Manager"
                             onInput={(e) => {
                                 setSelectedAgent(selectedAgent => {
                                     return {
@@ -3359,7 +3558,7 @@ const Agents = (props) => {
                             <input
                                 type="text"
                                 readOnly={!props.isAdmin}
-                                tabIndex={42 + props.tabTimes}
+                                tabIndex={45 + props.tabTimes}
                                 placeholder="Division"
                                 ref={refDivision}
                                 onKeyDown={async (e) => {
@@ -3745,7 +3944,7 @@ const Agents = (props) => {
                     </div>
 
                     <div className="input-box-container">
-                        <input tabIndex={43 + props.tabTimes} type="text" placeholder="FID"
+                        <input tabIndex={46 + props.tabTimes} type="text" placeholder="FID"
                             onKeyDown={(e) => {
                                 let key = e.keyCode || e.which;
 
@@ -3843,8 +4042,8 @@ const Agents = (props) => {
                                             removeAvatarUrl='/removeDivisioContactAvatar'
                                             origin={props.origin}
                                             owner='agent'
-                                            openPanel={props.openPanel}
-                                            closePanel={props.closePanel}
+                                            
+                                            
                                             componentId={moment().format('x')}
 
                                             contactSearchCustomer={{
@@ -3864,7 +4063,7 @@ const Agents = (props) => {
                                         />
                                     }
 
-                                    props.openPanel(panel, props.origin);
+                                    openPanel(panel, props.origin);
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">More</div>
@@ -3888,8 +4087,8 @@ const Agents = (props) => {
                                             removeAvatarUrl='/removeDivisioContactAvatar'
                                             origin={props.origin}
                                             owner='agent'
-                                            openPanel={props.openPanel}
-                                            closePanel={props.closePanel}
+                                            
+                                            
                                             componentId={moment().format('x')}
                                             isEditingContact={true}
 
@@ -3904,7 +4103,7 @@ const Agents = (props) => {
                                         />
                                     }
 
-                                    props.openPanel(panel, props.origin);
+                                    openPanel(panel, props.origin);
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Add Contact</div>
@@ -4874,8 +5073,8 @@ const Agents = (props) => {
                                                                     removeAvatarUrl='/removeAvatar'
                                                                     origin={props.origin}
                                                                     owner='agent'
-                                                                    openPanel={props.openPanel}
-                                                                    closePanel={props.closePanel}
+                                                                    
+                                                                    
                                                                     componentId={moment().format('x')}
 
                                                                     contactSearchCustomer={{
@@ -4885,7 +5084,7 @@ const Agents = (props) => {
                                                                 />
                                                             }
 
-                                                            props.openPanel(panel, props.origin);
+                                                            openPanel(panel, props.origin);
                                                         }} onClick={() => setSelectedContact(contact)}>
                                                         <div
                                                             className="contact-list-col tcol first-name" style={{
@@ -5048,7 +5247,156 @@ const Agents = (props) => {
                 </div>
 
                 {/* DRIVERS FORM */}
-                <div className="form-bordered-box">
+                <MainForm
+                    formTitle={`Driver Information`}
+                    formButtons={[
+                        {
+                            title: "More",
+                            onClick: () => {
+                                if ((selectedAgent?.id || 0) === 0) {
+                                    window.alert('You must select a agent first!');
+                                    return;
+                                }
+
+                                if ((selectedDriver?.id || 0) === 0) {
+                                    window.alert('You must select a driver first!');
+                                    return;
+                                }
+
+                                let panel = {
+                                    panelName: `${props.panelName}-agent-drivers`,
+                                    component: <CompanyDrivers
+                                        title='Agent Driver'
+                                        tabTimes={322500 + props.tabTimes}
+                                        panelName={`${props.panelName}-agent-drivers`}
+                                        savingDriverUrl='/saveDriver'
+                                        deletingDriverUrl='/deleteDriver'
+                                        uploadAvatarUrl='/uploadDriverAvatar'
+                                        removeAvatarUrl='/removeDriverAvatar'
+                                        origin={props.origin}
+                                        subOrigin='agent'
+                                        owner='agent'
+                                        isEditingDriver={true}
+                                        
+                                        
+                                        componentId={moment().format('x')}
+                                        selectedDriverId={selectedDriver.id}
+                                        selectedParent={selectedAgent}
+
+                                        driverSearchAgent={{
+                                            ...selectedAgent,
+                                            selectedDriver: { id: 0, agent_id: selectedAgent?.id }
+                                        }}
+                                    />
+                                }
+
+                                openPanel(panel, props.origin);
+                            },
+                            isEnabled: true,
+                        },
+                        {
+                            title: "Add Driver",
+                            onClick: () => {
+                                if ((selectedAgent?.id || 0) === 0) {
+                                    window.alert('You must select a agent first!');
+                                    return;
+                                }
+
+                                let panel = {
+                                    panelName: `${props.panelName}-agent-drivers`,
+                                    component: <CompanyDrivers
+                                        title='Agent Driver'
+                                        tabTimes={322500 + props.tabTimes}
+                                        panelName={`${props.panelName}-agent-drivers`}
+                                        savingDriverUrl='/saveDriver'
+                                        deletingDriverUrl='/deleteDriver'
+                                        uploadAvatarUrl='/uploadDriverAvatar'
+                                        removeAvatarUrl='/removeDriverAvatar'
+                                        origin={props.origin}
+                                        subOrigin='agent'
+                                        owner='agent'
+                                        isEditingDriver={true}
+                                        
+                                        
+                                        componentId={moment().format('x')}
+                                        selectedParent={selectedAgent}
+
+                                        driverSearchAgent={{
+                                            ...selectedAgent,
+                                            selectedDriver: { id: 0, agent_id: selectedAgent?.id }
+                                        }}
+                                    />
+                                }
+
+                                openPanel(panel, props.origin);
+                            },
+                            isEnabled: true,
+                        },
+                        {
+                            title: "Delete",
+                            onClick: () => {
+                                if (window.confirm("Are you sure you want to proceed?")) {
+
+                                    axios.post(props.serverUrl + '/deleteDriver', {
+                                        id: selectedDriver.id,
+                                        sub_origin: 'agent'
+                                    }).then(res => {
+                                        if (res.data.result === 'OK') {
+                                            setSelectedAgent(prev => {
+                                                return {
+                                                    ...prev,
+                                                    drivers: (res.data.drivers || []).filter(x => x.owner_type === 'agent')
+                                                }
+                                            });
+
+                                            setSelectedDriver({});
+                                            refDriverCode.current.focus();
+                                        }
+                                    }).catch(e => {
+                                        console.log('error deleting driver');
+                                    });
+                                }
+                            },
+                            isEnabled: (selectedDriver?.id || 0) > 0,
+                        },
+                        {
+                            title: "Clear",
+                            onClick: () => {
+                                setSelectedDriver({});
+                                refDriverCode.current.focus();
+                            },
+                            isEnabled: true,
+                        },
+                    ]}
+                    refs={{
+                        refCode: refDriverCode,
+                        refName: refDriverName,
+                        refEmail: refDriverEmail
+                    }}
+                    tabTimesFrom={30}
+                    tabTimes={props.tabTimes}
+                    searchByCode={searchDriverInfoByCode}
+                    validateForSaving={validateDriverForSaving}
+                    selectedParent={selectedDriver}
+                    setSelectedParent={setSelectedDriver}
+                    fields={[
+                        'code',
+                        'name',
+                        'address1',
+                        'address2',
+                        'city',
+                        'state',
+                        'zip',
+                        'contact',
+                        'phone',
+                        'ext',
+                        'email',
+                        'notes',
+                        'email_driver_btn'
+                    ]}
+                    triggerFields={['notes']}
+                />
+                {/* <div className="form-bordered-box">
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
                         <div className="form-title">Driver Information</div>
@@ -5087,7 +5435,7 @@ const Agents = (props) => {
                                             setSelectedDriver({});
                                         }
                                     }).catch(e => {
-                                        console.log('error deleting carrier driver', e);
+                                        console.log('error deleting agent driver', e);
                                     });
                                 }
                             }}>
@@ -5682,7 +6030,7 @@ const Agents = (props) => {
 
                                                     setIsSavingDriver(false);
                                                 }).catch(e => {
-                                                    console.log('error on saving carrier driver', e);
+                                                    console.log('error on saving agent driver', e);
                                                     setIsSavingDriver(false);
                                                 });
                                             } else {
@@ -5736,7 +6084,7 @@ const Agents = (props) => {
                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="fields-container-col" style={{
                     display: 'grid',
@@ -5766,7 +6114,7 @@ const Agents = (props) => {
                                     whiteSpace: 'nowrap'
                                 }}>Agent Pay Brokerage
                                 </div>
-                                <input tabIndex={44 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                <input tabIndex={47 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
                                     onKeyDown={(e) => {
                                         let key = e.keyCode || e.which;
 
@@ -5802,7 +6150,7 @@ const Agents = (props) => {
                                     whiteSpace: 'nowrap'
                                 }}>Agent Pay ET3
                                 </div>
-                                <input tabIndex={44 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                <input tabIndex={48 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
                                     onKeyDown={(e) => {
                                         let key = e.keyCode || e.which;
 
@@ -5838,7 +6186,7 @@ const Agents = (props) => {
                                     whiteSpace: 'nowrap'
                                 }}>Agent Pay Outside Broker
                                 </div>
-                                <input tabIndex={44 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                <input tabIndex={49 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
                                     onKeyDown={(e) => {
                                         let key = e.keyCode || e.which;
 
@@ -5874,7 +6222,7 @@ const Agents = (props) => {
                                     whiteSpace: 'nowrap'
                                 }}>Agent Pay Company Trucks
                                 </div>
-                                <input tabIndex={45 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
+                                <input tabIndex={50 + props.tabTimes} type="number" min={0} style={{ textAlign: 'right' }}
                                     onKeyDown={(e) => {
                                         let key = e.keyCode || e.which;
 
@@ -5913,7 +6261,7 @@ const Agents = (props) => {
                                     whiteSpace: 'nowrap'
                                 }}>Agent Pay Own Trucks
                                 </div>
-                                <input tabIndex={46 + props.tabTimes} type="number" min={3} style={{ textAlign: 'right' }}
+                                <input tabIndex={51 + props.tabTimes} type="number" min={3} style={{ textAlign: 'right' }}
                                     readOnly={(selectedAgent?.agent_own_units || 0) === 0}
                                     onKeyDown={(e) => {
                                         let key = e.keyCode || e.which;
@@ -5968,7 +6316,7 @@ const Agents = (props) => {
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
 
                 <div></div>
@@ -6062,10 +6410,41 @@ const Agents = (props) => {
                             {
                                 (selectedAgent.drivers || []).map((driver, index) => {
                                     return (
-                                        <div className="drivers-list-item" key={index} onClick={() => {
+                                        <div className="drivers-list-item" key={index} 
+                                        onDoubleClick={async () => {
+                                            let panel = {
+                                                panelName: `${props.panelName}-agent-drivers`,
+                                                component: <CompanyDrivers
+                                                    title='Agent Driver'
+                                                    tabTimes={322500 + props.tabTimes}
+                                                    panelName={`${props.panelName}-agent-drivers`}
+                                                    savingDriverUrl='/saveDriver'
+                                                    deletingDriverUrl='/deleteDriver'
+                                                    uploadAvatarUrl='/uploadDriverAvatar'
+                                                    removeAvatarUrl='/removeDriverAvatar'
+                                                    origin={props.origin}
+                                                    subOrigin='agent'
+                                                    owner='agent'
+                                                    isEditingDriver={true}
+                                                    
+                                                    
+                                                    componentId={moment().format('x')}
+                                                    selectedDriverId={driver.id}
+                                                    selectedParent={selectedAgent}
+
+                                                    driverSearchAgent={{
+                                                        ...selectedAgent,
+                                                        selectedDriver: { id: 0, carrier_id: selectedAgent?.id }
+                                                    }}
+                                                />
+                                            }
+
+                                            openPanel(panel, props.origin);
+                                        }}
+                                        onClick={() => {
                                             if ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.save || 0) === 1 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'agent drivers')?.pivot?.edit || 0) === 1)) {
+                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 1)) {
                                                 setSelectedDriver({ ...driver });
                                                 refDriverName.current.focus();
                                             }
@@ -6073,8 +6452,28 @@ const Agents = (props) => {
                                             <div
                                                 className="driver-list-col tcol first-name">{driver.first_name || ''}</div>
                                             <div className="driver-list-col tcol last-name">{driver.last_name || ''}</div>
-                                            <div className="driver-list-col tcol phone">{driver.phone || ''}</div>
-                                            <div className="driver-list-col tcol email">{driver.email || ''}</div>
+                                            <div className="driver-list-col tcol phone">{
+                                                ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'work'
+                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_work || ''
+                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'fax'
+                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_work_fax || ''
+                                                        : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'mobile'
+                                                            ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_mobile || ''
+                                                            : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'direct'
+                                                                ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_direct || ''
+                                                                : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_phone || '') === 'other'
+                                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.phone_other || ''
+                                                                    : (driver?.contact_phone || '')
+                                            }</div>
+                                            <div className="driver-list-col tcol email">{
+                                                ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'work'
+                                                ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_work || ''
+                                                : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'personal'
+                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_personal || ''
+                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'other'
+                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_other || ''
+                                                        : (driver?.email || '')
+                                            }</div>
                                             {
                                                 (driver.id === (selectedDriver?.id || 0)) &&
                                                 <div className="driver-list-col tcol driver-selected">
@@ -6113,15 +6512,15 @@ const Agents = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-                                                    openPanel={props.openPanel}
-                                                    closePanel={props.closePanel}
+                                                    
+                                                    
                                                     componentId={moment().format('x')}
 
                                                     order_id={order.id}
                                                 />
                                             }
 
-                                            props.openPanel(panel, props.origin);
+                                            openPanel(panel, props.origin);
                                         }}>
                                             <span style={{
                                                 color: "#4682B4",
@@ -6191,18 +6590,46 @@ const mapStateToProps = (state) => {
     return {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
-        user: state.systemReducers.user
+        user: state.systemReducers.user,
+
+        adminHomePanels: state.adminReducers.adminHomePanels,
+companyHomePanels: state.companyReducers.companyHomePanels,
+adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+adminReportPanels: state.reportReducers.adminReportPanels,
+companyReportPanels: state.reportReducers.companyReportPanels,
+
     }
 }
 
 export default connect(mapStateToProps, {
-    setCompanyOpenedPanels,
-    setDispatchOpenedPanels,
-    setCarrierOpenedPanels,
-    setLoadBoardOpenedPanels,
-    setInvoiceOpenedPanels,
-    setAdminCarrierOpenedPanels,
-    setCompanySetupOpenedPanels,
+    setAdminHomePanels,
+setCompanyHomePanels,
+setAdminCarrierPanels,
+setCompanyCarrierPanels,
+setAdminCompanySetupPanels,
+setCompanyCompanySetupPanels,
+setAdminCustomerPanels,
+setCompanyCustomerPanels,
+setAdminDispatchPanels,
+setCompanyDispatchPanels,
+setAdminInvoicePanels,
+setCompanyInvoicePanels,
+setAdminLoadBoardPanels,
+setCompanyLoadBoardPanels,
+setAdminReportPanels,
+setCompanyReportPanels,
+
     setSelectedCompany,
     setSelectedDriver
 })(Agents)

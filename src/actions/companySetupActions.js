@@ -28,6 +28,13 @@ export const setSelectedAgent = agent => {
     }
 }
 
+export const setSelectedAgentDriver = driver => {
+    return {
+        type: companySetupConstants.SET_SELECTED_AGENT_DRIVER,
+        payload: driver
+    }
+}
+
 export const setSelectedCompanyDriver = driver => {
     return {
         type: companySetupConstants.SET_SELECTED_COMPANY_DRIVER,
@@ -60,5 +67,19 @@ export const setSelectedOwnerOperator = ownerOperator => {
     return {
         type: companySetupConstants.SET_SELECTED_OWNER_OPERATOR,
         payload: ownerOperator
+    }
+}
+
+export const setAdminCompanySetupPanels = panels => {
+    return {
+        type: companySetupConstants.SET_ADMIN_COMPANY_SETUP_PANELS,
+        payload: panels
+    }
+}
+
+export const setCompanyCompanySetupPanels = panels => {
+    return {
+        type: companySetupConstants.SET_COMPANY_COMPANY_SETUP_PANELS,
+        payload: panels
     }
 }

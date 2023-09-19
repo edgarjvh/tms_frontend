@@ -228,7 +228,7 @@ export default class ToPrint extends Component {
                                                                             key={_index}
                                                                             style={{
                                                                                 fontWeight: _index % 2 === 0 ? 'bold' : 'normal',
-                                                                                marginLeft: _index === 0 ? 0 : 5
+                                                                                marginLeft: _index === 0 ? 0 : ((_item || '') === '' ? 0 : 5)
                                                                             }}
                                                                         >
                                                                             {_item}

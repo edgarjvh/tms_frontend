@@ -18,7 +18,8 @@ export const adminReducers = (state = {
     reportsScreenFocused: false,
     setupCompanyScreenFocused: false,
     invoiceScreenFocused: false,
-    adminOpenedPanels: []
+    adminOpenedPanels: [],
+    adminHomePanels: []
 }, action) => {
     switch (action.type) {
         case adminConstants.SET_ADMIN_OPENED_PANELS:
@@ -123,6 +124,12 @@ export const adminReducers = (state = {
                 carrierScreenFocused: action.payload ? false : state.carrierScreenFocused,
                 reportsScreenFocused: action.payload ? false : state.reportsScreenFocused,
                 setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
+            }
+            break;
+            case adminConstants.SET_ADMIN_HOME_PANELS:
+            state = {
+                ...state,
+                adminHomePanels: action.payload
             }
             break;
         default:

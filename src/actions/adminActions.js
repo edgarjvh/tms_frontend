@@ -70,3 +70,10 @@ export const setSetupCompanyScreenFocused = bool => {
         payload: bool
     }
 }
+
+export const setAdminHomePanels = bool => {
+    return {
+        type: adminConstants.SET_ADMIN_HOME_PANELS,
+        payload: bool
+    }
+}

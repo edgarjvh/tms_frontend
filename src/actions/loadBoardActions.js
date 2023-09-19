@@ -6,3 +6,17 @@ export const setLoadBoardOpenedPanels = panels => {
         payload: panels
     }
 }
+
+export const setAdminLoadBoardPanels = panels => {
+    return {
+        type: loadBoardConstants.SET_ADMIN_LOAD_BOARD_PANELS,
+        payload: panels
+    }
+}
+
+export const setCompanyLoadBoardPanels = panels => {
+    return {
+        type: loadBoardConstants.SET_COMPANY_LOAD_BOARD_PANELS,
+        payload: panels
+    }
+}

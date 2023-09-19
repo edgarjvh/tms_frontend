@@ -125,12 +125,6 @@ export const setAdminSelectedCustomer = customer => {
         payload: customer
     }
 }
-export const setAdminCustomerPanels = panels => {
-    return {
-        type: customersConstants.SET_ADMIN_CUSTOMER_PANELS,
-        payload: panels
-    }
-}
 export const setAdminSelectedContact = contact => {
     return {
         type: customersConstants.SET_ADMIN_SELECTED_CONTACT,
@@ -1278,6 +1272,18 @@ export const setCustomerOpenedPanels = panels => {
 export const setAdminCustomerOpenedPanels = panels => {
     return {
         type: customersConstants.SET_ADMIN_CUSTOMER_OPENED_PANELS,
+        payload: panels
+    }
+}
+export const setAdminCustomerPanels = panels => {
+    return {
+        type: customersConstants.SET_ADMIN_CUSTOMER_PANELS,
+        payload: panels
+    }
+}
+export const setCompanyCustomerPanels = panels => {
+    return {
+        type: customersConstants.SET_COMPANY_CUSTOMER_PANELS,
         payload: panels
     }
 }

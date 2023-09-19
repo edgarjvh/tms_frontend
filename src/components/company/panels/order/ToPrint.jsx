@@ -8,6 +8,7 @@ import { Invoice } from "../../index";
 export default class ToPrint extends Component {
     constructor(props) {
         super(props)
+        
     }
 
     styleFlexRow = {
@@ -730,7 +731,7 @@ export default class ToPrint extends Component {
                                                                                                 : (pickup?.contact_primary_phone || 'work') === 'other'
                                                                                                     ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                                     : ''
-                                                                                : (pickup?.contact_phone || '')
+                                                                                : (customer?.contact_phone || '')
                                                                         : (route?.type || '') === 'delivery'
                                                                             ? (delivery?.contact_id || 0) > 0
                                                                                 ? (delivery?.contact_primary_phone || 'work') === 'work'
@@ -756,7 +757,7 @@ export default class ToPrint extends Component {
                                                                                                     : (delivery?.contact_primary_phone || 'work') === 'other'
                                                                                                         ? (customer.contacts.find(x => x.is_primary === 1)?.phone_other || '')
                                                                                                         : ''
-                                                                                    : (delivery?.contact_phone || '')
+                                                                                    : (customer?.contact_phone || '')
                                                                             : ''
 
                                                                 }
@@ -775,7 +776,7 @@ export default class ToPrint extends Component {
                                                                             : (customer?.contacts || []).find(x => x.is_primary === 1)
                                                                                 ? (((customer?.contacts || []).find(x => x.is_primary === 1)?.first_name || '') + ' ' +
                                                                                     ((customer?.contacts || []).find(x => x.is_primary === 1)?.last_name || '')).trim()
-                                                                                : (pickup?.contact_name || '')
+                                                                                : (customer?.contact_name || '')
                                                                         : (route?.type || '') === 'delivery'
                                                                             ? (delivery?.contact_id || 0) > 0
                                                                                 ? (((customer?.contacts || []).find(x => x.id === delivery.contact_id)?.first_name || '') + ' ' +
@@ -783,7 +784,7 @@ export default class ToPrint extends Component {
                                                                                 : (customer?.contacts || []).find(x => x.is_primary === 1)
                                                                                     ? (((customer?.contacts || []).find(x => x.is_primary === 1)?.first_name || '') + ' ' +
                                                                                         ((customer?.contacts || []).find(x => x.is_primary === 1)?.last_name || '')).trim()
-                                                                                    : (delivery?.contact_name || '')
+                                                                                    : (customer?.contact_name || '')
                                                                             : ''
 
                                                                 }

@@ -471,7 +471,7 @@ export default class ToPrint extends Component {
                                 <div style={{ ...this.styleFieldData, ...this.styleFlexRow, padding: 10, alignItems: 'center', justifyContent: 'space-evenly' }}>
                                     <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">Prepaid</label><input type="checkbox" /></div>
                                     <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">Collect</label><input type="checkbox" /></div>
-                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">3rd Party</label><input type="checkbox" /></div>
+                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">3rd Party</label><input type="checkbox" checked={(this.props.selectedCompany?.mailing_address?.id || 0) > 0} /></div>
                                 </div>
                                 <div style={{
 
